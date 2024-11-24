@@ -3,6 +3,7 @@
      fluffychat
      thunderbird
      qq
+     telegram-desktop
   ];
   nixpkgs.config.permittedInsecurePackages = [
     "fluffychat-linux-1.20.0"

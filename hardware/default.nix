@@ -8,14 +8,12 @@
    (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
-  boot.initrd.availableKernelModules = [ "xhci_pci" "thunderbolt" "nvme" "usb_storage" "usbhid" "sd_mod" "rtsx_pci_sdmmc" ];
-  boot.initrd.kernelModules = [ ];
-  # boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.kernelModules = [ "kvm-intel"];
-  # boot.extraModulePackages = with config.boot.kernelPackages; [ rtl8812au ];
-  # boot.blacklistedKernelModules = lib.mkDefault [ "i915" ];
-  # KMS will load the module, regardless of blacklisting
-  boot.kernelParams = lib.mkDefault [ "i915.modeset=0" ];
+  boot = {
+    initrd.availableKernelModules = [ "xhci_pci" "thunderbolt" "nvme" "usb_storage" "usbhid" "sd_mod" "rtsx_pci_sdmmc" ];
+    initrd.kernelModules = [ ];
+    kernelModules = [ "kvm-intel"];
+    kernelParams = [ "i915.enable_psr=0" "i8042.dumbkbd" ];
+  };
 
   hardware.bluetooth = {
     enable = true;
@@ -26,7 +24,7 @@
       };
     };
   };
-  
+  services.blueman.enable = true;
   hardware.enableAllFirmware = true;
   hardware.enableRedistributableFirmware = true;
   fileSystems."/" =

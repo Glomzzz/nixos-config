@@ -5,6 +5,7 @@
       curl
       git
       google-chrome
+      v2raya
   ];
   
 }

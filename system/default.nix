@@ -5,8 +5,14 @@
     ./audio.nix
     ./network.nix
     ./font.nix
+    ./boot.nix
   ];
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+
+
   services.printing.enable = true;
+
+  services.asusd = {
+      enable = true;
+      enableUserService = true;
+};
 }

@@ -8,6 +8,7 @@
     ./network.nix
     ./shell.nix
     ./social.nix
+    ./util.nix
   ];
   nixpkgs.config.allowUnfree = true;
 }
