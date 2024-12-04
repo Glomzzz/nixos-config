@@ -1,9 +1,7 @@
-{pkgs,...} : let
-  nix-alien = import (
-    builtins.fetchTarball "https://github.com/thiagokokada/nix-alien/tarball/master"
-  ) { }.nix-alien;
-in {
-    environment.systemPackages = with pkgs; [
+{pkgs,inputs,system,...} : {
+    environment.systemPackages = let
+      nix-alien = inputs.nix-alien-source.${system}.nix-alien;
+    in with pkgs; [
       vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
       wget
       curl
@@ -21,6 +19,6 @@ in {
       just
       ripgrep
       wine
-      nix-alien
+      ix-alien
   ];
 }

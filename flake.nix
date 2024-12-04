@@ -7,7 +7,7 @@
       url = "github:nix-community/home-manager/release-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
+    nix-alien-source.url = "github:thiagokokada/nix-alien";
   };
 
   outputs = inputs@{ nixpkgs, home-manager, ... }: {
@@ -17,10 +17,11 @@
             system = "x86_64-linux";
             hostname = "nixos";
             username = "glom";
-            specialArgs = {inherit hostname; inherit username; inherit system;};
+            specialArgs = {inherit hostname; inherit username; inherit system; inherit inputs;};
         in nixpkgs.lib.nixosSystem {
             inherit specialArgs;
             inherit system;
+            
             modules = [
               ./hosts/nixos
               ./users/${username}
