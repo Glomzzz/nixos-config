@@ -7,9 +7,9 @@
 
   imports = [
     ../../home/core.nix 
-
     ../../home/fcitx5
     ../../home/programs
+    ../../home/shell
   ];
 
   home.packages = with pkgs; [
