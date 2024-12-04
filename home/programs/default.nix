@@ -6,6 +6,5 @@
     ./media.nix
     ./util.nix
     ./xdg.nix
-    ./alien.nix
   ];
 }
