@@ -1,4 +1,9 @@
 {username,lib, ...}: {
+  imports = [
+    ./fcitx5
+    ./programs
+    ./shell
+  ];
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
   home = {

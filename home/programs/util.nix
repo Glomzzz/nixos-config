@@ -1,9 +1,6 @@
-{pkgs,system, nix-alien-source,...} : {
-    home.packages = let
-      nix-alien = nix-alien-source.packages.${system}.nix-alien;
-    in with pkgs; [
+{pkgs,system,...} : {
+    home.packages = with pkgs; [
      usbutils
      yq-go # https://github.com/mikefarah/yq
-     nix-alien
   ];
 }

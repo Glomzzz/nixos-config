@@ -7,11 +7,11 @@
       url = "github:nix-community/home-manager/release-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    catppuccin-bat = {
-      url = "github:catppuccin/bat";
-      flake = false;
+    plasma-manager = {
+      url = "github:nix-community/plasma-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
     };
-    nix-alien-source.url = "github:thiagokokada/nix-alien";
   };
 
   outputs = inputs@{ nixpkgs, home-manager, ... }: {
