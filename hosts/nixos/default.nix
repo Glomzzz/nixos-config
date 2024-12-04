@@ -1,5 +1,5 @@
 
-{ config, pkgs,lib,username,hostname,inputs ... }:
+{ config, pkgs,lib,username,hostname, ... }:
 {
   imports =
     [ 

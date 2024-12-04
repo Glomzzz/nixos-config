@@ -1,6 +1,6 @@
 {pkgs,inputs,system,...} : {
     environment.systemPackages = let
-      nix-alien = inputs.nix-alien-source.${system}.nix-alien;
+      nix-alien = inputs.nix-alien-source.packages.${system}.nix-alien;
     in with pkgs; [
       vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
       wget
@@ -19,6 +19,6 @@
       just
       ripgrep
       wine
-      ix-alien
+      nix-alien
   ];
 }
