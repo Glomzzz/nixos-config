@@ -12,6 +12,7 @@
       url = "github:catppuccin/bat";
       flake = false;
     };
+    nix-alien.url = "github:thiagokokada/nix-alien";
   };
 
   outputs = inputs@{ nixpkgs, home-manager, ... }: {

@@ -2,6 +2,7 @@
   lib,
   pkgs,
   catppuccin-bat,
+  nix-alien,
   ...
 }: {
   home.packages = with pkgs; [
@@ -18,6 +19,7 @@
     dbeaver-bin
     mycli
     pgcli
+    nix-alien
   ];
 
   programs = {
