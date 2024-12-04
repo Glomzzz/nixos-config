@@ -3,7 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/";
-    helix.url = "github:helix-editor/helix/master";
     home-manager = {
       url = "github:nix-community/home-manager/release-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -12,19 +11,20 @@
       url = "github:catppuccin/bat";
       flake = false;
     };
-    nix-alien.url = "github:thiagokokada/nix-alien";
+    nix-alien-source.url = "github:thiagokokada/nix-alien";
   };
 
   outputs = inputs@{ nixpkgs, home-manager, ... }: {
     nixosConfigurations = {
       nixos = 
         let 
+            system = "x86_64-linux";
             hostname = "nixos";
             username = "glom";
-            specialArgs = {inherit hostname; inherit username;};
+            specialArgs = {inherit hostname; inherit username; inherit system;};
         in nixpkgs.lib.nixosSystem {
             inherit specialArgs;
-            system = "x86_64-linux";
+            inherit system;
             modules = [
               ./hosts/nixos
               ./users/${username}
@@ -33,7 +33,7 @@
                 home-manager.useUserPackages = true;
 
                 home-manager.users.glom = import ./users/${username}/home.nix;
-                home-manager.extraSpecialArgs = inputs // {inherit username;};
+                home-manager.extraSpecialArgs = inputs // specialArgs;
               }
             ];
           };
