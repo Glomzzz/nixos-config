@@ -8,6 +8,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-alien-source.url = "github:thiagokokada/nix-alien";
+    plasma-manager = {
+      url = "github:nix-community/plasma-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
   };
 
   outputs = inputs@{ nixpkgs, home-manager, ... }: {
@@ -21,7 +26,6 @@
         in nixpkgs.lib.nixosSystem {
             inherit specialArgs;
             inherit system;
-            
             modules = [
               ./hosts/nixos
               ./users/${username}
