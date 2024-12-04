@@ -21,5 +21,6 @@ in {
       just
       ripgrep
       wine
+      nix-alien
   ];
 }
