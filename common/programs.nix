@@ -16,6 +16,5 @@
     p7zip
     just
     ripgrep
-    direnv
   ];
 }
