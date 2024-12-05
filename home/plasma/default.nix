@@ -292,20 +292,49 @@
     };
     panels = [
       {
-        location = "bottom";
+        location = "top";
         alignment = "center";
         floating = false;
-        height = 40;
+        height = 22;
         hiding = "normalpanel";
         lengthMode = "fill";
         # share/plasma/plasmoids
         widgets = [
+          "org.kde.plasma.marginsseparator"
+          {
+            kickoff = {
+              icon = "nix-snowflake";
+            };
+          }
+          "org.kde.plasma.marginsseparator"
+          {
+            name = "com.dv.uswitcher";
+            config = {
+              General = {
+                icon = "~/nixos/assets/glom.jpg";
+                showFace=true;
+              };
+            };
+          }
+          "org.kde.plasma.marginsseparator"
+          "org.kde.plasma.showdesktop"
+          {
+            name = "org.kde.windowtitle.Fork";
+            config = {
+              General = {
+                spacing = 10;
+                lengthFirstMargin = 5;
+                lengthLastMargin = 5;
+              };
+            };
+          }
+          "org.kde.plasma.panelspacer"
           {
             digitalClock = {
               date = {
                 enable = true;
                 format = "isoDate";
-                position = "belowTime";
+                position = "besideTime";
               };
               time = {
                 showSeconds = "never";
@@ -325,41 +354,33 @@
               };
             };
           }
-          # idk why this leads to a kde crash
           # {
-          #   systemMonitor =  {
-          #       displayStyle = "piechart";
-          #       sensors = [
-          #         {
-          #           name = "cpu/all/averageTemperature";
-          #           color = "61,145,233";
-          #           label = "CPU Temperature";
-          #         }
-          #         {
-          #           name = "gpu/gpu1/temperature";
-          #           color = "233,163,61";
-          #           label = "GPU Temperature";
-          #         }
-          #       ];
+          #   name = "org.kde.plasma.weather";
+          #   config = {
+          #     General = {
+          #       Units = "{pressureUnit: 5007,speedUnit:9000,temperatureUnit:6001,visibilityUnit:2007}";
+          #       WeatherStation = "{ source : \"bbcukmet|weather|Kuala Lumpur, Malaysia, MY|1735161\" }";
+          #     };
           #   };
           # }
           "org.kde.plasma.panelspacer"
-          "org.kde.plasma.kickoff"
           {
-            iconTasks = {
-              launchers = [
-                "applications:systemsettings.desktop"
-                "applications:org.kde.dolphin.desktop"
-                "applications:microsoft-edge.desktop"
-                "applications:code.desktop"
-              ];
+            name = "org.kde.olib.thermalmonitor";
+            config = {
+              General = {
+                sensors = [
+                  "{\"name\":\"CPU Temperature\",\"sensorId\":\"cpu/all/averageTemperature\"}"
+                  "{\"name\":\"GPU Temperature\",\"sensorId\":\"gpu/gpu1/temperature\"}"
+                ];
+              };
             };
           }
-          "org.kde.plasma.panelspacer"
+          "org.kde.netspeedWidget"
           {
             systemTray.items = {
               shown = [
                 "org.kde.plasma.clipboard"
+                "org.kde.plasma.manage-inputmethod"
                 "org.kde.plasma.volume"
                 "org.kde.plasma.bluetooth"
                 "org.kde.plasma.networkmanagement"
@@ -374,8 +395,40 @@
               ];
             };
           }
-          "org.kde.plasma.notifications"
           "org.kde.plasma.showdesktop"
+        ];
+      }
+      {
+        location = "bottom";
+        alignment = "center";
+        floating = true;
+        height = 40;
+        hiding = "dodgewindows";
+        lengthMode = "fit";
+        widgets = [
+          {
+            iconTasks = {
+              launchers = [
+                "applications:org.kde.dolphin.desktop"
+                "applications:microsoft-edge.desktop"
+                "applications:code.desktop"
+              ];
+            };
+          }
+          {
+            plasmaPanelColorizer = {
+              general = {
+                enable = true;
+                hideWidget = false;
+              };
+              
+              widgetBackground = {
+                shape = {
+                  radius = 12;
+                };
+              };
+            };
+          }
         ];
       }
     ];
