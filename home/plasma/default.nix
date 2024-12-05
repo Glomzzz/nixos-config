@@ -1,4 +1,4 @@
-{plasma-manager,...} : {
+{pkgs,plasma-manager,...} : {
   imports = [
     plasma-manager.homeManagerModules.plasma-manager
   ];
@@ -287,6 +287,93 @@
       "plasma-localerc"."Formats"."LC_TIME" = "C";
       "plasmarc"."Wallpapers"."usersWallpapers" = "";
     };
-
+    panels = [
+      {
+        location = "bottom";
+        alignment = "center";
+        floating = false;
+        height = 40;
+        hiding = "normalpanel";
+        lengthMode = "fill";
+        # share/plasma/plasmoids
+        widgets = [
+          {
+            digitalClock = {
+              date = {
+                enable = true;
+                format = "isoDate";
+                position = "belowTime";
+              };
+              time = {
+                showSeconds = "never";
+                format = "12h";
+              };
+              timeZone = { 
+                selected = ["Asia/Singapore"];
+              };
+              calendar = {
+                firstDayOfWeek = "sunday";
+                plugins = [
+                  "holidaysevents"
+                  "alternatecalendar"
+                  "astronomicalevents"
+                ];
+                showWeekNumbers = true;
+              };
+            };
+          }
+          # {
+          #   systemMonitor =  {
+          #       displayStyle = "piechart";
+          #       sensors = [
+          #         {
+          #           name = "cpu/all/averageTemperature";
+          #           color = "61,145,233";
+          #           label = "CPU Temperature";
+          #         }
+          #         {
+          #           name = "gpu/gpu1/temperature";
+          #           color = "233,163,61";
+          #           label = "GPU Temperature";
+          #         }
+          #       ];
+          #   };
+          # }
+          "org.kde.plasma.panelspacer"
+          "org.kde.plasma.kickoff"
+          {
+            iconTasks = {
+              launchers = [
+                "applications:systemsettings.desktop"
+                "applications:org.kde.dolphin.desktop"
+                "applications:microsoft-edge.desktop"
+                "applications:code.desktop"
+              ];
+            };
+          }
+          "org.kde.plasma.panelspacer"
+          {
+            systemTray.items = {
+              shown = [
+                "org.kde.plasma.clipboard"
+                "org.kde.plasma.volume"
+                "org.kde.plasma.bluetooth"
+                "org.kde.plasma.networkmanagement"
+                "org.kde.plasma.battery"
+              ];
+              hidden = [
+                "org.kde.plasma.brightness"
+                "org.kde.kscreen"
+                "org.kde.plasma.printmanager"
+                "org.kde.plasma.mediacontroller"
+                "blueman"
+              ];
+            };
+          }
+          "org.kde.plasma.notifications"
+          "org.kde.plasma.showdesktop"
+        ];
+      }
+    ];
   };
 }
