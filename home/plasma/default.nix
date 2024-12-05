@@ -322,6 +322,7 @@
               };
             };
           }
+          # idk why this leads to a kde crash
           # {
           #   systemMonitor =  {
           #       displayStyle = "piechart";
