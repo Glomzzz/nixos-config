@@ -2,6 +2,9 @@
   imports = [
     plasma-manager.homeManagerModules.plasma-manager
   ];
+  home.packages = with pkgs; [
+    plasma-panel-colorizer
+  ];
   programs.plasma = {
     enable = true;
     overrideConfig = true;
