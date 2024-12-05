@@ -4,10 +4,10 @@
   cache = config.xdg.cacheHome;
 in {
   imports = [
+    ./alacritty
     ./nushell
     ./common.nix
     ./starship.nix
-    ./terminals.nix
   ];
 
   # add environment variables
