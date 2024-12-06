@@ -13,3 +13,4 @@ Based on Flakes & Home Manager
   - Alacritty + Starship + Nushell
 - 24.12.5, KDE panels config in plasma-manager (but doesn't work currently)
 - 24.12.6, Nushell full completions, via nu-scripts/completions in nixpkgs
+  - Also direnv works now. 
