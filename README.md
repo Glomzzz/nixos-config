@@ -12,3 +12,4 @@ Based on Flakes & Home Manager
 - 24.12.4, Shell environment configuration. (533e662d1312acbc0f437c9521117ac22e8edfe3)
   - Alacritty + Starship + Nushell
 - 24.12.5, KDE panels config in plasma-manager (but doesn't work currently)
+- 24.12.6, Nushell full completions, via nu-scripts/completions in nixpkgs
