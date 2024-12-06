@@ -8,11 +8,17 @@
     alejandra
     deadnix
     statix
+    argc
+    bash-completionc
   ];
 
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
-    enableZshIntegration = true;
+    # enableNushellIntegration = true;
+    silent = true;
+    config = {
+      hide_env_diff = true;
+    };
   };
 }
