@@ -8,8 +8,6 @@
     alejandra
     deadnix
     statix
-    argc
-    bash-completionc
   ];
 
   programs.direnv = {
