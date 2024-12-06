@@ -4,6 +4,7 @@
   ];
   home.packages = with pkgs; [
     plasma-panel-colorizer
+    kdePackages.kconfig
   ];
   # give up on the full plasma config for now, due to bugs.
   programs.plasma = {
