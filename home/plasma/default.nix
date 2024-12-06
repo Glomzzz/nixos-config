@@ -11,9 +11,9 @@
     overrideConfig = false;
     kscreenlocker.lockOnStartup = false;
     kscreenlocker.passwordRequired = false;
-    shortcuts = {
-      "services/Alacritty.desktop"."_launch" = "Ctrl+Alt+T";
-    };
+    # shortcuts = {
+    #   "services/Alacritty.desktop"."_launch" = "Ctrl+Alt+T";
+    # };
     # panels = [
     #   {
     #     screen = 0;

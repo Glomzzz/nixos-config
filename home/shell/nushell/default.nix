@@ -35,8 +35,10 @@
         processCompletions = concatStringsSep "\n" (
           map (path: "use ${path} *") getNuFiles
         );
+
       in
       ''
+        $env.SHELL = "nu";
         $env.config.show_banner = false
         $env.config.filesize.metric = true
 
@@ -53,6 +55,7 @@
         } 
         ${processCompletions}
       '';
+    
     envFile.source = ./env.nu;
   };
 }
