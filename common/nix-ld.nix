@@ -1,4 +1,4 @@
-{pkgs, ...}:{
+{config, pkgs, ...}:{
   # For jetbrains IDEs  
     programs.nix-ld.enable = true;
     programs.nix-ld.libraries = with pkgs; [
@@ -116,4 +116,5 @@
         xz
         zlib
     ];
+    environment.systemPackages = config.programs.nix-ld.libraries;
 }

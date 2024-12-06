@@ -3,5 +3,6 @@
       clang
       cargo
       rustc
+      openjdk
   ];
 }

@@ -13,17 +13,22 @@
         proggyfonts
         nerd-fonts.fira-code
         nerd-fonts.jetbrains-mono
+        wqy_zenhei # WenQuanYi Zen Hei
       ];
       enableDefaultPackages = false;
 
       # user defined fonts
       # the reason there's Noto Color Emoji everywhere is to override DejaVu's
       # B&W emojis that would sometimes show instead of some Color emojis
-      fontconfig.defaultFonts = {
-        serif = ["Noto Serif" "Noto Color Emoji"];
-        sansSerif = ["Noto Sans" "Noto Color Emoji"];
-        monospace = ["JetBrainsMono Nerd Font" "Noto Color Emoji"];
-        emoji = ["Noto Color Emoji"];
+      fontconfig = {
+        antialias = true;
+        hinting.enable = true;
+        defaultFonts = { 
+          emoji = [ "Noto Color Emoji" ];
+          monospace = [ "FiraCode Nerd Font" ];
+          sansSerif = [ "Noto Sans CJK SC" ];
+          serif = [ "Noto Serif CJK SC" ];
+      };
       };
    };
 }
