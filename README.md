@@ -14,3 +14,5 @@ Based on Flakes & Home Manager
 - 24.12.5, KDE panels config in plasma-manager (but doesn't work currently)
 - 24.12.6, Nushell full completions, via nu-scripts/completions in nixpkgs
   - Also direnv works now. 
+- 24.12.7, qq and wechat-uos works well now.
+  - Except for some issues about rendering window, but i dont care.
