@@ -1,6 +1,6 @@
 {
   imports = [
-    ./browsers.nix
+    ./network.nix
     ./common.nix
     ./git.nix
     ./media.nix
