@@ -189,11 +189,10 @@ buildFHSEnv {
     export QT_QPA_PLATFORM=xcb
     export QT_AUTO_SCREEN_SCALE_FACTOR=1
     export LD_LIBRARY_PATH=${lib.makeLibraryPath wechat-uos-runtime}
-
-    if [[ '${XMODIFIERS}' =~ fcitx ]]; then
+    if [[ ''${XMODIFIERS} =~ fcitx ]]; then
       export QT_IM_MODULE=fcitx
       export GTK_IM_MODULE=fcitx
-    elif [[ '${XMODIFIERS}' =~ ibus ]]; then
+    elif [[ ''${XMODIFIERS} =~ ibus ]]; then
       export QT_IM_MODULE=ibus
       export GTK_IM_MODULE=ibus
       export IBUS_USE_PORTAL=1
