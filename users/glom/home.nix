@@ -12,12 +12,14 @@
   home.packages = with pkgs; [
       sony-headphones-client
       spotify
+      mumble
       vscode
       zotero
       obsidian
       v2raya
       telegram-desktop
       kwallet-pam
+      poppler_data
   ];
   home.enableNixpkgsReleaseCheck = false;
 

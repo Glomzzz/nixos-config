@@ -21,7 +21,6 @@
       };
     in
     with pkgs; [
-        fcitx5-configtool  
         fcitx5-chinese-addons 
         rime-data
         fcitx5-rime
