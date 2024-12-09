@@ -7,13 +7,7 @@
   ...
 }:
 {
-  services.xserver.videoDrivers = ["nvidia"];
-
-  hardware.nvidia = {
-    prime = {
-      nvidiaBusId = "PCI:1:0:0";
-    };
-  };
+  # services.xserver.videoDrivers = ["nvidia"];
 
   hardware.graphics = {
     extraPackages = with pkgs; [
@@ -22,6 +16,9 @@
   };
 
   hardware.nvidia = {
+    prime = {
+      nvidiaBusId = "PCI:1:0:0";
+    };
     open = true;
     package = config.boot.kernelPackages.nvidiaPackages.stable;
 
