@@ -2,11 +2,11 @@
 {pkgs,...}:
 {
   imports = [
-    # ./nvidia.nix
-    ./intel.nix
+    ./nvidia.nix
+    # ./intel
   ];
 
-  boot.blacklistedKernelModules = [ "nouveau" "nvidia_drm" "nvidia_modeset" "nvidia"  ];
+  # boot.blacklistedKernelModules = [ "nouveau" "nvidia_drm" "nvidia_modeset" "nvidia"  ];
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [

@@ -1,11 +1,12 @@
 {pkgs,...} : {
+
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [
       intel-compute-runtime.drivers
-      #intel-media-driver
-      #intel-vaapi-driver
-        vpl-gpu-rt          # for newer GPUs on NixOS >24.05 or unstable
+      intel-media-driver
+      intel-vaapi-driver
+      vpl-gpu-rt          # for newer GPUs on NixOS >24.05 or unstable
       #onevpl-intel-gpu  # for newer GPUs on NixOS <= 24.05
        # intel-media-sdk   # for older GPUs
     ];
@@ -34,10 +35,13 @@
     };
     wantedBy = [ "multi-user.target" ];
   };
-  imports = [
-    ./i915-sriov-dkms.nix
-    ./intel-gfx-sriov.nix
-    ./intel-firmware.nix
-    ./kernel.nix
+  nixpkgs.overlays = [
+    #(import ./distcc.nix)
+    (import ./i915-sriov-dkms.nix)
+    (import ./intel-firmware.nix)
+    (import ./intel-gfx-sriov.nix)
+    (import ./kernel.nix)
+    #(import ./libuv.nix)
   ];
+
 }
