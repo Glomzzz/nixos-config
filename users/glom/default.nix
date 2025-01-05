@@ -7,6 +7,8 @@
   imports = [
     ../../common/nix-ld.nix
   ];
+
+  home-manager.backupFileExtension = "backup";
   # To make sure that the home-manager session variables are loaded
   # https://github.com/nix-community/home-manager/issues/1011 
   environment.extraInit = let 
