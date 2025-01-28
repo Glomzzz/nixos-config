@@ -6,8 +6,8 @@
 }: {
   home.packages = with pkgs; [
     microsoft-edge
-    (pkgs.callPackage ./qq { })
-    (pkgs.callPackage ./clash-verge-rev { })
+    qq
+    clash-verge-rev
     wechat-uos
   ];
   
