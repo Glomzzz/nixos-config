@@ -15,7 +15,6 @@
     pulsemixer
     # images
     imv
-    
   ];
 
   programs = {

@@ -13,6 +13,7 @@
     ./audio.nix
     ./boot.nix
     ./asus.nix
+    ./graphic.nix
     (modulesPath + "/installer/scan/not-detected.nix")
     ];
  

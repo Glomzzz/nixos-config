@@ -7,6 +7,5 @@
       rustup
       # java
       openjdk
-      qt5Full
   ];
 }
