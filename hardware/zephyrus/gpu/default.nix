@@ -12,12 +12,12 @@
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [
-      nvidia-vaapi-driver
+    nvidia-vaapi-driver
     ];
   };
 
   hardware.nvidia = {
-    open = true;
+    open = false;
     package = config.boot.kernelPackages.nvidiaPackages.stable;
 
     nvidiaSettings = true;
@@ -34,7 +34,7 @@
   };
 
   boot = {
-    kernelParams = [ "nvidia-drm.fbdev=1" ];
+    kernelParams = [ "nvidia-drm.fbdev=1" "nvidia-drm.modeset=1" ];
 
     extraModprobeConfig =
       "options nvidia "
