@@ -1,5 +1,5 @@
 { ...} : {
-    services.pipewire = {
+  services.pipewire = {
       enable = true;
       audio.enable = true;
       pulse.enable = true;
@@ -10,7 +10,7 @@
       jack.enable = true;
   };
   security.rtkit.enable = true;
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   
 
 }

@@ -1,6 +1,9 @@
 {config, pkgs, ...}:{
   # For jetbrains IDEs  
     programs.nix-ld.enable = true;
+    nixpkgs.config.permittedInsecurePackages = [
+                "SDL_ttf-2.0.11"
+    ];
     programs.nix-ld.libraries = with pkgs; [
         SDL
         SDL2

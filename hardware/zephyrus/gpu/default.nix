@@ -12,20 +12,23 @@
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [
-    nvidia-vaapi-driver
+      nvidia-vaapi-driver
     ];
   };
 
+  # 570.86.16 
+
   hardware.nvidia = {
     open = false;
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    package = config.boot.kernelPackages.nvidiaPackages.beta;
 
     nvidiaSettings = true;
     modesetting.enable = true;
     # Power management is required to get nvidia GPUs to behave on
     # suspend, due to firmware bugs. Aren't nvidia great?
     powerManagement.enable = true;
-    dynamicBoost.enable = true;
+    dynamicBoost.enable = false;
+
 
   };
 
@@ -51,14 +54,14 @@
       ];
   };
 
-  # environment.variables = {
-  #   GBM_BACKEND = "nvidia-drm";
-  #   # Apparently, without this nouveau may attempt to be used instead
-  #   # (despite it being blacklisted)
-  #   __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-  #   # Hardware cursors are currently broken on nvidia
-  #   # TEST
-  #   WLR_NO_HARDWARE_CURSORS = "1";
-  # };
+  environment.variables = {
+    GBM_BACKEND = "nvidia-drm";
+    # Apparently, without this nouveau may attempt to be used instead
+    # (despite it being blacklisted)
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+    # Hardware cursors are currently broken on nvidia
+    # TEST
+    WLR_NO_HARDWARE_CURSORS = "1";
+  };
 }
 

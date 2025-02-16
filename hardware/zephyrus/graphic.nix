@@ -4,7 +4,7 @@
       vulkan-tools
       vulkan-validation-layers
       vulkan-headers
-      vulkan-cts
+      # vulkan-cts
       mesa
       qt5Full
   ];
