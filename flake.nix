@@ -13,6 +13,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
+    nixvim-source = {
+      url = "github:Glomzzz/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs@{ nixpkgs, home-manager, ... }: {
@@ -39,5 +43,4 @@
             ];
           };
     };
-  };
-}
+  }; }
