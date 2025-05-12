@@ -1,14 +1,15 @@
 {
   pkgs,
-  config,
-  username,
   ...
 }: {
   home.packages = with pkgs; [
+    v2raya
+    clash-verge-rev
     microsoft-edge
     qq
-    clash-verge-rev
     wechat-uos
+    telegram-desktop
+    mumble
   ];
   
 }

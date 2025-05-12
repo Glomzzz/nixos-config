@@ -4,7 +4,7 @@
   imports =
     [ 
       ../../hardware/zephyrus
-      ../../common
+      ../../system
     ];
 
   networking.hostName = hostname;

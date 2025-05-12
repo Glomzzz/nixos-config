@@ -6,5 +6,7 @@
     ./media.nix
     ./util.nix
     ./xdg.nix
+    ./code.nix
+    ./work.nix
   ];
 }

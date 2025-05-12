@@ -10,20 +10,11 @@
   ];
 
   home.packages = with pkgs; [
-      sony-headphones-client
-      spotify
-      mumble
-      vscode
-      zotero
-      obsidian
-      v2raya
-      telegram-desktop
       kdePackages.kwallet-pam
       poppler_data
   ];
   home.enableNixpkgsReleaseCheck = false;
 
-  programs.obs-studio.enable = true;
   programs.git = {
     userName = "Glom Zhao";
     userEmail = "glom@skillw.com";

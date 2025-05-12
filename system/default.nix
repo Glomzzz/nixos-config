@@ -6,8 +6,4 @@
     ./programs.nix
     ./env.nix
   ];
-
-
-
-
 }

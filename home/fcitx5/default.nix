@@ -3,8 +3,6 @@
 {
   home.sessionVariables = {
     XMODIFIERS = "@im=fcitx";
-    GTK_IM_MODULE = "fcitx";
-    QT_IM_MODULE = "fcitx";
   };
   i18n.inputMethod = {
     enabled = "fcitx5";

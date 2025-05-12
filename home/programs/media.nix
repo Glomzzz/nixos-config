@@ -10,6 +10,7 @@
 
   home.packages = with pkgs; [
     # audio control
+    sony-headphones-client
     pavucontrol
     playerctl
     pulsemixer
@@ -29,4 +30,6 @@
   services = {
     playerctld.enable = true;
   };
+
+  
 }
