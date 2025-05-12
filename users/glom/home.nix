@@ -18,7 +18,7 @@
       obsidian
       v2raya
       telegram-desktop
-      kwallet-pam
+      kdePackages.kwallet-pam
       poppler_data
   ];
   home.enableNixpkgsReleaseCheck = false;
