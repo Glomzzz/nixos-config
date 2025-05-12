@@ -26,9 +26,9 @@
     modesetting.enable = true;
     # Power management is required to get nvidia GPUs to behave on
     # suspend, due to firmware bugs. Aren't nvidia great?
-    powerManagement.enable = true;
+    powerManagement.enable = false;
+    powerManagement.finegrained = false;
     dynamicBoost.enable = false;
-
 
   };
 

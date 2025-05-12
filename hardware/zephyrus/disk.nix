@@ -3,18 +3,19 @@
 {
 
   fileSystems."/" =
-    { device = "/dev/disk/by-uuid/5094e655-4d5d-48df-90db-45e62e42d1e1";
+    { device = "/dev/disk/by-uuid/d2e23fd9-5500-40e5-a41a-dea6c37cbf96";
       fsType = "btrfs";
       options = [ "subvol=@" ];
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/C3AB-ABB0";
+    { device = "/dev/disk/by-uuid/CEBC-DA24";
       fsType = "vfat";
       options = [ "fmask=0077" "dmask=0077" ];
     };
 
   swapDevices =
-    [ { device = "/dev/disk/by-uuid/d7e33875-391a-4d29-9abe-4f990ef53fce"; }
+    [ { device = "/dev/disk/by-uuid/19460597-1975-48a9-a2be-0f4fb6207883"; }
     ];
+
 }

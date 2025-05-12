@@ -1,4 +1,5 @@
 {pkgs, ...} : {
+    programs.xwayland.enable = true;
     environment.systemPackages = with pkgs; [
       vulkan-loader
       vulkan-tools
