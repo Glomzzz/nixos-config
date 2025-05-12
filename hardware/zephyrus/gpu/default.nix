@@ -16,8 +16,7 @@
     ];
   };
 
-  # 570.86.16 
-
+  # 575.51.02 
   hardware.nvidia = {
     open = false;
     package = config.boot.kernelPackages.nvidiaPackages.beta;
@@ -29,7 +28,6 @@
     powerManagement.enable = false;
     powerManagement.finegrained = false;
     dynamicBoost.enable = false;
-
   };
 
   programs.sway.package = pkgs.sway.override {
