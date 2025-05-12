@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 {
-  xdg.configFile.nvim.source = ./nvim;
+  xdg.configFile.nvim.source = ./config;
   # As default editor
   home.sessionVariables = {
     EDITOR = "nvim";

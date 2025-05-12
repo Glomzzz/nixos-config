@@ -2,7 +2,6 @@
     environment.systemPackages = let
       nix-alien = inputs.nix-alien-source.packages.${system}.nix-alien;
     in with pkgs; [
-      vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
       wget
       curl
       git
@@ -16,10 +15,14 @@
       zip
       unzip
       p7zip
+
+      # utils
       just
       ripgrep
       wine
       nix-alien
       gnumake
+      fd
+      xclip
   ];
 }
