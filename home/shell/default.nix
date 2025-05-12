@@ -17,9 +17,7 @@ in {
     LESSKEY = c + "/less/lesskey";
     WINEPREFIX = d + "/wine";
 
-    # set default applications
-    EDITOR = "vim";
-    BROWSER = "microsoft-edge";
+    # set default terminal
     TERMINAL = "alacritty";
 
     # enable scrolling in git diff

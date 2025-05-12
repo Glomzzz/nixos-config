@@ -20,5 +20,6 @@
       ripgrep
       wine
       nix-alien
+      gnumake
   ];
 }

@@ -11,5 +11,9 @@
     telegram-desktop
     mumble
   ];
+
+  home.sessionVariables = {
+    BROWSER = "microsoft-edge";
+  };
   
 }
