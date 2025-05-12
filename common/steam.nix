@@ -1,4 +1,4 @@
-{... }: {
+{pkgs, ... }: {
     programs.steam = {
       enable = true;
       remotePlay.openFirewall = true; 
@@ -17,5 +17,5 @@
         vkd3d
         mangohud
       ];
-    }
+    };
 }
