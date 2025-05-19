@@ -15,8 +15,8 @@ Based on Flakes & Home Manager
 - 24.12.6, Nushell full completions, via nu-scripts/completions in nixpkgs
   - Also direnv works now. 
 - 24.12.7, qq and wechat-uos works well now.  
-  - Except for some issues about fcitx5
-    - when wechat is lauched the fcitx5 muse be relauched to work in wechat-uos
+  - Except for some issues about fcitx5 (fixed in 25.5.19-9ccac7d)
+    - when wechat is lauched the fcitx5 muse be relauched to work in wechat-uos 
 - 25.5.12, nvidia-driver (unfree,beta) works fine now (9cd2df)
   - the problem is about power-management:
     - power management is required to get nvidia GPUs to behave on suspend, due to firmware bugs.
@@ -27,3 +27,5 @@ Based on Flakes & Home Manager
 - 25.5.14, [nixvim](https://github.com/Glomzzz/nixvim) works well (378a3c)
   - All stuff got reproducibility
   - ***Aren't Nix great?***
+- 25.5.19, embrace home-manager 25.05 & NixOS 25.11 (9ccac7d)
+  - Enabled Fcitx5 wayland-frontend to fix inputmethod problem in wechat-uos
