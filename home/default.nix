@@ -12,7 +12,7 @@
     inherit username;
     homeDirectory = lib.mkForce "/home/${username}";
 
-    stateVersion = "24.11";
+    stateVersion = "25.05";
   };
 
   # Let Home Manager install and manage itself.
