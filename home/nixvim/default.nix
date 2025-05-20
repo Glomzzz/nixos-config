@@ -5,4 +5,8 @@
     in [
       nixvim
     ];
-}
+  home.sessionVariables = {
+    EDITOR = "nvim";
+  };
+
+} 
