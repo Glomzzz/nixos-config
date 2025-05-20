@@ -1,4 +1,4 @@
-{pkgs, username, ...}: {
+{pkgs,  ...}: {
   ##################################################################################################################
   #
   # All Glom's Home Manager Configuration
@@ -15,9 +15,6 @@
   ];
   home.enableNixpkgsReleaseCheck = false;
 
-  programs.git = {
-    userName = "Glom Zhao";
-    userEmail = "glom@skillw.com";
-  };
+
 
 }

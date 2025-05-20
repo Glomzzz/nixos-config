@@ -19,28 +19,43 @@
     };
   };
 
-  outputs = inputs@{ nixpkgs, home-manager, ... }: {
+  outputs = inputs @ {
+    nixpkgs,
+    home-manager,
+    ...
+  }: {
     nixosConfigurations = {
-      nixos = 
-        let 
-            system = "x86_64-linux";
-            hostname = "nixos";
-            username = "glom";
-            specialArgs = {inherit hostname; inherit username; inherit system; inherit inputs;};
-        in nixpkgs.lib.nixosSystem {
-            inherit specialArgs;
-            inherit system;
-            modules = [
-              ./hosts/nixos
-              ./users/${username}
-              home-manager.nixosModules.home-manager {
-                home-manager.useGlobalPkgs = true;
-                home-manager.useUserPackages = true;
+      nixos = let
+        system = "x86_64-linux";
+        hostname = "nixos";
+        username = "glom";
+        usernameFull = "Glom Zhao";
+        email = "glom@skillw.com";
+        specialArgs = {
+          inherit hostname;
+          inherit username;
+          inherit usernameFull;
+          inherit email;
+          inherit system;
+          inherit inputs;
+        };
+      in
+        nixpkgs.lib.nixosSystem {
+          inherit specialArgs;
+          inherit system;
+          modules = [
+            ./hosts/nixos
+            ./users/${username}
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
 
-                home-manager.users.glom = import ./users/${username}/home.nix;
-                home-manager.extraSpecialArgs = inputs // specialArgs;
-              }
-            ];
-          };
+              home-manager.users.glom = import ./users/${username}/home.nix;
+              home-manager.extraSpecialArgs = inputs // specialArgs;
+            }
+          ];
+        };
     };
-  }; }
+  };
+}
