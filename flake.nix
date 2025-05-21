@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/";
+    nixpkgs-2505.url = "github:NixOS/nixpkgs/nixos-25.05/";
     home-manager = {
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -21,6 +22,7 @@
 
   outputs = inputs @ {
     nixpkgs,
+    nixpkgs-2505,
     home-manager,
     ...
   }: {
@@ -39,11 +41,19 @@
           inherit system;
           inherit inputs;
         };
+        overlay-2505 = final: prev: {
+        legacy-2505 = import nixpkgs-2505 {
+          inherit system;
+          config.allowUnfree = true;
+        };
+
+      };
       in
         nixpkgs.lib.nixosSystem {
           inherit specialArgs;
           inherit system;
           modules = [
+          ({ config, pkgs, ... }: { nixpkgs.overlays = [ overlay-2505 ]; })
             ./hosts/nixos
             ./users/${username}
             home-manager.nixosModules.home-manager
