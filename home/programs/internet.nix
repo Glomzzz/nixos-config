@@ -9,6 +9,7 @@
     wechat-uos
     telegram-desktop
     mumble
+    discord
   ];
 
 }
