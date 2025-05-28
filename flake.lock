@@ -340,11 +340,11 @@
         "wgsl-analyzer": "wgsl-analyzer"
       },
       "locked": {
-        "lastModified": 1747781355,
-        "narHash": "sha256-DNgxJ999JP2xCeGkny8LXhTG62eOOXezjYyesDfJz8M=",
+        "lastModified": 1748360619,
+        "narHash": "sha256-arE9gXyZUBcUqM41SrBtTzEktH6ptSzmq6tsflG9naA=",
         "owner": "Glomzzz",
         "repo": "nixvim",
-        "rev": "4cf297e13ee84d37b49980bf0f27601665180fa4",
+        "rev": "7dd698d135aa00145f9bc15976de03dded355f0d",
         "type": "github"
       },
       "original": {
