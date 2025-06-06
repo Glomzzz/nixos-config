@@ -16,7 +16,7 @@
     ];
   };
 
-  # 575.51.02 
+  # 575.57.08-6.12.32
   hardware.nvidia = {
     open = false;
     package = config.boot.kernelPackages.nvidiaPackages.beta;
