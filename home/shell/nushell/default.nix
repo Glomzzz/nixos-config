@@ -1,10 +1,11 @@
-{username,pkgs,...}:
+{pkgs,...}:
 {
   home.packages = with pkgs; [
     nu_scripts
   ];
   programs.nushell = {
     enable = true;
+    package = pkgs.stable.nushell;
     configFile.text = with builtins;
       let
         lib = pkgs.lib;

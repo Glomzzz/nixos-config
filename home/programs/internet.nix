@@ -5,11 +5,12 @@
   home.packages = with pkgs; [
     v2raya
     clash-verge-rev
-    qq
+    pkgs.stable.qq
     wechat-uos
     telegram-desktop
     mumble
     discord
+    syncplay
   ];
 
 }

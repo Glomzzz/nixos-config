@@ -9,5 +9,6 @@
     ./xdg.nix
     ./code.nix
     ./work.nix
+    ./game.nix
   ];
 }

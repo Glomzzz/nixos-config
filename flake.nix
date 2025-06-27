@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/";
+    nixpkgs-2505.url = "github:NixOS/nixpkgs/nixos-25.05/";
     nixpkgs-2411.url = "github:NixOS/nixpkgs/nixos-24.11/";
     home-manager = {
       url = "github:nix-community/home-manager/release-25.05";
@@ -22,6 +23,7 @@
 
   outputs = inputs @ {
     nixpkgs,
+    nixpkgs-2505,
     nixpkgs-2411,
     home-manager,
     ...
@@ -42,18 +44,27 @@
           inherit inputs;
         };
         overlay-2411 = final: prev: {
-        legacy-2411 = import nixpkgs-2411 {
-          inherit system;
-          config.allowUnfree = true;
+          legacy-2411 = import nixpkgs-2411 {
+            inherit system;
+            config.allowUnfree = true;
+          };
         };
-
-      };
+        overlay-stable = final: prev: {
+          stable = import nixpkgs-2505 {
+            inherit system;
+            config.allowUnfree = true;
+          };
+        };
       in
         nixpkgs.lib.nixosSystem {
           inherit specialArgs;
           inherit system;
           modules = [
-          ({ config, pkgs, ... }: { nixpkgs.overlays = [ overlay-2411 ]; })
+            ({
+              config,
+              pkgs,
+              ...
+            }: {nixpkgs.overlays = [overlay-2411 overlay-stable];})
             ./hosts/nixos
             ./users/${username}
             home-manager.nixosModules.home-manager
