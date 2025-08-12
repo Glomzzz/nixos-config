@@ -1,11 +1,11 @@
-{
-  pkgs,
-  ...
+{ pkgs
+, ...
 }: {
   programs.obs-studio.enable = true;
   home.packages = with pkgs; [
-      zotero
-      gimp3
+    zotero
+    gimp3
+    cherry-studio
   ];
-  
+
 }

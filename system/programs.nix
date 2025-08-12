@@ -2,6 +2,7 @@
     environment.systemPackages = let
       nix-alien = inputs.nix-alien-source.packages.${system}.nix-alien;
     in with pkgs; [
+      input-remapper
       wget
       curl
       git

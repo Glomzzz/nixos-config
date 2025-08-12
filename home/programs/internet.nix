@@ -1,10 +1,9 @@
-{
-  pkgs,
-  ...
+{ pkgs
+, config
+, ...
 }: {
   home.packages = with pkgs; [
     v2raya
-    clash-verge-rev
     pkgs.stable.qq
     wechat-uos
     telegram-desktop
@@ -12,5 +11,4 @@
     discord
     syncplay
   ];
-
 }
