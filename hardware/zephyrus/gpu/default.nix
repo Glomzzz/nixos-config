@@ -1,13 +1,10 @@
- 
 {
   pkgs,
   flake-inputs,
   config,
   lib,
   ...
-}:
-{
-
+}: {
   services.xserver.videoDrivers = ["nvidia"];
   hardware.graphics = {
     enable = true;
@@ -16,10 +13,18 @@
     ];
   };
 
-  # 575.57.08-6.12.32
-  hardware.nvidia = {
+  # 580.82.09
+  hardware.nvidia = let
+    nvidia-src = pkgs.fetchurl {
+      url = "https://us.download.nvidia.com/XFree86/Linux-x86_64/580.82.09/NVIDIA-Linux-x86_64-580.82.09.run";
+      sha256 = "sha256-Puz4MtouFeDgmsNMKdLHoDgDGC+QRXh6NVysvltWlbc=";
+    };
+  in {
     open = false;
-    package = config.boot.kernelPackages.nvidiaPackages.beta;
+    package = config.boot.kernelPackages.nvidiaPackages.production.overrideAttrs (old: {
+      version = "580.82.09";
+      src = nvidia-src;
+    });
 
     nvidiaSettings = true;
     modesetting.enable = true;
@@ -35,7 +40,7 @@
   };
 
   boot = {
-    kernelParams = [ "nvidia-drm.fbdev=1" "nvidia-drm.modeset=1" ];
+    kernelParams = ["nvidia-drm.fbdev=1" "nvidia-drm.modeset=1"];
 
     extraModprobeConfig =
       "options nvidia "
@@ -62,4 +67,3 @@
     WLR_NO_HARDWARE_CURSORS = "1";
   };
 }
-

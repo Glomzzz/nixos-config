@@ -3,6 +3,7 @@
     programs.nix-ld.enable = true;
     nixpkgs.config.permittedInsecurePackages = [
                 "SDL_ttf-2.0.11"
+                "qtwebengine-5.15.19"
     ];
     programs.nix-ld.libraries = with pkgs; [
         SDL

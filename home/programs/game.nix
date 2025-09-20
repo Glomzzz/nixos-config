@@ -1,6 +1,6 @@
 {pkgs,...}: {
   home.packages = with pkgs; [
-     lutris
+     # lutris
      prismlauncher
      hmcl
   ];

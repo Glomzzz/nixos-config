@@ -4,7 +4,7 @@
 }: {
   home.packages = with pkgs; [
     v2raya
-    pkgs.stable.qq
+    pkgs.legacy-2411.qq
     wechat-uos
     telegram-desktop
     mumble
