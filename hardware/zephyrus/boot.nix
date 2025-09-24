@@ -1,6 +1,7 @@
 { lib, ...} :{
 
   boot = {
+    loader.systemd-boot.configurationLimit = 3;
     initrd.availableKernelModules = [ "xhci_pci" "thunderbolt" "nvme" "usb_storage" "usbhid" "sd_mod" "rtsx_pci_sdmmc" ];
     initrd.kernelModules = [ ];
     kernelModules = [ "kvm-intel"];

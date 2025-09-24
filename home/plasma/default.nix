@@ -1,6 +1,6 @@
 {pkgs,plasma-manager,username,...} : {
   imports = [
-    plasma-manager.homeManagerModules.plasma-manager
+    plasma-manager.homeModules.plasma-manager
   ];
   home.packages = with pkgs; [
     plasma-panel-colorizer

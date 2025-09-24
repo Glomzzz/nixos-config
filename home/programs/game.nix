@@ -1,7 +1,9 @@
-{pkgs,...}: {
+{pkgs, ...}: {
   home.packages = with pkgs; [
-     # lutris
-     prismlauncher
-     hmcl
+    playonlinux
+    lutris
+    prismlauncher
+    hmcl
+    airshipper
   ];
 }
