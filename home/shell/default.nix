@@ -6,7 +6,6 @@ in {
   imports = [
     ./alacritty
     ./nushell
-    ./common.nix
     ./starship.nix
   ];
 

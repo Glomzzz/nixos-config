@@ -1,6 +1,8 @@
 { pkgs, ... }:
-{
-  home.packages = with pkgs; [
+let
+  nu_scripts = (pkgs.callPackage ./nu_scripts.nix { });
+in {
+  home.packages = [
     nu_scripts
   ];
   programs.nushell = {
@@ -9,7 +11,7 @@
     configFile.text = with builtins;
       let
         lib = pkgs.lib;
-        completions = pkgs.nu_scripts.outPath + "/share/nu_scripts/custom-completions";
+        completions = nu_scripts.outPath + "/share/nu_scripts/custom-completions";
 
         flatten = lib.lists.flatten;
 

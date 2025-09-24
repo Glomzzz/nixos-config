@@ -22,7 +22,7 @@
 
   programs.clash-verge = {
     enable = true;
-    serviceMode = false;
+    serviceMode = true;
     tunMode = true;
   };
   systemd.services.clash-verge = {
