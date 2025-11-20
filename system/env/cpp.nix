@@ -6,5 +6,6 @@
     ninja
     clang
     valgrind
+    vcpkg
   ];
 }

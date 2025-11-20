@@ -1,6 +1,7 @@
 {pkgs, ...}: {
-  home.packages = with pkgs.legacy-2411; [
+  home.packages = with pkgs; [
     microsoft-edge
+    google-chrome
   ];
   home.sessionVariables = {
     BROWSER = "microsoft-edge";

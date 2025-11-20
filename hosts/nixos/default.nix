@@ -14,6 +14,8 @@
   networking.hostName = hostname;
   services.resolved.enable = true;
 
+  nix.settings.trusted-users = [ "root" "@wheel" username];
+
   users.users.${username} = {
     isNormalUser = true;
     description = username;

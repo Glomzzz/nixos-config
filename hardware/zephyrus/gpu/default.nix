@@ -14,17 +14,19 @@
   };
 
   # 580.82.09
-  hardware.nvidia = let
+  hardware.nvidia =
+  let
     nvidia-src = pkgs.fetchurl {
       url = "https://us.download.nvidia.com/XFree86/Linux-x86_64/580.82.09/NVIDIA-Linux-x86_64-580.82.09.run";
       sha256 = "sha256-Puz4MtouFeDgmsNMKdLHoDgDGC+QRXh6NVysvltWlbc=";
     };
   in {
     open = false;
-    package = config.boot.kernelPackages.nvidiaPackages.production.overrideAttrs (old: {
-      version = "580.82.09";
-      src = nvidia-src;
-    });
+    package = config.boot.kernelPackages.nvidiaPackages.production;
+    # .overrideAttrs (old: {
+    #   version = "580.82.09";
+    #   src = nvidia-src;
+    # });
 
     nvidiaSettings = true;
     modesetting.enable = true;

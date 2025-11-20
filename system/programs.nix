@@ -2,6 +2,8 @@
     environment.systemPackages = let
       nix-alien = inputs.nix-alien-source.packages.${system}.nix-alien;
     in with pkgs; [
+        libevdev
+        python313Packages.libevdev
       input-remapper
       wget
       curl
