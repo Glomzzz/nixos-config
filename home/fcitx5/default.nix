@@ -23,7 +23,7 @@
       };
     in
       with pkgs; [
-        fcitx5-chinese-addons
+        qt6Packages.fcitx5-chinese-addons
         rime-data
         fcitx5-rime
         fcitx5-mozc

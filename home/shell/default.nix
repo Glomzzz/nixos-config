@@ -28,4 +28,6 @@ in {
   home.shellAliases = {
     k = "kubectl";
   };
+
+  programs.ssh.enableDefaultConfig = false;
 }

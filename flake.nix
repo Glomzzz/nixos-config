@@ -2,12 +2,12 @@
   description = "Glom's Flake configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/";
-    nixpkgs-2505.url = "github:NixOS/nixpkgs/nixos-25.05/";
-    nixpkgs-2411.url = "github:NixOS/nixpkgs/nixos-24.11/";
-    # nixpkgs.url = "https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable/nixexprs.tar.xz";
-    # nixpkgs-2505.url = "https://mirrors.ustc.edu.cn/nix-channels/nixos-25.05/nixexprs.tar.xz";
-    # nixpkgs-2411.url = "https://mirrors.ustc.edu.cn/nix-channels/nixos-24.11/nixexprs.tar.xz";
+    # nixpkgs.url = "github:NixOS/nixpkgs/";
+    # nixpkgs-2505.url = "github:NixOS/nixpkgs/nixos-25.05/";
+    # nixpkgs-2411.url = "github:NixOS/nixpkgs/nixos-24.11/";
+    nixpkgs.url = "https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable/nixexprs.tar.xz";
+    nixpkgs-2505.url = "https://mirrors.ustc.edu.cn/nix-channels/nixos-25.05/nixexprs.tar.xz";
+    nixpkgs-2411.url = "https://mirrors.ustc.edu.cn/nix-channels/nixos-24.11/nixexprs.tar.xz";
     home-manager = {
       url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";

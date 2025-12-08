@@ -7,6 +7,5 @@
       vulkan-headers
       # vulkan-cts
       mesa
-      qt5Full
   ];
 }

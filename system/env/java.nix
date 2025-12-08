@@ -4,7 +4,7 @@
     # graalpy
     # trufflerruby
     # graalnodejs
-    graaljs
+    # graaljs
     graalvm-oracle
   ];
 }

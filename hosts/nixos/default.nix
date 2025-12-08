@@ -1,9 +1,10 @@
-{ config
-, pkgs
-, lib
-, username
-, hostname
-, ...
+{
+  config,
+  pkgs,
+  lib,
+  username,
+  hostname,
+  ...
 }: {
   imports = [
     ../../hardware/zephyrus
@@ -14,27 +15,12 @@
   networking.hostName = hostname;
   services.resolved.enable = true;
 
-  nix.settings.trusted-users = [ "root" "@wheel" username];
+  nix.settings.trusted-users = ["root" "@wheel" username];
 
   users.users.${username} = {
     isNormalUser = true;
     description = username;
-    extraGroups = [ "networkmanager" "wheel" ];
-  };
-
-  programs.clash-verge = {
-    enable = true;
-    serviceMode = true;
-    tunMode = true;
-  };
-  systemd.services.clash-verge = {
-    enable = true;
-    description = "Clash Verge Service Mode";
-    serviceConfig = {
-      ExecStart = "${config.programs.clash-verge.package}/bin/clash-verge-service";
-      Restart = "on-failure";
-    };
-    wantedBy = [ "multi-user.target" ];
+    extraGroups = ["networkmanager" "wheel"];
   };
 
   # Enable the X server (for compatibility)
@@ -54,5 +40,5 @@
   nixpkgs.config.allowUnfree = true;
 
   system.stateVersion = "25.11";
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = ["nix-command" "flakes"];
 }
