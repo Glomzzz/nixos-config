@@ -5,9 +5,7 @@
     # nixpkgs.url = "github:NixOS/nixpkgs/";
     # nixpkgs-2505.url = "github:NixOS/nixpkgs/nixos-25.05/";
     # nixpkgs-2411.url = "github:NixOS/nixpkgs/nixos-24.11/";
-    nixpkgs.url = "https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable/nixexprs.tar.xz";
-    nixpkgs-2505.url = "https://mirrors.ustc.edu.cn/nix-channels/nixos-25.05/nixexprs.tar.xz";
-    nixpkgs-2411.url = "https://mirrors.ustc.edu.cn/nix-channels/nixos-24.11/nixexprs.tar.xz";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
       url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -26,8 +24,6 @@
 
   outputs = inputs @ {
     nixpkgs,
-    nixpkgs-2505,
-    nixpkgs-2411,
     home-manager,
     ...
   }: {
@@ -46,28 +42,12 @@
           inherit system;
           inherit inputs;
         };
-        overlay-2411 = final: prev: {
-          legacy-2411 = import nixpkgs-2411 {
-            inherit system;
-            config.allowUnfree = true;
-          };
-        };
-        overlay-stable = final: prev: {
-          stable = import nixpkgs-2505 {
-            inherit system;
-            config.allowUnfree = true;
-          };
-        };
       in
         nixpkgs.lib.nixosSystem {
           inherit specialArgs;
           inherit system;
           modules = [
-            ({
-              config,
-              pkgs,
-              ...
-            }: {nixpkgs.overlays = [overlay-2411 overlay-stable];})
+
             ./hosts/nixos
             ./users/${username}
             home-manager.nixosModules.home-manager

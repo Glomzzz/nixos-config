@@ -1,11 +1,10 @@
-{
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   home.packages = with pkgs; [
-      vscode
-      nixpkgs-fmt
-      jetbrains-toolbox
+    opencode
+    antigravity
+    vscode
+    nixpkgs-fmt
+    jetbrains-toolbox
   ];
-  
 }
+

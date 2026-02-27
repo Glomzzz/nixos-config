@@ -5,26 +5,29 @@
   lib,
   ...
 }: {
-  services.xserver.videoDrivers = ["nvidia"];
+  services.xserver.videoDrivers = [ "nvidia"];
   hardware.graphics = {
     enable = true;
+    enable32Bit = true;
     extraPackages = with pkgs; [
       nvidia-vaapi-driver
+      vulkan-loader
+      vulkan-validation-layers
+      vulkan-extension-layer
+      mesa
     ];
   };
 
-  # 580.82.09
-  hardware.nvidia =
-  let
-    nvidia-src = pkgs.fetchurl {
-      url = "https://us.download.nvidia.com/XFree86/Linux-x86_64/580.82.09/NVIDIA-Linux-x86_64-580.82.09.run";
-      sha256 = "sha256-Puz4MtouFeDgmsNMKdLHoDgDGC+QRXh6NVysvltWlbc=";
-    };
+  hardware.nvidia = let
+     #   nvidia-src = pkgs.fetchurl {
+     #     url = "https://us.download.nvidia.com/XFree86/Linux-x86_64/580.126.18/NVIDIA-Linux-x86_64-580.126.18.run";
+     #     sha256 = "sha256-p3gbLhwtZcZYCRTHbnntRU0ClF34RxHAMwcKCSqatJ0=";
+     # };
   in {
     open = false;
     package = config.boot.kernelPackages.nvidiaPackages.production;
-    # .overrideAttrs (old: {
-    #   version = "580.82.09";
+    #   .overrideAttrs (old: {
+    #   version = "580.126.18";
     #   src = nvidia-src;
     # });
 
@@ -35,6 +38,18 @@
     powerManagement.enable = false;
     powerManagement.finegrained = false;
     dynamicBoost.enable = false;
+
+    prime = {
+      /*
+         offload = {
+        enable = true;
+        enableOffloadCmd = true;
+      };
+      */
+/*       sync.enable = true; */
+      intelBusId = "PCI:0:2:0";
+      nvidiaBusId = "PCI:1:0:0";
+    };
   };
 
   programs.sway.package = pkgs.sway.override {
@@ -42,7 +57,7 @@
   };
 
   boot = {
-    kernelParams = ["nvidia-drm.fbdev=1" "nvidia-drm.modeset=1"];
+    kernelParams = ["nvidia-drm.fbdev=1"];
 
     extraModprobeConfig =
       "options nvidia "
@@ -65,7 +80,8 @@
     # (despite it being blacklisted)
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
     # Hardware cursors are currently broken on nvidia
-    # TEST
     WLR_NO_HARDWARE_CURSORS = "1";
+    # 指定 VA-API 后端为 NVIDIA（用于视频硬件解码）
+    LIBVA_DRIVER_NAME = "nvidia";
   };
 }

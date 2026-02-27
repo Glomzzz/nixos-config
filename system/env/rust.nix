@@ -4,5 +4,6 @@
     trunk
     cargo-generate
     wasm-pack
+    pkg-config
   ];
 }

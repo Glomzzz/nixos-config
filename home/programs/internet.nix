@@ -9,5 +9,8 @@
     telegram-desktop
     mumble
     discord
+    easytier
+    tailscale
+    tailscalesd
 ];
 }

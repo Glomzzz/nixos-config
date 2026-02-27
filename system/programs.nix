@@ -1,9 +1,17 @@
-{pkgs,inputs,system,...} : {
-    environment.systemPackages = let
-      nix-alien = inputs.nix-alien-source.packages.${system}.nix-alien;
-    in with pkgs; [
-        libevdev
-        python313Packages.libevdev
+{
+  pkgs,
+  inputs,
+  system,
+  ...
+}: {
+  environment.systemPackages = let
+    nix-alien = inputs.nix-alien-source.packages.${system}.nix-alien;
+  in
+    with pkgs; [
+      lsfg-vk
+      lsfg-vk-ui
+      libevdev
+      python313Packages.libevdev
       input-remapper
       wget
       curl
@@ -11,7 +19,7 @@
       sysstat
       lm_sensors # for `sensors` command
       fastfetch
-      xfce.thunar # xfce4's file manager
+      thunar # xfce4's file manager
       nnn # terminal file manager
 
       # archives
@@ -22,10 +30,9 @@
       # utils
       just
       ripgrep
-      wine
       nix-alien
       gnumake
       fd
       xclip
-  ];
+    ];
 }

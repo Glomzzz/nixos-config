@@ -7,7 +7,7 @@
 ############################################################################
 
 deploy:
-  sudo nixos-rebuild switch --flake . --sudo --option substituters "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
+  sudo nixos-rebuild switch --flake . --sudo
 
 debug:
   sudo nixos-rebuild switch --flake . --sudo --show-trace --verbose

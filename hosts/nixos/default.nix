@@ -35,10 +35,25 @@
 
   services.displayManager.autoLogin.user = username;
 
+  services.tailscale = {
+    enable = true;
+  };
+
+
   security.pam.services.kde.kwallet.enable = true;
+
+  nixpkgs.overlays = [
+    (final: prev: {
+      mycli = prev.mycli.overridePythonAttrs (old: {
+        pythonRelaxDeps = (old.pythonRelaxDeps or []) ++ ["sqlglot"];
+        nativeBuildInputs = (old.nativeBuildInputs or [])
+          ++ [final.python3Packages.pythonRelaxDepsHook];
+      });
+    })
+  ];
 
   nixpkgs.config.allowUnfree = true;
 
-  system.stateVersion = "25.11";
+  system.stateVersion = "26.05";
   nix.settings.experimental-features = ["nix-command" "flakes"];
 }
