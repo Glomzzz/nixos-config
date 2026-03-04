@@ -7,6 +7,14 @@
   xdg = {
     enable = true; # Enable XDG 
     userDirs.enable = true;
+    mimeApps = {
+      enable = true;
+      defaultApplications = {
+        "text/html" = ["com.google.Chrome.beta.desktop"];
+        "x-scheme-handler/http" = ["com.google.Chrome.beta.desktop"];
+        "x-scheme-handler/https" = ["com.google.Chrome.beta.desktop"];
+      };
+    };
   };
   home.packages = with pkgs; [
      xdg-utils

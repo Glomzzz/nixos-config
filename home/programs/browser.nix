@@ -1,9 +1,10 @@
 {pkgs, ...}: {
-  home.packages = with pkgs; [
-    microsoft-edge
-    google-chrome
+  home.packages = with pkgs; let
+    chromeBeta = callPackage ./google-chrome-beta.nix {};
+  in [
+    chromeBeta
   ];
   home.sessionVariables = {
-    BROWSER = "microsoft-edge";
+    BROWSER = "google-chrome-beta";
   };
 }
