@@ -4,10 +4,7 @@
   # NixOS Configuration
   #
   ##################################################################################################################
-  imports = [
-    ../../common/nix-ld.nix
-    ../../common/steam.nix
-  ];
+  imports = [];
   # To make sure that the home-manager session variables are loaded
   #h ttps://github.com/nix-community/home-manager/issues/1011 
   environment.extraInit = let 

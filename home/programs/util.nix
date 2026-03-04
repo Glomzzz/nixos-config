@@ -4,7 +4,7 @@
   ...
 }: {
   home.packages = with pkgs; [
-    (callPackage ./tracy/package.nix {})
+    (callPackage ../../pkgs/tracy/package.nix {})
     typst
     usbutils
     yq-go # https://github.com/mikefarah/yq
