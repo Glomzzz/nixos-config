@@ -40,6 +40,8 @@
     enable = true;
   };
 
+  services.openssh.enable = true;
+
   security.pam.services.kde.kwallet.enable = true;
 
   nixpkgs.overlays = [

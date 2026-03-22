@@ -8,6 +8,8 @@
     nix-alien = inputs.nix-alien-source.packages.${system}.nix-alien;
   in
     with pkgs; [
+      clamav
+      clamtk
       lsfg-vk
       lsfg-vk-ui
       libevdev
