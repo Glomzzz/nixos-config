@@ -1,7 +1,4 @@
 {
-  config,
-  pkgs,
-  lib,
   inputs,
   username,
   hostname,
@@ -9,7 +6,8 @@
 }: {
   imports = [
     ../../hardware/zephyrus
-    ../../system
+    ../../modules/nixos
+    ../../users/glom
     ../../cachix.nix
   ];
 
