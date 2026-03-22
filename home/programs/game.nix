@@ -7,6 +7,7 @@
     prismlauncher
     hmcl
     airshipper
+    r2modman
 
 
   ];
