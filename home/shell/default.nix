@@ -25,6 +25,10 @@ in {
     MANPAGER = "sh -c 'col -bx | bat -l man -p'";
   };
 
+  home.sessionPath = [
+    "${config.home.homeDirectory}/.local/bin"
+  ];
+
   home.shellAliases = {
     k = "kubectl";
   };
