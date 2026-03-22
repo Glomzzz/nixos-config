@@ -40,12 +40,13 @@
     enable = true;
   };
 
-
   security.pam.services.kde.kwallet.enable = true;
 
   nixpkgs.overlays = [
     inputs.nix-openclaw.overlays.default
     (final: prev: {
+      codex = final.callPackage ../../pkgs/codex.nix {};
+
       mycli = prev.mycli.overridePythonAttrs (old: {
         pythonRelaxDeps = (old.pythonRelaxDeps or []) ++ ["sqlglot"];
         nativeBuildInputs = (old.nativeBuildInputs or [])
