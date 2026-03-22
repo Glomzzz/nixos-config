@@ -5,5 +5,7 @@
     cargo-generate
     wasm-pack
     pkg-config
+    openssl
+    openssl.dev
   ];
 }

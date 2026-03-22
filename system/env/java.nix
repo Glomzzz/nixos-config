@@ -5,7 +5,8 @@
     # trufflerruby
     # graalnodejs
     # graaljs
-    javaPackages.compiler.openjdk21
+    #    javaPackages.compiler.openjdk21
+    graalvmPackages.graalvm-oracle
 
   ];
 }
