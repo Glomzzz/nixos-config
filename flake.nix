@@ -20,6 +20,14 @@
       url = "github:Glomzzz/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-openclaw = {
+      url = "github:openclaw/nix-openclaw";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    openclaw-local = {
+      url = "path:/home/glom/code/openclaw-local";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs @ {

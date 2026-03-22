@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  inputs,
   username,
   hostname,
   ...
@@ -43,6 +44,7 @@
   security.pam.services.kde.kwallet.enable = true;
 
   nixpkgs.overlays = [
+    inputs.nix-openclaw.overlays.default
     (final: prev: {
       mycli = prev.mycli.overridePythonAttrs (old: {
         pythonRelaxDeps = (old.pythonRelaxDeps or []) ++ ["sqlglot"];
