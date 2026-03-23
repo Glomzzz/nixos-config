@@ -1,23 +1,4 @@
-{
-  lib,
-  pkgs,
-  ...
-}: {
-  home.packages = with pkgs ; [
-    # cloud native
-    docker-compose
-    kubectl
-
-    nodePackages.npm
-    nodePackages.pnpm
-    bun
-
-    # db related
-    dbeaver-bin
-    mycli
-    pgcli
-  ];
-
+{...}: {
   programs = {
     tmux = {
       enable = true;
@@ -33,10 +14,9 @@
       };
     };
 
-    btop.enable = true; # replacement of htop/nmon
-    eza.enable = true; # A modern replacement for ‘ls’
-    jq.enable = true; # A lightweight and flexible command-line JSON processor
-    ssh.enable = true;
+    btop.enable = true;
+    eza.enable = true;
+    jq.enable = true;
     aria2.enable = true;
 
     skim = {
@@ -49,5 +29,4 @@
       ];
     };
   };
-
 }

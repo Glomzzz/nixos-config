@@ -1,5 +1,6 @@
 {...}: {
   imports = [
+    ./dev-cli.nix
     ./internet.nix
     ./browser.nix
     ./git.nix

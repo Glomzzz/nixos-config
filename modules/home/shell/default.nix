@@ -6,7 +6,9 @@ in {
   imports = [
     ./alacritty.nix
     ./nushell.nix
+    ./terminal-tools.nix
     ./starship.nix
+    ./ssh.nix
   ];
 
   home.sessionVariables = {
