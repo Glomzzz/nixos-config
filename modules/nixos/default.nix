@@ -1,6 +1,7 @@
 {...}: {
   imports = [
-    ../../system
-    ./core/home-manager.nix
+    ./core
+    ./programs
+    ../services/nixos
   ];
 }
