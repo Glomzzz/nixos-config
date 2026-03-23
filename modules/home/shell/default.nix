@@ -4,9 +4,9 @@
   cache = config.xdg.cacheHome;
 in {
   imports = [
-    ../../../home/shell/alacritty/default.nix
-    ../../../home/shell/nushell/default.nix
-    ../../../home/shell/starship.nix
+    ./alacritty.nix
+    ./nushell.nix
+    ./starship.nix
   ];
 
   home.sessionVariables = {

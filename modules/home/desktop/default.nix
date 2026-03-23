@@ -1,6 +1,6 @@
 {...}: {
   imports = [
-    ../../../home/fcitx5/default.nix
-    ../../../home/plasma/default.nix
+    ./fcitx5.nix
+    ./plasma.nix
   ];
 }

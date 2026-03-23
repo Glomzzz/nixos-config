@@ -1,10 +1,4 @@
-{
-  lib,
-  pkgs,
-  inputs,
-  config,
-  ...
-}:
+{pkgs, inputs, ...}:
 {
   ##################################################################################################################
   #
@@ -14,7 +8,7 @@
 
   imports = [
     inputs.nix-openclaw.homeManagerModules.openclaw
-    ../../home
+    ../../modules/home
   ];
 
   home.packages = with pkgs; [
