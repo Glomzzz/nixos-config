@@ -4,6 +4,6 @@
     ./fonts.nix
     ./networking.nix
     ./plasma-auth.nix
-    ./home-manager.nix
+    (./. + "/home-manager.nix")
   ];
 }
