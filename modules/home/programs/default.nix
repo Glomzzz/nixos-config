@@ -1,5 +1,6 @@
 {...}: {
   imports = [
+    ./dev/default.nix
     ./dev-cli.nix
     ./communication.nix
     ./network-clients.nix
