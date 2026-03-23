@@ -1,5 +1,6 @@
 {
   hostname,
+  username,
   inputs,
   ...
 }: {
@@ -9,5 +10,9 @@
     defaultSopsFile = ../../../secrets/hosts + "/${hostname}.yaml";
     defaultSopsFormat = "yaml";
     age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
+
+    secrets."opencode/openai_api_key" = {
+      owner = username;
+    };
   };
 }
