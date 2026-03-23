@@ -1,12 +1,12 @@
 {...}: {
   imports = [
-    ../../../system/locale.nix
-    ../../../system/font.nix
+    ./locale.nix
+    ./fonts.nix
     ./networking.nix
-    ../../../system/env/cpp.nix
-    ../../../system/env/java.nix
-    ../../../system/env/rust.nix
-    ../../../system/env/other.nix
+    ./cpp.nix
+    ./java.nix
+    ./rust.nix
+    ./other.nix
     ./home-manager.nix
   ];
 }
