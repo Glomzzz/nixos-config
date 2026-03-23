@@ -1,9 +1,9 @@
 {
-  inputs,
   username,
   hostname,
   ...
-}: {
+}:
+{
   imports = [
     ./networking.nix
     ../../hardware/zephyrus
@@ -18,7 +18,10 @@
   users.users.${username} = {
     isNormalUser = true;
     description = username;
-    extraGroups = ["networkmanager" "wheel"];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
   };
 
   # Enable the X server (for compatibility)
@@ -31,22 +34,17 @@
   services.displayManager.autoLogin.enable = false;
 
   nixpkgs.overlays = [
-    inputs.nix-openclaw.overlays.default
-    (final: prev: {
+    (final: _prev: {
       codex = final.callPackage ../../pkgs/codex.nix {};
       sub2api = final.callPackage ../../pkgs/sub2api.nix {};
-
-      mycli = prev.mycli.overridePythonAttrs (old: {
-        pythonRelaxDeps = (old.pythonRelaxDeps or []) ++ ["sqlglot"];
-        nativeBuildInputs =
-          (old.nativeBuildInputs or [])
-          ++ [final.python3Packages.pythonRelaxDepsHook];
-      });
     })
   ];
 
   nixpkgs.config.allowUnfree = true;
 
   system.stateVersion = "26.05";
-  nix.settings.experimental-features = ["nix-command" "flakes"];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 }

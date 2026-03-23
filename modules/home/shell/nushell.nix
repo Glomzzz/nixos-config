@@ -75,7 +75,6 @@ in {
       processCompletions = concatStringsSep "\n" (map (path: "use ${path} *") getNuFiles);
     in ''
       $env.SHELL = "nu";
-      $env.OPENCLAW_BUNDLED_PLUGINS_DIR = "${pkgs.openclaw-gateway}/lib/openclaw/extensions";
       $env.config.show_banner = false
 
       let carapace_completer = {|spans|
