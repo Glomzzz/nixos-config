@@ -2,7 +2,8 @@
   username,
   lib,
   ...
-}: {
+}:
+{
   imports = [
     ./programs
     ./shell
@@ -14,7 +15,7 @@
     inherit username;
     homeDirectory = lib.mkForce "/home/${username}";
 
-    stateVersion = "25.05";
+    stateVersion = "26.05";
   };
 
   programs.home-manager.enable = true;

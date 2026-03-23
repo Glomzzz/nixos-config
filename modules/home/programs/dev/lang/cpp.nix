@@ -1,5 +1,7 @@
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
   home.packages = with pkgs; [
+    gnumake
     glibc
     clang-tools
     libgccjit
@@ -8,5 +10,6 @@
     clang
     valgrind
     vcpkg
+    pkg-config
   ];
 }
