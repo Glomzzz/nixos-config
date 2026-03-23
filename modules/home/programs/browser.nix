@@ -1,7 +1,11 @@
-{...}: let
-  legacyRoot = ./../../..;
-in {
-  imports = [
-    (legacyRoot + "/home/programs/browser.nix")
+{pkgs, ...}: {
+  home.packages = with pkgs; let
+    chromeBeta = callPackage ../../../home/programs/google-chrome-beta.nix {};
+  in [
+    chromeBeta
   ];
+
+  home.sessionVariables = {
+    BROWSER = "google-chrome-beta";
+  };
 }

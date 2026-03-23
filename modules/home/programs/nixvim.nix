@@ -1,7 +1,15 @@
-{...}: let
-  legacyRoot = ./../../..;
-in {
-  imports = [
-    (legacyRoot + "/home/nixvim/default.nix")
+{
+  inputs,
+  system,
+  ...
+}: {
+  home.packages = let
+    nixvim = inputs.nixvim-source.packages.${system}.default;
+  in [
+    nixvim
   ];
+
+  home.sessionVariables = {
+    EDITOR = "nvim";
+  };
 }
