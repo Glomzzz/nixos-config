@@ -1,35 +1,8 @@
-{pkgs, lib, ...}: let
-  sub2apiVersion = "0.1.104";
-  sub2apiSources = {
-    "x86_64-linux" = {
-      url = "https://github.com/Wei-Shaw/sub2api/releases/download/v${sub2apiVersion}/sub2api_${sub2apiVersion}_linux_amd64.tar.gz";
-      sha256 = "sha256-JGqb++t13WpTGzFRYzLBYWsRZrs8JDtgECuKjQ54GKk=";
-    };
-    "aarch64-linux" = {
-      url = "https://github.com/Wei-Shaw/sub2api/releases/download/v${sub2apiVersion}/sub2api_${sub2apiVersion}_linux_arm64.tar.gz";
-      sha256 = "sha256-ijhRLHdD9DK7t6KEDU3My9y0fhKvgawT166gWuXx42A=";
-    };
-  };
-  sub2apiSource = lib.attrByPath [pkgs.stdenv.hostPlatform.system] null sub2apiSources;
-  sub2api = pkgs.stdenvNoCC.mkDerivation {
-    pname = "sub2api";
-    version = sub2apiVersion;
-    src = pkgs.fetchurl sub2apiSource;
-    nativeBuildInputs = [pkgs.gnutar];
-    dontUnpack = true;
-    installPhase = ''
-      runHook preInstall
-      mkdir -p "$out/bin"
-      tar -xzf "$src"
-      install -m755 sub2api "$out/bin/sub2api"
-      runHook postInstall
-    '';
-  };
-in {
+{pkgs, ...}: {
   assertions = [
     {
-      assertion = sub2apiSource != null;
-      message = "sub2api: unsupported system ${pkgs.stdenv.hostPlatform.system}";
+      assertion = pkgs ? sub2api;
+      message = "sub2api package is missing from pkgs";
     }
   ];
 
@@ -95,7 +68,7 @@ in {
       User = "sub2api";
       Group = "sub2api";
       WorkingDirectory = "/var/lib/sub2api";
-      ExecStart = "${sub2api}/bin/sub2api";
+      ExecStart = "${pkgs.sub2api}/bin/sub2api";
       Restart = "on-failure";
       RestartSec = "5s";
       StateDirectory = "sub2api";
