@@ -1,8 +1,8 @@
 {...}: {
   imports = [
-    ../../../system/programs.nix
-    ../../../system/nix-ld.nix
-    ../../../system/wine.nix
-    ../../../system/steam.nix
+    ./programs.nix
+    ./nix-ld.nix
+    ./wine.nix
+    ./steam.nix
   ];
 }

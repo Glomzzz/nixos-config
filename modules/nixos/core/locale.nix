@@ -1,8 +1,8 @@
-{ pkgs,... }:
+{ ... }:
 {
-
   security.rtkit.enable = true;
   time.timeZone = "Asia/Singapore";
+
   i18n = {
     defaultLocale = "en_US.UTF-8";
     supportedLocales = [
@@ -23,7 +23,6 @@
       LC_PAPER = "en_US.UTF-8";
       LC_TELEPHONE = "en_US.UTF-8";
       LC_TIME = "en_US.UTF-8";
+    };
   };
-  };
-
 }
