@@ -1,0 +1,10 @@
+keys:
+  - &operator age13q4trdmhusl5ga4jydpgfpd247z8sakknh7898rxdkvpjr32fepsmp0fsq
+  - &nixos age1n2grhrttd7fstlwneu3ygwta0frhscup9wv6d8eul0g2tsrq9g8qv0ul75
+
+creation_rules:
+  - path_regex: ^secrets/hosts/nixos\.yaml$
+    key_groups:
+      - age:
+          - *operator
+          - *nixos
