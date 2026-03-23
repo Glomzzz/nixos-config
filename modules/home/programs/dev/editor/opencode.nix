@@ -7,6 +7,7 @@ in {
   programs.opencode = {
     enable = true;
     settings = {
+      "$schema" = "https://opencode.ai/config.json";
       plugin = [ "oh-my-opencode@latest" ];
       provider = {
         openai = {
