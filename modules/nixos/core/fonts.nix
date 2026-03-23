@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   fonts = {
     packages = with pkgs; [
       material-design-icons
@@ -25,10 +24,10 @@
       antialias = true;
       hinting.enable = true;
       defaultFonts = {
-        emoji = [ "Noto Color Emoji" ];
-        monospace = [ "FiraCode Nerd Font" ];
-        sansSerif = [ "Noto Sans CJK SC" ];
-        serif = [ "Noto Serif CJK SC" ];
+        emoji = ["Noto Color Emoji"];
+        monospace = ["FiraCode Nerd Font"];
+        sansSerif = ["Noto Sans CJK SC"];
+        serif = ["Noto Serif CJK SC"];
       };
     };
   };

@@ -6,7 +6,8 @@
   authorizedKeys = import ../../../users/glom/ssh/authorizedKeys.nix;
   hasAuthorizedKeys = authorizedKeys != [];
 in {
-  warnings = lib.optional (!hasAuthorizedKeys)
+  warnings =
+    lib.optional (!hasAuthorizedKeys)
     "OpenSSH password authentication remains enabled because users/glom/ssh/authorizedKeys.nix is empty.";
 
   services.openssh = {

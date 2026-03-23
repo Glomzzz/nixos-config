@@ -1,5 +1,11 @@
 # just is a command runner, Justfile is very similar to Makefile, but simpler.
 
+check:
+  nix flake check --no-build
+
+build HOST='nixos':
+  host='{{HOST}}'; host="${host#HOST=}"; nix build ".#nixosConfigurations.${host}.config.system.build.toplevel" --no-link
+
 ############################################################################
 #
 #  Nix commands related to the local machine
@@ -38,5 +44,3 @@ gc:
 # why:
 #   nix shell nixpkgs#nix-tree nixpkgs#ripgrep
 #   nix-store --gc --print-roots | rg -v '/proc/' | rg -Po '(?<= -> ).*' | xargs -o nix-tree
-
-

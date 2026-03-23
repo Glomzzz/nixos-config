@@ -1,6 +1,4 @@
-{ modulesPath, ... }:
-
-{
+{modulesPath, ...}: {
   nixpkgs.hostPlatform = "x86_64-linux";
 
   imports = [
@@ -15,10 +13,8 @@
     ./asus.nix
     ./graphics-stack.nix
     (modulesPath + "/installer/scan/not-detected.nix")
-    ];
- 
+  ];
 
   hardware.enableAllFirmware = true;
   hardware.enableRedistributableFirmware = true;
-
 }

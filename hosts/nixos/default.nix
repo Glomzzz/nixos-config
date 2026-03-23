@@ -38,7 +38,8 @@
 
       mycli = prev.mycli.overridePythonAttrs (old: {
         pythonRelaxDeps = (old.pythonRelaxDeps or []) ++ ["sqlglot"];
-        nativeBuildInputs = (old.nativeBuildInputs or [])
+        nativeBuildInputs =
+          (old.nativeBuildInputs or [])
           ++ [final.python3Packages.pythonRelaxDepsHook];
       });
     })

@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   environment.systemPackages = with pkgs; [
     gamescope
   ];
@@ -9,7 +8,7 @@
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
     localNetworkGameTransfers.openFirewall = true;
-    fontPackages = with pkgs; [ source-han-sans ];
+    fontPackages = with pkgs; [source-han-sans];
     extraPackages = with pkgs; [
       corefonts
       noto-fonts-cjk-sans

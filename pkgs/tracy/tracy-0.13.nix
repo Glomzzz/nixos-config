@@ -1,6 +1,5 @@
 {
   fetchFromGitHub,
-
   md4c,
   pugixml,
   curl,
@@ -8,8 +7,7 @@
   nlohmann_json,
   nativefiledialog-extended,
   html-tidy,
-}:
-{
+}: {
   version = "0.13.1";
   srcHash = "sha256-D4aQ5kSfWH9qEUaithR0W/E5pN5on0n9YoBHeMggMSE=";
   extraBuildInputs = [
@@ -29,7 +27,7 @@
       hash = "sha256-/jVT7+874LCeSF/pdNVTFoSOfRisSqxCJnt5/SGCXPQ=";
     })
     # Use nixpkgs source but let CPM build with tracy's options (NFD_PORTAL)
-    (nativefiledialog-extended.src // { name = "nfd"; })
+    (nativefiledialog-extended.src // {name = "nfd";})
     (fetchFromGitHub {
       name = "PPQSort";
       owner = "GabTux";

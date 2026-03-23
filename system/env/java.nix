@@ -1,5 +1,4 @@
-
-{ pkgs, ... }: {
+{pkgs, ...}: {
   environment.systemPackages = with pkgs; [
     # graalpy
     # trufflerruby
@@ -7,6 +6,5 @@
     # graaljs
     #    javaPackages.compiler.openjdk21
     graalvmPackages.graalvm-oracle
-
   ];
 }
