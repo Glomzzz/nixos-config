@@ -1,14 +1,16 @@
 {...}: {
   imports = [
     ./dev-cli.nix
-    ./internet.nix
+    ./communication.nix
+    ./network-clients.nix
     ./browser.nix
     ./git.nix
     ./xdg.nix
     ./code.nix
     ./util.nix
-    ./work.nix
-    ./game.nix
+    ./productivity.nix
+    ./creative.nix
+    ./gaming.nix
     ./nixvim.nix
   ];
 }
