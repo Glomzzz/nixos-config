@@ -35,7 +35,6 @@
 
   nixpkgs.overlays = [
     (final: _prev: {
-      codex = final.callPackage ../../pkgs/codex.nix {};
       sub2api = final.callPackage ../../pkgs/sub2api.nix {};
     })
   ];
