@@ -34,18 +34,13 @@
 
   services.displayManager.autoLogin.user = username;
 
-  services.tailscale = {
-    enable = true;
-  };
-
-  services.openssh.enable = true;
-
   security.pam.services.kde.kwallet.enable = true;
 
   nixpkgs.overlays = [
     inputs.nix-openclaw.overlays.default
     (final: prev: {
       codex = final.callPackage ../../pkgs/codex.nix {};
+      sub2api = final.callPackage ../../pkgs/sub2api.nix {};
 
       mycli = prev.mycli.overridePythonAttrs (old: {
         pythonRelaxDeps = (old.pythonRelaxDeps or []) ++ ["sqlglot"];
