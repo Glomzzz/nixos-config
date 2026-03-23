@@ -1,6 +1,10 @@
-{...}: {
+{ lib, ... }:
+{
+  nix.settings.trusted-users = lib.mkForce [
+    "root"
+    "glom"
+  ];
   imports = [
-    ./nix.nix
     ./locale.nix
     ./fonts.nix
     ./networking.nix
