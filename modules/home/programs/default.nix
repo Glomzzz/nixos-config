@@ -10,7 +10,7 @@
     ./gaming-utils.nix
     ./gaming-wine.nix
     ./git.nix
-    ./system-utilities.nix
+    (./. + "/system-utilities.nix")
     ./xdg.nix
     ./code.nix
     ./util.nix

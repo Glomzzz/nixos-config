@@ -1,6 +1,5 @@
 {
   pkgs,
-  flake-inputs,
   config,
   lib,
   ...
@@ -50,11 +49,6 @@
       nvidiaBusId = "PCI:1:0:0";
     };
   };
-
-  programs.sway.package = pkgs.sway.override {
-    inherit (flake-inputs.nixpkgs-wayland.packages.${pkgs.system}) sway-unwrapped;
-  };
-
   boot = {
     kernelParams = ["nvidia-drm.fbdev=1"];
 

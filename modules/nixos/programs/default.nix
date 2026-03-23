@@ -1,6 +1,6 @@
 {...}: {
   imports = [
-    ./system-tools.nix
+    (./. + "/system-tools.nix")
     ./nix-ld.nix
     ./steam.nix
   ];
