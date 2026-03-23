@@ -1,7 +1,21 @@
-{...}: let
-  legacyRoot = ./../../..;
-in {
+{
+  pkgs,
+  plasma-manager,
+  ...
+}: {
   imports = [
-    (legacyRoot + "/home/plasma/default.nix")
+    plasma-manager.homeModules.plasma-manager
   ];
+
+  home.packages = with pkgs; [
+    plasma-panel-colorizer
+    kdePackages.kconfig
+  ];
+
+  programs.plasma = {
+    enable = true;
+    overrideConfig = false;
+    kscreenlocker.lockOnStartup = true;
+    kscreenlocker.passwordRequired = true;
+  };
 }
