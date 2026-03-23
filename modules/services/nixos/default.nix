@@ -1,6 +1,6 @@
-{lib, ...}: {
+{ lib, ... }:
+{
   imports = [
-    ./clamav.nix
     ./ollama.nix
     ./openssh.nix
     ./printing.nix
