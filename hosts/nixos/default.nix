@@ -8,7 +8,7 @@
     ./networking.nix
     ../../hardware/zephyrus
     ../../modules/nixos
-    ../../users/glom
+    (../../users + "/${username}")
     ../../cachix.nix
   ];
 
