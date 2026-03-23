@@ -1,6 +1,6 @@
 {pkgs, ...}: {
   home.packages = with pkgs; let
-    chromeBeta = callPackage ../../../home/programs/google-chrome-beta.nix {};
+    chromeBeta = callPackage ./google-chrome-beta.nix {};
   in [
     chromeBeta
   ];
