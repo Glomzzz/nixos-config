@@ -5,6 +5,7 @@
   ...
 }: {
   imports = [
+    ./networking.nix
     ../../hardware/zephyrus
     ../../modules/nixos
     ../../users/glom
