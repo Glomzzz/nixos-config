@@ -12,7 +12,6 @@
     extraPackages = with pkgs; [
       nvidia-vaapi-driver
       vulkan-loader
-      vulkan-validation-layers
       vulkan-extension-layer
       mesa
     ];
