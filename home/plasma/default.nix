@@ -1,4 +1,4 @@
-{pkgs,plasma-manager,username,...} : {
+{pkgs, plasma-manager, ...}: {
   imports = [
     plasma-manager.homeModules.plasma-manager
   ];
@@ -10,8 +10,8 @@
   programs.plasma = {
     enable = true;
     overrideConfig = false;
-    kscreenlocker.lockOnStartup = false;
-    kscreenlocker.passwordRequired = false;
+    kscreenlocker.lockOnStartup = true;
+    kscreenlocker.passwordRequired = true;
     # shortcuts = {
     #   "services/Alacritty.desktop"."_launch" = "Ctrl+Alt+T";
     # };
