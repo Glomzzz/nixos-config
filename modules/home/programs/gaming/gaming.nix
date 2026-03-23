@@ -1,7 +1,9 @@
 { pkgs, ... }:
 {
   home.packages = with pkgs; [
-    typst
-    zotero
+    mgba
+    lutris
+    r2modman
+    prismlauncher
   ];
 }

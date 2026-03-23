@@ -3,22 +3,19 @@
   inputs,
   system,
   ...
-}: let
+}:
+let
   nix-alien = inputs.nix-alien-source.packages.${system}.nix-alien;
-in {
+in
+{
   home.packages = with pkgs; [
-    git
+    just
     fastfetch
-    thunar
-    nnn
     zip
     unzip
     p7zip
-    just
     ripgrep
-    gnumake
     fd
-    xclip
     nix-alien
   ];
 }

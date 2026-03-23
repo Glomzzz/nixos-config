@@ -1,9 +1,10 @@
-{...}: {
+{ ... }:
+{
   imports = [
-    ./cpp.nix
-    ./graphics-debug.nix
-    ./java.nix
-    ./rust.nix
-    ./other.nix
+    ./lang
+    ./database
+    ./editor
+    ./direnv.nix
+    ./git.nix
   ];
 }
