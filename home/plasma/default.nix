@@ -1,4 +1,8 @@
-{pkgs, plasma-manager, ...}: {
+{
+  pkgs,
+  plasma-manager,
+  ...
+}: {
   imports = [
     plasma-manager.homeModules.plasma-manager
   ];
@@ -66,7 +70,7 @@
     #             showSeconds = "never";
     #             format = "12h";
     #           };
-    #           timeZone = { 
+    #           timeZone = {
     #             selected = ["Asia/Singapore"];
     #           };
     #           calendar = {
@@ -95,7 +99,7 @@
     #       #     config = {
     #       #       General = {
     #       #         sensors = ''[{"name":"CPU Temperature","sensorId":"cpu/all/averageTemperature"}]'';
-                  
+
     #       #         # [
     #       #         #     "[{"name":"CPU Temperature","sensorId":"cpu/all/averageTemperature"}]"
     #       #         #     # {"name":"GPU Temperature","sensorId":"gpu/gpu1/temperature"}
@@ -151,7 +155,7 @@
     #       #       enable = true;
     #       #       hideWidget = true;
     #       #     };
-              
+
     #       #     widgetBackground = {
     #       #       shape = {
     #       #         radius = 12;

@@ -1,14 +1,12 @@
 {
   fetchFromGitHub,
   fetchFromGitLab,
-
   zstd,
   nativefiledialog-extended,
-}:
-{
+}: {
   version = "0.12.2";
   srcHash = "sha256-voHql8ETnrUMef14LYduKI+0LpdnCFsvpt8B6M/ZNmc=";
-  extraBuildInputs = [ zstd ];
+  extraBuildInputs = [zstd];
   cpmSrcs = [
     (fetchFromGitHub {
       name = "ImGui";
@@ -18,7 +16,7 @@
       hash = "sha256-mQOJ6jCN+7VopgZ61yzaCnt4R1QLrW7+47xxMhFRHLQ=";
     })
     # Use nixpkgs source but let CPM build with tracy's options (NFD_PORTAL)
-    (nativefiledialog-extended.src // { name = "nfd"; })
+    (nativefiledialog-extended.src // {name = "nfd";})
     (fetchFromGitHub {
       name = "PPQSort";
       owner = "GabTux";

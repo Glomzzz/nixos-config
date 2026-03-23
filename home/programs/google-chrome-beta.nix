@@ -5,7 +5,6 @@
   patchelf,
   stdenvNoCC,
   bintools,
-
   # Linked dynamic libraries.
   alsa-lib,
   at-spi2-atk,
@@ -46,20 +45,15 @@
   pipewire,
   vulkan-loader,
   wayland, # ozone/wayland
-
   # Command line programs
   coreutils,
-
   # command line arguments which are always set e.g "--disable-gpu"
   commandLineArgs ? "",
-
   # Will crash without.
   systemd,
-
   # Loaded at runtime.
   libexif,
   pciutils,
-
   # Additional dependencies according to other distros.
   ## Ubuntu
   curl,
@@ -78,109 +72,101 @@
   ## Gentoo
   bzip2,
   libcap,
-
   # Fonts (See issue #463615)
   makeFontsConf,
   noto-fonts-cjk-sans,
   noto-fonts-cjk-serif,
-
   # Necessary for USB audio devices.
   libpulseaudio,
   pulseSupport ? true,
-
   adwaita-icon-theme,
   gsettings-desktop-schemas,
-
   # For video acceleration via VA-API (--enable-features=VaapiVideoDecoder)
   libva,
   libvaSupport ? true,
-
   # For Vulkan support (--enable-features=Vulkan)
   addDriverRunpath,
   undmg,
-
   # Enables Chrome's "Use QT" appearance to introspect the user's Plasma theme
   plasmaSupport ? false,
   qt6,
   kdePackages,
-
   # Create a symlink at $out/bin/google-chrome
   withSymlink ? true,
-}:
-
-let
+}: let
   pname = "google-chrome-beta";
 
-  opusWithCustomModes = libopus.override { withCustomModes = true; };
+  opusWithCustomModes = libopus.override {withCustomModes = true;};
 
-  deps = [
-    alsa-lib
-    at-spi2-atk
-    at-spi2-core
-    atk
-    bzip2
-    cairo
-    coreutils
-    cups
-    curl
-    dbus
-    expat
-    flac
-    fontconfig
-    freetype
-    gcc-unwrapped.lib
-    gdk-pixbuf
-    glib
-    harfbuzz
-    icu
-    libcap
-    libdrm
-    liberation_ttf
-    libexif
-    libglvnd
-    libkrb5
-    libpng
-    libx11
-    libxcb
-    libxcomposite
-    libxcursor
-    libxdamage
-    libxext
-    libxfixes
-    libxi
-    libxkbcommon
-    libxrandr
-    libxrender
-    libxscrnsaver
-    libxshmfence
-    libxtst
-    libgbm
-    nspr
-    nss
-    opusWithCustomModes
-    pango
-    pciutils
-    pipewire
-    snappy
-    speechd-minimal
-    systemd
-    util-linux
-    vulkan-loader
-    wayland
-    wget
-  ]
-  ++ lib.optional pulseSupport libpulseaudio
-  ++ lib.optional libvaSupport libva
-  ++ [
-    gtk3
-    gtk4
-  ]
-  ++ lib.optionals plasmaSupport [
-    qt6.qtbase
-    qt6.qtwayland
-    kdePackages.plasma-integration
-    kdePackages.breeze
-  ];
+  deps =
+    [
+      alsa-lib
+      at-spi2-atk
+      at-spi2-core
+      atk
+      bzip2
+      cairo
+      coreutils
+      cups
+      curl
+      dbus
+      expat
+      flac
+      fontconfig
+      freetype
+      gcc-unwrapped.lib
+      gdk-pixbuf
+      glib
+      harfbuzz
+      icu
+      libcap
+      libdrm
+      liberation_ttf
+      libexif
+      libglvnd
+      libkrb5
+      libpng
+      libx11
+      libxcb
+      libxcomposite
+      libxcursor
+      libxdamage
+      libxext
+      libxfixes
+      libxi
+      libxkbcommon
+      libxrandr
+      libxrender
+      libxscrnsaver
+      libxshmfence
+      libxtst
+      libgbm
+      nspr
+      nss
+      opusWithCustomModes
+      pango
+      pciutils
+      pipewire
+      snappy
+      speechd-minimal
+      systemd
+      util-linux
+      vulkan-loader
+      wayland
+      wget
+    ]
+    ++ lib.optional pulseSupport libpulseaudio
+    ++ lib.optional libvaSupport libva
+    ++ [
+      gtk3
+      gtk4
+    ]
+    ++ lib.optionals plasmaSupport [
+      qt6.qtbase
+      qt6.qtwayland
+      kdePackages.plasma-integration
+      kdePackages.breeze
+    ];
 
   linux = stdenvNoCC.mkDerivation (finalAttrs: {
     inherit pname meta;
@@ -273,15 +259,15 @@ let
       # "--simulate-outdated-no-au" disables auto updates and browser outdated popup
       makeWrapper "$out/share/google/$appname/google-$appname" "$exe" \
         ${lib.optionalString plasmaSupport ''
-          --prefix QT_PLUGIN_PATH  : "${qt6.qtbase}/lib/qt-6/plugins" \
-          --prefix QT_PLUGIN_PATH  : "${qt6.qtwayland}/lib/qt-6/plugins" \
-          --prefix QT_PLUGIN_PATH  : "${kdePackages.plasma-integration}/lib/qt-6/plugins" \
-          --prefix QT_PLUGIN_PATH  : "${kdePackages.breeze}/lib/qt-6/plugins" \
-          --prefix NIXPKGS_QT6_QML_IMPORT_PATH : "${qt6.qtwayland}/lib/qt-6/qml" \
-        ''} \
+        --prefix QT_PLUGIN_PATH  : "${qt6.qtbase}/lib/qt-6/plugins" \
+        --prefix QT_PLUGIN_PATH  : "${qt6.qtwayland}/lib/qt-6/plugins" \
+        --prefix QT_PLUGIN_PATH  : "${kdePackages.plasma-integration}/lib/qt-6/plugins" \
+        --prefix QT_PLUGIN_PATH  : "${kdePackages.breeze}/lib/qt-6/plugins" \
+        --prefix NIXPKGS_QT6_QML_IMPORT_PATH : "${qt6.qtwayland}/lib/qt-6/qml" \
+      ''} \
         --prefix LD_LIBRARY_PATH : "$rpath" \
         --prefix PATH            : "$binpath" \
-        --suffix PATH            : "${lib.makeBinPath [ xdg-utils ]}" \
+        --suffix PATH            : "${lib.makeBinPath [xdg-utils]}" \
         --prefix XDG_DATA_DIRS   : "$XDG_ICON_DIRS:$GSETTINGS_SCHEMAS_PATH:${addDriverRunpath.driverLink}/share" \
         --set FONTCONFIG_FILE "${finalAttrs.fontsConf}" \
         --set CHROME_WRAPPER  "google-chrome-$dist" \
@@ -355,14 +341,13 @@ let
       iedame
       mdaniels5757
     ];
-    platforms = lib.platforms.darwin ++ [ "x86_64-linux" ];
-    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
+    platforms = lib.platforms.darwin ++ ["x86_64-linux"];
+    sourceProvenance = with lib.sourceTypes; [binaryNativeCode];
     mainProgram = "google-chrome-beta";
   };
 in
-if stdenvNoCC.hostPlatform.isDarwin then
-  darwin
-else if stdenvNoCC.hostPlatform.isLinux then
-  linux
-else
-  throw "Unsupported platform ${stdenvNoCC.hostPlatform.system}"
+  if stdenvNoCC.hostPlatform.isDarwin
+  then darwin
+  else if stdenvNoCC.hostPlatform.isLinux
+  then linux
+  else throw "Unsupported platform ${stdenvNoCC.hostPlatform.system}"

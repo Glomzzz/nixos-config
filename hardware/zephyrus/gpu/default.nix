@@ -4,7 +4,7 @@
   lib,
   ...
 }: {
-  services.xserver.videoDrivers = [ "nvidia"];
+  services.xserver.videoDrivers = ["nvidia"];
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
@@ -17,10 +17,10 @@
   };
 
   hardware.nvidia = let
-     #   nvidia-src = pkgs.fetchurl {
-     #     url = "https://us.download.nvidia.com/XFree86/Linux-x86_64/580.126.18/NVIDIA-Linux-x86_64-580.126.18.run";
-     #     sha256 = "sha256-p3gbLhwtZcZYCRTHbnntRU0ClF34RxHAMwcKCSqatJ0=";
-     # };
+    #   nvidia-src = pkgs.fetchurl {
+    #     url = "https://us.download.nvidia.com/XFree86/Linux-x86_64/580.126.18/NVIDIA-Linux-x86_64-580.126.18.run";
+    #     sha256 = "sha256-p3gbLhwtZcZYCRTHbnntRU0ClF34RxHAMwcKCSqatJ0=";
+    # };
   in {
     open = false;
     package = config.boot.kernelPackages.nvidiaPackages.production;
@@ -44,7 +44,9 @@
         enableOffloadCmd = true;
       };
       */
-/*       sync.enable = true; */
+      /*
+      sync.enable = true;
+      */
       intelBusId = "PCI:0:2:0";
       nvidiaBusId = "PCI:1:0:0";
     };

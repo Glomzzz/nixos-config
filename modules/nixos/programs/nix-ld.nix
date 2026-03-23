@@ -1,5 +1,8 @@
-{ config, pkgs, ... }:
 {
+  config,
+  pkgs,
+  ...
+}: {
   # For jetbrains IDEs
   programs.nix-ld.enable = true;
   nixpkgs.config.permittedInsecurePackages = [
