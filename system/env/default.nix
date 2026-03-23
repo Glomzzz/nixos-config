@@ -1,5 +1,4 @@
-
-{ pkgs, ... }: {
+{pkgs, ...}: {
   imports = [
     ./cpp.nix
     ./java.nix

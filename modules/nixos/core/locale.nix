@@ -1,5 +1,4 @@
-{ ... }:
-{
+{...}: {
   security.rtkit.enable = true;
   time.timeZone = "Asia/Singapore";
 

@@ -31,7 +31,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   sourceRoot = "${finalAttrs.src.name}/codex-rs";
 
   depsExtraArgs = {
-    nativeBuildInputs = [ cargo ];
+    nativeBuildInputs = [cargo];
     postBuild = ''
       shopt -s globstar
       for manifest_path in "$out"/**/Cargo.toml; do
@@ -51,13 +51,14 @@ rustPlatform.buildRustPackage (finalAttrs: {
     pkg-config
   ];
 
-  buildInputs = [
-    libclang
-    openssl
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [
-    libcap
-  ];
+  buildInputs =
+    [
+      libclang
+      openssl
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
+      libcap
+    ];
 
   env = {
     LIBCLANG_PATH = "${lib.getLib libclang}/lib";
@@ -81,11 +82,11 @@ rustPlatform.buildRustPackage (finalAttrs: {
   '';
 
   postFixup = ''
-    wrapProgram $out/bin/codex --prefix PATH : ${lib.makeBinPath [ ripgrep ]}
+    wrapProgram $out/bin/codex --prefix PATH : ${lib.makeBinPath [ripgrep]}
   '';
 
   doInstallCheck = true;
-  nativeInstallCheckInputs = [ versionCheckHook ];
+  nativeInstallCheckInputs = [versionCheckHook];
 
   meta = {
     description = "Lightweight coding agent that runs in your terminal";

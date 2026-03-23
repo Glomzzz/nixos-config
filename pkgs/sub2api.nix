@@ -4,8 +4,7 @@
   fetchurl,
   gnutar,
   system,
-}:
-let
+}: let
   version = "0.1.104";
   sources = {
     "x86_64-linux" = {
@@ -19,27 +18,27 @@ let
   };
   source = lib.attrByPath [system] null sources;
 in
-stdenvNoCC.mkDerivation {
-  pname = "sub2api";
-  inherit version;
+  stdenvNoCC.mkDerivation {
+    pname = "sub2api";
+    inherit version;
 
-  src = fetchurl source;
-  nativeBuildInputs = [gnutar];
-  dontUnpack = true;
+    src = fetchurl source;
+    nativeBuildInputs = [gnutar];
+    dontUnpack = true;
 
-  installPhase = ''
-    runHook preInstall
-    mkdir -p "$out/bin"
-    tar -xzf "$src"
-    install -m755 sub2api "$out/bin/sub2api"
-    runHook postInstall
-  '';
+    installPhase = ''
+      runHook preInstall
+      mkdir -p "$out/bin"
+      tar -xzf "$src"
+      install -m755 sub2api "$out/bin/sub2api"
+      runHook postInstall
+    '';
 
-  meta = {
-    description = "Sub2API binary package";
-    homepage = "https://github.com/Wei-Shaw/sub2api";
-    license = lib.licenses.unfreeRedistributable;
-    platforms = builtins.attrNames sources;
-    mainProgram = "sub2api";
-  };
-}
+    meta = {
+      description = "Sub2API binary package";
+      homepage = "https://github.com/Wei-Shaw/sub2api";
+      license = lib.licenses.unfreeRedistributable;
+      platforms = builtins.attrNames sources;
+      mainProgram = "sub2api";
+    };
+  }

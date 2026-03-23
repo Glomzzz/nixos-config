@@ -1,7 +1,4 @@
-{
-pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   environment.systemPackages = with pkgs; [
     # winePackages.unstableFull
     wineWow64Packages.waylandFull

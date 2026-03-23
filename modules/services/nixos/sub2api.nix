@@ -1,4 +1,8 @@
-{config, pkgs, ...}: {
+{
+  config,
+  pkgs,
+  ...
+}: {
   assertions = [
     {
       assertion = pkgs ? sub2api;

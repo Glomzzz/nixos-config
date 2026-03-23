@@ -24,6 +24,5 @@
       defaultProfiles = ["gpu-hq"];
       scripts = [pkgs.mpvScripts.mpris];
     };
-
   };
 }

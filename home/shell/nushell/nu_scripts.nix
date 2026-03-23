@@ -4,7 +4,6 @@
   fetchFromGitHub,
   unstableGitUpdater,
 }:
-
 stdenvNoCC.mkDerivation {
   pname = "nu_scripts";
   version = "0-unstable-2025-09-24";
@@ -25,7 +24,7 @@ stdenvNoCC.mkDerivation {
     runHook postInstall
   '';
 
-  passthru.updateScript = unstableGitUpdater { };
+  passthru.updateScript = unstableGitUpdater {};
 
   meta = {
     description = "Place to share Nushell scripts with each other";
@@ -33,6 +32,6 @@ stdenvNoCC.mkDerivation {
     license = lib.licenses.mit;
 
     platforms = lib.platforms.unix;
-    maintainers = [ lib.maintainers.CardboardTurkey ];
+    maintainers = [lib.maintainers.CardboardTurkey];
   };
 }
