@@ -35,8 +35,6 @@
 
   services.displayManager.autoLogin.user = username;
 
-  security.pam.services.kde.kwallet.enable = true;
-
   nixpkgs.overlays = [
     inputs.nix-openclaw.overlays.default
     (final: prev: {

@@ -1,4 +1,4 @@
-{pkgs, inputs, ...}:
+{inputs, ...}:
 {
   ##################################################################################################################
   #
@@ -11,10 +11,6 @@
     ../../modules/home
   ];
 
-  home.packages = with pkgs; [
-    kdePackages.kwallet-pam
-    poppler_data
-  ];
   home.enableNixpkgsReleaseCheck = false;
   # home.sessionVariables = {
   #   OPENCLAW_BUNDLED_PLUGINS_DIR = "${pkgs.openclaw-gateway}/lib/openclaw/extensions";
