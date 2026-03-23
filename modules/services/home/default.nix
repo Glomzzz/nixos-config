@@ -1,6 +1,7 @@
 {...}: {
   imports = [
-    ../../../home/programs/common.nix
-    ../../../home/programs/media.nix
+    ./syncthing.nix
+    ./udiskie.nix
+    ./playerctld.nix
   ];
 }

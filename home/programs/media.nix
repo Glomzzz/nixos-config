@@ -26,10 +26,4 @@
     };
 
   };
-
-  services = {
-    playerctld.enable = true;
-  };
-
-  
 }
