@@ -15,8 +15,6 @@
   networking.hostName = hostname;
   services.resolved.enable = true;
 
-  nix.settings.trusted-users = ["root" "@wheel" username];
-
   users.users.${username} = {
     isNormalUser = true;
     description = username;
@@ -30,10 +28,7 @@
   # Enable the KDE Plasma 6 desktop
   services.desktopManager.plasma6.enable = true;
 
-  # Enable automatic login for the user.
-  services.displayManager.autoLogin.enable = true;
-
-  services.displayManager.autoLogin.user = username;
+  services.displayManager.autoLogin.enable = false;
 
   nixpkgs.overlays = [
     inputs.nix-openclaw.overlays.default
