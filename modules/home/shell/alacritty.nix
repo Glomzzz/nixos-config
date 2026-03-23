@@ -7,7 +7,7 @@ in {
 
     settings = {
       general.import = [
-        ../../../home/shell/alacritty/catppuccin-mocha.toml
+        ./alacritty/catppuccin-mocha.toml
       ];
       window = {
         opacity = 0.93;
