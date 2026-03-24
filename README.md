@@ -29,3 +29,5 @@ Based on Flakes & Home Manager
   - ***Aren't Nix great?***
 - 25.5.19, embrace home-manager 25.05 & NixOS 25.11 (9ccac7d)
   - Enabled Fcitx5 wayland-frontend to fix inputmethod problem in wechat-uos
+- 26.3.20, refactor file structure for better module split (9cc1a4a)
+  - Hosts/Systems/Services
