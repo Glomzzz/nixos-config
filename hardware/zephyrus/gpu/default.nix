@@ -3,9 +3,8 @@
   config,
   lib,
   ...
-}:
-{
-  services.xserver.videoDrivers = [ "nvidia" ];
+}: {
+  services.xserver.videoDrivers = ["nvidia"];
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
@@ -42,10 +41,10 @@
 
       prime = {
         /*
-             offload = {
-            enable = true;
-            enableOffloadCmd = true;
-          };
+           offload = {
+          enable = true;
+          enableOffloadCmd = true;
+        };
         */
         # sync.enable = true;
         intelBusId = "PCI:0:2:0";
@@ -53,7 +52,7 @@
       };
     };
   boot = {
-    kernelParams = [ "nvidia-drm.fbdev=1" ];
+    kernelParams = ["nvidia-drm.fbdev=1"];
 
     extraModprobeConfig =
       "options nvidia "

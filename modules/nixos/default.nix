@@ -1,5 +1,4 @@
-{ ... }:
-{
+{...}: {
   imports = [
     ./core
     ../services/nixos

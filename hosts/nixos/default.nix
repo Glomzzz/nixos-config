@@ -2,8 +2,7 @@
   username,
   hostname,
   ...
-}:
-{
+}: {
   imports = [
     ./networking.nix
     ../../hardware/zephyrus

@@ -1,5 +1,4 @@
-{ ... }:
-{
+{...}: {
   imports = [
     ./jetbrains.nix
     ./nixvim.nix
