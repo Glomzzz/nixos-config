@@ -1,5 +1,4 @@
-{ ... }:
-{
+{...}: {
   programs.zed-editor = {
     enable = true;
     mutableUserSettings = false;
@@ -24,13 +23,13 @@
       buffer_font_family = "Monocraft";
       icon_theme = "Material Icon Theme";
       agent = {
-        favorite_models = [ ];
+        favorite_models = [];
         inline_assistant_model = {
           provider = "copilot_chat";
           model = "gpt-4o";
           enable_thinking = false;
         };
-        model_parameters = [ ];
+        model_parameters = [];
       };
       telemetry = {
         diagnostics = false;
@@ -62,11 +61,11 @@
     userKeymaps = [
       {
         context = "Workspace";
-        bindings = { };
+        bindings = {};
       }
       {
         context = "Editor && vim_mode == insert";
-        bindings = { };
+        bindings = {};
       }
       {
         context = "AcpThread > (Editor && !use_modifier_to_send)";

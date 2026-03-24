@@ -1,5 +1,4 @@
-{pkgs, ...}:
-let
+{pkgs, ...}: let
   font = "JetBrainsMono Nerd Font";
 in {
   programs.alacritty = {

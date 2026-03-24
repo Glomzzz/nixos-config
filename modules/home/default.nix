@@ -2,8 +2,7 @@
   username,
   lib,
   ...
-}:
-{
+}: {
   imports = [
     ./programs
     ./shell

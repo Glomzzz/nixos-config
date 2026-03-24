@@ -3,11 +3,9 @@
   specialArgs,
   username,
   ...
-}:
-let
+}: let
   userRoot = ../../../users + "/${username}";
-in
-{
+in {
   home-manager.backupFileExtension = "hm-backup";
 
   home-manager.useGlobalPkgs = true;
