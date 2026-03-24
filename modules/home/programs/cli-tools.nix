@@ -3,11 +3,9 @@
   inputs,
   system,
   ...
-}:
-let
+}: let
   nix-alien = inputs.nix-alien-source.packages.${system}.nix-alien;
-in
-{
+in {
   home.packages = with pkgs; [
     just
     fastfetch

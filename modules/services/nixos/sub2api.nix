@@ -3,8 +3,7 @@
   lib,
   config,
   ...
-}:
-let
+}: let
   sub2apiVersion = "0.1.104";
   sub2apiSources = {
     "x86_64-linux" = {
@@ -16,12 +15,12 @@ let
       sha256 = "sha256-ijhRLHdD9DK7t6KEDU3My9y0fhKvgawT166gWuXx42A=";
     };
   };
-  sub2apiSource = lib.attrByPath [ pkgs.stdenv.hostPlatform.system ] null sub2apiSources;
+  sub2apiSource = lib.attrByPath [pkgs.stdenv.hostPlatform.system] null sub2apiSources;
   sub2api = pkgs.stdenvNoCC.mkDerivation {
     pname = "sub2api";
     version = sub2apiVersion;
     src = pkgs.fetchurl sub2apiSource;
-    nativeBuildInputs = [ pkgs.gnutar ];
+    nativeBuildInputs = [pkgs.gnutar];
     dontUnpack = true;
     installPhase = ''
       runHook preInstall
@@ -31,8 +30,7 @@ let
       runHook postInstall
     '';
   };
-in
-{
+in {
   assertions = [
     {
       assertion = sub2apiSource != null;
@@ -40,7 +38,7 @@ in
     }
   ];
 
-  users.groups.sub2api = { };
+  users.groups.sub2api = {};
   users.users.sub2api = {
     isSystemUser = true;
     group = "sub2api";
@@ -91,7 +89,7 @@ in
 
   services.postgresql = {
     enable = true;
-    ensureDatabases = [ "sub2api" ];
+    ensureDatabases = ["sub2api"];
     ensureUsers = [
       {
         name = "sub2api";
@@ -109,8 +107,8 @@ in
       "postgresql.service"
       "postgresql-setup.service"
     ];
-    before = [ "sub2api.service" ];
-    wantedBy = [ "multi-user.target" ];
+    before = ["sub2api.service"];
+    wantedBy = ["multi-user.target"];
 
     serviceConfig = {
       Type = "oneshot";
@@ -158,7 +156,7 @@ in
       "postgresql-setup.service"
       "redis.service"
     ];
-    wantedBy = [ "multi-user.target" ];
+    wantedBy = ["multi-user.target"];
 
     serviceConfig = {
       User = "sub2api";

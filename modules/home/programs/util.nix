@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   home.packages = with pkgs; [
     wget
     usbutils
@@ -7,5 +6,4 @@
     curl
     sysstat
   ];
-
 }

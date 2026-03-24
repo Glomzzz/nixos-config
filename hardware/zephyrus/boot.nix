@@ -1,5 +1,4 @@
-{ ... }:
-{
+{...}: {
   boot = {
     loader.systemd-boot.configurationLimit = 3;
     initrd.availableKernelModules = [
@@ -11,8 +10,8 @@
       "sd_mod"
       "rtsx_pci_sdmmc"
     ];
-    initrd.kernelModules = [ ];
-    kernelModules = [ "kvm-intel" ];
+    initrd.kernelModules = [];
+    kernelModules = ["kvm-intel"];
     kernelParams = [
       "i915.enable_psr=0"
       "i8042.dumbkbd"
