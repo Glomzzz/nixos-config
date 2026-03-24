@@ -1,4 +1,5 @@
-{modulesPath, ...}: {
+{ modulesPath, pkgs, ... }:
+{
   nixpkgs.hostPlatform = "x86_64-linux";
 
   imports = [
@@ -17,4 +18,7 @@
 
   hardware.enableAllFirmware = true;
   hardware.enableRedistributableFirmware = true;
+  environment.systemPackages = with pkgs; [
+    thunderbolt
+  ];
 }
