@@ -1,4 +1,5 @@
-{lib, ...}: {
+{ lib, ... }:
+{
   nix.settings.trusted-users = lib.mkForce [
     "root"
     "glom"
@@ -9,6 +10,7 @@
     ./networking.nix
     ./plasma-auth.nix
     ./sops.nix
-    (./. + "/home-manager.nix")
+    ./nix-ld.nix
+    ./home-manager.nix
   ];
 }
