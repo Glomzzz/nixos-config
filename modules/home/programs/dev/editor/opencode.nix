@@ -1,17 +1,21 @@
-{osConfig, ...}: let
-  openaiApiKeyFile = osConfig.sops.secrets."opencode/openai_api_key".path;
-in {
-  home.sessionVariables.OPENCODE_OPENAI_API_KEY_FILE = openaiApiKeyFile;
+{ osConfig, ... }:
+let
+  openaiBaseFile = osConfig.sops.secrets."openai/base".path;
+  openaiApiKeyFile = osConfig.sops.secrets."openai/api_key".path;
+in
+{
+  home.sessionVariables.OPENAI_BASE_API_FILE = openaiBaseFile;
+  home.sessionVariables.OPENAI_API_KEY_FILE = openaiApiKeyFile;
 
   programs.opencode = {
     enable = true;
     settings = {
       "$schema" = "https://opencode.ai/config.json";
-      plugin = ["oh-my-opencode@latest"];
+      plugin = [ "oh-my-opencode@latest" ];
       provider = {
         openai = {
           options = {
-            baseURL = "http://0.0.0.0:8080/v1";
+            baseURL = "{file:${openaiBaseFile}}";
             apiKey = "{file:${openaiApiKeyFile}}";
           };
           models = {
@@ -23,9 +27,9 @@ in {
               };
               options.store = false;
               variants = {
-                low = {};
-                medium = {};
-                high = {};
+                low = { };
+                medium = { };
+                high = { };
               };
             };
             "gpt-5.1-codex" = {
@@ -36,9 +40,9 @@ in {
               };
               options.store = false;
               variants = {
-                low = {};
-                medium = {};
-                high = {};
+                low = { };
+                medium = { };
+                high = { };
               };
             };
             "gpt-5.1-codex-max" = {
@@ -49,9 +53,9 @@ in {
               };
               options.store = false;
               variants = {
-                low = {};
-                medium = {};
-                high = {};
+                low = { };
+                medium = { };
+                high = { };
               };
             };
             "gpt-5.1-codex-mini" = {
@@ -62,9 +66,9 @@ in {
               };
               options.store = false;
               variants = {
-                low = {};
-                medium = {};
-                high = {};
+                low = { };
+                medium = { };
+                high = { };
               };
             };
             "gpt-5.2" = {
@@ -75,10 +79,10 @@ in {
               };
               options.store = false;
               variants = {
-                low = {};
-                medium = {};
-                high = {};
-                xhigh = {};
+                low = { };
+                medium = { };
+                high = { };
+                xhigh = { };
               };
             };
             "gpt-5.4" = {
@@ -89,10 +93,10 @@ in {
               };
               options.store = false;
               variants = {
-                low = {};
-                medium = {};
-                high = {};
-                xhigh = {};
+                low = { };
+                medium = { };
+                high = { };
+                xhigh = { };
               };
             };
             "gpt-5.3-codex-spark" = {
@@ -103,10 +107,10 @@ in {
               };
               options.store = false;
               variants = {
-                low = {};
-                medium = {};
-                high = {};
-                xhigh = {};
+                low = { };
+                medium = { };
+                high = { };
+                xhigh = { };
               };
             };
             "gpt-5.3-codex" = {
@@ -117,10 +121,10 @@ in {
               };
               options.store = false;
               variants = {
-                low = {};
-                medium = {};
-                high = {};
-                xhigh = {};
+                low = { };
+                medium = { };
+                high = { };
+                xhigh = { };
               };
             };
             "gpt-5.2-codex" = {
@@ -131,10 +135,10 @@ in {
               };
               options.store = false;
               variants = {
-                low = {};
-                medium = {};
-                high = {};
-                xhigh = {};
+                low = { };
+                medium = { };
+                high = { };
+                xhigh = { };
               };
             };
             "codex-mini-latest" = {
@@ -145,9 +149,9 @@ in {
               };
               options.store = false;
               variants = {
-                low = {};
-                medium = {};
-                high = {};
+                low = { };
+                medium = { };
+                high = { };
               };
             };
           };
