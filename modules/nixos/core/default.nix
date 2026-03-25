@@ -5,11 +5,11 @@
     "glom"
   ];
   imports = [
+    ./sops
     ./locale.nix
     ./fonts.nix
     ./networking.nix
     ./plasma-auth.nix
-    ./sops.nix
     ./nix-ld.nix
     ./home-manager.nix
   ];
