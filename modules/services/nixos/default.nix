@@ -1,9 +1,10 @@
-{lib, ...}: {
+{ lib, ... }:
+{
   imports = [
     ./ollama.nix
     ./openssh.nix
     ./printing.nix
-    ./sub2api.nix
+    # ./sub2api.nix
     ./tailscale.nix
   ];
 
