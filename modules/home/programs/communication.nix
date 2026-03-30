@@ -1,7 +1,8 @@
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
   home.packages = with pkgs; [
     qq
-    wechat-uos
+    (callPackage ../../../pkgs/wechat { })
     telegram-desktop
     mumble
     discord
