@@ -23,6 +23,8 @@
     nixvim-source = {
       url = "github:Glomzzz/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs-unstable.follows = "nixpkgs";
+      inputs.nixvim.inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
