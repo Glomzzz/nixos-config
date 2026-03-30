@@ -1,10 +1,13 @@
 # just is a command runner, Justfile is very similar to Makefile, but simpler.
 
-check:
-  nix flake check --no-build
+deploy:
+  sudo nixos-rebuild switch --flake . --sudo
 
 build HOST='nixos':
   host='{{HOST}}'; host="${host#HOST=}"; nix build ".#nixosConfigurations.${host}.config.system.build.toplevel" --no-link
+
+check:
+  nix flake check --no-build
 
 ############################################################################
 #
@@ -12,8 +15,6 @@ build HOST='nixos':
 #
 ############################################################################
 
-deploy:
-  sudo nixos-rebuild switch --flake . --sudo
 
 debug:
   sudo nixos-rebuild switch --flake . --sudo --show-trace --verbose
