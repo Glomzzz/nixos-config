@@ -7,6 +7,8 @@
   imports = [
     inputs.sops-nix.nixosModules.sops
     ./ai.nix
+    ./opencode.nix
+    ./tailscale.nix
   ];
 
   sops = {
