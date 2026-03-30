@@ -1,0 +1,191 @@
+{
+  username,
+  config,
+  ...
+}:
+let
+  opencodePasswordFile = config.sops.secrets."opencode/password".path;
+  openaiBaseFile = config.sops.secrets."openai/base".path;
+  openaiApiKeyFile = config.sops.secrets."openai/api_key".path;
+  # port = "6112";
+in
+{
+  home-manager.users.${username} = {
+    home.sessionVariables.OPENCODE_PASSWORD_FILE = opencodePasswordFile;
+    home.sessionVariables.OPENAI_BASE_API_FILE = openaiBaseFile;
+    home.sessionVariables.OPENAI_API_KEY_FILE = openaiApiKeyFile;
+
+    programs.opencode = {
+      enable = true;
+      # web = {
+      #   enable = true;
+      #   extraArgs = [
+      #     "--hostname"
+      #     "127.0.0.1"
+      #     "--port"
+      #     "${port}"
+      #   ];
+      # };
+      settings = {
+        "$schema" = "https://opencode.ai/config.json";
+        plugin = [ "oh-my-opencode@latest" ];
+        provider = {
+          openai = {
+            options = {
+              baseURL = "{file:${openaiBaseFile}}";
+              apiKey = "{file:${openaiApiKeyFile}}";
+            };
+            models = {
+              "gpt-5-codex" = {
+                name = "GPT-5 Codex";
+                limit = {
+                  context = 400000;
+                  output = 128000;
+                };
+                options.store = false;
+                variants = {
+                  low = { };
+                  medium = { };
+                  high = { };
+                };
+              };
+              "gpt-5.1-codex" = {
+                name = "GPT-5.1 Codex";
+                limit = {
+                  context = 400000;
+                  output = 128000;
+                };
+                options.store = false;
+                variants = {
+                  low = { };
+                  medium = { };
+                  high = { };
+                };
+              };
+              "gpt-5.1-codex-max" = {
+                name = "GPT-5.1 Codex Max";
+                limit = {
+                  context = 400000;
+                  output = 128000;
+                };
+                options.store = false;
+                variants = {
+                  low = { };
+                  medium = { };
+                  high = { };
+                };
+              };
+              "gpt-5.1-codex-mini" = {
+                name = "GPT-5.1 Codex Mini";
+                limit = {
+                  context = 400000;
+                  output = 128000;
+                };
+                options.store = false;
+                variants = {
+                  low = { };
+                  medium = { };
+                  high = { };
+                };
+              };
+              "gpt-5.2" = {
+                name = "GPT-5.2";
+                limit = {
+                  context = 400000;
+                  output = 128000;
+                };
+                options.store = false;
+                variants = {
+                  low = { };
+                  medium = { };
+                  high = { };
+                  xhigh = { };
+                };
+              };
+              "gpt-5.4" = {
+                name = "GPT-5.4";
+                limit = {
+                  context = 1050000;
+                  output = 128000;
+                };
+                options.store = false;
+                variants = {
+                  low = { };
+                  medium = { };
+                  high = { };
+                  xhigh = { };
+                };
+              };
+              "gpt-5.3-codex-spark" = {
+                name = "GPT-5.3 Codex Spark";
+                limit = {
+                  context = 128000;
+                  output = 32000;
+                };
+                options.store = false;
+                variants = {
+                  low = { };
+                  medium = { };
+                  high = { };
+                  xhigh = { };
+                };
+              };
+              "gpt-5.3-codex" = {
+                name = "GPT-5.3 Codex";
+                limit = {
+                  context = 400000;
+                  output = 128000;
+                };
+                options.store = false;
+                variants = {
+                  low = { };
+                  medium = { };
+                  high = { };
+                  xhigh = { };
+                };
+              };
+              "gpt-5.2-codex" = {
+                name = "GPT-5.2 Codex";
+                limit = {
+                  context = 400000;
+                  output = 128000;
+                };
+                options.store = false;
+                variants = {
+                  low = { };
+                  medium = { };
+                  high = { };
+                  xhigh = { };
+                };
+              };
+              "codex-mini-latest" = {
+                name = "Codex Mini";
+                limit = {
+                  context = 200000;
+                  output = 100000;
+                };
+                options.store = false;
+                variants = {
+                  low = { };
+                  medium = { };
+                  high = { };
+                };
+              };
+            };
+          };
+        };
+        agent = {
+          build.options.store = false;
+          plan.options.store = false;
+        };
+      };
+    };
+  };
+
+  # services.tailscale.serve.services.opencode = {
+  #   endpoints = {
+  #     "tcp:${port}" = "http://127.0.0.1:${port}";
+  #   };
+  #   advertised = true;
+  # };
+}
