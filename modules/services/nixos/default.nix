@@ -4,8 +4,8 @@
     ./ollama.nix
     ./openssh.nix
     ./printing.nix
-    # ./sub2api.nix
     ./tailscale.nix
+    # ./sub2api.nix
   ];
 
   services.speechd.enable = lib.mkForce false;
