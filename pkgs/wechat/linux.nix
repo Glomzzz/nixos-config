@@ -4,6 +4,8 @@
   src,
   meta,
   appimageTools,
+  kdePackages,
+  libsForQt5,
   writeShellScript,
 }: let
   appimageContents = appimageTools.extract {
@@ -14,13 +16,17 @@
   };
 
   launcher = writeShellScript "wechat" ''
-    if [[ "$XMODIFIERS" =~ fcitx ]]; then
-      export QT_IM_MODULE=fcitx
-      export GTK_IM_MODULE=fcitx
-    elif [[ "$XMODIFIERS" =~ ibus ]]; then
+    if [[ "$XMODIFIERS" =~ ibus ]]; then
       export QT_IM_MODULE=ibus
       export GTK_IM_MODULE=ibus
       export IBUS_USE_PORTAL=1
+    else
+      export XMODIFIERS=@im=fcitx
+      export QT_IM_MODULE=fcitx
+      export GTK_IM_MODULE=fcitx
+      export SDL_IM_MODULE=fcitx
+      export GLFW_IM_MODULE=ibus
+      export QT_PLUGIN_PATH=${libsForQt5.fcitx5-qt}/lib/qt-5.15.18/plugins:${kdePackages.fcitx5-qt}/lib/qt-6/plugins:''${QT_PLUGIN_PATH:+:$QT_PLUGIN_PATH}
     fi
 
     exec @wrapped@ "$@"
