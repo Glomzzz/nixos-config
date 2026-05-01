@@ -5,6 +5,10 @@
 }: {
   home.sessionVariables = {
     XMODIFIERS = "@im=fcitx";
+    GTK_IM_MODULE = "fcitx";
+    QT_IM_MODULE = "fcitx";
+    SDL_IM_MODULE = "fcitx";
+    GLFW_IM_MODULE = "ibus";
   };
 
   i18n.inputMethod = {
@@ -15,6 +19,8 @@
       rime-data
       fcitx5-rime
       fcitx5-gtk
+      kdePackages.fcitx5-qt
+      libsForQt5.fcitx5-qt
     ];
   };
 
@@ -134,9 +140,10 @@
     text = ''
       patch:
         schema_list:
-          - schema: luna_pinyin_simp
+          - schema: pin
 
         menu/page_size: 7
+        switcher/caption: 〔拼〕
 
         ascii_composer/good_old_caps_lock: true
         ascii_composer/switch_key/Caps_Lock: clear
@@ -163,8 +170,6 @@
     force = true;
     text = ''
       patch:
-        schema/name: 拼
-
         switches:
           - name: ascii_mode
             reset: 0
@@ -210,6 +215,65 @@
     '';
   };
 
+  xdg.dataFile."fcitx5/rime/pin.schema.yaml" = {
+    force = true;
+    text = ''
+      # Rime schema
+      # encoding: utf-8
+
+      __include: luna_pinyin_simp.schema:/
+
+      schema:
+        schema_id: pin
+        name: 拼
+        version: "0.1"
+        author:
+          - 佛振 <chen.sst@gmail.com>
+        description: |
+          简体拼音输入。
+
+      translator:
+        prism: pin
+    '';
+  };
+
+  xdg.dataFile."fcitx5/rime/punctuation.custom.yaml" = {
+    force = true;
+    text = ''
+      patch:
+        half_shape:
+          "!": {commit: "!"}
+          "\"": {commit: "\""}
+          "#": {commit: "#"}
+          "$": {commit: "$"}
+          "%": {commit: "%"}
+          "&": {commit: "&"}
+          "'": {commit: "'"}
+          "(": {commit: "("}
+          ")": {commit: ")"}
+          "*": {commit: "*"}
+          "+": {commit: "+"}
+          "/": {commit: "/"}
+          ":": {commit: ":"}
+          ";": {commit: ";"}
+          "<": {commit: "<"}
+          "=": {commit: "="}
+          ">": {commit: ">"}
+          "?": {commit: "?"}
+          "@": {commit: "@"}
+          "[": {commit: "["}
+          "\\": {commit: "\\"}
+          "]": {commit: "]"}
+          "^": {commit: "^"}
+          "_": {commit: "_"}
+          "`": {commit: "`"}
+          "{": {commit: "{"}
+          "|": {commit: "|"}
+          "}": {commit: "}"}
+          "~": {commit: "~"}
+    '';
+  };
+
   home.activation.removeObsoleteFcitxPinyinConfig = lib.hm.dag.entryAfter ["linkGeneration"] ''
     run rm -f \
       "$HOME/.config/fcitx5/conf/pinyin.conf" \
@@ -219,6 +283,7 @@
 
   home.activation.deployRimeConfig = lib.hm.dag.entryAfter ["linkGeneration"] ''
     rime_data_home="''${XDG_DATA_HOME:-$HOME/.local/share}/fcitx5/rime"
+    run rm -f "$rime_data_home/user.yaml"
     run rm -rf "$rime_data_home/build"
     run mkdir -p "$rime_data_home"
     run ${pkgs.librime}/bin/rime_deployer \
