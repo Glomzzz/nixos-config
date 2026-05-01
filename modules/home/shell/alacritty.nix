@@ -24,8 +24,8 @@ in {
       };
       terminal = {
         shell = {
-          program = "${pkgs.bash}/bin/bash";
-          args = ["--login" "-c" "nu --login --interactive"];
+          program = "${pkgs.nushell}/bin/nu";
+          args = ["--login" "--interactive"];
         };
         osc52 = "CopyPaste";
       };
