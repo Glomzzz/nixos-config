@@ -1,5 +1,8 @@
-{ modulesPath, pkgs, ... }:
 {
+  modulesPath,
+  pkgs,
+  ...
+}: {
   nixpkgs.hostPlatform = "x86_64-linux";
 
   imports = [
