@@ -17,7 +17,19 @@
   programs.plasma = {
     enable = true;
     overrideConfig = false;
-    kscreenlocker.lockOnStartup = true;
-    kscreenlocker.passwordRequired = true;
+    kscreenlocker.lockOnStartup = false;
+    kscreenlocker.passwordRequired = false;
+  };
+
+  # Disable KWallet password prompt on auto-login
+  xdg.configFile."kwalletrc" = {
+    text = ''
+      [Wallet]
+      Enabled=false
+      Close When Idle=false
+      Use One Wallet=true
+      Default Wallet=kdewallet
+    '';
+    force = true;
   };
 }
