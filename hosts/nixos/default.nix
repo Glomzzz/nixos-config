@@ -1,6 +1,7 @@
 {
   username,
   hostname,
+  pkgs,
   ...
 }: {
   imports = [
@@ -13,6 +14,7 @@
 
   networking.hostName = hostname;
   services.resolved.enable = true;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   users.users.${username} = {
     isNormalUser = true;
@@ -23,11 +25,14 @@
     ];
   };
 
-  # Enable the X server (for compatibility)
+  # Enable the X server (for XWayland compatibility)
   services.xserver.enable = true;
-  # Enable the Simple Desktop Display Manager
-  services.displayManager.sddm.enable = true;
-  # Enable the KDE Plasma 6 desktop
+  # Enable the Simple Desktop Display Manager with Wayland support
+  services.displayManager.sddm = {
+    enable = true;
+    wayland.enable = true;
+  };
+  # Enable the KDE Plasma 6 desktop with Wayland
   services.desktopManager.plasma6.enable = true;
 
   services.displayManager.autoLogin = {
