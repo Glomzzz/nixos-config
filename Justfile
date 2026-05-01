@@ -37,6 +37,12 @@ clean:
   # remove all generations older than 7 days
   sudo nix profile wipe-history --profile /nix/var/nix/profiles/system  --older-than 7d
 
+# Clean up home-manager backup files that cause rebuild failures
+clean-backups:
+  find ~/.config -name "*.hm-backup*" -type f -delete 2>/dev/null || true
+  find ~ -maxdepth 1 -name ".*.hm-backup*" -type f -delete 2>/dev/null || true
+  echo "Cleaned up hm-backup files"
+
 gc:
   # garbage collect all unused nix store entries
   sudo nix store gc --debug
