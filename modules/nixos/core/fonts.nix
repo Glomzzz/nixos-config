@@ -2,6 +2,7 @@
   fonts = {
     packages = with pkgs; [
       material-design-icons
+      noto-fonts
       noto-fonts-cjk-sans
       noto-fonts-cjk-serif
       noto-fonts-color-emoji
