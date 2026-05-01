@@ -1,6 +1,22 @@
 {...}: {
   boot = {
-    loader.systemd-boot.configurationLimit = 3;
+    loader.systemd-boot.enable = false;
+    loader.grub = {
+      enable = true;
+      configurationLimit = 3;
+      device = "nodev";
+      efiSupport = true;
+      useOSProber = false;
+      gfxmodeEfi = "1920x1080";
+      gfxmodeBios = "1920x1080";
+      gfxpayloadEfi = "text";
+      extraEntries = ''
+        menuentry "Windows" {
+          search --file --no-floppy --set=root /EFI/Microsoft/Boot/bootmgfw.efi
+          chainloader (''${root})/EFI/Microsoft/Boot/bootmgfw.efi
+        }
+      '';
+    };
     initrd.availableKernelModules = [
       "xhci_pci"
       "thunderbolt"
@@ -16,25 +32,9 @@
       "i915.enable_psr=0"
       "i8042.dumbkbd"
     ];
-    loader = {
-      grub = {
-        enable = true;
-        device = "nodev";
-        efiSupport = true;
-        useOSProber = false;
-        gfxmodeEfi = "1920x1080";
-        gfxmodeBios = "1920x1080";
-        extraEntries = ''
-          menuentry "Windows" {
-              search --file --no-floppy --set=root /EFI/Microsoft/Boot/bootmgfw.efi
-              chainloader (''${root})/EFI/Microsoft/Boot/bootmgfw.efi
-          }
-        '';
-      };
-      efi = {
-        canTouchEfiVariables = true;
-        efiSysMountPoint = "/boot";
-      };
+    loader.efi = {
+      canTouchEfiVariables = true;
+      efiSysMountPoint = "/boot";
     };
   };
 }
