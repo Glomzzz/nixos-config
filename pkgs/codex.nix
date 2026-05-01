@@ -1,77 +1,40 @@
 {
   lib,
   stdenv,
-  rustPlatform,
-  fetchFromGitHub,
+  fetchurl,
   installShellFiles,
-  cargo,
-  clang,
-  cmake,
-  gitMinimal,
-  libcap,
-  libclang,
   makeBinaryWrapper,
-  pkg-config,
-  openssl,
   ripgrep,
+  bubblewrap,
   versionCheckHook,
   installShellCompletions ? stdenv.buildPlatform.canExecute stdenv.hostPlatform,
 }:
-rustPlatform.buildRustPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "codex";
-  version = "0.117.0";
+  version = "0.128.0";
 
-  src = fetchFromGitHub {
-    owner = "openai";
-    repo = "codex";
-    tag = "rust-v${finalAttrs.version}";
-    hash = "";
+  src = fetchurl {
+    url = "https://github.com/openai/codex/releases/download/rust-v${finalAttrs.version}/codex-x86_64-unknown-linux-musl.tar.gz";
+    hash = "sha256-iGuF5hGMC0MjRDfKAH++kjYRpTsQPQDg0650rvsg4jo=";
   };
 
-  sourceRoot = "${finalAttrs.src.name}/codex-rs";
-
-  depsExtraArgs = {
-    nativeBuildInputs = [ cargo ];
-    postBuild = ''
-      shopt -s globstar
-      for manifest_path in "$out"/**/Cargo.toml; do
-        cargo metadata --format-version 1 --no-deps --manifest-path "$manifest_path" >/dev/null || rm -v "$manifest_path"
-      done
-    '';
-  };
-
-  cargoHash = "sha256-EPzRYCquZUuH8eLu1ZSqQ3KTpYZRznGBfbXLPhqp2VI=";
+  sourceRoot = ".";
 
   nativeBuildInputs = [
-    clang
-    cmake
-    gitMinimal
     installShellFiles
     makeBinaryWrapper
-    pkg-config
   ];
 
-  buildInputs = [
-    libclang
-    openssl
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [
-    libcap
-  ];
+  dontConfigure = true;
+  dontBuild = true;
 
-  env = {
-    LIBCLANG_PATH = "${lib.getLib libclang}/lib";
-    NIX_CFLAGS_COMPILE = toString (
-      lib.optionals stdenv.cc.isGNU [
-        "-Wno-error=stringop-overflow"
-      ]
-      ++ lib.optionals stdenv.cc.isClang [
-        "-Wno-error=character-conversion"
-      ]
-    );
-  };
-
-  doCheck = false;
+  installPhase = ''
+    runHook preInstall
+    mkdir -p $out/bin
+    cp codex-x86_64-unknown-linux-musl $out/bin/codex
+    chmod +x $out/bin/codex
+    runHook postInstall
+  '';
 
   postInstall = lib.optionalString installShellCompletions ''
     installShellCompletion --cmd codex \
@@ -81,7 +44,9 @@ rustPlatform.buildRustPackage (finalAttrs: {
   '';
 
   postFixup = ''
-    wrapProgram $out/bin/codex --prefix PATH : ${lib.makeBinPath [ ripgrep ]}
+    wrapProgram $out/bin/codex --prefix PATH : ${
+      lib.makeBinPath ([ ripgrep ] ++ lib.optionals stdenv.hostPlatform.isLinux [ bubblewrap ])
+    }
   '';
 
   doInstallCheck = true;
@@ -93,6 +58,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     changelog = "https://raw.githubusercontent.com/openai/codex/refs/tags/rust-v${finalAttrs.version}/CHANGELOG.md";
     license = lib.licenses.asl20;
     mainProgram = "codex";
-    platforms = lib.platforms.unix;
+    platforms = [ "x86_64-linux" ];
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
   };
 })
