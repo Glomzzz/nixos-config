@@ -23,8 +23,11 @@
     nixvim-source = {
       url = "github:Glomzzz/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.nixpkgs-unstable.follows = "nixpkgs";
       inputs.nixvim.inputs.nixpkgs.follows = "nixpkgs";
+    };
+    emacs-config = {
+      url = "path:/home/glom/emacs-config";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
