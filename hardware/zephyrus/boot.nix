@@ -27,7 +27,14 @@
       "rtsx_pci_sdmmc"
     ];
     initrd.kernelModules = [];
-    kernelModules = ["kvm-intel"];
+    kernelModules = [
+      "kvm-intel"
+      # HID support for various mice and input devices
+      "hid_multitouch"
+      "hid_generic"
+      "hid_logitech_dj"
+      "hid_logitech_hidpp"
+    ];
     kernelParams = [
       "i915.enable_psr=0"
       "i8042.dumbkbd"
