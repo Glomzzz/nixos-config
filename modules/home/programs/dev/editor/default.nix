@@ -1,5 +1,4 @@
-{ ... }:
-{
+{...}: {
   imports = [
     ./codex.nix
     ./jetbrains.nix
