@@ -1,5 +1,8 @@
-{ pkgs, username, ... }:
 {
+  pkgs,
+  username,
+  ...
+}: {
   environment.systemPackages = with pkgs; [
     android-tools
     android-studio
