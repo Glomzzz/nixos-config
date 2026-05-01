@@ -18,6 +18,9 @@
           program = "nu";
         };
       };
+      project_panel = {
+        dock = "left";
+      };
       agent_buffer_font_size = 16.0;
       ui_font_family = "Monocraft";
       buffer_font_family = "Monocraft";
