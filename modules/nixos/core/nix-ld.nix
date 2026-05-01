@@ -1,5 +1,8 @@
-{ config, pkgs, ... }:
 {
+  config,
+  pkgs,
+  ...
+}: {
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
     SDL
@@ -57,20 +60,17 @@
     libjpeg
     libmikmod
     libogg
-    libpng12
     libpulseaudio
     librsvg
     libsamplerate
     libthai
     libtheora
     libtiff
-    libudev0-shim
     libusb1
     libuuid
     libvdpau
     libvorbis
     libvpx
-    libxcrypt-legacy
     libxkbcommon
     libxml2
     mesa

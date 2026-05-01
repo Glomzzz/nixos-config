@@ -10,7 +10,5 @@
     virtualglLib
     egl-wayland
     libglvnd
-    vulkan-loader
-    mesa
   ];
 }

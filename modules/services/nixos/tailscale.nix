@@ -5,12 +5,14 @@
     # serve.enable = true;
   };
   networking.firewall = {
-    checkReversePath = "loose";
     trustedInterfaces = [ "tailscale0" ];
     allowedUDPPorts = [
       config.services.tailscale.port
       6112
+      9944
+      8082
+      9942
     ];
-    allowedTCPPorts = [ 6112 ];
+    allowedTCPPorts = [ 6112  9944 8082 9942];
   };
 }
