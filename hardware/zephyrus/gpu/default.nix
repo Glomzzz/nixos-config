@@ -49,7 +49,11 @@
       };
     };
   boot = {
-    kernelParams = ["nvidia-drm.fbdev=1"];
+    kernelParams = [
+      # Required for Wayland on NVIDIA
+      "nvidia-drm.modeset=1"
+      "nvidia-drm.fbdev=1"
+    ];
 
     extraModprobeConfig =
       "options nvidia "
@@ -75,5 +79,15 @@
     WLR_NO_HARDWARE_CURSORS = "1";
     # VA-API Backend as NVIDIA
     LIBVA_DRIVER_NAME = "nvidia";
+
+    # --- Wayland / Plasma Wayland ---
+    # Force Qt applications to use the Wayland platform plugin
+    QT_QPA_PLATFORM = "wayland";
+    # Ensure SDL2 applications use Wayland
+    SDL_VIDEODRIVER = "wayland";
+    # Force Firefox to use Wayland
+    MOZ_ENABLE_WAYLAND = "1";
+    # Ozone platform for Chromium/Electron apps
+    NIXOS_OZONE_WL = "1";
   };
 }
