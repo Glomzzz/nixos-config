@@ -1,5 +1,4 @@
-{ username, ... }:
-{
+{username, ...}: {
   sops.secrets."openai/base" = {
     owner = username;
   };

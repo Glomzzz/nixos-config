@@ -25,7 +25,7 @@ buildNpmPackage rec {
   npmBuildScript = "build";
 
   postInstall = ''
-    wrapProgram $out/bin/omx --prefix PATH : ${lib.makeBinPath [ codex ]}
+    wrapProgram $out/bin/omx --prefix PATH : ${lib.makeBinPath [codex]}
   '';
 
   meta = {
