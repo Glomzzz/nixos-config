@@ -2,16 +2,141 @@
   username,
   config,
   ...
-}: let
+}:
+let
   opencodePasswordFile = config.sops.secrets."opencode/password".path;
-  openaiBaseFile = config.sops.secrets."openai/base".path;
-  openaiApiKeyFile = config.sops.secrets."openai/api_key".path;
+  opencodeGoApiKeyFile = config.sops.secrets."opencode/api_key".path;
+  ohMyOpenAgentConfig = builtins.toJSON {
+    "$schema" = "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/master/assets/oh-my-openagent.schema.json";
+    
+    # Optimized agent configuration for maximum performance
+    # Using DeepSeek V4 Pro for reasoning-heavy agents
+    # Using DeepSeek V4 Flash for high-throughput agents (31x more requests)
+    agents = {
+      # Main orchestrator - highest quality reasoning
+      sisyphus = {
+        model = "opencode-go/deepseek-v4-pro";
+        temperature = 0.1;
+      };
+      
+      # Autonomous deep worker - enabled with non-GPT model support
+      # DeepSeek V4 Pro has strong reasoning capabilities
+      hephaestus = {
+        model = "opencode-go/deepseek-v4-pro";
+        allow_non_gpt_model = true;
+        temperature = 0.1;
+        maxTokens = 8000;
+      };
+      
+      # Strategic planner - high reasoning quality
+      prometheus = {
+        model = "opencode-go/deepseek-v4-pro";
+        temperature = 0.1;
+      };
+      
+      # Pre-planning consultant - good balance
+      metis = {
+        model = "opencode-go/glm-5";
+        temperature = 0.3;
+      };
+      
+      # Plan reviewer - good balance
+      momus = {
+        model = "opencode-go/glm-5";
+        temperature = 0.1;
+      };
+      
+      # Read-only consultant - needs strong reasoning
+      oracle = {
+        model = "opencode-go/deepseek-v4-pro";
+        temperature = 0.1;
+      };
+      
+      # Contextual grep - high throughput, cost-effective
+      # DeepSeek V4 Flash: 31,650 req/5h vs Pro: 3,450 req/5h
+      explore = {
+        model = "opencode-go/deepseek-v4-flash";
+        temperature = 0.1;
+        textVerbosity = "low";
+      };
+      
+      # External docs/code search - high throughput
+      librarian = {
+        model = "opencode-go/deepseek-v4-flash";
+        temperature = 0.1;
+      };
+      
+      # PDF/image analysis - vision capabilities
+      "multimodal-looker" = {
+        model = "opencode-go/kimi-k2.5";
+        temperature = 0.1;
+      };
+      
+      # Todo-list orchestrator - high throughput
+      atlas = {
+        model = "opencode-go/deepseek-v4-flash";
+        temperature = 0.1;
+      };
+      
+      # Category-spawned executor - high throughput
+      "sisyphus-junior" = {
+        model = "opencode-go/deepseek-v4-flash";
+        temperature = 0.1;
+      };
+    };
+    
+    # Category-based model routing for task delegation
+    categories = {
+      # Complex problem solving - use best reasoning model
+      ultrabrain = {
+        model = "opencode-go/deepseek-v4-pro";
+      };
+      # Autonomous research - balance quality and speed
+      deep = {
+        model = "opencode-go/deepseek-v4-pro";
+      };
+      # Quick tasks - fastest model
+      quick = {
+        model = "opencode-go/deepseek-v4-flash";
+      };
+      # Visual/UI work - good balance
+      "visual-engineering" = {
+        model = "opencode-go/kimi-k2.5";
+      };
+      # Writing tasks
+      writing = {
+        model = "opencode-go/glm-5";
+      };
+    };
+    
+    # Fallback models for reliability
+    fallback_models = {
+      default = [
+        "opencode-go/deepseek-v4-pro"
+        "opencode-go/kimi-k2.5"
+        "opencode-go/glm-5"
+      ];
+      hephaestus = [
+        "opencode-go/deepseek-v4-pro"
+        "opencode-go/glm-5"
+      ];
+    };
+    
+    # Background task configuration
+    background_tasks = {
+      max_concurrent = 5;
+    };
+    
+    # LSP integration
+    lsp = {
+      enabled = true;
+    };
+  };
   # port = "6112";
-in {
+in
+{
   home-manager.users.${username} = {
     home.sessionVariables.OPENCODE_PASSWORD_FILE = opencodePasswordFile;
-    home.sessionVariables.OPENAI_BASE_API_FILE = openaiBaseFile;
-    home.sessionVariables.OPENAI_API_KEY_FILE = openaiApiKeyFile;
 
     programs.opencode = {
       enable = true;
@@ -26,149 +151,11 @@ in {
       # };
       settings = {
         "$schema" = "https://opencode.ai/config.json";
-        plugin = ["oh-my-opencode@latest"];
+        plugin = [ "oh-my-openagent" ];
         provider = {
-          openai = {
+          "opencode-go" = {
             options = {
-              baseURL = "{file:${openaiBaseFile}}";
-              apiKey = "{file:${openaiApiKeyFile}}";
-            };
-            models = {
-              "gpt-5-codex" = {
-                name = "GPT-5 Codex";
-                limit = {
-                  context = 400000;
-                  output = 128000;
-                };
-                options.store = false;
-                variants = {
-                  low = {};
-                  medium = {};
-                  high = {};
-                };
-              };
-              "gpt-5.1-codex" = {
-                name = "GPT-5.1 Codex";
-                limit = {
-                  context = 400000;
-                  output = 128000;
-                };
-                options.store = false;
-                variants = {
-                  low = {};
-                  medium = {};
-                  high = {};
-                };
-              };
-              "gpt-5.1-codex-max" = {
-                name = "GPT-5.1 Codex Max";
-                limit = {
-                  context = 400000;
-                  output = 128000;
-                };
-                options.store = false;
-                variants = {
-                  low = {};
-                  medium = {};
-                  high = {};
-                };
-              };
-              "gpt-5.1-codex-mini" = {
-                name = "GPT-5.1 Codex Mini";
-                limit = {
-                  context = 400000;
-                  output = 128000;
-                };
-                options.store = false;
-                variants = {
-                  low = {};
-                  medium = {};
-                  high = {};
-                };
-              };
-              "gpt-5.2" = {
-                name = "GPT-5.2";
-                limit = {
-                  context = 400000;
-                  output = 128000;
-                };
-                options.store = false;
-                variants = {
-                  low = {};
-                  medium = {};
-                  high = {};
-                  xhigh = {};
-                };
-              };
-              "gpt-5.4" = {
-                name = "GPT-5.4";
-                limit = {
-                  context = 1050000;
-                  output = 128000;
-                };
-                options.store = false;
-                variants = {
-                  low = {};
-                  medium = {};
-                  high = {};
-                  xhigh = {};
-                };
-              };
-              "gpt-5.3-codex-spark" = {
-                name = "GPT-5.3 Codex Spark";
-                limit = {
-                  context = 128000;
-                  output = 32000;
-                };
-                options.store = false;
-                variants = {
-                  low = {};
-                  medium = {};
-                  high = {};
-                  xhigh = {};
-                };
-              };
-              "gpt-5.3-codex" = {
-                name = "GPT-5.3 Codex";
-                limit = {
-                  context = 400000;
-                  output = 128000;
-                };
-                options.store = false;
-                variants = {
-                  low = {};
-                  medium = {};
-                  high = {};
-                  xhigh = {};
-                };
-              };
-              "gpt-5.2-codex" = {
-                name = "GPT-5.2 Codex";
-                limit = {
-                  context = 400000;
-                  output = 128000;
-                };
-                options.store = false;
-                variants = {
-                  low = {};
-                  medium = {};
-                  high = {};
-                  xhigh = {};
-                };
-              };
-              "codex-mini-latest" = {
-                name = "Codex Mini";
-                limit = {
-                  context = 200000;
-                  output = 100000;
-                };
-                options.store = false;
-                variants = {
-                  low = {};
-                  medium = {};
-                  high = {};
-                };
-              };
+              apiKey = "{file:${opencodeGoApiKeyFile}}";
             };
           };
         };
@@ -178,6 +165,8 @@ in {
         };
       };
     };
+
+    xdg.configFile."opencode/oh-my-openagent.json".text = ohMyOpenAgentConfig;
   };
 
   # services.tailscale.serve.services.opencode = {
