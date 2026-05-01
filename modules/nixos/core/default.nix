@@ -14,5 +14,6 @@
     ./opencode.nix
     ./nix-ld.nix
     ./home-manager.nix
+    ./input.nix
   ];
 }
