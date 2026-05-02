@@ -2,13 +2,13 @@
   username,
   config,
   ...
-}:
-let
+}: let
   opencodePasswordFile = config.sops.secrets."opencode/password".path;
   opencodeGoApiKeyFile = config.sops.secrets."opencode/api_key".path;
+  apiapiApiKeyFile = config.sops.secrets."apiapi/api_key".path;
   ohMyOpenAgentConfig = builtins.toJSON {
     "$schema" = "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/master/assets/oh-my-openagent.schema.json";
-    
+
     # Optimized agent configuration for maximum performance
     # Using DeepSeek V4 Pro for reasoning-heavy agents
     # Using DeepSeek V4 Flash for high-throughput agents (31x more requests)
@@ -18,7 +18,7 @@ let
         model = "opencode-go/deepseek-v4-pro";
         temperature = 0.1;
       };
-      
+
       # Autonomous deep worker - enabled with non-GPT model support
       # DeepSeek V4 Pro has strong reasoning capabilities
       hephaestus = {
@@ -27,31 +27,31 @@ let
         temperature = 0.1;
         maxTokens = 8000;
       };
-      
+
       # Strategic planner - high reasoning quality
       prometheus = {
         model = "opencode-go/deepseek-v4-pro";
         temperature = 0.1;
       };
-      
+
       # Pre-planning consultant - good balance
       metis = {
         model = "opencode-go/glm-5";
         temperature = 0.3;
       };
-      
+
       # Plan reviewer - good balance
       momus = {
         model = "opencode-go/glm-5";
         temperature = 0.1;
       };
-      
+
       # Read-only consultant - needs strong reasoning
       oracle = {
         model = "opencode-go/deepseek-v4-pro";
         temperature = 0.1;
       };
-      
+
       # Contextual grep - high throughput, cost-effective
       # DeepSeek V4 Flash: 31,650 req/5h vs Pro: 3,450 req/5h
       explore = {
@@ -59,32 +59,32 @@ let
         temperature = 0.1;
         textVerbosity = "low";
       };
-      
+
       # External docs/code search - high throughput
       librarian = {
         model = "opencode-go/deepseek-v4-flash";
         temperature = 0.1;
       };
-      
+
       # PDF/image analysis - vision capabilities
       "multimodal-looker" = {
         model = "opencode-go/kimi-k2.5";
         temperature = 0.1;
       };
-      
+
       # Todo-list orchestrator - high throughput
       atlas = {
         model = "opencode-go/deepseek-v4-flash";
         temperature = 0.1;
       };
-      
+
       # Category-spawned executor - high throughput
       "sisyphus-junior" = {
         model = "opencode-go/deepseek-v4-flash";
         temperature = 0.1;
       };
     };
-    
+
     # Category-based model routing for task delegation
     categories = {
       # Complex problem solving - use best reasoning model
@@ -108,7 +108,7 @@ let
         model = "opencode-go/glm-5";
       };
     };
-    
+
     # Fallback models for reliability
     fallback_models = {
       default = [
@@ -121,20 +121,19 @@ let
         "opencode-go/glm-5"
       ];
     };
-    
+
     # Background task configuration
     background_tasks = {
       max_concurrent = 5;
     };
-    
+
     # LSP integration
     lsp = {
       enabled = true;
     };
   };
   # port = "6112";
-in
-{
+in {
   home-manager.users.${username} = {
     home.sessionVariables.OPENCODE_PASSWORD_FILE = opencodePasswordFile;
 
@@ -151,11 +150,17 @@ in
       # };
       settings = {
         "$schema" = "https://opencode.ai/config.json";
-        plugin = [ "oh-my-openagent" ];
+        plugin = ["oh-my-openagent"];
         provider = {
           "opencode-go" = {
             options = {
               apiKey = "{file:${opencodeGoApiKeyFile}}";
+            };
+          };
+          "apiapi" = {
+            options = {
+              apiKey = "{file:${apiapiApiKeyFile}}";
+              baseUrl = "https://apiapi.chat/v1";
             };
           };
         };
