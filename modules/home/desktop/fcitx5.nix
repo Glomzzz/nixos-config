@@ -212,6 +212,7 @@
           __append:
             - derive/ian$/iang/
             - derive/iang$/ian/
+
     '';
   };
 
@@ -237,43 +238,6 @@
     '';
   };
 
-  xdg.dataFile."fcitx5/rime/punctuation.custom.yaml" = {
-    force = true;
-    text = ''
-      patch:
-        half_shape:
-          "!": {commit: "!"}
-          "\"": {commit: "\""}
-          "#": {commit: "#"}
-          "$": {commit: "$"}
-          "%": {commit: "%"}
-          "&": {commit: "&"}
-          "'": {commit: "'"}
-          "(": {commit: "("}
-          ")": {commit: ")"}
-          "*": {commit: "*"}
-          "+": {commit: "+"}
-          "/": {commit: "/"}
-          ":": {commit: ":"}
-          ";": {commit: ";"}
-          "<": {commit: "<"}
-          "=": {commit: "="}
-          ">": {commit: ">"}
-          "?": {commit: "?"}
-          "@": {commit: "@"}
-          "[": {commit: "["}
-          "\\": {commit: "\\"}
-          "]": {commit: "]"}
-          "^": {commit: "^"}
-          "_": {commit: "_"}
-          "`": {commit: "`"}
-          "{": {commit: "{"}
-          "|": {commit: "|"}
-          "}": {commit: "}"}
-          "~": {commit: "~"}
-    '';
-  };
-
   home.activation.removeObsoleteFcitxPinyinConfig = lib.hm.dag.entryAfter ["linkGeneration"] ''
     run rm -f \
       "$HOME/.config/fcitx5/conf/pinyin.conf" \
@@ -286,10 +250,38 @@
     run rm -f "$rime_data_home/user.yaml"
     run rm -rf "$rime_data_home/build"
     run mkdir -p "$rime_data_home"
+
+    # Build default Rime config from shared data
     run ${pkgs.librime}/bin/rime_deployer \
       --build \
       "$rime_data_home" \
       "${pkgs.rime-data}/share/rime-data" \
       "$rime_data_home/build"
+
+    # === Post-process: force direct symbol output in pinyin mode ===
+    # rime_deployer ignores .custom.yaml patches for config presets
+    # loaded via import_preset. So we directly patch the built schema
+    # to replace list-based half_shape entries with {commit: ...}
+    # for immediate ASCII output — no candidate selection bar.
+    built="$rime_data_home/build/pin.schema.yaml"
+    run sed -i "$built" \
+      -e 's_^    "~": \[.*_    "~": {commit: "~"}_' \
+      -e 's_^    "`": \[.*_    "`": {commit: "`"}_' \
+      -e 's_^    "@": \[.*_    "@": {commit: "@"}_' \
+      -e 's_^    "#": \[.*_    "#": {commit: "#"}_' \
+      -e 's_^    "\$": \[.*_    "$": {commit: "$"}_' \
+      -e 's_^    "%": \[.*_    "%": {commit: "%"}_' \
+      -e 's_^    "\*": \[.*_    "*": {commit: "*"}_' \
+      -e 's_^    "<": \[.*_    "<": {commit: "<"}_' \
+      -e 's_^    "=": \[.*_    "=": {commit: "="}_' \
+      -e 's_^    ">": \[.*_    ">": {commit: ">"}_' \
+      -e 's_^    "\?": \[.*_    "?": {commit: "?"}_' \
+      -e 's_^    "\[": \[.*_    "[": {commit: "["}_' \
+      -e 's_^    "\\\\": \[.*_    "\\\\": {commit: "\\\\"}_' \
+      -e 's_^    "\]": \[.*_    "]": {commit: "]"}_' \
+      -e 's_^    "{": \[.*_    "{": {commit: "{"}_' \
+      -e 's_^    "|": \[.*_    "|": {commit: "|"}_' \
+      -e 's_^    "}": \[.*_    "}": {commit: "}"}_' \
+      -e 's_^    "/": \[.*_    "/": {commit: "/"}_'
   '';
 }
