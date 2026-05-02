@@ -32,6 +32,7 @@ in {
     mumble
     discord
     anydesk
+    kdePackages.krdc
     cherryStudioWithDesktop
   ];
 
