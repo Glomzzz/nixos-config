@@ -11,6 +11,7 @@
     ./networking.nix
     ./plasma-auth.nix
     ./howdy.nix
+    ./codex.nix
     ./opencode.nix
     ./nix-ld.nix
     ./home-manager.nix
