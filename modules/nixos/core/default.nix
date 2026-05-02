@@ -10,6 +10,7 @@
     ./android.nix
     ./networking.nix
     ./plasma-auth.nix
+    ./howdy.nix
     ./opencode.nix
     ./nix-ld.nix
     ./home-manager.nix
