@@ -16,5 +16,6 @@
     ./nix-ld.nix
     ./home-manager.nix
     ./input.nix
+    ./keyboard.nix
   ];
 }
