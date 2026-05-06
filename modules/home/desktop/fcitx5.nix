@@ -2,7 +2,8 @@
   lib,
   pkgs,
   ...
-}: {
+}:
+{
   home.sessionVariables = {
     XMODIFIERS = "@im=fcitx";
     GTK_IM_MODULE = "fcitx";
@@ -19,6 +20,7 @@
       rime-data
       fcitx5-rime
       fcitx5-gtk
+      qt6Packages.fcitx5-configtool
       kdePackages.fcitx5-qt
       libsForQt5.fcitx5-qt
     ];
@@ -33,7 +35,7 @@
       # Layout
       Default Layout=us
       # Default Input Method
-      DefaultIM=keyboard-us
+      DefaultIM=rime
 
       [Groups/0/Items/0]
       # Name
@@ -77,10 +79,10 @@
       [Hotkey/AltTriggerKeys]
 
       [Hotkey/EnumerateGroupForwardKeys]
-      0=Super+space
+      0=Control+Shift
 
       [Hotkey/EnumerateGroupBackwardKeys]
-      0=Shift+Super+space
+      0=Control+Alt+Shift
 
       [Hotkey/PrevPage]
       0=Up
@@ -153,6 +155,15 @@
         ascii_composer/switch_key/Control_R: noop
 
         switcher/hotkeys: []
+
+        # Disable backtick reverse lookup — output ` directly
+        "recognizer/patterns/reverse_lookup": "^$"
+
+        # Map < > to Chinese guillemets 《》
+        "punctuator/half_shape/<": {commit: "《"}
+        "punctuator/half_shape/>": {commit: "》"}
+        "punctuator/full_shape/<": {commit: "《"}
+        "punctuator/full_shape/>": {commit: "》"}
 
         key_binder/bindings:
           - {accept: minus, send: Page_Up, when: has_menu}
@@ -238,14 +249,14 @@
     '';
   };
 
-  home.activation.removeObsoleteFcitxPinyinConfig = lib.hm.dag.entryAfter ["linkGeneration"] ''
+  home.activation.removeObsoleteFcitxPinyinConfig = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
     run rm -f \
       "$HOME/.config/fcitx5/conf/pinyin.conf" \
       "$HOME/.config/fcitx5/conf/cloudpinyin.conf" \
       "$HOME/.config/fcitx5/conf/punctuation.conf"
   '';
 
-  home.activation.deployRimeConfig = lib.hm.dag.entryAfter ["linkGeneration"] ''
+  home.activation.deployRimeConfig = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
     rime_data_home="''${XDG_DATA_HOME:-$HOME/.local/share}/fcitx5/rime"
     run rm -f "$rime_data_home/user.yaml"
     run rm -rf "$rime_data_home/build"
