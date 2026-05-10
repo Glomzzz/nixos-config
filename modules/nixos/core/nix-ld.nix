@@ -55,6 +55,7 @@
     libdrm
     libgcrypt
     libgpg-error
+    libbsd
     libidn
     libjack2
     libjpeg
@@ -99,6 +100,7 @@
     libxft
     libxi
     libxinerama
+    libxkbfile
     libxmu
     libxrandr
     libxrender
@@ -112,9 +114,11 @@
     libxcb-keysyms
     libxcb-render-util
     libxcb-wm
+    libxcb-cursor
     xkeyboard-config
     xz
     zlib
+    systemd
   ];
   environment.systemPackages = config.programs.nix-ld.libraries;
 }
