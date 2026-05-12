@@ -47,8 +47,8 @@ let
   modelComments = lib.concatStringsSep "\n" (map (model: "# - ${model}") availableModels);
 
   codexConfig = ''
-        # NixOS-managed Codex configuration
-        # This file is controlled by NixOS home-manager. Do not edit manually.
+        # Codex configuration seeded by NixOS home-manager
+        # Codex may update this file at runtime.
 
         model_provider = "codex"
         model = "${defaultModel}"
@@ -64,12 +64,14 @@ let
         # Available models via apiapi provider:
     ${modelComments}
   '';
+  codexConfigFile = pkgs.writeText "codex-config.toml" codexConfig;
 
   # Version tracking for codex
   versionConfig = builtins.toJSON {
     version = "0.128.0";
     last_checked = "2026-05-01T12:56:33Z";
   };
+  versionConfigFile = pkgs.writeText "codex-version.json" versionConfig;
 in
 {
   home-manager.users.${username} = {
@@ -77,27 +79,6 @@ in
       codex
       oh-my-codex
     ];
-
-    # Force-manage Codex configuration via NixOS
-    home.file.".codex/config.toml".text = codexConfig;
-
-    # Version file to prevent codex from prompting for updates
-    home.file.".codex/version.json".text = versionConfig;
-
-    # Execution rules for Codex (allow common Nix/development commands)
-    home.file.".codex/rules/default.rules".text = ''
-      prefix_rule(pattern=["direnv", "exec", ".", "uv", "run"], decision="allow")
-      prefix_rule(pattern=["timeout", "20s", "direnv", "exec", ".", "uv", "run"], decision="allow")
-      prefix_rule(pattern=["nix", "eval"], decision="allow")
-      prefix_rule(pattern=["nix", "build"], decision="allow")
-      prefix_rule(pattern=["nix", "run"], decision="allow")
-      prefix_rule(pattern=["git"], decision="allow")
-      prefix_rule(pattern=["cargo"], decision="allow")
-      prefix_rule(pattern=["npm"], decision="allow")
-      prefix_rule(pattern=["pnpm"], decision="allow")
-      prefix_rule(pattern=["yarn"], decision="allow")
-      prefix_rule(pattern=["just"], decision="allow")
-    '';
 
     # Ensure codex uses apiapi endpoint
     home.sessionVariables.CODEX_BASE_URL = "https://apiapi.chat/v1";
@@ -107,6 +88,22 @@ in
       (
         { config, ... }:
         {
+          # Seed writable Codex state files. Codex mutates these at runtime,
+          # so symlinking them into /nix/store breaks settings updates.
+          home.activation.codexState = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+            $DRY_RUN_CMD ${pkgs.coreutils}/bin/mkdir -p /home/${username}/.codex
+
+            if [ ! -e /home/${username}/.codex/config.toml ] || [ -L /home/${username}/.codex/config.toml ]; then
+              $DRY_RUN_CMD ${pkgs.coreutils}/bin/rm -f /home/${username}/.codex/config.toml
+              $DRY_RUN_CMD ${pkgs.coreutils}/bin/install -m 600 ${codexConfigFile} /home/${username}/.codex/config.toml
+            fi
+
+            if [ ! -e /home/${username}/.codex/version.json ] || [ -L /home/${username}/.codex/version.json ]; then
+              $DRY_RUN_CMD ${pkgs.coreutils}/bin/rm -f /home/${username}/.codex/version.json
+              $DRY_RUN_CMD ${pkgs.coreutils}/bin/install -m 600 ${versionConfigFile} /home/${username}/.codex/version.json
+            fi
+          '';
+
           # Write auth.json from sops secret during home-manager activation
           home.activation.codexAuth = config.lib.dag.entryAfter [ "writeBoundary" ] ''
             if [ -r ${apiapiApiKeyFile} ]; then
