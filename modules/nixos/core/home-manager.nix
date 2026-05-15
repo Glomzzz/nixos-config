@@ -3,9 +3,11 @@
   specialArgs,
   username,
   ...
-}: let
+}:
+let
   userRoot = ../../../users + "/${username}";
-in {
+in
+{
   home-manager.backupFileExtension = "hm-backup";
 
   home-manager.useGlobalPkgs = true;
@@ -13,14 +15,14 @@ in {
   home-manager.users.${username} = {
     imports = [
       (import (userRoot + "/home.nix"))
-      inputs.emacs-config.homeManagerModules.default
+      # inputs.emacs-config.homeManagerModules.default
     ];
   };
   home-manager.extraSpecialArgs = inputs // specialArgs;
 
   # Clean up old hm-backup files before activation to prevent conflicts
   system.activationScripts.cleanup-hm-backups = {
-    deps = [];
+    deps = [ ];
     text = ''
       echo "Cleaning up old home-manager backup files..."
       find /home/${username}/.config -name "*.hm-backup*" -type f -delete 2>/dev/null || true
