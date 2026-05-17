@@ -4,8 +4,21 @@
     mutableUserSettings = false;
     mutableUserKeymaps = false;
 
-    userSettings = {
-      edit_predictions = {
+      userSettings = {
+        soft_wrap = "none";
+        languages = {
+          Markdown = {
+            soft_wrap = "editor_width";
+            buffer_font_family = "Noto Sans Mono CJK SC";
+            buffer_font_size = 18.0;
+          };
+          Typst = {
+            soft_wrap = "editor_width";
+            buffer_font_family = "Noto Sans Mono CJK SC";
+            buffer_font_size = 18.0;
+          };
+        };
+        edit_predictions = {
         provider = "none";
       };
       agent_servers = {
