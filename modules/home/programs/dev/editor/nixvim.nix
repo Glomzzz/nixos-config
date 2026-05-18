@@ -2,14 +2,17 @@
   inputs,
   system,
   ...
-}: {
-  home.packages = let
-    nixvim = inputs.nixvim-source.packages.${system}.default;
-  in [
-    nixvim
-  ];
+}:
+{
+  home.packages =
+    let
+      nixvim = inputs.nixvim-source.packages.${system}.default;
+    in
+    [
+      nixvim
+    ];
 
-  home.sessionVariables = {
-    EDITOR = "nvim";
-  };
+  # home.sessionVariables = {
+  #   EDITOR = "nvim";
+  # };
 }
