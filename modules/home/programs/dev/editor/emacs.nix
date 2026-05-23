@@ -22,6 +22,9 @@
   # };
 
   home.sessionVariables = {
-    EDITOR = "emacs";
+    EDITOR = "emacsclient -c -a emacs";
+    VISUAL = "emacsclient -c -a emacs";
+    SUDO_EDITOR = "emacsclient -c -a emacs";
+    ALTERNATE_EDITOR = "";
   };
 }

@@ -13,6 +13,9 @@
         name = usernameFull;
         email = email;
       };
+      core = {
+        editor = "emacsclient -c -a emacs";
+      };
     };
   };
 
