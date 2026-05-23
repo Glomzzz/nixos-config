@@ -34,6 +34,9 @@
   };
   # Enable the KDE Plasma 6 desktop with Wayland
   services.desktopManager.plasma6.enable = true;
+  environment.plasma6.excludePackages = [
+    pkgs.kdePackages.kate
+  ];
 
   services.displayManager.autoLogin = {
     enable = true;
