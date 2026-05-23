@@ -68,8 +68,8 @@ let
 
   # Version tracking for codex
   versionConfig = builtins.toJSON {
-    version = "0.132.0";
-    last_checked = "2026-05-20T22:00:47Z";
+    version = "0.133.0";
+    last_checked = "2026-05-21T16:48:03Z";
   };
   versionConfigFile = pkgs.writeText "codex-version.json" versionConfig;
 in
