@@ -4,15 +4,15 @@
   config,
   ...
 }: let
-  sub2apiVersion = "0.1.104";
+  sub2apiVersion = "0.1.137";
   sub2apiSources = {
     "x86_64-linux" = {
       url = "https://github.com/Wei-Shaw/sub2api/releases/download/v${sub2apiVersion}/sub2api_${sub2apiVersion}_linux_amd64.tar.gz";
-      sha256 = "sha256-JGqb++t13WpTGzFRYzLBYWsRZrs8JDtgECuKjQ54GKk=";
+      sha256 = "sha256-kZdlX+h5zBdwIcLIPStjae39v0xUIMpjN6cxsdmw3gk=";
     };
     "aarch64-linux" = {
       url = "https://github.com/Wei-Shaw/sub2api/releases/download/v${sub2apiVersion}/sub2api_${sub2apiVersion}_linux_arm64.tar.gz";
-      sha256 = "sha256-ijhRLHdD9DK7t6KEDU3My9y0fhKvgawT166gWuXx42A=";
+      sha256 = "sha256-bwIwj1ALi308Qz0bbv0GK/dSN0OZnCP0OIY22z7rnkc=";
     };
   };
   sub2apiSource = lib.attrByPath [pkgs.stdenv.hostPlatform.system] null sub2apiSources;
