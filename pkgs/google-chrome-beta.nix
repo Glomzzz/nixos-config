@@ -174,7 +174,7 @@
 
     src = fetchurl {
       url = "https://dl.google.com/linux/direct/google-chrome-beta_current_amd64.deb";
-      hash = "sha256-blcbNS99acbZI6Ov3tyHexhRY9KU28I5GNEzFrnUjgw=";
+      hash = "sha256-kUcZ1b6u1KacppWhpWjPeib3+GkEA8GeQZK1UqWnV0Y=";
     };
 
     # With strictDeps on, some shebangs were not being patched correctly
@@ -291,13 +291,13 @@
     '';
   });
 
-  darwin = stdenvNoCC.mkDerivation (finalAttrs: {
+  darwin = stdenvNoCC.mkDerivation {
     inherit pname meta;
-    version = "145.0.7632.110";
+    version = "beta-current";
 
     src = fetchurl {
-      url = "http://dl.google.com/release2/chrome/odn6jvyow6owsodlm42m33k7ta_145.0.7632.110/GoogleChrome-145.0.7632.110.dmg";
-      hash = "sha256-siBn+vaSvvgrMEF1Da74nu1WGvyM1QUggarrEuqcGy4=";
+      url = "https://dl.google.com/chrome/mac/universal/beta/googlechromebeta.dmg";
+      hash = "sha256-wpMP3nS5FuJ/9+0BY5cGnytaOPjnMhU9USx3++kcNPE=";
     };
 
     dontPatch = true;
@@ -321,16 +321,16 @@
       mkdir -p $out/bin
 
       # "--simulate-outdated-no-au" disables auto updates and browser outdated popup
-      makeWrapper $out/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome $out/bin/google-chrome-stable \
+      makeWrapper $out/Applications/Google\ Chrome\ Beta.app/Contents/MacOS/Google\ Chrome\ Beta $out/bin/google-chrome-beta \
         --add-flags "--simulate-outdated-no-au='Tue, 31 Dec 2099 23:59:59 GMT'" \
         --add-flags ${lib.escapeShellArg commandLineArgs}
       runHook postInstall
     '';
 
     postInstall = lib.optionalString withSymlink ''
-      ln -s $out/bin/google-chrome-stable $out/bin/google-chrome
+      ln -s $out/bin/google-chrome-beta $out/bin/google-chrome
     '';
-  });
+  };
 
   meta = {
     changelog = "https://chromereleases.googleblog.com/";

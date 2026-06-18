@@ -7,16 +7,16 @@
 }:
 buildNpmPackage rec {
   pname = "oh-my-codex";
-  version = "0.15.2";
+  version = "0.18.13";
 
   src = fetchFromGitHub {
     owner = "Yeachan-Heo";
     repo = "oh-my-codex";
     tag = "v${version}";
-    hash = "sha256-KYRNVv+0L+7v6VvPVo4Vdi9ALcvAH/7WTgxn5Y8cncE=";
+    hash = "sha256-1zQBKBspNl2UwXgc3lP8QphXAJD0ooRrPgbyd0JTO8A=";
   };
 
-  npmDepsHash = "sha256-Zf/nYTFclUQqxEFJVmZY5lie9htVWLov7BdyY9EtnV0=";
+  npmDepsHash = "sha256-7l/wPoSWxQBVaF6VBdTSrmFHOzUJv1QVa27ptf8/52k=";
 
   nativeBuildInputs = [
     makeBinaryWrapper
