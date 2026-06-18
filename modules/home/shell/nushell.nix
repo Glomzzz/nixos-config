@@ -74,7 +74,7 @@ in {
 
       processCompletions = concatStringsSep "\n" (map (path: "use ${path} *") getNuFiles);
     in ''
-      $env.SHELL = "nu";
+      $env.SHELL = "${pkgs.nushell}/bin/nu";
       $env.config.show_banner = false
 
       let carapace_completer = {|spans|
@@ -88,7 +88,14 @@ in {
           partial: true
         }
       }
+
       ${processCompletions}
+
+      def --wrapped ssh [...args] {
+        with-env { SHELL: "${pkgs.runtimeShell}" } {
+          ^ssh ...$args
+        }
+      }
     '';
 
     envFile.text = ''
