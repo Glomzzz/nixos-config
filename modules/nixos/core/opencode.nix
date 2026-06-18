@@ -5,7 +5,7 @@
 }: let
   opencodePasswordFile = config.sops.secrets."opencode/password".path;
   opencodeGoApiKeyFile = config.sops.secrets."opencode/api_key".path;
-  apiapiApiKeyFile = config.sops.secrets."apiapi/api_key".path;
+  skillwApiKeyFile = config.sops.secrets."skillw/api_key".path;
   ohMyOpenAgentConfig = builtins.toJSON {
     "$schema" = "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/master/assets/oh-my-openagent.schema.json";
 
@@ -157,10 +157,10 @@ in {
               apiKey = "{file:${opencodeGoApiKeyFile}}";
             };
           };
-          "apiapi" = {
+          "skillw" = {
             options = {
-              apiKey = "{file:${apiapiApiKeyFile}}";
-              baseUrl = "https://apiapi.chat/v1";
+              apiKey = "{file:${skillwApiKeyFile}}";
+              baseUrl = "https://api.skillw.com/v1";
             };
           };
         };

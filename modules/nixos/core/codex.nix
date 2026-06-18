@@ -6,12 +6,12 @@
   ...
 }:
 let
-  apiapiApiKeyFile = config.sops.secrets."apiapi/api_key".path;
+  skillwApiKeyFile = config.sops.secrets."skillw/api_key".path;
 
   # Default model configuration
   defaultModel = "gpt-5.4";
 
-  # All available models via apiapi
+  # All available models via skillw
   availableModels = [
     "gpt-5"
     "gpt-5-codex"
@@ -50,26 +50,26 @@ let
         # Codex configuration seeded by NixOS home-manager
         # Codex may update this file at runtime.
 
-        model_provider = "codex"
+        model_provider = "skillw"
         model = "${defaultModel}"
         model_reasoning_effort = "xhigh"
         disable_response_storage = true
         approvals_reviewer = "user"
 
-        [model_providers.codex]
-        name = "codex"
-        base_url = "https://apiapi.chat/v1"
+        [model_providers.skillw]
+        name = "skillw"
+        base_url = "https://api.skillw.com/v1"
         wire_api = "responses"
 
-        # Available models via apiapi provider:
+        # Available models via skillw provider:
     ${modelComments}
   '';
   codexConfigFile = pkgs.writeText "codex-config.toml" codexConfig;
 
   # Version tracking for codex
   versionConfig = builtins.toJSON {
-    version = "0.133.0";
-    last_checked = "2026-05-21T16:48:03Z";
+    version = "0.140.0";
+    last_checked = "2026-06-16T16:49:31Z";
   };
   versionConfigFile = pkgs.writeText "codex-version.json" versionConfig;
 in
@@ -80,8 +80,8 @@ in
       oh-my-codex
     ];
 
-    # Ensure codex uses apiapi endpoint
-    home.sessionVariables.CODEX_BASE_URL = "https://apiapi.chat/v1";
+    # Ensure codex uses skillw endpoint
+    home.sessionVariables.CODEX_BASE_URL = "https://api.skillw.com/v1";
 
     # Use an inline module to get access to home-manager's config.lib.dag
     imports = [
@@ -106,13 +106,13 @@ in
 
           # Write auth.json from sops secret during home-manager activation
           home.activation.codexAuth = config.lib.dag.entryAfter [ "writeBoundary" ] ''
-            if [ -r ${apiapiApiKeyFile} ]; then
-              API_KEY=$(${pkgs.coreutils}/bin/cat ${apiapiApiKeyFile})
+            if [ -r ${skillwApiKeyFile} ]; then
+              API_KEY=$(${pkgs.coreutils}/bin/cat ${skillwApiKeyFile})
               $DRY_RUN_CMD ${pkgs.coreutils}/bin/mkdir -p /home/${username}/.codex
               $DRY_RUN_CMD ${pkgs.coreutils}/bin/echo "{\"OPENAI_API_KEY\":\"$API_KEY\"}" > /home/${username}/.codex/auth.json
               $DRY_RUN_CMD ${pkgs.coreutils}/bin/chmod 600 /home/${username}/.codex/auth.json
             else
-              echo "Warning: apiapi/api_key secret not available at ${apiapiApiKeyFile}" >&2
+              echo "Warning: skillw/api_key secret not available at ${skillwApiKeyFile}" >&2
             fi
           '';
         }
