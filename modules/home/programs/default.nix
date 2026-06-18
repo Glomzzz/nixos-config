@@ -4,7 +4,6 @@
     ./gaming
     ./cli-tools.nix
     ./communication.nix
-    ./vpn.nix
     ./browser.nix
     ./documents.nix
     ./xdg.nix
