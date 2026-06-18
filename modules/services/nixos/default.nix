@@ -14,7 +14,6 @@
   '';
 in {
   imports = [
-    ./ollama.nix
     ./openssh.nix
     ./printing.nix
     ./tailscale.nix
