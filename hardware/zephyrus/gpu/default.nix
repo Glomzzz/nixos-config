@@ -81,8 +81,9 @@
     LIBVA_DRIVER_NAME = "nvidia";
 
     # --- Wayland / Plasma Wayland ---
-    # Force Qt applications to use the Wayland platform plugin
-    QT_QPA_PLATFORM = "wayland";
+    # Prefer Wayland, but allow X11 fallback for SDK-bundled Qt apps such as
+    # the Android emulator, which does not ship the Wayland platform plugin.
+    QT_QPA_PLATFORM = "wayland;xcb";
     # Ensure SDL2 applications use Wayland
     SDL_VIDEODRIVER = "wayland";
     # Force Firefox to use Wayland
