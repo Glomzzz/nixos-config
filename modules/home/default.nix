@@ -14,7 +14,7 @@
     inherit username;
     homeDirectory = lib.mkForce "/home/${username}";
 
-    stateVersion = "26.05";
+    stateVersion = "26.11";
   };
 
   programs.home-manager.enable = true;
