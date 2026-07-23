@@ -8,6 +8,7 @@
     ./locale.nix
     ./fonts.nix
     ./android.nix
+    ./ios.nix
     ./networking.nix
     ./plasma-auth.nix
     ./howdy.nix
