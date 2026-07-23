@@ -46,15 +46,44 @@
 
   nixpkgs.overlays = [
     (final: prev: {
+      python3 = prev.python3.override {
+        packageOverrides = pySelf: pySuper: {
+          cli-helpers = pySuper.cli-helpers.overridePythonAttrs (oldAttrs: {
+            doCheck = false;
+          });
+          face-recognition = pySuper.face-recognition.overrideAttrs (oldAttrs: {
+            doInstallCheck = false;
+          });
+        };
+      };
+      python3Packages = final.python3.pkgs;
+      howdy = let
+        pythonDeps = builtins.map (
+          dep:
+            if dep == "opencv4Full"
+            then "opencv4"
+            else dep
+        );
+      in
+        (prev.howdy.override {inherit (final) python3;}).overrideAttrs (oldAttrs: {
+          pythonEnv = final.python3.buildEnv.override {
+            extraLibs = final.lib.attrVals (pythonDeps oldAttrs.passthru.pythonDeps) final.python3.pkgs;
+            makeWrapperArgs = [
+              "--set"
+              "OMP_NUM_THREADS"
+              "1"
+            ];
+          };
+          passthru =
+            oldAttrs.passthru
+            // {
+              pythonDeps = pythonDeps oldAttrs.passthru.pythonDeps;
+            };
+        });
       sub2api = final.callPackage ../../pkgs/sub2api.nix {};
       codex = final.callPackage ../../pkgs/codex.nix {};
       oh-my-codex = final.callPackage ../../pkgs/oh-my-codex.nix {};
       cherry-studio = final.callPackage ../../pkgs/cherry-studio.nix {};
-      python3Packages = prev.python3Packages.overrideScope (pySelf: pySuper: {
-        cli-helpers = pySuper.cli-helpers.overridePythonAttrs (oldAttrs: {
-          doCheck = false;
-        });
-      });
       openldap = prev.openldap.overrideAttrs (oldAttrs: {
         doCheck = false;
       });
