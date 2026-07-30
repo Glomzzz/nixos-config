@@ -3,9 +3,9 @@
   pkgs,
   ...
 }: let
-  httpProxy = "http://127.0.0.1:20172";
-  socksProxy = "socks5h://127.0.0.1:20170";
-  noProxy = "127.0.0.1,localhost,::1";
+  # httpProxy = "http://127.0.0.1:20172";
+  # socksProxy = "socks5h://127.0.0.1:20170";
+  # noProxy = "127.0.0.1,localhost,::1";
 
   v2rayAssets = pkgs.runCommand "v2raya-assets" {} ''
     mkdir -p "$out"
@@ -34,16 +34,16 @@ in {
     path = [pkgs.kmod];
   };
 
-  networking.proxy = {
-    default = httpProxy;
-    allProxy = socksProxy;
-    inherit noProxy;
-  };
+  # networking.proxy = {
+  #   default = httpProxy;
+  #   allProxy = socksProxy;
+  #   inherit noProxy;
+  # };
 
-  environment.sessionVariables = {
-    HTTP_PROXY = httpProxy;
-    HTTPS_PROXY = httpProxy;
-    ALL_PROXY = socksProxy;
-    NO_PROXY = noProxy;
-  };
+  # environment.sessionVariables = {
+  #   HTTP_PROXY = httpProxy;
+  #   HTTPS_PROXY = httpProxy;
+  #   ALL_PROXY = socksProxy;
+  #   NO_PROXY = noProxy;
+  # };
 }
