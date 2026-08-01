@@ -13,7 +13,6 @@
   ];
 
   networking.hostName = hostname;
-  services.resolved.enable = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   users.users.${username} = {
@@ -26,32 +25,41 @@
     ];
   };
 
-  # Enable the X server (for XWayland compatibility)
-  services.xserver.enable = true;
-  # Enable the Simple Desktop Display Manager with Wayland support
-  services.displayManager.sddm = {
-    enable = true;
-    wayland.enable = true;
+  services = {
+    resolved.enable = true;
+
+    # Enable the X server (for XWayland compatibility)
+    xserver.enable = true;
+
+    displayManager = {
+      # Enable the Simple Desktop Display Manager with Wayland support
+      sddm = {
+        enable = true;
+        wayland.enable = true;
+      };
+
+      autoLogin = {
+        enable = true;
+        user = username;
+      };
+    };
+
+    # Enable the KDE Plasma 6 desktop with Wayland
+    desktopManager.plasma6.enable = true;
   };
-  # Enable the KDE Plasma 6 desktop with Wayland
-  services.desktopManager.plasma6.enable = true;
   environment.plasma6.excludePackages = [
     pkgs.kdePackages.kate
   ];
 
-  services.displayManager.autoLogin = {
-    enable = true;
-    user = username;
-  };
-
   nixpkgs.overlays = [
+    (import ../../pkgs)
     (final: prev: {
       python3 = prev.python3.override {
-        packageOverrides = pySelf: pySuper: {
-          cli-helpers = pySuper.cli-helpers.overridePythonAttrs (oldAttrs: {
+        packageOverrides = _: pySuper: {
+          cli-helpers = pySuper.cli-helpers.overridePythonAttrs (_: {
             doCheck = false;
           });
-          face-recognition = pySuper.face-recognition.overrideAttrs (oldAttrs: {
+          face-recognition = pySuper.face-recognition.overrideAttrs (_: {
             doInstallCheck = false;
           });
         };
@@ -80,11 +88,7 @@
               pythonDeps = pythonDeps oldAttrs.passthru.pythonDeps;
             };
         });
-      sub2api = final.callPackage ../../pkgs/sub2api.nix {};
-      codex = final.callPackage ../../pkgs/codex.nix {};
-      oh-my-codex = final.callPackage ../../pkgs/oh-my-codex.nix {};
-      cherry-studio = final.callPackage ../../pkgs/cherry-studio.nix {};
-      openldap = prev.openldap.overrideAttrs (oldAttrs: {
+      openldap = prev.openldap.overrideAttrs (_: {
         doCheck = false;
       });
     })

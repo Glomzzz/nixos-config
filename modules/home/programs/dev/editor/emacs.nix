@@ -1,10 +1,4 @@
-{
-  pkgs,
-  inputs,
-  system,
-  ...
-}:
-{
+{pkgs, ...}: {
   # environment.systemPackages = [
   #   pkgs.emacs
   # ];

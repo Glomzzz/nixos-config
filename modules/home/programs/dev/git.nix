@@ -11,7 +11,7 @@
     settings = {
       user = {
         name = usernameFull;
-        email = email;
+        inherit email;
       };
       core = {
         editor = "emacsclient -c -a emacs";
