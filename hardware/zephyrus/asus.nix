@@ -1,4 +1,4 @@
-{...}: {
+_: {
   # ASUS
   services.asusd = {
     enable = true;

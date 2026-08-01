@@ -4,8 +4,7 @@
   lib,
   pkgs,
   ...
-}:
-let
+}: let
   skillwApiKeyFile = config.sops.secrets."skillw/api_key".path;
 
   # Default model configuration
@@ -72,8 +71,7 @@ let
     last_checked = "2026-06-16T16:49:31Z";
   };
   versionConfigFile = pkgs.writeText "codex-version.json" versionConfig;
-in
-{
+in {
   home-manager.users.${username} = {
     home.packages = with pkgs; [
       codex
@@ -86,11 +84,10 @@ in
     # Use an inline module to get access to home-manager's config.lib.dag
     imports = [
       (
-        { config, ... }:
-        {
+        {config, ...}: {
           # Seed writable Codex state files. Codex mutates these at runtime,
           # so symlinking them into /nix/store breaks settings updates.
-          home.activation.codexState = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+          home.activation.codexState = config.lib.dag.entryAfter ["writeBoundary"] ''
             $DRY_RUN_CMD ${pkgs.coreutils}/bin/mkdir -p /home/${username}/.codex
 
             if [ ! -e /home/${username}/.codex/config.toml ] || [ -L /home/${username}/.codex/config.toml ]; then
@@ -105,7 +102,7 @@ in
           '';
 
           # Write auth.json from sops secret during home-manager activation
-          home.activation.codexAuth = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+          home.activation.codexAuth = config.lib.dag.entryAfter ["writeBoundary"] ''
             if [ -r ${skillwApiKeyFile} ]; then
               API_KEY=$(${pkgs.coreutils}/bin/cat ${skillwApiKeyFile})
               $DRY_RUN_CMD ${pkgs.coreutils}/bin/mkdir -p /home/${username}/.codex

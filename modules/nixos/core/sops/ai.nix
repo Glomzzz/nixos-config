@@ -2,8 +2,7 @@
   username,
   config,
   ...
-}:
-{
+}: {
   sops.secrets."skillw/api_key" = {
     owner = username;
   };

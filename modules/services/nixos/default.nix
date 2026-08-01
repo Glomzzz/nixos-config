@@ -2,17 +2,11 @@
   lib,
   pkgs,
   ...
-}: let
+}: {
   # httpProxy = "http://127.0.0.1:20172";
   # socksProxy = "socks5h://127.0.0.1:20170";
   # noProxy = "127.0.0.1,localhost,::1";
 
-  v2rayAssets = pkgs.runCommand "v2raya-assets" {} ''
-    mkdir -p "$out"
-    ln -s ${pkgs.v2ray-geoip}/share/v2ray/geoip.dat "$out/geoip.dat"
-    ln -s ${pkgs.v2ray-domain-list-community}/share/v2ray/geosite.dat "$out/geosite.dat"
-  '';
-in {
   imports = [
     ./openssh.nix
     ./printing.nix
@@ -30,7 +24,7 @@ in {
   };
 
   systemd.services.v2raya = {
-    environment.V2RAYA_V2RAY_ASSETSDIR = "${v2rayAssets}";
+    environment.V2RAYA_V2RAY_ASSETSDIR = "${pkgs.v2raya-assets}";
     path = [pkgs.kmod];
   };
 

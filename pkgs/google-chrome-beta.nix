@@ -174,7 +174,7 @@
 
     src = fetchurl {
       url = "https://dl.google.com/linux/direct/google-chrome-beta_current_amd64.deb";
-      hash = "sha256-kUcZ1b6u1KacppWhpWjPeib3+GkEA8GeQZK1UqWnV0Y=";
+      hash = "sha256-v7USP8tZpajt59wMyO6khGkvZqksx/FHTgZ9ArfpvTQ=";
     };
 
     # With strictDeps on, some shebangs were not being patched correctly
@@ -276,11 +276,15 @@
         --add-flags ${lib.escapeShellArg commandLineArgs}
 
       # Make sure that libGL and libvulkan are found by ANGLE libGLESv2.so
-      patchelf --set-rpath $rpath $out/share/google/$appname/lib*GL*
+      for libfile in $out/share/google/$appname/lib*GL*; do
+        [ -e "$libfile" ] || continue
+        patchelf --set-rpath "$rpath" "$libfile"
+      done
 
       for elf in $out/share/google/$appname/{chrome,chrome-sandbox,chrome_crashpad_handler}; do
-        patchelf --set-rpath $rpath $elf
-        patchelf --set-interpreter ${bintools.dynamicLinker} $elf
+        [ -e "$elf" ] || continue
+        patchelf --set-rpath "$rpath" "$elf"
+        patchelf --set-interpreter ${bintools.dynamicLinker} "$elf"
       done
 
       runHook postInstall
@@ -297,7 +301,7 @@
 
     src = fetchurl {
       url = "https://dl.google.com/chrome/mac/universal/beta/googlechromebeta.dmg";
-      hash = "sha256-wpMP3nS5FuJ/9+0BY5cGnytaOPjnMhU9USx3++kcNPE=";
+      hash = "sha256-l65qmLZKEWHwFoWnZN8E7I2IDf6o29TuzdNBOKXmEd8=";
     };
 
     dontPatch = true;

@@ -3,20 +3,20 @@
   stdenvNoCC,
   fetchurl,
   gnutar,
-  system,
 }: let
-  version = "0.1.137";
+  version = "0.1.169";
+  inherit (stdenvNoCC.hostPlatform) system;
   sources = {
     "x86_64-linux" = {
       url = "https://github.com/Wei-Shaw/sub2api/releases/download/v${version}/sub2api_${version}_linux_amd64.tar.gz";
-      sha256 = "sha256-kZdlX+h5zBdwIcLIPStjae39v0xUIMpjN6cxsdmw3gk=";
+      sha256 = "sha256-Rcq3CcV4IIsJ68rBoc+aao1qgbmZRipxO1jO4yuFOUY=";
     };
     "aarch64-linux" = {
       url = "https://github.com/Wei-Shaw/sub2api/releases/download/v${version}/sub2api_${version}_linux_arm64.tar.gz";
-      sha256 = "sha256-bwIwj1ALi308Qz0bbv0GK/dSN0OZnCP0OIY22z7rnkc=";
+      sha256 = "sha256-NmRSSGUVCq/kkqDpu+x0+0sEKvAk1HKYtyHOL4jNroo=";
     };
   };
-  source = lib.attrByPath [system] null sources;
+  source = sources.${system} or (throw "Unsupported system: ${system}");
 in
   stdenvNoCC.mkDerivation {
     pname = "sub2api";

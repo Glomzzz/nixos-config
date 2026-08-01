@@ -1,4 +1,4 @@
-{...}: {
+_: {
   imports = [
     ./syncthing.nix
     ./udiskie.nix

@@ -1,53 +1,14 @@
-{pkgs, ...}: let
-  nu_scripts = pkgs.callPackage (
-    {
-      lib,
-      stdenvNoCC,
-      fetchFromGitHub,
-      unstableGitUpdater,
-    }:
-      stdenvNoCC.mkDerivation {
-        pname = "nu_scripts";
-        version = "0-unstable-2025-09-24";
-
-        src = fetchFromGitHub {
-          owner = "nushell";
-          repo = "nu_scripts";
-          rev = "7ea6780a4137bef1d683fb16989c19a945891b54";
-          hash = "sha256-Bof9bsQZnjtc9MLcuTIjdtsX/lbWGKc1u9HgGZp8uD8=";
-        };
-
-        installPhase = ''
-          runHook preInstall
-
-          mkdir -p $out/share/nu_scripts
-          mv ./* $out/share/nu_scripts
-
-          runHook postInstall
-        '';
-
-        passthru.updateScript = unstableGitUpdater {};
-
-        meta = {
-          description = "Place to share Nushell scripts with each other";
-          homepage = "https://github.com/nushell/nu_scripts";
-          license = lib.licenses.mit;
-          platforms = lib.platforms.unix;
-          maintainers = [lib.maintainers.CardboardTurkey];
-        };
-      }
-  ) {};
-in {
+{pkgs, ...}: {
   home.packages = [
-    nu_scripts
+    pkgs.nu_scripts
   ];
 
   programs.nushell = {
     enable = true;
     package = pkgs.nushell;
     configFile.text = with builtins; let
-      lib = pkgs.lib;
-      completions = nu_scripts.outPath + "/share/nu_scripts/custom-completions";
+      inherit (pkgs) lib;
+      completions = pkgs.nu_scripts.outPath + "/share/nu_scripts/custom-completions";
 
       flatten = lib.lists.flatten;
 

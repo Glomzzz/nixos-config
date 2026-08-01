@@ -26,13 +26,13 @@
   sources = let
     # https://dldir1.qq.com/weixin/mac/mac-release.xml
     any-darwin = let
-      version = "4.1.10.53-39917";
+      version = "4.1.12.29-269341";
       version' = lib.replaceString "-" "_" version;
     in {
       inherit version;
       src = fetchurl {
         url = "https://dldir1v6.qq.com/weixin/Universal/Mac/xWeChatMac_universal_${version'}.dmg";
-        hash = "sha256-52dr+I/J2SSbMUTwzdXzb/CHgsTpw53ZE2ln7WezZDA=";
+        hash = "sha256-ktAu/Z8K13Xeax66vbjsc/AkZV5+Rva7DvSU4rGXuWs=";
       };
     };
   in {
@@ -42,14 +42,14 @@
       version = "4.1.1.4";
       src = fetchurl {
         url = "https://dldir1v6.qq.com/weixin/Universal/Linux/WeChatLinux_arm64.AppImage";
-        hash = "sha256-OTh4hLeBfbF4bLFyByCIPUxa5OCUMbOjIvEt0qQIHE4=";
+        hash = "sha256-RLHhac3wSS1C9rx3GsA07Tp1EzxSf2LLBMyPtrECnUY=";
       };
     };
     x86_64-linux = {
       version = "4.1.1.4";
       src = fetchurl {
         url = "https://dldir1v6.qq.com/weixin/Universal/Linux/WeChatLinux_x86_64.AppImage";
-        hash = "sha256-vTTkuFm1LhAqVvuynIfYdROPf19nfCQIOGhw6Z+dOeo=";
+        hash = "sha256-RX26ArkbAxzdRBLu4HT7v/udnQax5Q/Bgi00hw4RSZA=";
       };
     };
   };

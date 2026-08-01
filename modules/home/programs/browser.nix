@@ -1,10 +1,6 @@
 {pkgs, ...}: {
-  home.packages = with pkgs; let
-    chromeBeta = callPackage ../../../pkgs/google-chrome-beta.nix {
-      # commandLineArgs = "--proxy-server=http://127.0.0.1:20172"; 
-    };
-  in [
-    chromeBeta
+  home.packages = with pkgs; [
+    google-chrome-beta
   ];
 
   home.sessionVariables = {
