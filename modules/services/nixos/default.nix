@@ -8,6 +8,7 @@
   # noProxy = "127.0.0.1,localhost,::1";
 
   imports = [
+    ./docker.nix
     ./openssh.nix
     ./printing.nix
     ./tailscale.nix
