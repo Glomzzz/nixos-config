@@ -6,5 +6,6 @@ _: {
     ./rust.nix
     ./nix.nix
     ./scheme.nix
+    ./koka.nix
   ];
 }
