@@ -21,7 +21,7 @@ in
     port="$1"
     host="$2"
     lan_host="mac-mini.local"
-    lan_ip_fallback="192.168.4.198"
+    lan_ip_fallback="192.168.50.198"
 
     direct_lan_route() {
       route="$(${ip} -4 route get "$1" 2>/dev/null || true)"
