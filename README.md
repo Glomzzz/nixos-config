@@ -6,10 +6,11 @@ Based on Flakes & Home Manager
 
 ## Develop Dev Env...
 
-Keep language toolchains out of the global NixOS configuration. Each project
-should define its compiler, native dependencies, and development tools in a
-local `flake.nix`, then commit the generated `flake.lock`. This keeps the
-command-line environment, editor, and CI on the same toolchain.
+Global Home Manager packages provide editor and command-line defaults. Each
+project should still define its compiler, native dependencies, and development
+tools in a local `flake.nix`, then commit the generated `flake.lock`. The
+project shell takes precedence and keeps the editor, CLI, and CI on one
+toolchain.
 
 Add the following `.envrc` to either kind of project to enter its development
 shell automatically:
@@ -34,7 +35,7 @@ for builds. A minimal `flake.nix` is:
   outputs = {nixpkgs, ...}: let
     system = "x86_64-linux";
     pkgs = import nixpkgs {inherit system;};
-    ocamlPkgs = pkgs.ocamlPackages;
+    ocamlPkgs = pkgs.ocaml-ng.ocamlPackages_latest;
   in {
     devShells.${system}.default = pkgs.mkShell {
       packages = [
@@ -60,11 +61,12 @@ dune build
 dune test
 ```
 
-Use `pkgs.ocamlPackages` for straightforward Nix-native projects. For an
-existing project with `.opam` files, or when exact opam dependency resolution
-is important, use [`opam-nix`](https://github.com/tweag/opam-nix). Plain opam
-inside a Nix shell is useful for experimentation, but splits dependency state
-between Nix and opam and is less reproducible.
+Use `pkgs.ocaml-ng.ocamlPackages_latest` for the newest coherent package set in
+Nixpkgs. For an existing project with `.opam` files, or when exact opam
+dependency resolution is important, use
+[`opam-nix`](https://github.com/tweag/opam-nix). Plain opam inside a Nix shell
+is useful for experimentation, but splits dependency state between Nix and
+opam and is less reproducible.
 
 ### Haskell
 
