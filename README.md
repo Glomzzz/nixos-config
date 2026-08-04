@@ -66,6 +66,60 @@ is important, use [`opam-nix`](https://github.com/tweag/opam-nix). Plain opam
 inside a Nix shell is useful for experimentation, but splits dependency state
 between Nix and opam and is less reproducible.
 
+### Haskell
+
+For most Haskell projects, use Nix for GHC, native libraries, and development
+tools, and use Cabal for Haskell dependencies and builds. Keep GHC and HLS in
+the same package set so their versions remain compatible:
+
+```nix
+{
+  description = "Haskell development environment";
+
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+  outputs = {nixpkgs, ...}: let
+    system = "x86_64-linux";
+    pkgs = import nixpkgs {inherit system;};
+    hs = pkgs.haskellPackages;
+  in {
+    devShells.${system}.default = pkgs.mkShell {
+      packages = [
+        hs.ghc
+        hs.cabal-install
+        hs.haskell-language-server
+        hs.fourmolu
+        hs.hlint
+        pkgs.pkg-config
+      ];
+    };
+  };
+}
+```
+
+Enter the environment and create or build the project with:
+
+```bash
+nix develop
+cabal update
+cabal init
+cabal build all
+cabal test all
+```
+
+Add native libraries such as `zlib`, `openssl`, or PostgreSQL to the shell only
+when the project needs them. For applications, pin the Hackage `index-state`
+and commit `cabal.project.freeze`; libraries should generally test supported
+dependency ranges instead of enforcing one frozen plan.
+
+Use `callCabal2nix` for straightforward reproducible Nix builds. Use
+[`haskell.nix`](https://github.com/input-output-hk/haskell.nix) when a large or
+multi-package project needs exact Cabal plans, cross-compilation, or more
+control over production builds. Avoid `ghcup` on NixOS unless it is explicitly
+required, because its prebuilt tools expect a conventional Linux filesystem.
+When using Stack, configure it to use the GHC supplied by Nix rather than
+downloading another compiler.
+
 ## Configuration history
 
 - 24.12.4, Basic configuration for my laptop. (0c6678)
