@@ -8,5 +8,6 @@ _: {
     ./koka.nix
     ./java.nix
     ./kotlin.nix
+    ./scala.nix
   ];
 }
