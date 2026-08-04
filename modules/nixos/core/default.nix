@@ -5,6 +5,7 @@
   ];
   imports = [
     ./sops
+    ./cachix.nix
     ./locale.nix
     ./fonts.nix
     ./android.nix
