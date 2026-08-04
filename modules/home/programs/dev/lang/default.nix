@@ -9,5 +9,6 @@ _: {
     ./java.nix
     ./kotlin.nix
     ./scala.nix
+    ./flix.nix
   ];
 }
