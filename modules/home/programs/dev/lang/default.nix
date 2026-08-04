@@ -7,5 +7,6 @@ _: {
     ./scheme.nix
     ./koka.nix
     ./java.nix
+    ./kotlin.nix
   ];
 }
