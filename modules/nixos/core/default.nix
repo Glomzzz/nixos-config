@@ -8,6 +8,7 @@
     ./cachix.nix
     ./locale.nix
     ./fonts.nix
+    ./hyprland.nix
     ./android.nix
     ./ios.nix
     ./networking.nix
