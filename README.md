@@ -4,6 +4,70 @@ This repository contains my NixOS configuration files.
 
 Based on Flakes & Home Manager
 
+## Develop Dev Env...
+
+Keep language toolchains out of the global NixOS configuration. Each project
+should define its compiler, native dependencies, and development tools in a
+local `flake.nix`, then commit the generated `flake.lock`. This keeps the
+command-line environment, editor, and CI on the same toolchain.
+
+Add the following `.envrc` to either kind of project to enter its development
+shell automatically:
+
+```bash
+use flake
+```
+
+Run `direnv allow` once after creating or changing it.
+
+### OCaml
+
+For most OCaml projects, use Nix for OCaml and development tools, and use Dune
+for builds. A minimal `flake.nix` is:
+
+```nix
+{
+  description = "OCaml development environment";
+
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+  outputs = {nixpkgs, ...}: let
+    system = "x86_64-linux";
+    pkgs = import nixpkgs {inherit system;};
+    ocamlPkgs = pkgs.ocamlPackages;
+  in {
+    devShells.${system}.default = pkgs.mkShell {
+      packages = [
+        ocamlPkgs.ocaml
+        ocamlPkgs.dune_3
+        ocamlPkgs.ocaml-lsp
+        ocamlPkgs.ocamlformat
+        ocamlPkgs.utop
+        pkgs.pkg-config
+      ];
+    };
+  };
+}
+```
+
+Enter the environment and create or build the project with:
+
+```bash
+nix develop
+dune init project my_project
+cd my_project
+dune build
+dune test
+```
+
+Use `pkgs.ocamlPackages` for straightforward Nix-native projects. For an
+existing project with `.opam` files, or when exact opam dependency resolution
+is important, use [`opam-nix`](https://github.com/tweag/opam-nix). Plain opam
+inside a Nix shell is useful for experimentation, but splits dependency state
+between Nix and opam and is less reproducible.
+
+## Configuration history
+
 - 24.12.4, Basic configuration for my laptop. (0c6678)
   - Based on Flake & HomeManager
   - Hardware drivers, nessessary packages.
