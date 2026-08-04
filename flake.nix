@@ -14,6 +14,7 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    hyprland.url = "github:hyprwm/Hyprland";
     nix-alien-source.url = "github:thiagokokada/nix-alien";
     plasma-manager = {
       url = "github:nix-community/plasma-manager";
