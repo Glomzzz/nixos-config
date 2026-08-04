@@ -26,6 +26,13 @@
         "x-scheme-handler/org-protocol" = ["emacsclient.desktop"];
       };
     };
+    terminal-exec = {
+      enable = true;
+      settings = {
+        default = ["kitty.desktop"];
+        KDE = ["kitty.desktop"];
+      };
+    };
   };
 
   home.packages = with pkgs; [

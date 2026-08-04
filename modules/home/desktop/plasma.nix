@@ -17,6 +17,14 @@
   programs.plasma = {
     enable = true;
     overrideConfig = false;
+    configFile.kdeglobals.General = {
+      TerminalApplication = "kitty";
+      TerminalService = "kitty.desktop";
+    };
+    shortcuts = {
+      "services/Alacritty.desktop".New = [];
+      "services/kitty.desktop"."_launch" = "Ctrl+Alt+T";
+    };
     kscreenlocker = {
       autoLock = false;
       lockOnResume = false;

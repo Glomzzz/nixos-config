@@ -4,7 +4,7 @@
   cache = config.xdg.cacheHome;
 in {
   imports = [
-    ./alacritty.nix
+    ./kitty.nix
     ./nushell.nix
     ./terminal-tools.nix
     ./starship.nix
@@ -17,7 +17,7 @@ in {
       LESSKEY = c + "/less/lesskey";
       WINEPREFIX = d + "/wine";
 
-      TERMINAL = "alacritty";
+      TERMINAL = "kitty";
       DELTA_PAGER = "less -R";
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
     };
