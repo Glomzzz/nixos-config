@@ -5,6 +5,7 @@ _: {
     ./rust.nix
     ./nix.nix
     ./scheme.nix
+    ./ocaml.nix
     ./koka.nix
     ./java.nix
     ./kotlin.nix
