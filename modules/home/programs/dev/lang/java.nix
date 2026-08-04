@@ -6,5 +6,6 @@
     # graaljs
     #javaPackages.compiler.openjdk21
     graalvmPackages.graalvm-oracle
+    jdt-language-server# Java LSP
   ];
 }
