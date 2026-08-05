@@ -27,11 +27,11 @@
           # Use mouse wheel to go to prev or next page
           WheelForPaging=True
           # Font
-          Font="Sans 12"
+          Font="Sans 10"
           # Menu Font
-          MenuFont="Sans 12"
+          MenuFont="Sans 10"
           # Tray Font
-          TrayFont="Sans Bold 12"
+          TrayFont="Sans Bold 10"
           # Tray Label Outline Color
           TrayOutlineColor=#000000
           # Tray Label Text Color

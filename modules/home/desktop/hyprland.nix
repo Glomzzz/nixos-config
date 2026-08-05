@@ -8,6 +8,9 @@
   xwaylandSatellite = inputs.xwayland-satellite.packages.${pkgs.stdenv.hostPlatform.system}.xwayland-satellite;
   grimblast = pkgs.grimblast.override {hyprland = hyprlandPackage;};
   hyprlandOnly = ''${pkgs.systemd}/lib/systemd/systemd-xdg-autostart-condition "Hyprland" ""'';
+  xwaylandXresources = pkgs.writeText "xwayland-satellite.Xresources" ''
+    Xft.dpi: 144
+  '';
   wallpaper = ../../../assets/e022.jpg;
   batteryStatus = pkgs.writeShellApplication {
     name = "waybar-battery-status";
@@ -561,7 +564,10 @@ in {
         NotifyAccess = "all";
         ExecCondition = hyprlandOnly;
         ExecStart = "${xwaylandSatellite}/bin/xwayland-satellite :0";
-        ExecStartPost = "${pkgs.uwsm}/bin/uwsm finalize";
+        ExecStartPost = [
+          "${pkgs.xrdb}/bin/xrdb -display :0 -global -merge -nocpp ${xwaylandXresources}"
+          "${pkgs.uwsm}/bin/uwsm finalize"
+        ];
         Environment = [
           "DISPLAY=:0"
           "XWAYLAND_SATELLITE_BASE_SCALE=1.5"
