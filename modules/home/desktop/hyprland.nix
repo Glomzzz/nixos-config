@@ -109,10 +109,6 @@ in {
 
   xdg.configFile = {
     "uwsm/env".source = "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
-    "uwsm/env-hyprland".text = ''
-      export XCURSOR_SIZE=24
-      export HYPRCURSOR_SIZE=24
-    '';
   };
 
   wayland.windowManager.hyprland = {
@@ -218,6 +214,7 @@ in {
 
         cursor = {
           default_monitor = "eDP-1",
+          enable_hyprcursor = false,
         },
 
         dwindle = {
