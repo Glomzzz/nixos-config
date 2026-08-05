@@ -13,5 +13,15 @@ in {
     xwayland.enable = true;
   };
 
+  # Hyprland's portal does not implement Secret. Route it to the KWallet
+  # backend so browsers can retrieve the same cookie encryption key as Plasma.
+  xdg.portal.config.hyprland = {
+    default = [
+      "hyprland"
+      "gtk"
+    ];
+    "org.freedesktop.impl.portal.Secret" = ["kwallet"];
+  };
+
   services.displayManager.defaultSession = "hyprland-uwsm";
 }

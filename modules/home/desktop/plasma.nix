@@ -17,9 +17,15 @@
   programs.plasma = {
     enable = true;
     overrideConfig = false;
-    configFile.kdeglobals.General = {
-      TerminalApplication = "kitty";
-      TerminalService = "kitty.desktop";
+    configFile = {
+      kdeglobals.General = {
+        TerminalApplication = "kitty";
+        TerminalService = "kitty.desktop";
+      };
+
+      # kde-gtk-config's color reload module leaves a stale GFileMonitor
+      # callback when kded6 is used in Hyprland, crashing GLib apps together.
+      kded6rc."Module-gtkconfig".autoload = false;
     };
     shortcuts = {
       "services/Alacritty.desktop".New = [];
