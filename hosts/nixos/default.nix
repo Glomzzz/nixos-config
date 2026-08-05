@@ -18,9 +18,10 @@
   users.users.${username} = {
     isNormalUser = true;
     description = username;
+    # User-owned NetworkManager profiles use the KWallet-backed secret agent.
+    # System-wide profile changes should continue to require Polkit approval.
     extraGroups = [
       "dialout"
-      "networkmanager"
       "wheel"
     ];
   };

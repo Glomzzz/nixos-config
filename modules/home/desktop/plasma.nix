@@ -40,7 +40,8 @@
     };
   };
 
-  # NetworkManager stores per-user Wi-Fi secrets in KWallet.
+  # nm-applet stores user-owned Wi-Fi secrets through Secret Service, backed
+  # by KWallet. System-owned profiles remain in root-only NetworkManager files.
   xdg.configFile."kwalletrc" = {
     text = ''
       [Wallet]

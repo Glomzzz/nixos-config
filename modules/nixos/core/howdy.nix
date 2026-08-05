@@ -16,8 +16,9 @@
   # KDE Wallet auto-unlock:
   #   - Wallet name must be "kdewallet" with Blowfish encryption
   #   - Wallet password must match your login password
-  #   - howdy is DISABLED on the login PAM service so SDDM always prompts
-  #     for a password → kwallet-pam receives it → wallet auto-unlocks
+  #   - Password-based logins can pass the password to kwallet-pam
+  #   - SDDM auto-login supplies no password, so an encrypted wallet prompts
+  #     once after login instead of weakening its encryption
   #
   #############################################################################
 
@@ -26,8 +27,6 @@
 
     # "sufficient": face alone is enough (skip password if face matches).
     # "required": 2FA mode (face + password both needed).
-    # Using "sufficient" because login.howdy is disabled below, so password
-    # is still required at SDDM login for kwallet auto-unlock.
     control = "sufficient";
 
     settings = {
@@ -43,10 +42,8 @@
     };
   };
 
-  # === KDE Wallet Auto-Unlock ===
-  # SDDM must prompt for password so that kwallet-pam receives it and can
-  # auto-unlock the wallet. Disabling howdy on the login PAM service ensures
-  # face auth doesn't bypass the password prompt at SDDM login.
+  # Keep password-based login services from bypassing the password that
+  # kwallet-pam needs. SDDM auto-login uses a separate PAM service.
   security.pam.services.login.howdy.enable = false;
 
   # === polkit-127 Workaround ===
