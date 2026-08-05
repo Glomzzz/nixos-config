@@ -9,6 +9,8 @@
   programs.steam = {
     enable = true;
     package = pkgs.steam.override {
+      # Modern clients persist this through Settings > Accessibility; retain
+      # the matching environment fallback for older UI surfaces.
       extraEnv.STEAM_FORCE_DESKTOPUI_SCALING = "1.6";
     };
     fontPackages = with pkgs; [source-han-sans];
