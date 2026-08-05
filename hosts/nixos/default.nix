@@ -64,6 +64,10 @@
         };
       };
       python3Packages = final.python3.pkgs;
+      # powerprofilesctl aborts during PyGObject teardown under Python 3.14.
+      power-profiles-daemon = prev.power-profiles-daemon.override {
+        python3 = final.python313;
+      };
       howdy = let
         pythonDeps = builtins.map (
           dep:
