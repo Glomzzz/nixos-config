@@ -16,10 +16,6 @@
   };
 
   launcher = writeShellScript "wechat" ''
-    # WeChat is X11-only. Match the satellite's render scale so its buffer stays
-    # sharp on the laptop and can be downsampled on the HDMI output.
-    export QT_SCALE_FACTOR=1.5
-
     if [[ "$XMODIFIERS" =~ ibus ]]; then
       export QT_IM_MODULE=ibus
       export GTK_IM_MODULE=ibus
