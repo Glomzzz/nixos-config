@@ -8,6 +8,9 @@
 
   programs.steam = {
     enable = true;
+    package = pkgs.steam.override {
+      extraEnv.STEAM_FORCE_DESKTOPUI_SCALING = "1.6";
+    };
     fontPackages = with pkgs; [source-han-sans];
     extraPackages = with pkgs; [
       corefonts

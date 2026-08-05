@@ -128,13 +128,13 @@ in {
         output = "eDP-1",
         mode = "2560x1600@240",
         position = "0x0",
-        scale = 1.5,
+        scale = 1.6,
       })
 
       hl.monitor({
         output = "HDMI-A-1",
         mode = "1920x1080@60",
-        position = "1707x0",
+        position = "1600x0",
         scale = 1,
       })
 
@@ -209,6 +209,10 @@ in {
         misc = {
           disable_hyprland_logo = true,
           force_default_wallpaper = 0,
+        },
+
+        xwayland = {
+          force_zero_scaling = true,
         },
       })
 
