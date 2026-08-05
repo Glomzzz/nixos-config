@@ -159,7 +159,8 @@ in {
       hl.monitor({
         output = "HDMI-A-1",
         mode = "1920x1080@60",
-        position = "auto-right",
+        -- 2560 / 1.5 rounds to a 1707-pixel logical laptop width.
+        position = "1707x0",
         scale = 1,
       })
 
@@ -183,6 +184,11 @@ in {
       })
 
       hl.config({
+        debug = {
+          -- Permit the requested 1.5 scale despite fractional logical pixels.
+          disable_scale_checks = true,
+        },
+
         general = {
           gaps_in = 5,
           gaps_out = 10,
