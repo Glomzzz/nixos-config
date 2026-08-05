@@ -1,7 +1,14 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
+    biome
+    bun
+    deno
+    eslint
     nodejs
     pnpm
-    bun
+    prettier
+    typescript
+    typescript-language-server
+    vscode-langservers-extracted
   ];
 }

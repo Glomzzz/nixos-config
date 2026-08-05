@@ -1,10 +1,16 @@
-{pkgs, ...}: {
+{pkgs, ...}: let
+  emacs = (pkgs.emacsPackagesFor pkgs.emacs-pgtk).emacsWithPackages (epkgs: [
+    epkgs.apheleia
+    epkgs.flymake-eslint
+    epkgs.typescript-mode
+  ]);
+in {
   # environment.systemPackages = [
   #   pkgs.emacs
   # ];
-  home.packages = with pkgs; [
-    emacs-pgtk
-    libtool
+  home.packages = [
+    emacs
+    pkgs.libtool
   ];
   # programs.emacs = {
   #   enable = true;
