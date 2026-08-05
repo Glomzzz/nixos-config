@@ -29,8 +29,9 @@
   services = {
     resolved.enable = true;
 
-    # Enable the X server (for XWayland compatibility)
-    xserver.enable = true;
+    # Hyprland and SDDM run natively on Wayland. Legacy X11 applications use
+    # the separately enabled XWayland compatibility server.
+    xserver.enable = false;
 
     displayManager = {
       # Enable the Simple Desktop Display Manager with Wayland support
