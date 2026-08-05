@@ -254,7 +254,9 @@ in {
         modules-right = [
           "tray"
           "pulseaudio"
-          "network"
+          "network#wifi"
+          "backlight"
+          "power-profiles-daemon"
           "cpu"
           "memory"
           "battery"
@@ -282,11 +284,27 @@ in {
           format-muted = "VOL muted";
           on-click = "${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
         };
-        network = {
-          format-wifi = "{essid} {signalStrength}%";
-          format-ethernet = "{ifname}";
-          format-disconnected = "offline";
-          tooltip-format = "{ifname}: {ipaddr}/{cidr}";
+        "network#wifi" = {
+          interface = "wlp46s0f0";
+          format = "WIFI --";
+          format-wifi = "WIFI {essid} {signalStrength}%";
+          format-linked = "WIFI linked";
+          format-disconnected = "WIFI --";
+          format-disabled = "WIFI off";
+          max-length = 28;
+          tooltip-format-wifi = "{essid}\nSignal: {signalStrength}%\nAddress: {ipaddr}/{cidr}";
+          tooltip-format-disconnected = "WiFi disconnected";
+          tooltip-format-disabled = "WiFi disabled";
+        };
+        backlight = {
+          device = "nvidia_0";
+          format = "BRT {percent}%";
+          on-scroll-up = "${pkgs.brightnessctl}/bin/brightnessctl -d nvidia_0 -e4 -n2 set 5%+";
+          on-scroll-down = "${pkgs.brightnessctl}/bin/brightnessctl -d nvidia_0 -e4 -n2 set 5%-";
+        };
+        "power-profiles-daemon" = {
+          format = "PWR {profile}";
+          tooltip-format = "Power profile: {profile}\nDriver: {driver}";
         };
         cpu = {
           format = "CPU {usage}%";
@@ -346,6 +364,8 @@ in {
         #tray,
         #pulseaudio,
         #network,
+        #backlight,
+        #power-profiles-daemon,
         #cpu,
         #memory,
         #battery,
@@ -366,6 +386,22 @@ in {
 
         #battery.warning {
           color: #f9e2af;
+        }
+
+        #backlight {
+          color: #f9e2af;
+        }
+
+        #power-profiles-daemon.performance {
+          color: #fab387;
+        }
+
+        #power-profiles-daemon.balanced {
+          color: #89dceb;
+        }
+
+        #power-profiles-daemon.power-saver {
+          color: #a6e3a1;
         }
 
         tooltip {
