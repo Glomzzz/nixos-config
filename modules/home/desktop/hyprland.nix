@@ -33,6 +33,7 @@ in {
     extraConfig = ''
       local mainMod = "SUPER"
       local terminal = "${pkgs.uwsm}/bin/uwsm app -- ${pkgs.kitty}/bin/kitty"
+      local editor = "${pkgs.uwsm}/bin/uwsm app -- ${pkgs.emacs-pgtk}/bin/emacsclient -c -a ${pkgs.emacs-pgtk}/bin/emacs"
       local fileManager = "${pkgs.uwsm}/bin/uwsm app -- ${pkgs.kdePackages.dolphin}/bin/dolphin"
       local menu = "${pkgs.uwsm}/bin/uwsm app -- ${pkgs.fuzzel}/bin/fuzzel"
       local clipboard = "${pkgs.cliphist}/bin/cliphist list | ${pkgs.fuzzel}/bin/fuzzel --dmenu --prompt 'Clipboard> ' | ${pkgs.cliphist}/bin/cliphist decode | ${pkgs.wl-clipboard}/bin/wl-copy"
@@ -56,6 +57,12 @@ in {
         mode = "preferred",
         position = "auto",
         scale = "auto",
+      })
+
+      hl.workspace_rule({
+        workspace = "1",
+        monitor = "eDP-1",
+        default = true,
       })
 
       hl.config({
@@ -104,6 +111,10 @@ in {
           },
         },
 
+        cursor = {
+          default_monitor = "eDP-1",
+        },
+
         dwindle = {
           preserve_split = true,
         },
@@ -121,6 +132,7 @@ in {
       })
 
       hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
+      hl.bind(mainMod .. " + C", hl.dsp.exec_cmd(editor))
       hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
       hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(menu))
       hl.bind(mainMod .. " + V", hl.dsp.exec_cmd(clipboard))
