@@ -5,6 +5,7 @@
   ...
 }: let
   hyprlandPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+  xwaylandSatellite = inputs.xwayland-satellite.packages.${pkgs.stdenv.hostPlatform.system}.xwayland-satellite;
   grimblast = pkgs.grimblast.override {hyprland = hyprlandPackage;};
   hyprlandOnly = ''${pkgs.systemd}/lib/systemd/systemd-xdg-autostart-condition "Hyprland" ""'';
   wallpaper = ../../../assets/e022.jpg;
@@ -94,25 +95,12 @@
       powerprofilesctl set "$next"
     '';
   };
-  setX11Primary = pkgs.writeShellApplication {
-    name = "set-x11-primary";
-    runtimeInputs = [
-      pkgs.coreutils
-      pkgs.xrandr
-    ];
-    text = ''
-      for _ in {1..20}; do
-        if xrandr --output eDP-1 --primary 2>/dev/null; then
-          exit 0
-        fi
-        sleep 0.25
-      done
-
-      echo "eDP-1 did not become available to XWayland" >&2
-      exit 1
-    '';
-  };
 in {
+  home.sessionVariables = {
+    DISPLAY = ":0";
+    _JAVA_AWT_WM_NONREPARENTING = "1";
+  };
+
   home.packages = [
     pkgs.brightnessctl
     grimblast
@@ -141,13 +129,6 @@ in {
       local fileManager = "${pkgs.uwsm}/bin/uwsm app -- ${pkgs.kdePackages.dolphin}/bin/dolphin"
       local menu = "${pkgs.uwsm}/bin/uwsm app -- ${pkgs.fuzzel}/bin/fuzzel"
       local clipboard = "${pkgs.cliphist}/bin/cliphist list | ${pkgs.fuzzel}/bin/fuzzel --dmenu --prompt 'Clipboard> ' | ${pkgs.cliphist}/bin/cliphist decode | ${pkgs.wl-clipboard}/bin/wl-copy"
-
-      local function markLaptopAsX11Primary()
-        hl.exec_cmd("${setX11Primary}/bin/set-x11-primary")
-      end
-
-      hl.on("hyprland.start", markLaptopAsX11Primary)
-      hl.on("monitor.added", markLaptopAsX11Primary)
 
       hl.monitor({
         output = "eDP-1",
@@ -248,11 +229,6 @@ in {
           force_default_wallpaper = 0,
         },
 
-        xwayland = {
-          -- Keep legacy X11 buffers at native resolution. X11-only apps must
-          -- set their own toolkit scale instead of being enlarged and blurred.
-          force_zero_scaling = true,
-        },
       })
 
       hl.gesture({
@@ -318,18 +294,6 @@ in {
         suppress_event = "maximize",
       })
 
-      hl.window_rule({
-        name = "fix-xwayland-drags",
-        match = {
-          class = "^$",
-          title = "^$",
-          xwayland = true,
-          float = true,
-          fullscreen = false,
-          pin = false,
-        },
-        no_focus = true,
-      })
     '';
   };
 
@@ -585,6 +549,33 @@ in {
   };
 
   systemd.user.services = {
+    xwayland-satellite = {
+      Unit = {
+        Description = "Rootless XWayland with mixed-DPI scaling";
+        Documentation = "https://github.com/Supreeeme/xwayland-satellite/pull/452";
+        PartOf = ["graphical-session.target"];
+        After = [
+          "wayland-wm@hyprland.desktop.service"
+          "wayland-session-waitenv.service"
+        ];
+        Before = ["graphical-session.target"];
+      };
+      Service = {
+        Type = "notify";
+        NotifyAccess = "all";
+        ExecCondition = hyprlandOnly;
+        ExecStart = "${xwaylandSatellite}/bin/xwayland-satellite :0";
+        Environment = [
+          "DISPLAY=:0"
+          "XWAYLAND_SATELLITE_BASE_SCALE=1.5"
+        ];
+        Restart = "on-failure";
+        RestartSec = 1;
+        Slice = "session.slice";
+        TimeoutStartSec = 15;
+      };
+      Install.WantedBy = ["graphical-session.target"];
+    };
     mako = {
       Unit = {
         Description = "Lightweight Wayland notification daemon";

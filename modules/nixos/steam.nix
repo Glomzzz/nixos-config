@@ -9,8 +9,8 @@
   programs.steam = {
     enable = true;
     package = pkgs.steam.override {
-      # Steam is X11-only. Scale its native-resolution XWayland buffer to match
-      # the laptop panel without compositor-side blurring.
+      # Match the satellite's render scale. It keeps this buffer sharp on the
+      # laptop and downsamples it when the window moves to the HDMI output.
       extraEnv.STEAM_FORCE_DESKTOPUI_SCALING = "1.5";
     };
     fontPackages = with pkgs; [source-han-sans];

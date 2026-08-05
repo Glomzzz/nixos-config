@@ -15,6 +15,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hyprland.url = "github:hyprwm/Hyprland";
+    # PR #452 adds compositor-side mixed-DPI scaling for X11 applications.
+    xwayland-satellite = {
+      url = "github:Supreeeme/xwayland-satellite/0a95f18d9fd254e3f42e0b4e4132a59084b18b98";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.rust-overlay.follows = "";
+    };
     nix-alien-source.url = "github:thiagokokada/nix-alien";
     # emacs-config = {
     #   url = "path:/home/glom/emacs-config";
