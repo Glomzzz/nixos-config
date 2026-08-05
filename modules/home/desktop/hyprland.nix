@@ -96,10 +96,7 @@
     '';
   };
 in {
-  home.sessionVariables = {
-    DISPLAY = ":0";
-    _JAVA_AWT_WM_NONREPARENTING = "1";
-  };
+  home.sessionVariables._JAVA_AWT_WM_NONREPARENTING = "1";
 
   home.packages = [
     pkgs.brightnessctl
@@ -125,6 +122,8 @@ in {
       local fileManager = "${pkgs.uwsm}/bin/uwsm app -- ${pkgs.kdePackages.dolphin}/bin/dolphin"
       local menu = "${pkgs.uwsm}/bin/uwsm app -- ${pkgs.fuzzel}/bin/fuzzel"
       local clipboard = "${pkgs.cliphist}/bin/cliphist list | ${pkgs.fuzzel}/bin/fuzzel --dmenu --prompt 'Clipboard> ' | ${pkgs.cliphist}/bin/cliphist decode | ${pkgs.wl-clipboard}/bin/wl-copy"
+
+      hl.env("DISPLAY", ":0")
 
       hl.monitor({
         output = "eDP-1",
@@ -562,6 +561,7 @@ in {
         NotifyAccess = "all";
         ExecCondition = hyprlandOnly;
         ExecStart = "${xwaylandSatellite}/bin/xwayland-satellite :0";
+        ExecStartPost = "${pkgs.uwsm}/bin/uwsm finalize";
         Environment = [
           "DISPLAY=:0"
           "XWAYLAND_SATELLITE_BASE_SCALE=1.5"
