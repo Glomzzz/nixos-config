@@ -13,12 +13,12 @@
   #        sudo howdy test
   #        sudo -i
   #
-  # KDE Wallet auto-unlock:
-  #   - Wallet name must be "kdewallet" with Blowfish encryption
-  #   - Wallet password must match your login password
-  #   - Password-based logins can pass the password to kwallet-pam
-  #   - SDDM auto-login supplies no password, so an encrypted wallet prompts
-  #     once after login instead of weakening its encryption
+  # KDE Wallet with SDDM auto-login:
+  #   - SDDM auto-login cannot pass a password to kwallet-pam
+  #   - The "kdewallet" wallet intentionally has an empty password so it opens
+  #     without a prompt after auto-login
+  #   - Its secrets are protected only by user file permissions, not by the
+  #     wallet password; set a non-empty password to restore encryption
   #
   #############################################################################
 
@@ -42,8 +42,8 @@
     };
   };
 
-  # Keep password-based login services from bypassing the password that
-  # kwallet-pam needs. SDDM auto-login uses a separate PAM service.
+  # Keep console logins password-based. SDDM auto-login uses a separate PAM
+  # service and the passwordless wallet does not depend on a PAM unlock key.
   security.pam.services.login.howdy.enable = false;
 
   # === polkit-127 Workaround ===
