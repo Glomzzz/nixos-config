@@ -212,7 +212,8 @@ in {
         },
 
         xwayland = {
-          force_zero_scaling = true,
+          -- Match legacy X11 applications to each monitor's scale.
+          force_zero_scaling = false,
         },
       })
 

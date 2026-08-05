@@ -9,9 +9,9 @@
   programs.steam = {
     enable = true;
     package = pkgs.steam.override {
-      # Modern clients persist this through Settings > Accessibility; retain
-      # the matching environment fallback for older UI surfaces.
-      extraEnv.STEAM_FORCE_DESKTOPUI_SCALING = "1.6";
+      # Hyprland scales XWayland surfaces, so Steam must not multiply that
+      # scale with its own persisted accessibility setting.
+      extraEnv.STEAM_FORCE_DESKTOPUI_SCALING = "1";
     };
     fontPackages = with pkgs; [source-han-sans];
     extraPackages = with pkgs; [
