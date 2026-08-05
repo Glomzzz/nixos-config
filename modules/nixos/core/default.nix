@@ -12,7 +12,7 @@
     ./android.nix
     ./ios.nix
     ./networking.nix
-    ./plasma-auth.nix
+    ./kwallet.nix
     ./howdy.nix
     ./codex.nix
     ./opencode.nix

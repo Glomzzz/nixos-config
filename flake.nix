@@ -16,11 +16,6 @@
     };
     hyprland.url = "github:hyprwm/Hyprland";
     nix-alien-source.url = "github:thiagokokada/nix-alien";
-    plasma-manager = {
-      url = "github:nix-community/plasma-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
-    };
     # emacs-config = {
     #   url = "path:/home/glom/emacs-config";
     #   inputs.nixpkgs.follows = "nixpkgs";

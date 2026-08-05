@@ -27,9 +27,6 @@ in {
       echo "Cleaning up old home-manager backup files..."
       find /home/${username}/.config -name "*.hm-backup*" -type f -delete 2>/dev/null || true
       find /home/${username} -maxdepth 1 -name ".*.hm-backup*" -type f -delete 2>/dev/null || true
-      if [ -L /home/${username}/.config/kscreenlockerrc ]; then
-        rm -f /home/${username}/.config/kscreenlockerrc
-      fi
     '';
   };
 }

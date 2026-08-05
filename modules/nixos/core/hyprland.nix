@@ -14,7 +14,7 @@ in {
   };
 
   # Hyprland's portal does not implement Secret. Route it to the KWallet
-  # backend so browsers can retrieve the same cookie encryption key as Plasma.
+  # backend so browsers can retrieve their persistent cookie encryption key.
   xdg.portal.config.hyprland = {
     default = [
       "hyprland"
