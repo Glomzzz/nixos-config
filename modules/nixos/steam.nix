@@ -9,8 +9,8 @@
   programs.steam = {
     enable = true;
     package = pkgs.steam.override {
-      # Steam is X11-only. Scale its native-resolution XWayland buffer slightly
-      # below the laptop's 1.6 display scale so the desktop UI is not oversized.
+      # Steam is X11-only. Scale its native-resolution XWayland buffer to match
+      # the laptop panel without compositor-side blurring.
       extraEnv.STEAM_FORCE_DESKTOPUI_SCALING = "1.5";
     };
     fontPackages = with pkgs; [source-han-sans];

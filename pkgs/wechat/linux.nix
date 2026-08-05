@@ -18,7 +18,7 @@
   launcher = writeShellScript "wechat" ''
     # WeChat is X11-only; render its UI at the laptop panel's HiDPI scale while
     # Hyprland keeps the XWayland surface at native resolution.
-    export QT_SCALE_FACTOR=1.6
+    export QT_SCALE_FACTOR=1.5
 
     if [[ "$XMODIFIERS" =~ ibus ]]; then
       export QT_IM_MODULE=ibus
