@@ -5,7 +5,11 @@
   ...
 }: let
   hyprlandPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-  xwaylandSatellite = inputs.xwayland-satellite.packages.${pkgs.stdenv.hostPlatform.system}.xwayland-satellite;
+  xwaylandSatellite =
+    inputs.xwayland-satellite.packages.${pkgs.stdenv.hostPlatform.system}.xwayland-satellite.overrideAttrs
+    (old: {
+      patches = (old.patches or []) ++ [../../../patches/xwayland-satellite-preserve-popup-parent.patch];
+    });
   grimblast = pkgs.grimblast.override {hyprland = hyprlandPackage;};
   hyprlandOnly = ''${pkgs.systemd}/lib/systemd/systemd-xdg-autostart-condition "Hyprland" ""'';
   xwaylandXresources = pkgs.writeText "xwayland-satellite.Xresources" ''

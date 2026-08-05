@@ -1,0 +1,62 @@
+diff --git a/src/server/mod.rs b/src/server/mod.rs
+index cd03fac..c81ac07 100644
+--- a/src/server/mod.rs
++++ b/src/server/mod.rs
+@@ -1370 +1369,0 @@ impl<S: X11Selection + 'static> InnerServerState<S> {
+-        let transient_for = win.attrs.transient_for;
+@@ -1386,9 +1385,7 @@ impl<S: X11Selection + 'static> InnerServerState<S> {
+-                if let Some(parent) = transient_for {
+-                    if let Some(&parent_entity) = self.windows.get(&parent) {
+-                        if let Ok(parent_data) = self.world.get::<&WindowData>(parent_entity) {
+-                            parent_dims = parent_data.attrs.dims;
+-                            if let Ok(parent_role) = self.world.get::<&SurfaceRole>(parent_entity) {
+-                                if let SurfaceRole::Toplevel(Some(toplevel)) = &*parent_role {
+-                                    if let Some(ref sat) = toplevel.decoration.satellite {
+-                                        decorations_height = sat.titlebar_height();
+-                                    }
++                if let Some(&parent_entity) = self.windows.get(&popup.parent) {
++                    if let Ok(parent_data) = self.world.get::<&WindowData>(parent_entity) {
++                        parent_dims = parent_data.attrs.dims;
++                        if let Ok(parent_role) = self.world.get::<&SurfaceRole>(parent_entity) {
++                            if let SurfaceRole::Toplevel(Some(toplevel)) = &*parent_role {
++                                if let Some(ref sat) = toplevel.decoration.satellite {
++                                    decorations_height = sat.titlebar_height();
+@@ -1399,0 +1397 @@ impl<S: X11Selection + 'static> InnerServerState<S> {
++
+diff --git a/src/server/tests.rs b/src/server/tests.rs
+index f12ad7e..033120a 100644
+--- a/src/server/tests.rs
++++ b/src/server/tests.rs
+@@ -2106,0 +2107,32 @@ fn reconfigure_popup() {
++#[test]
++fn reconfigure_popup_uses_inferred_parent() {
++    let (mut f, comp) = TestFixture::new_with_compositor();
++    f.new_output(0, 0);
++    let (_, output) = f.new_output(500, 0);
++    f.run();
++
++    let toplevel = Window::new(1);
++    let (_, t_id) = f.create_toplevel(&comp, toplevel);
++    f.testwl.move_surface_to_output(t_id, &output);
++    f.run();
++
++    let popup = Window::new(2);
++    let (_, p_id) = f.create_popup(&comp, PopupBuilder::new(popup, toplevel, t_id).x(520).y(40));
++
++    let new_dims = WindowDims {
++        x: 540,
++        y: 60,
++        width: 80,
++        height: 100,
++    };
++    f.reconfigure_window(popup, new_dims, true);
++    f.run();
++    f.run();
++
++    let data = f.testwl.get_surface_data(p_id).unwrap();
++    assert_eq!(
++        data.popup().positioner_state.offset,
++        testwl::Vec2 { x: 40, y: 60 }
++    );
++}
++
