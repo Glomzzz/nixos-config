@@ -212,8 +212,9 @@ in {
         },
 
         xwayland = {
-          -- Match legacy X11 applications to each monitor's scale.
-          force_zero_scaling = false,
+          -- Keep legacy X11 buffers at native resolution. X11-only apps must
+          -- set their own toolkit scale instead of being enlarged and blurred.
+          force_zero_scaling = true,
         },
       })
 

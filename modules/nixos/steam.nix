@@ -9,9 +9,9 @@
   programs.steam = {
     enable = true;
     package = pkgs.steam.override {
-      # Hyprland scales XWayland surfaces, so Steam must not multiply that
-      # scale with its own persisted accessibility setting.
-      extraEnv.STEAM_FORCE_DESKTOPUI_SCALING = "1";
+      # Steam is X11-only. Scale its native-resolution XWayland buffer slightly
+      # below the laptop's 1.6 display scale so the desktop UI is not oversized.
+      extraEnv.STEAM_FORCE_DESKTOPUI_SCALING = "1.5";
     };
     fontPackages = with pkgs; [source-han-sans];
     extraPackages = with pkgs; [
