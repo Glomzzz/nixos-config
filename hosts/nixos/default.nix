@@ -38,9 +38,10 @@
         wayland.enable = true;
       };
 
-      # pam_kwallet needs the login password to unlock the wallet that stores
-      # browser cookie encryption keys. SDDM auto-login cannot provide it.
-      autoLogin.enable = false;
+      autoLogin = {
+        enable = true;
+        user = username;
+      };
     };
 
     # Enable the KDE Plasma 6 desktop with Wayland
