@@ -8,6 +8,92 @@
   grimblast = pkgs.grimblast.override {hyprland = hyprlandPackage;};
   hyprlandOnly = ''${pkgs.systemd}/lib/systemd/systemd-xdg-autostart-condition "Hyprland" ""'';
   wallpaper = ../../../assets/e022.jpg;
+  batteryStatus = pkgs.writeShellApplication {
+    name = "waybar-battery-status";
+    runtimeInputs = [
+      pkgs.jq
+      pkgs.power-profiles-daemon
+    ];
+    text = ''
+      battery_path=""
+      for supply in /sys/class/power_supply/BAT*; do
+        if [[ -r "$supply/capacity" && -r "$supply/status" ]]; then
+          battery_path="$supply"
+          break
+        fi
+      done
+
+      if [[ -z "$battery_path" ]]; then
+        jq --null-input --compact-output \
+          --arg text "BAT --" \
+          --arg tooltip "Battery not found" \
+          '{text: $text, tooltip: $tooltip, class: "unavailable"}'
+        exit 0
+      fi
+
+      read -r capacity < "$battery_path/capacity"
+      read -r status < "$battery_path/status"
+      profile="$(powerprofilesctl get 2>/dev/null || true)"
+
+      case "$profile" in
+        power-saver)
+          profile_label="Power saver"
+          next_label="balanced"
+          ;;
+        balanced)
+          profile_label="Balanced"
+          next_label="performance"
+          ;;
+        performance)
+          profile_label="Performance"
+          next_label="power saver"
+          ;;
+        *)
+          profile="balanced"
+          profile_label="Balanced"
+          next_label="performance"
+          ;;
+      esac
+
+      case "$status" in
+        Charging)
+          suffix=" +"
+          ;;
+        Full|"Not charging")
+          suffix=" AC"
+          ;;
+        *)
+          suffix=""
+          ;;
+      esac
+
+      tooltip="$(printf 'Battery: %s%% (%s)\nPower profile: %s\nClick to switch to %s' "$capacity" "$status" "$profile_label" "$next_label")"
+      jq --null-input --compact-output \
+        --arg text "BAT $capacity%$suffix" \
+        --arg tooltip "$tooltip" \
+        --arg class "$profile" \
+        '{text: $text, tooltip: $tooltip, class: $class}'
+    '';
+  };
+  cyclePowerProfile = pkgs.writeShellApplication {
+    name = "waybar-cycle-power-profile";
+    runtimeInputs = [pkgs.power-profiles-daemon];
+    text = ''
+      case "$(powerprofilesctl get)" in
+        power-saver)
+          next="balanced"
+          ;;
+        balanced)
+          next="performance"
+          ;;
+        *)
+          next="power-saver"
+          ;;
+      esac
+
+      powerprofilesctl set "$next"
+    '';
+  };
 in {
   home.packages = [
     pkgs.brightnessctl
@@ -103,6 +189,7 @@ in {
 
         input = {
           kb_layout = "us",
+          kb_options = "ctrl:nocaps",
           follow_mouse = 1,
           sensitivity = 0,
           accel_profile = "flat",
@@ -254,12 +341,11 @@ in {
         modules-right = [
           "tray"
           "pulseaudio"
-          "network#wifi"
-          "backlight"
-          "power-profiles-daemon"
           "cpu"
+          # "network"
           "memory"
-          "battery"
+          "backlight"
+          "custom/battery"
         ];
 
         "hyprland/workspaces" = {
@@ -284,27 +370,25 @@ in {
           format-muted = "VOL muted";
           on-click = "${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
         };
-        "network#wifi" = {
-          interface = "wlp46s0f0";
-          format = "WIFI --";
-          format-wifi = "WIFI {essid} {signalStrength}%";
-          format-linked = "WIFI linked";
-          format-disconnected = "WIFI --";
-          format-disabled = "WIFI off";
-          max-length = 28;
+        network = {
+          interval = 1;
+          format = "NET ↑ {bandwidthUpBits} ↓ {bandwidthDownBits}";
+          format-wifi = "NET ↑ {bandwidthUpBits} ↓ {bandwidthDownBits}";
+          format-ethernet = "NET ↑ {bandwidthUpBits} ↓ {bandwidthDownBits}";
+          format-linked = "NET linked";
+          format-disconnected = "NET --";
+          format-disabled = "NET off";
+          max-length = 32;
           tooltip-format-wifi = "{essid}\nSignal: {signalStrength}%\nAddress: {ipaddr}/{cidr}";
-          tooltip-format-disconnected = "WiFi disconnected";
-          tooltip-format-disabled = "WiFi disabled";
+          tooltip-format-ethernet = "{ifname}\nAddress: {ipaddr}/{cidr}";
+          tooltip-format-disconnected = "Network disconnected";
+          tooltip-format-disabled = "Network disabled";
         };
         backlight = {
           device = "nvidia_0";
           format = "BRT {percent}%";
           on-scroll-up = "${pkgs.brightnessctl}/bin/brightnessctl -d nvidia_0 -e4 -n2 set 5%+";
           on-scroll-down = "${pkgs.brightnessctl}/bin/brightnessctl -d nvidia_0 -e4 -n2 set 5%-";
-        };
-        "power-profiles-daemon" = {
-          format = "PWR {profile}";
-          tooltip-format = "Power profile: {profile}\nDriver: {driver}";
         };
         cpu = {
           format = "CPU {usage}%";
@@ -314,14 +398,12 @@ in {
           format = "MEM {percentage}%";
           interval = 5;
         };
-        battery = {
-          states = {
-            warning = 30;
-            critical = 15;
-          };
-          format = "BAT {capacity}%";
-          format-charging = "BAT {capacity}% +";
-          format-plugged = "BAT {capacity}% AC";
+        "custom/battery" = {
+          exec = "${batteryStatus}/bin/waybar-battery-status";
+          exec-on-event = true;
+          interval = 5;
+          on-click = "${cyclePowerProfile}/bin/waybar-cycle-power-profile";
+          return-type = "json";
         };
         clock = {
           format = "{:%a %d %b  %H:%M}";
@@ -365,10 +447,9 @@ in {
         #pulseaudio,
         #network,
         #backlight,
-        #power-profiles-daemon,
         #cpu,
         #memory,
-        #battery,
+        #custom-battery,
         #clock {
           padding: 0 8px;
         }
@@ -379,28 +460,23 @@ in {
         }
 
         #network.disconnected,
-        #pulseaudio.muted,
-        #battery.critical {
+        #pulseaudio.muted {
           color: #f38ba8;
-        }
-
-        #battery.warning {
-          color: #f9e2af;
         }
 
         #backlight {
           color: #f9e2af;
         }
 
-        #power-profiles-daemon.performance {
+        #custom-battery.performance {
           color: #fab387;
         }
 
-        #power-profiles-daemon.balanced {
+        #custom-battery.balanced {
           color: #89dceb;
         }
 
-        #power-profiles-daemon.power-saver {
+        #custom-battery.power-saver {
           color: #a6e3a1;
         }
 
