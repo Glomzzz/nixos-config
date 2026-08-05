@@ -94,6 +94,24 @@
       powerprofilesctl set "$next"
     '';
   };
+  setX11Primary = pkgs.writeShellApplication {
+    name = "set-x11-primary";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.xrandr
+    ];
+    text = ''
+      for _ in {1..20}; do
+        if xrandr --output eDP-1 --primary 2>/dev/null; then
+          exit 0
+        fi
+        sleep 0.25
+      done
+
+      echo "eDP-1 did not become available to XWayland" >&2
+      exit 1
+    '';
+  };
 in {
   home.packages = [
     pkgs.brightnessctl
@@ -124,6 +142,13 @@ in {
       local menu = "${pkgs.uwsm}/bin/uwsm app -- ${pkgs.fuzzel}/bin/fuzzel"
       local clipboard = "${pkgs.cliphist}/bin/cliphist list | ${pkgs.fuzzel}/bin/fuzzel --dmenu --prompt 'Clipboard> ' | ${pkgs.cliphist}/bin/cliphist decode | ${pkgs.wl-clipboard}/bin/wl-copy"
 
+      local function markLaptopAsX11Primary()
+        hl.exec_cmd("${setX11Primary}/bin/set-x11-primary")
+      end
+
+      hl.on("hyprland.start", markLaptopAsX11Primary)
+      hl.on("monitor.added", markLaptopAsX11Primary)
+
       hl.monitor({
         output = "eDP-1",
         mode = "2560x1600@240",
@@ -148,6 +173,12 @@ in {
       hl.workspace_rule({
         workspace = "1",
         monitor = "eDP-1",
+        default = true,
+      })
+
+      hl.workspace_rule({
+        workspace = "2",
+        monitor = "HDMI-A-1",
         default = true,
       })
 
