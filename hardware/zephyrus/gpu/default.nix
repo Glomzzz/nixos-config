@@ -75,8 +75,6 @@
     # Apparently, without this nouveau may attempt to be used instead
     # (despite it being blacklisted)
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-    # Hardware cursors are currently broken on nvidia
-    WLR_NO_HARDWARE_CURSORS = "1";
     # VA-API Backend as NVIDIA
     LIBVA_DRIVER_NAME = "nvidia";
 

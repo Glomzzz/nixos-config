@@ -1,5 +1,5 @@
 {pkgs, ...}: let
-  hyprlandOnly = ''${pkgs.systemd}/lib/systemd/systemd-xdg-autostart-condition "Hyprland" ""'';
+  niriOnly = ''${pkgs.systemd}/lib/systemd/systemd-xdg-autostart-condition "niri" ""'';
   unlockKWallet = pkgs.writeShellApplication {
     name = "unlock-kwallet";
     runtimeInputs = [
@@ -58,7 +58,7 @@ in {
       description = "KWallet Secret Service";
       wantedBy = ["graphical-session.target"];
       partOf = ["graphical-session.target"];
-      after = ["wayland-session-waitenv.service"];
+      after = ["niri.service"];
       before = [
         "graphical-session.target"
         "nm-applet.service"
@@ -67,7 +67,7 @@ in {
       serviceConfig = {
         Type = "dbus";
         BusName = "org.freedesktop.secrets";
-        ExecCondition = hyprlandOnly;
+        ExecCondition = niriOnly;
         ExecStart = "${pkgs.kdePackages.kwallet}/bin/ksecretd";
         ExecStartPost = "-${unlockKWallet}/bin/unlock-kwallet";
         Restart = "on-failure";
@@ -81,7 +81,7 @@ in {
       wants = ["ksecretd.service"];
       after = ["ksecretd.service"];
       serviceConfig = {
-        ExecCondition = hyprlandOnly;
+        ExecCondition = niriOnly;
         Restart = "on-failure";
         RestartSec = 3;
       };

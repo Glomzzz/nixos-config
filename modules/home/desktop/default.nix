@@ -1,7 +1,7 @@
 _: {
   imports = [
     ./fcitx5.nix
-    ./hyprland.nix
+    ./niri.nix
     ./kwallet.nix
     ./theme.nix
   ];

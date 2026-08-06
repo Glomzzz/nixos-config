@@ -13,6 +13,7 @@ in {
 
     users.${username} = {
       imports = [
+        inputs.niri-config.homeManagerModules.default
         (import (userRoot + "/home.nix"))
         # inputs.emacs-config.homeManagerModules.default
       ];
