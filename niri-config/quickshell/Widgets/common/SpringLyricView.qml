@@ -229,11 +229,9 @@ Item {
         root._animating = running;
     }
 
-    Timer {
-        interval: 16
-        repeat: true
+    FrameAnimation {
         running: root.visible && root._animating
-        onTriggered: root.advance(interval / 1000)
+        onTriggered: root.advance(Math.max(0, Math.min(0.05, frameTime)))
     }
 
     Item {

@@ -1094,23 +1094,12 @@ Item {
         }
     }
 
-    Timer {
-        interval: 16
+    FrameAnimation {
         running: root.animate
-        repeat: true
-
-        property double lastTickMs: 0
-
-        onRunningChanged: {
-            if (!running)
-                lastTickMs = 0
-        }
 
         onTriggered: {
-            const now = Date.now()
-            const dt = lastTickMs > 0 ? Math.min(0.05, (now - lastTickMs) / 1000.0) : interval / 1000.0
+            const dt = Math.max(0, Math.min(0.05, frameTime))
             const stepScale = dt / root.frameBaseDt
-            lastTickMs = now
             const base = root.driftBaseSpeed()
             const nextBands = []
             for (let i = 0; i < root.cloudBands.length; ++i) {

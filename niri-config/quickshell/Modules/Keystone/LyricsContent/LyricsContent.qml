@@ -194,11 +194,12 @@ Item {
 
             property var smoothValues: [0, 0, 0, 0, 0, 0]
 
-            Timer {
-                interval: 16
+            FrameAnimation {
                 running: root.active && AudioSpectrum.available
-                repeat: true
                 onTriggered: {
+                    const dt = Math.max(0, Math.min(0.05, frameTime));
+                    const attackFactor = 1 - Math.pow(1 - 0.85, dt * 60);
+                    const releaseFactor = 1 - Math.pow(1 - 0.08, dt * 60);
                     let s = spectrumContainer.smoothValues;
                     let r = AudioSpectrum.values;
                     if (!r || r.length < 6) return;
@@ -231,8 +232,8 @@ Item {
 
                         let diff = finalTarget - s[i];
 
-                        if (diff > 0) s[i] += 0.85 * diff;
-                        else s[i] += 0.08 * diff;
+                        if (diff > 0) s[i] += attackFactor * diff;
+                        else s[i] += releaseFactor * diff;
                     }
 
                     spectrumContainer.smoothValues = s;
