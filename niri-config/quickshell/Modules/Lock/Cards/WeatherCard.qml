@@ -10,12 +10,12 @@ Rectangle {
 
     readonly property string temp: fmtTemp(WeatherPlugin.currentTemperatureC, "--")
     readonly property string cond: WeatherPlugin.loading
-        ? qsTr("正在加载…")
-        : (WeatherPlugin.currentWeatherText || qsTr("未知"))
-    readonly property string loc: WeatherPlugin.locationName || qsTr("位置")
+        ? qsTr("Loading…")
+        : (WeatherPlugin.currentWeatherText || qsTr("Unknown"))
+    readonly property string loc: WeatherPlugin.locationName || qsTr("Location")
     readonly property string iconName: WeatherPlugin.currentIconName || "cloud"
-    readonly property string feelsLike: qsTr("体感温度：") + fmtTemp(WeatherPlugin.currentFeelsLikeC, "--")
-    readonly property string humidity: qsTr("湿度：") + fmtPercent(WeatherPlugin.currentRelativeHumidity)
+    readonly property string feelsLike: qsTr("Feels like:") + fmtTemp(WeatherPlugin.currentFeelsLikeC, "--")
+    readonly property string humidity: qsTr("Humidity:") + fmtPercent(WeatherPlugin.currentRelativeHumidity)
     readonly property bool loadingState: WeatherPlugin.loading || !WeatherPlugin.hasValidData
     readonly property bool showTitle: root.rootHeight > 610 && root.height > 150
     readonly property bool showSkeletonForecast: root.loadingState && root.rootHeight > 610
@@ -105,7 +105,7 @@ Rectangle {
 
         Text {
             visible: root.showTitle
-            text: qsTr("天气")
+            text: qsTr("Weather")
             color: Appearance.colors.colPrimary
             font.family: Sizes.fontFamily
             font.pixelSize: 36

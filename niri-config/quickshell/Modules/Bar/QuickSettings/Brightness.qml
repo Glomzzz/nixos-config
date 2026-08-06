@@ -43,6 +43,6 @@ Item {
 
     PopupToolTip {
         extraVisibleCondition: mouseArea.containsMouse
-        text: qsTr("亮度: ") + Math.round(root.brightnessValue * 100) + qsTr("%\n滚轮调节")
+        text: qsTr("Brightness: ") + Math.round(root.brightnessValue * 100) + qsTr("%\nScroll to adjust")
     }
 }

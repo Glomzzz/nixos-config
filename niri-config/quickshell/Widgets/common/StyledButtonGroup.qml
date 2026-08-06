@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 import qs.Common
 import qs.Components
@@ -32,10 +33,13 @@ RowLayout {
     property string tooltipRole: "tooltip"
     property string enabledRole: "enabled"
     property string widthRole: "width"
+    property string accessibleName: ""
 
     signal valueSelected(var value, var modelData)
 
     spacing: 2
+    Accessible.role: Accessible.Grouping
+    Accessible.name: accessibleName
 
     function roleValue(item, role, fallback) {
         if (item === undefined || item === null)
@@ -106,7 +110,35 @@ RowLayout {
         return active ? Appearance.colors.colOnPrimary : Appearance.colors.colOnSecondaryContainer;
     }
 
+    function selectRelative(fromIndex, delta) {
+        if (model.length === 0)
+            return;
+        for (let offset = 1; offset <= model.length; offset += 1) {
+            const index = (fromIndex + delta * offset + model.length)
+                % model.length;
+            const item = segmentRepeater.itemAt(index);
+            if (!item || !item.segmentEnabled)
+                continue;
+            item.activate();
+            return;
+        }
+    }
+
+    function selectEdge(fromStart) {
+        const start = fromStart ? 0 : model.length - 1;
+        const delta = fromStart ? 1 : -1;
+        for (let offset = 0; offset < model.length; offset += 1) {
+            const item = segmentRepeater.itemAt(start + delta * offset);
+            if (!item || !item.segmentEnabled)
+                continue;
+            item.activate();
+            return;
+        }
+    }
+
     Repeater {
+        id: segmentRepeater
+
         model: root.model
 
         delegate: Item {
@@ -121,7 +153,8 @@ RowLayout {
             readonly property bool first: index === 0
             readonly property bool last: index === root.model.length - 1
             readonly property bool pressed: segmentMouse.pressed && segmentEnabled
-            readonly property bool hovered: segmentMouse.containsMouse && segmentEnabled
+            readonly property bool hovered: (segmentMouse.containsMouse
+                || activeFocus) && segmentEnabled
             readonly property real leftRadius: (active || (root.roundOuterSegments && first) || pressed) ? root.edgeRadius : root.innerRadius
             readonly property real rightRadius: (active || (root.roundOuterSegments && last) || pressed) ? root.edgeRadius : root.innerRadius
             readonly property color segmentColor: root.fillColor(active, hovered, pressed)
@@ -133,9 +166,46 @@ RowLayout {
             Layout.preferredWidth: root.segmentWidth(modelData, label.implicitWidth, root.iconSize)
                                    + (pressed ? root.pressedExpansion : 0)
             Layout.preferredHeight: root.buttonHeight
+            activeFocusOnTab: segmentEnabled
             opacity: segmentEnabled ? 1 : 0.45
             scale: pressed ? 0.97 : 1
             z: pressed ? 3 : active ? 2 : hovered ? 1 : 0
+            Accessible.role: Accessible.RadioButton
+            Accessible.name: labelText || tooltipText
+            Accessible.description: tooltipText !== labelText
+                ? tooltipText : ""
+            Accessible.checked: active
+            Accessible.onPressAction: segment.activate()
+
+            function activate() {
+                if (!segmentEnabled)
+                    return;
+                root.valueSelected(segmentValue, modelData);
+                forceActiveFocus();
+            }
+
+            Keys.onPressed: event => {
+                if (event.key === Qt.Key_Left
+                        || event.key === Qt.Key_Up) {
+                    root.selectRelative(index, -1);
+                    event.accepted = true;
+                } else if (event.key === Qt.Key_Right
+                        || event.key === Qt.Key_Down) {
+                    root.selectRelative(index, 1);
+                    event.accepted = true;
+                } else if (event.key === Qt.Key_Home) {
+                    root.selectEdge(true);
+                    event.accepted = true;
+                } else if (event.key === Qt.Key_End) {
+                    root.selectEdge(false);
+                    event.accepted = true;
+                } else if (event.key === Qt.Key_Space
+                        || event.key === Qt.Key_Return
+                        || event.key === Qt.Key_Enter) {
+                    segment.activate();
+                    event.accepted = true;
+                }
+            }
 
             Behavior on Layout.preferredWidth {
                 NumberAnimation {
@@ -173,6 +243,15 @@ RowLayout {
                         easing.bezierCurve: Appearance.animation.expressiveEffects.bezierCurve
                     }
                 }
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                radius: Math.max(segment.leftRadius, segment.rightRadius)
+                color: "transparent"
+                border.width: segment.activeFocus ? 2 : 0
+                border.color: segment.inkColor
+                z: 2
             }
 
             Rectangle {
@@ -251,7 +330,7 @@ RowLayout {
                 enabled: segment.segmentEnabled
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onClicked: root.valueSelected(segment.segmentValue, segment.modelData)
+                onClicked: segment.activate()
                 z: 3
             }
 

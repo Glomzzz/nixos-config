@@ -801,25 +801,25 @@ Item {
 
                 IconButton {
                     iconName: "content_copy"
-                    tooltipText: qsTr("复制")
+                    tooltipText: qsTr("Copy")
                     onClicked: root.copyCurve()
                 }
 
                 IconButton {
                     iconName: "save"
-                    tooltipText: qsTr("保存")
+                    tooltipText: qsTr("Save")
                     onClicked: root.saveCurve()
                 }
 
                 IconButton {
                     iconName: "center_focus_strong"
-                    tooltipText: qsTr("重置视图")
+                    tooltipText: qsTr("Reset view")
                     onClicked: root.resetView()
                 }
 
                 IconButton {
                     iconName: "close"
-                    tooltipText: qsTr("关闭")
+                    tooltipText: qsTr("Close")
                     onClicked: root.close()
                 }
             }
@@ -876,7 +876,7 @@ Item {
                         id: playMiniFab
 
                         iconName: root.playing ? "pause" : "play_arrow"
-                        labelText: root.playing ? qsTr("暂停") : qsTr("播放")
+                        labelText: root.playing ? qsTr("Pause") : qsTr("Play")
                         expanded: root.fabExpanded
                         order: 4
                         expandedY: fabMenu.height - fabMenu.mainSize - order * (fabMenu.miniSize + fabMenu.buttonGap)
@@ -889,7 +889,7 @@ Item {
                         id: reverseMiniFab
 
                         iconName: "keyboard_double_arrow_left"
-                        labelText: qsTr("倒放")
+                        labelText: qsTr("Reverse")
                         expanded: root.fabExpanded
                         order: 3
                         expandedY: fabMenu.height - fabMenu.mainSize - order * (fabMenu.miniSize + fabMenu.buttonGap)
@@ -902,7 +902,7 @@ Item {
                         id: flipMiniFab
 
                         iconName: "swap_vert"
-                        labelText: qsTr("翻转")
+                        labelText: qsTr("Flip")
                         expanded: root.fabExpanded
                         order: 2
                         expandedY: fabMenu.height - fabMenu.mainSize - order * (fabMenu.miniSize + fabMenu.buttonGap)
@@ -915,7 +915,7 @@ Item {
                         id: manualMiniFab
 
                         iconName: "edit_note"
-                        labelText: qsTr("手动输入")
+                        labelText: qsTr("Enter manually")
                         expanded: root.fabExpanded
                         order: 1
                         expandedY: fabMenu.height - fabMenu.mainSize - order * (fabMenu.miniSize + fabMenu.buttonGap)
@@ -1457,7 +1457,7 @@ Item {
 
             IconButton {
                 iconName: "check"
-                tooltipText: qsTr("应用到草稿")
+                tooltipText: qsTr("Apply to draft")
                 onClicked: root.applyManualInput()
             }
         }

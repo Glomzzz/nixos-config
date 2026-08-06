@@ -16,11 +16,11 @@ Item {
     readonly property string artUrl: hasPlayer && player.trackArtUrl
         ? player.trackArtUrl : ""
     readonly property string title: hasPlayer && player.trackTitle
-        ? player.trackTitle : qsTr("没有媒体")
+        ? player.trackTitle : qsTr("No media")
     readonly property string album: hasPlayer && player.trackAlbum
-        ? player.trackAlbum : qsTr("未知专辑")
+        ? player.trackAlbum : qsTr("Unknown album")
     readonly property string artist: hasPlayer && player.trackArtist
-        ? player.trackArtist : qsTr("未知艺术家")
+        ? player.trackArtist : qsTr("Unknown artist")
     property real currentPosition: 0
     property real coverRotation: 360
     readonly property real progress: hasPlayer && player.length > 0

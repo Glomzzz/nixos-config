@@ -10,7 +10,7 @@ Item {
     property string level: "--"
     property int activeIndex: -1
     property string icon: "wb_sunny"
-    property string title: qsTr("紫外线指数")
+    property string title: qsTr("UV index")
     property bool animationEnabled: false
     property bool animationActive: true
 

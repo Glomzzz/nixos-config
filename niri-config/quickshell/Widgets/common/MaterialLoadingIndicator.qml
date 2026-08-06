@@ -8,7 +8,7 @@ Item {
     property bool contained: true
     property color containerColor: Appearance.colors.colPrimaryContainer
     property color indicatorColor: Appearance.colors.colOnPrimaryContainer
-    property string accessibleName: qsTr("正在加载")
+    property string accessibleName: qsTr("Loading")
     property real animationProgress: 0
 
     readonly property var phaseStops: [0, 0.14, 0.27, 0.4, 0.54, 0.65, 0.78, 0.89, 1]

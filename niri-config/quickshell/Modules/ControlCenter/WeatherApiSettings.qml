@@ -34,20 +34,20 @@ StyledFlickable {
         const value = apiKeyField.text.trim()
         if (value.length < 16) {
             feedbackError = true
-            feedbackText = qsTr("请输入有效的 OpenWeather API key")
+            feedbackText = qsTr("Enter a valid OpenWeather API key")
             apiKeyField.forceActiveFocus()
             return
         }
 
         const result = WeatherMapPlugin.storeApiKey(value)
         feedbackError = !result.ok
-        feedbackText = result.message || qsTr("无法更新 API key")
+        feedbackText = result.message || qsTr("Could not update the API key")
     }
 
     function clearApiKey() {
         const result = WeatherMapPlugin.clearApiKey()
         feedbackError = !result.ok
-        feedbackText = result.message || qsTr("无法清除 API key")
+        feedbackText = result.message || qsTr("Could not clear the API key")
     }
 
     function notifyMainShell() {
@@ -129,7 +129,7 @@ StyledFlickable {
 
                 Text {
                     Layout.fillWidth: true
-                    text: qsTr("天气")
+                    text: qsTr("Weather")
                     color: Appearance.colors.colOnSurface
                     font.family: Sizes.fontFamily
                     font.pixelSize: 22
@@ -139,7 +139,7 @@ StyledFlickable {
 
                 Text {
                     Layout.fillWidth: true
-                    text: qsTr("配置 Keystone 天气地图服务")
+                    text: qsTr("Configure the Keystone weather map service")
                     color: Appearance.colors.colOnSurfaceVariant
                     font.family: Sizes.fontFamily
                     font.pixelSize: 13
@@ -196,7 +196,7 @@ StyledFlickable {
 
                         Text {
                             Layout.fillWidth: true
-                            text: qsTr("用于天气数据覆盖层")
+                            text: qsTr("Used for weather data overlays")
                             color: Appearance.colors.colOnSurfaceVariant
                             font.family: Sizes.fontFamily
                             font.pixelSize: 12
@@ -236,12 +236,12 @@ StyledFlickable {
                                 id: serviceStatus
 
                                 text: !WeatherMapPlugin.credentialsReady
-                                    ? qsTr("正在检查")
+                                    ? qsTr("Checking")
                                     : WeatherMapPlugin.credentialBusy
-                                        ? qsTr("处理中")
+                                        ? qsTr("Processing")
                                         : WeatherMapPlugin.apiConfigured
-                                            ? qsTr("已配置")
-                                            : qsTr("未配置")
+                                            ? qsTr("Configured")
+                                            : qsTr("Not configured")
                                 color: WeatherMapPlugin.apiConfigured
                                     ? Appearance.colors.colOnPrimaryContainer
                                     : Appearance.colors.colOnSurfaceVariant
@@ -278,7 +278,7 @@ StyledFlickable {
                         id: apiKeyField
 
                         anchors.fill: parent
-                        placeholderText: qsTr("输入 OpenWeather API key")
+                        placeholderText: qsTr("Enter OpenWeather API key")
                         echoMode: root.revealApiKey
                             ? TextInput.Normal
                             : TextInput.Password
@@ -297,7 +297,7 @@ StyledFlickable {
                         Material.containerStyle: Material.Outlined
                         Material.foreground: Appearance.colors.colOnSurface
                         Accessible.name: "OpenWeather API key"
-                        Accessible.description: qsTr("安全保存到系统密钥环")
+                        Accessible.description: qsTr("Saved securely in the system keyring")
                         onTextChanged: {
                             if (root.feedbackError) {
                                 root.feedbackError = false
@@ -318,8 +318,8 @@ StyledFlickable {
                         hoverEnabled: true
                         focusPolicy: Qt.StrongFocus
                         Accessible.name: root.revealApiKey
-                            ? qsTr("隐藏 API key")
-                            : qsTr("显示 API key")
+                            ? qsTr("Hide API key")
+                            : qsTr("Show API key")
                         onClicked: root.revealApiKey = !root.revealApiKey
 
                         background: Rectangle {
@@ -343,15 +343,15 @@ StyledFlickable {
                         StyledToolTip {
                             extraVisibleCondition: visibilityButton.hovered
                             text: root.revealApiKey
-                                ? qsTr("隐藏 API key")
-                                : qsTr("显示 API key")
+                                ? qsTr("Hide API key")
+                                : qsTr("Show API key")
                         }
                     }
                 }
 
                 Text {
                     Layout.fillWidth: true
-                    text: qsTr("密钥保存在系统密钥环中，保存后立即生效。")
+                    text: qsTr("The key is stored in the system keyring and takes effect immediately after saving.")
                     color: Appearance.colors.colOnSurfaceVariant
                     font.family: Sizes.fontFamily
                     font.pixelSize: 12
@@ -412,20 +412,20 @@ StyledFlickable {
                     }
 
                     Button {
-                        text: qsTr("清除密钥")
+                        text: qsTr("Clear key")
                         flat: true
                         enabled: WeatherMapPlugin.apiConfigured
                             && !WeatherMapPlugin.credentialBusy
                         focusPolicy: Qt.StrongFocus
                         Material.foreground: Appearance.colors.colOnSurfaceVariant
-                        Accessible.description: qsTr("从系统密钥环移除 OpenWeather API key")
+                        Accessible.description: qsTr("Remove the OpenWeather API key from the system keyring")
                         onClicked: root.clearApiKey()
                     }
 
                     Button {
                         id: saveButton
 
-                        text: qsTr("保存密钥")
+                        text: qsTr("Save key")
                         highlighted: true
                         enabled: WeatherMapPlugin.credentialsReady
                             && !WeatherMapPlugin.credentialBusy
@@ -434,7 +434,7 @@ StyledFlickable {
                         Material.background: Appearance.colors.colPrimary
                         Material.foreground: Appearance.colors.colOnPrimary
                         Material.elevation: 2
-                        Accessible.description: qsTr("安全保存并立即应用，无需重启")
+                        Accessible.description: qsTr("Save securely and apply immediately without restarting")
                         onClicked: root.applyApiKey()
 
                         contentItem: Text {
@@ -481,7 +481,7 @@ StyledFlickable {
 
                 Text {
                     Layout.fillWidth: true
-                    text: qsTr("密钥仅保存在系统密钥环中，不会写入项目配置或显示在界面中。")
+                    text: qsTr("The key is stored only in the system keyring and is never written to project configuration or shown in the interface.")
                     color: Appearance.colors.colOnSurfaceVariant
                     font.family: Sizes.fontFamily
                     font.pixelSize: 12

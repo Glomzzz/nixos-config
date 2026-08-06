@@ -186,7 +186,7 @@ Item {
 
             Text {
                 anchors.fill: parent
-                text: qsTr("搜索应用")
+                text: qsTr("Search applications")
                 color: Appearance.applyAlpha(
                     Appearance.colors.colOnSurfaceVariant, 0.72)
                 font.family: Sizes.fontFamily
@@ -199,7 +199,7 @@ Item {
 
             Text {
                 anchors.fill: parent
-                text: qsTr("搜索网页")
+                text: qsTr("Search the web")
                 color: Appearance.applyAlpha(
                     Appearance.colors.colOnSurfaceVariant, 0.72)
                 font.family: Sizes.fontFamily
@@ -226,7 +226,7 @@ Item {
                 activeFocusOnTab: false
 
                 Accessible.name: root.mode === "web"
-                    ? qsTr("网页搜索") : qsTr("聚焦搜索")
+                    ? qsTr("Web search") : qsTr("Spotlight search")
                 Accessible.role: Accessible.EditableText
 
                 Keys.priority: Keys.BeforeItem
@@ -247,9 +247,9 @@ Item {
 
     Repeater {
         model: [
-            { icon: "apps", label: qsTr("应用") },
-            { icon: "wallpaper", label: qsTr("壁纸") },
-            { icon: "content_paste", label: qsTr("剪贴板") }
+            { icon: "apps", label: qsTr("Applications") },
+            { icon: "wallpaper", label: qsTr("Wallpaper") },
+            { icon: "content_paste", label: qsTr("Clipboard") }
         ]
 
         delegate: Item {

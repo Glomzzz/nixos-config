@@ -27,7 +27,7 @@ AccountProfileHeader {
     distroName: SystemIdentityService.distroName
     uptimeText: SystemIdentityService.uptimeText
     showPackageStats: false
-    avatarActionLabel: qsTr("打开设置中心")
+    avatarActionLabel: qsTr("Open Settings")
 
     onAvatarActivated: {
         WidgetState.leftSidebarOpen = false;

@@ -41,10 +41,10 @@ Item {
 
     // 辅助函数：将乱七八糟的底层进程名清洗为美观的名称
     function getIdentity(player) {
-        if (!player || !player.identity) return qsTr("没有媒体");
+        if (!player || !player.identity) return qsTr("No media");
         let name = player.identity.toLowerCase();
 
-        if (name.includes("chrome") || name.includes("chromium")) return qsTr("浏览器");
+        if (name.includes("chrome") || name.includes("chromium")) return qsTr("Browser");
         if (name.includes("firefox")) return "Firefox";
         if (name.includes("spotify")) return "Spotify";
         if (name.includes("vlc")) return "VLC";

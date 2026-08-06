@@ -26,7 +26,7 @@ Rectangle {
             options.push({
                 "value": String(index),
                 "label": String(
-                    disk.mountPoint || disk.device || qsTr("存储设备")
+                    disk.mountPoint || disk.device || qsTr("Storage devices")
                 )
             });
         }
@@ -62,10 +62,10 @@ Rectangle {
 
     radius: Appearance.rounding.extraLarge
     color: Appearance.colors.colSurfaceContainer
-    Accessible.name: qsTr("存储 ")
+    Accessible.name: qsTr("Storage ")
         + String(root.disk.mountPoint || "")
         + ", " + Format.percent(root.disk.usagePercent, 0)
-        + qsTr("，已使用 ") + Format.bytes(root.disk.usedBytes)
+        + qsTr(", used ") + Format.bytes(root.disk.usedBytes)
 
     RowLayout {
         anchors {
@@ -129,7 +129,7 @@ Rectangle {
 
                 Text {
                     Layout.alignment: Qt.AlignHCenter
-                    text: qsTr("已使用")
+                    text: qsTr("Used")
                     color: Appearance.colors.colOnSurfaceVariant
                     font.family: Sizes.fontFamily
                     font.pixelSize: Sizes.typeLabelMedium
@@ -148,7 +148,7 @@ Rectangle {
 
             Text {
                 Layout.fillWidth: true
-                    text: qsTr("存储")
+                    text: qsTr("Storage")
                 color: Appearance.colors.colOnSurface
                 font.family: Sizes.fontFamily
                 font.pixelSize: Sizes.typeTitleLarge
@@ -162,7 +162,7 @@ Rectangle {
                     ? Format.bytes(root.disk.usedBytes)
                         + " / "
                         + Format.bytes(root.disk.totalBytes)
-                    : qsTr("未检测到存储盘")
+                    : qsTr("No storage volume detected")
                 color: Appearance.colors.colSecondary
                 font.family: Sizes.fontFamilyMono
                 font.pixelSize: Sizes.typeBodyLarge
@@ -193,7 +193,7 @@ Rectangle {
                     Appearance.colors.colSecondaryContainerActive
                 buttonTextColor:
                     Appearance.colors.colOnSecondaryContainer
-                Accessible.name: qsTr("选择存储盘")
+                Accessible.name: qsTr("Choose storage volume")
                 onValueSelected: value =>
                     root.currentDiskIndex = Number(value)
             }

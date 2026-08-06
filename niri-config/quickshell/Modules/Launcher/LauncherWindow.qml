@@ -385,7 +385,7 @@ PanelWindow {
             if (root.clipboardActionEntryId === id)
                 return false;
             root.clipboardActionError = qsTr(
-                "已有剪贴板操作正在执行");
+                "Another clipboard operation is already in progress");
             return false;
         }
         clipboardFeedbackTimer.stop();
@@ -396,7 +396,7 @@ PanelWindow {
         if (!clipboardProvider.execute(root.selectedResultIndex)) {
             if (root.clipboardActionState === "copying") {
                 root.clipboardActionState = "error";
-                root.clipboardActionError = qsTr("复制失败");
+                root.clipboardActionError = qsTr("Copy failed");
             }
             return false;
         }
@@ -427,7 +427,7 @@ PanelWindow {
             return;
         root.clipboardActionEntryId = String(id);
         root.clipboardActionState = "error";
-        root.clipboardActionError = String(message || qsTr("复制失败"));
+        root.clipboardActionError = String(message || qsTr("Copy failed"));
         root.clipboardActionKeepOpen = false;
         clipboardFeedbackTimer.stop();
     }

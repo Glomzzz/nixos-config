@@ -85,7 +85,7 @@ Rectangle {
             Appearance.animation.expressiveSlowSpatial.duration
         animationEasing: Easing.OutBack
         z: 4
-        Accessible.name: root.label + qsTr(" 图标")
+        Accessible.name: root.label + qsTr(" icon")
 
         Behavior on implicitSize {
             NumberAnimation {
@@ -165,9 +165,9 @@ Rectangle {
             scaleHeadroom: 1.2
             showGuideLines: false
             active: root.chartActive
-            accessibilityName: root.label + qsTr(" 最近一分钟趋势")
+            accessibilityName: root.label + qsTr(" trend over the last minute")
             accessibilityDescription:
-                qsTr("当前值 ") + root.valueText
+                qsTr("Current value ") + root.valueText
             lineColor: root.accentColor
             baselineColor: Appearance.applyAlpha(
                 root.foregroundColor,

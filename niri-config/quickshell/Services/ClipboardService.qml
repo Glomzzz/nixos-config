@@ -69,35 +69,35 @@ Singleton {
             ? String(value.code || fallbackCode) : fallbackCode;
         const localized = {
             cliphist_watcher_inactive:
-                qsTr("cliphist 监听服务未运行；请启用服务后重新复制内容"),
+                qsTr("The cliphist listener is not running; enable it and copy the content again"),
             cliphist_unavailable:
-                qsTr("缺少 cliphist，无法读取剪贴板历史"),
+                qsTr("cliphist is missing, so clipboard history cannot be read"),
             wl_copy_unavailable:
-                qsTr("缺少 wl-copy，无法恢复剪贴板内容"),
+                qsTr("wl-copy is missing, so clipboard content cannot be restored"),
             clipboard_dependency_unavailable:
-                qsTr("缺少 cliphist 或 wl-copy，剪贴板历史不可用"),
+                qsTr("cliphist or wl-copy is missing, so clipboard history is unavailable"),
             cliphist_decode_failed:
-                qsTr("无法从 cliphist 解码该条目"),
+                qsTr("Could not decode this cliphist entry"),
             clipboard_inspect_failed:
-                qsTr("无法检查该剪贴板条目"),
+                qsTr("Could not inspect this clipboard entry"),
             clipboard_preview_failed:
-                qsTr("无法生成剪贴板预览"),
+                qsTr("Could not generate a clipboard preview"),
             clipboard_payload_too_large:
-                qsTr("该剪贴板内容超过安全大小限制"),
+                qsTr("This clipboard content exceeds the safe size limit"),
             clipboard_image_decode_failed:
-                qsTr("图片数据已损坏或尺寸过大"),
+                qsTr("The image data is damaged or too large"),
             clipboard_file_missing:
-                qsTr("剪贴板中的文件已不存在"),
+                qsTr("The file referenced by this clipboard entry no longer exists"),
             clipboard_mime_unsupported:
-                qsTr("无法可靠恢复该剪贴板格式"),
+                qsTr("This clipboard format cannot be restored reliably"),
             wl_copy_failed:
-                qsTr("wl-copy 写入系统剪贴板失败"),
+                qsTr("wl-copy failed to write to the system clipboard"),
             invalid_clipboard_response:
-                qsTr("剪贴板服务返回了无效数据"),
+                qsTr("The clipboard service returned invalid data"),
             stale_key_cli:
-                qsTr("当前 key CLI 版本过旧；请构建并安装仓库中的新版 key"),
+                qsTr("The installed key CLI is outdated; build and install the current repository version"),
             clipboard_action_busy:
-                qsTr("已有剪贴板操作正在执行")
+                qsTr("Another clipboard operation is already running")
         };
         return {
             code: code,
@@ -135,7 +135,7 @@ Singleton {
             root.entries = [];
             root.error = root.normalizedError(
                 null, "invalid_clipboard_response",
-                qsTr("剪贴板服务返回了无效数据"));
+                qsTr("The clipboard service returned invalid data"));
             root.revision += 1;
             return;
         }
@@ -150,7 +150,7 @@ Singleton {
             root.entries = [];
             root.error = root.normalizedError(
                 null, "stale_key_cli",
-                qsTr("当前 key CLI 不支持新版剪贴板协议"));
+                qsTr("The installed key CLI does not support the current clipboard protocol"));
             root.revision += 1;
             return;
         }
@@ -170,7 +170,7 @@ Singleton {
             : root.normalizedError(
                 response.error,
                 "clipboard_unavailable",
-                qsTr("剪贴板历史不可用"));
+                qsTr("Clipboard history is unavailable"));
         root.revision += 1;
     }
 
@@ -205,7 +205,7 @@ Singleton {
         if (actionProcess.running || root.actionRunning) {
             const failure = root.normalizedError(
                 null, "clipboard_action_busy",
-                qsTr("已有剪贴板操作正在执行"));
+                qsTr("Another clipboard operation is already running"));
             root.actionFailed(action, normalizedId,
                               failure.code, failure.message);
             return false;
@@ -256,7 +256,7 @@ Singleton {
                 response ? response.error : null,
                 response ? "clipboard_action_failed"
                          : "invalid_clipboard_response",
-                qsTr("剪贴板操作失败"));
+                qsTr("The clipboard operation failed"));
             root.lastActionError = failure;
             root.actionFailed(root._actionName, root._actionId,
                               failure.code, failure.message);
@@ -349,7 +349,7 @@ Singleton {
                 response ? response.error : null,
                 response ? "clipboard_inspect_failed"
                          : "invalid_clipboard_response",
-                qsTr("无法检查剪贴板条目"));
+                qsTr("Could not inspect the clipboard entry"));
             root.inspectFailed(id, failure.code, failure.message);
         }
         root._inspectId = "";

@@ -93,17 +93,17 @@ Singleton {
     readonly property string statusText: {
         switch (state) {
         case "loading":
-            return qsTr("正在连接");
+            return qsTr("Connecting");
         case "ready":
-            return partial ? qsTr("部分传感器不可读取") : qsTr("实时");
+            return partial ? qsTr("Some sensors are unavailable") : qsTr("Live");
         case "stale":
-            return qsTr("数据已过期");
+            return qsTr("Data is stale");
         case "reconnecting":
-            return qsTr("正在重新连接");
+            return qsTr("Reconnecting");
         case "error":
-            return qsTr("服务不可用");
+            return qsTr("Service unavailable");
         default:
-            return qsTr("已暂停");
+            return qsTr("Paused");
         }
     }
 
@@ -207,9 +207,9 @@ Singleton {
         if (root.reconnectAttempt >= root.maximumReconnectAttempts) {
             root.state = "error";
             if (!root.errorMessage)
-                root.errorMessage = qsTr("系统监测服务不可用");
+                root.errorMessage = qsTr("The system monitor is unavailable");
             root.errorDetails = root.errorDetails
-                || qsTr("已达到自动重连次数上限，可检查 key 后端后重试。");
+                || qsTr("The automatic reconnect limit was reached. Check the key backend and try again.");
             return;
         }
 
@@ -221,8 +221,8 @@ Singleton {
         root.state = "reconnecting";
         if (!root.errorMessage) {
             root.errorMessage = reason === "failed_to_start"
-                ? qsTr("无法启动 key 系统监测服务")
-                : qsTr("系统监测数据流已中断");
+                ? qsTr("Could not start the key system monitor")
+                : qsTr("The system monitor data stream was interrupted");
         }
         reconnectTimer.interval = root._retryDelayMs;
         reconnectTimer.restart();
@@ -256,22 +256,22 @@ Singleton {
         }
 
         if (reason === "failed_to_start") {
-            root.errorMessage = qsTr("找不到或无法启动 key");
-            root.errorDetails = qsTr("请重新构建并安装 key 后端，然后重试。");
+            root.errorMessage = qsTr("key was not found or could not be started");
+            root.errorDetails = qsTr("Rebuild and install the key backend, then try again.");
         } else if (reason === "data_timeout") {
-            root.errorMessage = qsTr("系统监测数据长时间未更新");
-            root.errorDetails = qsTr("数据流没有按预期间隔产生新快照。");
+            root.errorMessage = qsTr("The system monitor data has not updated for too long");
+            root.errorDetails = qsTr("The data stream did not produce snapshots at the expected interval.");
         } else if (reason === "first_snapshot_timeout") {
-            root.errorMessage = qsTr("系统监测服务未返回首个快照");
-            root.errorDetails = qsTr("key 已启动，但没有按时输出 JSONL 数据。");
+            root.errorMessage = qsTr("The system monitor did not return its first snapshot");
+            root.errorDetails = qsTr("key started but did not emit JSONL data in time.");
         } else if (reason === "invalid_json") {
-            root.errorMessage = qsTr("key 持续输出无效的 JSONL");
-            root.errorDetails = qsTr("连续多行数据无法通过 JSON v1 校验。");
+            root.errorMessage = qsTr("key keeps emitting invalid JSONL data");
+            root.errorDetails = qsTr("Several consecutive lines failed JSON v1 validation.");
         } else {
-            root.errorMessage = qsTr("系统监测数据流意外退出");
+            root.errorMessage = qsTr("The system monitor data stream exited unexpectedly");
             root.errorDetails = exitCode >= 0
-                ? qsTr("key 退出码：") + exitCode
-                : qsTr("key 未报告退出码");
+                ? qsTr("key exit code: ") + exitCode
+                : qsTr("key did not report an exit code");
         }
 
         root._scheduleReconnect(reason);
@@ -289,24 +289,24 @@ Singleton {
 
     function _validateSnapshot(snapshot) {
         if (!root._isObject(snapshot))
-            return qsTr("JSON 顶层必须是对象");
+            return qsTr("The top-level JSON value must be an object");
         if (snapshot.schemaVersion !== root.supportedSchemaVersion)
             return "schemaVersion";
         if (!root._isFiniteNumber(snapshot.timestampMs)
                 || !root._isFiniteNumber(snapshot.sequence)
                 || !root._isFiniteNumber(snapshot.intervalMs)
                 || snapshot.intervalMs < 0)
-            return qsTr("时间戳、序列号或采样间隔无效");
+            return qsTr("The timestamp, sequence number, or sampling interval is invalid");
         if (!root._isObject(snapshot.system)
                 || !root._isObject(snapshot.cpu)
                 || !root._isObject(snapshot.memory)
                 || !root._isObject(snapshot.network)
                 || !root._isObject(snapshot.battery))
-            return qsTr("系统模块字段缺失或类型无效");
+            return qsTr("Required system module fields are missing or invalid");
         if (!Array.isArray(snapshot.gpus)
                 || !Array.isArray(snapshot.disks)
                 || !Array.isArray(snapshot.errors))
-            return qsTr("设备或错误字段必须是数组");
+            return qsTr("The device and error fields must be arrays");
         return "";
     }
 
@@ -383,11 +383,11 @@ Singleton {
         } catch (exception) {
             root.malformedLineCount += 1;
             root._consecutiveMalformedLines += 1;
-            root.errorDetails = qsTr("收到损坏的 JSONL 数据行");
+            root.errorDetails = qsTr("Received a malformed JSONL data line");
             if (!root.hasData)
-                root.errorMessage = qsTr("无法解析 key 系统监测数据");
+                root.errorMessage = qsTr("Could not parse system monitor data from key");
             if (root._consecutiveMalformedLines >= 3 && streamProcess.running) {
-                root.errorMessage = qsTr("key 持续输出无效的 JSONL");
+                root.errorMessage = qsTr("key keeps emitting invalid JSONL data");
                 root._terminateStream("invalid_json");
             }
             return;
@@ -397,8 +397,8 @@ Singleton {
         if (validationError === "schemaVersion") {
             root.schemaMismatchCount += 1;
             root._fatalError = true;
-            root.errorMessage = qsTr("系统监测协议版本不兼容");
-            root.errorDetails = qsTr("需要重新构建 key 后端（需要 schema v")
+            root.errorMessage = qsTr("The system monitor protocol version is incompatible");
+            root.errorDetails = qsTr("Rebuild the key backend (schema v")
                 + root.supportedSchemaVersion + ").";
             root.state = "error";
             root._terminateStream("schema_mismatch");
@@ -409,7 +409,7 @@ Singleton {
             root._consecutiveMalformedLines += 1;
             root.errorMessage = root.hasData
                 ? root.errorMessage
-                : qsTr("key 返回的系统监测数据不完整");
+                : qsTr("key returned incomplete system monitor data");
             root.errorDetails = validationError;
             if (root._consecutiveMalformedLines >= 3
                     && streamProcess.running) {
@@ -444,9 +444,9 @@ Singleton {
 
     function _markBackendOutdated() {
         root._fatalError = true;
-        root.errorMessage = qsTr("key 版本过旧");
+        root.errorMessage = qsTr("The key version is outdated");
         root.errorDetails =
-            qsTr("当前 key 不支持 sysmon，请重新构建并安装 key 后端。");
+            qsTr("The installed key does not support sysmon. Rebuild and install the key backend.");
         root.state = "error";
         root._terminateStream("outdated_backend");
     }
@@ -509,7 +509,7 @@ Singleton {
         if (exitCode !== 0) {
             root.actionBusy = false;
             root.actionError =
-                qsTr("key top 不可用，请重新构建并安装 key 后端");
+                qsTr("key top is unavailable. Rebuild and install the key backend.");
             return;
         }
 
@@ -522,7 +522,7 @@ Singleton {
         root._terminalCandidateIndex += 1;
         if (root._terminalCandidateIndex >= root._terminalCandidates.length) {
             root.actionBusy = false;
-            root.actionError = qsTr("未找到可用终端，无法打开 key top");
+            root.actionError = qsTr("No supported terminal was found, so key top could not be opened");
             return;
         }
 
@@ -578,7 +578,7 @@ Singleton {
                 root.actionError = "";
             } catch (exception) {
                 root.actionBusy = false;
-                root.actionError = qsTr("启动终端失败：") + exception;
+                root.actionError = qsTr("Could not start the terminal: ") + exception;
             }
             return;
         }
@@ -618,8 +618,8 @@ Singleton {
                 if (now - root._streamStartedAtMs > firstSnapshotAfter
                         && !root._terminationPending) {
                     root.errorMessage =
-                        qsTr("系统监测服务未返回首个快照");
-                    root.errorDetails = qsTr("正在重新启动 key 数据流。");
+                        qsTr("The system monitor did not return its first snapshot");
+                    root.errorDetails = qsTr("Restarting the key data stream.");
                     root._terminateStream("first_snapshot_timeout");
                 }
                 return;
@@ -639,8 +639,8 @@ Singleton {
             if (age > restartAfter && streamProcess.running
                     && !root._timeoutRestartIssued) {
                 root._timeoutRestartIssued = true;
-                root.errorMessage = qsTr("系统监测数据长时间未更新");
-                root.errorDetails = qsTr("正在重新连接 key 数据流。");
+                root.errorMessage = qsTr("The system monitor data has not updated for too long");
+                root.errorDetails = qsTr("Reconnecting to the key data stream.");
                 root._terminateStream("data_timeout");
             }
         }

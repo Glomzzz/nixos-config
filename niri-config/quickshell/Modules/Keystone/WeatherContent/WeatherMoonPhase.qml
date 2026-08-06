@@ -12,7 +12,7 @@ Item {
     implicitWidth: 300
 
     property real moonPhaseAngle: 0
-    property string moonPhaseName: qsTr("新月")
+    property string moonPhaseName: qsTr("New moon")
     property int illumination: 0
     property int currentPhaseIndex: 0
 
@@ -40,8 +40,8 @@ Item {
         root.currentPhaseIndex = index;
 
         const phases = [
-            qsTr("新月"), qsTr("蛾眉月"), qsTr("上弦月"), qsTr("盈凸月"),
-            qsTr("满月"), qsTr("亏凸月"), qsTr("下弦月"), qsTr("残月")
+            qsTr("New moon"), qsTr("Waxing crescent"), qsTr("First quarter"), qsTr("Waxing gibbous"),
+            qsTr("Full moon"), qsTr("Waning gibbous"), qsTr("Last quarter"), qsTr("Waning crescent")
         ];
         root.moonPhaseName = phases[index];
     }
@@ -95,7 +95,7 @@ Item {
                 }
 
                 Text {
-                    text: root.illumination + "% " + qsTr("照亮")
+                    text: root.illumination + "% " + qsTr("Illumination")
                     color: Appearance.colors.colOnSurfaceVariant
                     font.family: Sizes.fontFamilyMono
                     font.pixelSize: 16

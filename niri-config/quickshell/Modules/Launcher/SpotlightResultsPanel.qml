@@ -525,8 +525,8 @@ Item {
                     anchors.leftMargin: 8
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.providerAvailable && !root.canRestore
-                        ? qsTr("缺少 wl-copy：恢复功能不可用")
-                        : qsTr("剪贴板历史")
+                        ? qsTr("wl-copy is missing: restore is unavailable")
+                        : qsTr("Clipboard history")
                     color: root.providerAvailable && !root.canRestore
                         ? Appearance.colors.colError
                         : Appearance.colors.colOnSurfaceVariant
@@ -555,7 +555,7 @@ Item {
 
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
-                            text: qsTr("清空")
+                            text: qsTr("Clear")
                             color: Appearance.colors.colOnSurfaceVariant
                             font.family: Sizes.fontFamily
                             font.pixelSize: 13
@@ -745,7 +745,7 @@ Item {
                                     root.deleteRequested(
                                         clipboardDelegate.index)
                                 Accessible.name:
-                                    qsTr("删除剪贴板条目")
+                                    qsTr("Delete clipboard entry")
 
                                 contentItem: MaterialSymbol {
                                     text: "delete"
@@ -793,7 +793,7 @@ Item {
                                         parent.verticalCenter
                                     text: root.clipboardActionState
                                         === "copied"
-                                        ? qsTr("已复制") : qsTr("复制失败")
+                                        ? qsTr("Copied") : qsTr("Copy failed")
                                     color: root.clipboardActionState
                                         === "copied"
                                         ? Appearance.colors.colPrimary
@@ -860,12 +860,12 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: Math.min(520, root.width - 48)
                 text: root.loading
-                    ? qsTr("正在读取…")
+                    ? qsTr("Loading…")
                     : (!root.providerAvailable
                         ? (root.providerError
                             ? root.providerError.message
-                            : qsTr("当前 Provider 不可用"))
-                        : qsTr("没有匹配结果"))
+                            : qsTr("Current provider is unavailable"))
+                        : qsTr("No matching results"))
                 color: Appearance.colors.colOnSurfaceVariant
                 font.family: Sizes.fontFamily
                 font.pixelSize: 15
@@ -880,13 +880,13 @@ Item {
 
         anchors.centerIn: Overlay.overlay
         modal: true
-        title: qsTr("清空剪贴板历史？")
+        title: qsTr("Clear clipboard history?")
         standardButtons: Dialog.Cancel | Dialog.Ok
         onAccepted: root.clearRequested()
 
         Text {
             width: 320
-            text: qsTr("此操作会清除 cliphist 中的全部历史记录，无法撤销。")
+            text: qsTr("This will clear all history from cliphist and cannot be undone.")
             color: Appearance.colors.colOnSurface
             font.family: Sizes.fontFamily
             font.pixelSize: 14

@@ -47,43 +47,43 @@ Rectangle {
 
     function titleText() {
         if (mode === "temp")
-            return qsTr("温度")
+            return qsTr("Temperature")
         if (mode === "rain")
-            return qsTr("降水")
+            return qsTr("Precipitation")
         if (mode === "clouds")
-            return qsTr("云量")
+            return qsTr("Cloud cover")
         if (mode === "wind")
-            return qsTr("风速")
+            return qsTr("Wind speed")
         if (mode === "pressure")
-            return qsTr("气压")
-        return qsTr("天气")
+            return qsTr("Pressure")
+        return qsTr("Weather")
     }
 
     function minimumLabel() {
         if (mode === "temp")
-            return qsTr("低温")
+            return qsTr("Cold")
         if (mode === "rain")
-            return qsTr("少量")
+            return qsTr("Light")
         if (mode === "clouds")
-            return qsTr("晴朗")
+            return qsTr("Clear")
         if (mode === "wind")
-            return qsTr("平静")
+            return qsTr("Calm")
         if (mode === "pressure")
-            return qsTr("低")
+            return qsTr("Low")
         return ""
     }
 
     function maximumLabel() {
         if (mode === "temp")
-            return qsTr("高温")
+            return qsTr("Hot")
         if (mode === "rain")
-            return qsTr("大量")
+            return qsTr("Heavy")
         if (mode === "clouds")
-            return qsTr("阴天")
+            return qsTr("Overcast")
         if (mode === "wind")
-            return qsTr("强劲")
+            return qsTr("Strong")
         if (mode === "pressure")
-            return qsTr("高")
+            return qsTr("High")
         return ""
     }
 
@@ -92,7 +92,7 @@ Rectangle {
         if (updatedAt && !isNaN(updatedAt.getTime()))
             value = Qt.formatDateTime(updatedAt, "hh:mm")
         if (stale)
-            value = value === "" ? qsTr("缓存") : value + qsTr(" · 缓存")
+            value = value === "" ? qsTr("Cached") : value + qsTr(" · Cached")
         return value
     }
 

@@ -14,7 +14,7 @@ Item {
 
     signal refreshRequested()
 
-    property string locationName: qsTr("天气")
+    property string locationName: qsTr("Weather")
     property string currentTemp: "--"
     property string currentIcon: "cloud"
     property string currentDesc: "--"
@@ -23,7 +23,7 @@ Item {
 
     function syncData() {
         if (!WeatherPlugin.hasValidData) {
-            root.locationName = WeatherPlugin.locationName || qsTr("天气");
+            root.locationName = WeatherPlugin.locationName || qsTr("Weather");
             root.currentTemp = "--";
             root.currentIcon = "cloud";
             root.currentDesc = "--";
@@ -32,10 +32,10 @@ Item {
             return;
         }
 
-        root.locationName = WeatherPlugin.locationName || qsTr("未知");
+        root.locationName = WeatherPlugin.locationName || qsTr("Unknown");
         root.currentTemp = Math.round(WeatherPlugin.currentTemperatureC || 0) + "°";
         root.currentIcon = WeatherPlugin.currentIconName || "cloud";
-        root.currentDesc = WeatherPlugin.currentWeatherText || qsTr("未知");
+        root.currentDesc = WeatherPlugin.currentWeatherText || qsTr("Unknown");
 
         if (WeatherPlugin.dailyForecast.count() > 0) {
             const today = WeatherPlugin.dailyForecast.get(0);
@@ -113,7 +113,7 @@ Item {
 
             background: Item {}
 
-            StyledToolTip { text: qsTr("刷新天气") }
+            StyledToolTip { text: qsTr("Refresh weather") }
 
             contentItem: MaterialSymbol {
                 id: refreshIcon

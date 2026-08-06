@@ -16,7 +16,7 @@ Item {
     }
 
     readonly property var activeWindow: Niri.focusedWindow
-    readonly property string activeTitle: activeWindow.title || qsTr("桌面")
+    readonly property string activeTitle: activeWindow.title || qsTr("Desktop")
     readonly property string activeIcon: activeWindow.iconPath || ""
     readonly property string activeAppName: activeWindow.appName || activeWindow.appId || ""
 

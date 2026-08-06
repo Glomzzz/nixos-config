@@ -37,7 +37,7 @@ Item {
     }
 
     function aqiLevelName(level) {
-        const names = [qsTr("优"), qsTr("良"), qsTr("差"), qsTr("不健康"), qsTr("很不健康"), qsTr("危险")]
+        const names = [qsTr("Excellent"), qsTr("Good"), qsTr("Poor"), qsTr("Unhealthy"), qsTr("Very unhealthy"), qsTr("Hazardous")]
         return level >= 0 && level < names.length ? names[level] : "--"
     }
 
@@ -303,7 +303,7 @@ Item {
     Text {
         anchors.centerIn: parent
         visible: !root.hasData
-        text: qsTr("空气质量数据暂不可用")
+        text: qsTr("Air quality data is unavailable")
         color: Appearance.colors.colOnSurfaceVariant
         font.family: "LXGW WenKai Screen"
         font.pixelSize: 16

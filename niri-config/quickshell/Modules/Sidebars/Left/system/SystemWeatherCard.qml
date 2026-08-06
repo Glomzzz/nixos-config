@@ -77,11 +77,11 @@ Rectangle {
 
     function coordinateText() {
         if (!root.dataAvailable)
-            return qsTr("正在定位");
+            return qsTr("Locating");
         const latitude = Number(WeatherPlugin.latitude);
         const longitude = Number(WeatherPlugin.longitude);
         if (!isFinite(latitude) || !isFinite(longitude))
-            return qsTr("坐标未知");
+            return qsTr("Coordinates unknown");
         return latitude.toFixed(2)
             + "°, " + longitude.toFixed(2) + "°";
     }
@@ -89,23 +89,23 @@ Rectangle {
     radius: Appearance.rounding.extraLarge
     color: Appearance.colors.colSurfaceContainerHigh
     clip: true
-    Accessible.name: qsTr("天气，")
+    Accessible.name: qsTr("Weather,")
         + root.temperatureText() + ", "
         + (root.dataAvailable
             ? WeatherPlugin.currentWeatherText
-            : qsTr("正在获取"))
-        + ", " + (WeatherPlugin.locationName || qsTr("位置未知"))
-        + qsTr("，坐标 ") + root.coordinateText()
-        + qsTr("，湿度 ")
+            : qsTr("Getting data"))
+        + ", " + (WeatherPlugin.locationName || qsTr("Location unknown"))
+        + qsTr(", coordinates ") + root.coordinateText()
+        + qsTr(", humidity ")
         + root.percentText(WeatherPlugin.currentRelativeHumidity)
-        + qsTr("，风速 ")
+        + qsTr(", wind speed ")
         + root.speedText(WeatherPlugin.currentWindSpeedMs)
-        + qsTr("，气压 ")
+        + qsTr(", pressure ")
         + root.pressureText(WeatherPlugin.currentPressureHpa)
-        + qsTr("，能见度 ")
+        + qsTr(", visibility ")
         + root.visibilityText(WeatherPlugin.currentVisibilityM)
-        + qsTr("，日出 ") + root.timeText(root.currentDetails.sunrise)
-        + qsTr("，日落 ") + root.timeText(root.currentDetails.sunset)
+        + qsTr(", sunrise ") + root.timeText(root.currentDetails.sunrise)
+        + qsTr(", sunset ") + root.timeText(root.currentDetails.sunset)
 
     component CompactMetric: Item {
         id: metric
@@ -228,8 +228,8 @@ Rectangle {
                 text: root.dataAvailable
                     ? WeatherPlugin.currentWeatherText
                     : (WeatherPlugin.loading
-                        ? qsTr("正在获取天气")
-                        : qsTr("天气不可用"))
+                        ? qsTr("Getting weather")
+                        : qsTr("Weather unavailable"))
                 color: root.heroInk
                 font.family: Sizes.fontFamily
                 font.pixelSize: Sizes.typeTitleMedium
@@ -261,7 +261,7 @@ Rectangle {
 
                     width: parent.width - locationIcon.width
                         - parent.spacing
-                    text: WeatherPlugin.locationName || qsTr("位置未知")
+                    text: WeatherPlugin.locationName || qsTr("Location unknown")
                     color: root.supportingInk
                     font.family: Sizes.fontFamily
                     font.pixelSize: Sizes.typeBodySmall

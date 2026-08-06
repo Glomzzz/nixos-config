@@ -327,35 +327,35 @@ StyledFlickable {
         spacing: 30
 
         Section {
-            title: qsTr("提示音")
+            title: qsTr("Alert sound")
             iconName: "notification_sound"
 
             ToggleSettingRow {
-                title: qsTr("番茄钟")
-                description: qsTr("专注与休息阶段切换时播放系统提示音")
+                title: qsTr("Pomodoro")
+                description: qsTr("Play a system sound when focus and break stages change")
                 checked: PersonalizationConfig.pomodoroSoundEnabled
                 onToggled: checked => PersonalizationConfig.setPomodoroSoundEnabled(checked)
             }
         }
 
         Section {
-            title: qsTr("侧边栏")
+            title: qsTr("Sidebars")
             iconName: "side_navigation"
 
             ToggleSettingRow {
-                title: qsTr("保持侧边栏已加载")
-                description: qsTr("再次打开更快，但会增加内存占用")
+                title: qsTr("Keep sidebars loaded")
+                description: qsTr("Faster reopening, but uses more memory")
                 checked: PersonalizationConfig.keepSidebarsLoaded
                 onToggled: checked => PersonalizationConfig.setKeepSidebarsLoaded(checked)
             }
         }
 
         Section {
-            title: qsTr("透明与模糊")
+            title: qsTr("Transparency and blur")
             iconName: "blur_on"
 
             SliderSettingRow {
-                title: qsTr("背景不透明度")
+                title: qsTr("Background opacity")
                 from: 0
                 to: 100
                 stepSize: 1
@@ -368,7 +368,7 @@ StyledFlickable {
             }
 
             ToggleSettingRow {
-                title: qsTr("背景模糊")
+                title: qsTr("Background blur")
                 checked: PersonalizationConfig.shellBlurEnabled
                 enabled: BlurService.available
                 onToggled: checked =>
@@ -377,8 +377,8 @@ StyledFlickable {
             }
 
             ToggleSettingRow {
-                title: qsTr("仅模糊壁纸")
-                description: qsTr("关闭后会模糊窗口，开销更高")
+                title: qsTr("Blur wallpaper only")
+                description: qsTr("When off, windows are also blurred at a higher cost")
                 checked: PersonalizationConfig.shellBlurXray
                 enabled: BlurService.available
                     && BlurService.niriIntegrationReady
@@ -396,7 +396,7 @@ StyledFlickable {
 
                 Text {
                     Layout.fillWidth: true
-                    text: qsTr("Niri 集成")
+                    text: qsTr("Niri integration")
                     color: Appearance.colors.colOnSurface
                     font.family: Sizes.fontFamily
                     font.pixelSize: 15
@@ -422,7 +422,7 @@ StyledFlickable {
                         BlurService.configureNiriIntegration()
 
                     contentItem: Text {
-                        text: qsTr("配置")
+                        text: qsTr("Configure")
                         color:
                             Appearance.colors
                                 .colOnSecondaryContainer
@@ -444,17 +444,17 @@ StyledFlickable {
         }
 
         Section {
-            title: qsTr("滚动交互")
+            title: qsTr("Scrolling")
             iconName: "swipe"
 
             ToggleSettingRow {
-                title: qsTr("平滑滚轮")
+                title: qsTr("Smooth mouse wheel")
                 checked: PersonalizationConfig.scrollSmoothEnabled
                 onToggled: checked => PersonalizationConfig.setScrollSmoothEnabled(checked)
             }
 
             SliderSettingRow {
-                title: qsTr("鼠标滚轮速度")
+                title: qsTr("Mouse wheel speed")
                 from: 10
                 to: 240
                 stepSize: 5
@@ -463,7 +463,7 @@ StyledFlickable {
             }
 
             SliderSettingRow {
-                title: qsTr("触摸板滚动速度")
+                title: qsTr("Touchpad scroll speed")
                 from: 10
                 to: 300
                 stepSize: 5
@@ -472,8 +472,8 @@ StyledFlickable {
             }
 
             SliderSettingRow {
-                title: qsTr("滚轮识别阈值")
-                description: qsTr("angleDelta 大于该值时按鼠标滚轮处理")
+                title: qsTr("Wheel detection threshold")
+                description: qsTr("Treat angleDelta values above this threshold as mouse wheel input")
                 from: 60
                 to: 240
                 stepSize: 10

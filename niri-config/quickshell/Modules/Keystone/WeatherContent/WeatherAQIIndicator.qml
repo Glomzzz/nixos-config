@@ -35,12 +35,12 @@ Item {
     }
 
     function getAqiDescription(aqiValue) {
-        if (aqiValue <= 50) return qsTr("优");
-        if (aqiValue <= 100) return qsTr("良");
-        if (aqiValue <= 150) return qsTr("轻度污染");
-        if (aqiValue <= 200) return qsTr("中度污染");
-        if (aqiValue <= 300) return qsTr("重度污染");
-        return qsTr("严重污染");
+        if (aqiValue <= 50) return qsTr("Excellent");
+        if (aqiValue <= 100) return qsTr("Good");
+        if (aqiValue <= 150) return qsTr("Light pollution");
+        if (aqiValue <= 200) return qsTr("Moderate pollution");
+        if (aqiValue <= 300) return qsTr("Heavy pollution");
+        return qsTr("Severe pollution");
     }
 
     Connections {
@@ -68,7 +68,7 @@ Item {
             Layout.fillWidth: true
 
             Text {
-                text: qsTr("空气质量")
+                text: qsTr("Air quality")
                 color: Appearance.colors.colOnSurfaceVariant
                 font.family: Sizes.fontFamily
                 font.pixelSize: 14

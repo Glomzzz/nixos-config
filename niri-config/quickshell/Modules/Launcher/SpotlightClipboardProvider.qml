@@ -34,7 +34,7 @@ Item {
             const rawPreview = String(entry.preview || "");
             const searchText = String(entry.searchText || rawPreview);
             const title = String(entry.title || rawPreview
-                                 || qsTr("空内容"));
+                                 || qsTr("Empty content"));
             const subtitle = String(entry.subtitle || "");
             const fileNames = Array.isArray(entry.files)
                 ? entry.files.map(file => String(file.name || "")).join(" ")
@@ -108,14 +108,14 @@ Item {
                 null,
                 ClipboardService.dependencies.wlCopy
                     ? "cliphist_unavailable" : "wl_copy_unavailable",
-                qsTr("剪贴板恢复不可用"));
+                qsTr("Clipboard restore is unavailable"));
             root.restoreFailed(result.id, failure.code, failure.message);
             return false;
         }
         if (result.restorable === false) {
             root.restoreFailed(
                 result.id, "clipboard_mime_unsupported",
-                qsTr("该格式无法可靠恢复"));
+                qsTr("This format cannot be restored reliably"));
             return false;
         }
         return ClipboardService.restore(result.id);

@@ -24,11 +24,11 @@ Item {
     clip: true
 
     function dayLabel(index, epoch) {
-        if (index === 0) return qsTr("昨天")
-        if (index === 1) return qsTr("今天")
-        if (index === 2) return qsTr("明天")
+        if (index === 0) return qsTr("Yesterday")
+        if (index === 1) return qsTr("Today")
+        if (index === 2) return qsTr("Tomorrow")
         if (!epoch) return "--"
-        const week = [qsTr("周日"), qsTr("周一"), qsTr("周二"), qsTr("周三"), qsTr("周四"), qsTr("周五"), qsTr("周六")]
+        const week = [qsTr("Sun"), qsTr("Mon"), qsTr("Tue"), qsTr("Wed"), qsTr("Thu"), qsTr("Fri"), qsTr("Sat")]
         return week[new Date(epoch * 1000).getDay()]
     }
 
@@ -193,7 +193,7 @@ Item {
                         color: parent.weekColor
                         font.family: "LXGW WenKai Screen"
                         font.pixelSize: 14
-                        font.bold: modelData.dayText === qsTr("今天")
+                        font.bold: modelData.dayText === qsTr("Today")
                     }
 
                     Text {
@@ -298,7 +298,7 @@ Item {
     Text {
         anchors.centerIn: parent
         visible: !root.hasData
-        text: qsTr("风况数据暂不可用")
+        text: qsTr("Wind data is unavailable")
         color: Appearance.colors.colOnSurfaceVariant
         font.family: "LXGW WenKai Screen"
         font.pixelSize: 16

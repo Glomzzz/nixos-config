@@ -18,7 +18,7 @@ Rectangle {
     property int totalPackageCount: -1
     property int pendingUpdateCount: -1
     property bool showPackageStats: true
-    property string avatarActionLabel: qsTr("更改头像")
+    property string avatarActionLabel: qsTr("Change avatar")
     property real coverHeight: Math.max(150, Math.min(220, width * 0.23))
     property real profileAreaHeight: 120
     property real avatarSize: 104
@@ -288,7 +288,7 @@ Rectangle {
 
                 Text {
                     Layout.fillWidth: true
-                    text: qsTr("已运行 %1").arg(root.uptimeText)
+                    text: qsTr("Up %1").arg(root.uptimeText)
                     color: Appearance.colors.colOnSurfaceVariant
                     font.family: Sizes.fontFamily
                     font.pixelSize: Sizes.typeBodyMedium
@@ -313,7 +313,7 @@ Rectangle {
                 }
 
                 Text {
-                    text: qsTr("软件包")
+                    text: qsTr("Packages")
                     color: Appearance.colors.colOnSurfaceVariant
                     font.family: Sizes.fontFamily
                     font.pixelSize: Sizes.typeBodyMedium
@@ -344,7 +344,7 @@ Rectangle {
                 }
 
                 Text {
-                    text: qsTr("待更新")
+                    text: qsTr("Updates")
                     color: Appearance.colors.colOnSurfaceVariant
                     font.family: Sizes.fontFamily
                     font.pixelSize: Sizes.typeBodyMedium

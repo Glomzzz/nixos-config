@@ -13,6 +13,10 @@
       import nixpkgs {
         inherit system;
       };
+    powerProfilesDaemonFor = pkgs:
+      pkgs.power-profiles-daemon.override {
+        python3 = pkgs.python313;
+      };
     runtimePackagesFor = pkgs:
       with pkgs; [
         awww
@@ -39,6 +43,7 @@
         niri
         pavucontrol
         playerctl
+        (powerProfilesDaemonFor pkgs)
         procps
         pulseaudio
         python3
@@ -83,6 +88,7 @@
       pkgs = pkgsFor system;
       core = pkgs.callPackage ./nix/package.nix {};
       runtimePackages = runtimePackagesFor pkgs;
+      powerProfilesDaemon = powerProfilesDaemonFor pkgs;
       qmlImportPath = qmlImportPathFor pkgs core;
       desktopEntry = desktopEntryFor pkgs;
       desktopDataDirs = desktopDataDirsFor pkgs desktopEntry;
@@ -106,6 +112,7 @@
             --set QSG_USE_SIMPLE_ANIMATION_DRIVER "1" \
             --set QT_QPA_PLATFORMTHEME "gtk3" \
             --set CLAVIS_KEY "$out/bin/key" \
+            --set CLAVIS_POWERPROFILESCTL "${powerProfilesDaemon}/bin/powerprofilesctl" \
             --set CLAVIS_SOUND_DIR "${pkgs.sound-theme-freedesktop}/share/sounds/freedesktop/stereo"
           ln -s qs "$out/bin/clavis-shell"
         '';
@@ -133,6 +140,7 @@
     devShells = forAllSystems (system: let
       pkgs = pkgsFor system;
       core = self.packages.${system}.clavis-core;
+      powerProfilesDaemon = powerProfilesDaemonFor pkgs;
       qmlImportPath = qmlImportPathFor pkgs core;
       desktopEntry = desktopEntryFor pkgs;
       desktopDataDirs = desktopDataDirsFor pkgs desktopEntry;
@@ -152,6 +160,7 @@
             statix
           ]);
         CLAVIS_KEY = "${core}/bin/key";
+        CLAVIS_POWERPROFILESCTL = "${powerProfilesDaemon}/bin/powerprofilesctl";
         CLAVIS_SOUND_DIR = "${pkgs.sound-theme-freedesktop}/share/sounds/freedesktop/stereo";
         QML_IMPORT_PATH = qmlImportPath;
         QML2_IMPORT_PATH = qmlImportPath;

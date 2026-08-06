@@ -235,7 +235,7 @@ Item {
     Text {
         anchors.centerIn: parent
         visible: !root.hasData
-        text: qsTr("风况数据暂不可用")
+        text: qsTr("Wind data is unavailable")
         color: Appearance.colors.colOnSurfaceVariant
         font.family: "LXGW WenKai Screen"
         font.pixelSize: 16

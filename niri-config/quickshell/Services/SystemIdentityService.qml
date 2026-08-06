@@ -15,15 +15,21 @@ Singleton {
     readonly property real uptimeSeconds: Math.max(0, Number(SysmonPlugin.uptimeSeconds) || 0)
     readonly property string uptimeText: formatUptime(uptimeSeconds)
 
+    function quantity(value, singular, plural) {
+        return value + " " + (value === 1 ? singular : plural);
+    }
+
     function formatUptime(value) {
         const total = Math.max(0, Math.floor(Number(value) || 0));
         const days = Math.floor(total / 86400);
         const hours = Math.floor((total % 86400) / 3600);
         const minutes = Math.floor((total % 3600) / 60);
         if (days > 0)
-            return qsTr("%1 天 %2 小时").arg(days).arg(hours);
+            return root.quantity(days, qsTr("day"), qsTr("days")) + " "
+                + root.quantity(hours, qsTr("hour"), qsTr("hours"));
         if (hours > 0)
-            return qsTr("%1 小时 %2 分钟").arg(hours).arg(minutes);
-        return qsTr("%1 分钟").arg(minutes);
+            return root.quantity(hours, qsTr("hour"), qsTr("hours")) + " "
+                + root.quantity(minutes, qsTr("minute"), qsTr("minutes"));
+        return root.quantity(minutes, qsTr("minute"), qsTr("minutes"));
     }
 }

@@ -78,7 +78,7 @@ Item {
             }
 
             Text {
-                text: qsTr("空气质量")
+                text: qsTr("Air quality")
                 color: root.mutedInk
                 font.pixelSize: 18
                 font.bold: true

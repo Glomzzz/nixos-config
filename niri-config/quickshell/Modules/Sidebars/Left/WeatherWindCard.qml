@@ -62,10 +62,10 @@ WeatherInsightCard {
         if (label.indexOf("·") >= 0)
             label = label.split("·")[0].trim()
 
-        if (label.startsWith(qsTr("阵风 "))) {
-            label = qsTr("阵风:") + label.slice(2).trim()
-        } else if (label.startsWith(qsTr("阵风:"))) {
-            label = qsTr("阵风:") + label.slice(3).trim()
+        if (label.startsWith(qsTr("Gusts "))) {
+            label = qsTr("Gusts:") + label.slice(2).trim()
+        } else if (label.startsWith(qsTr("Gusts:"))) {
+            label = qsTr("Gusts:") + label.slice(3).trim()
         }
 
         label = label.replace(/(\d)\.0(\s|$)/g, "$1$2")
@@ -146,7 +146,7 @@ WeatherInsightCard {
         }
 
         Text {
-            text: qsTr("风况")
+            text: qsTr("Wind")
             color: root.mutedInk
             font.pixelSize: 18
             font.bold: true

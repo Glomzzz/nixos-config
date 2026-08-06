@@ -37,6 +37,6 @@ Rectangle {
 
     PopupToolTip {
         extraVisibleCondition: mouseArea.containsMouse
-        text: qsTr("通知")
+        text: qsTr("Notifications")
     }
 }

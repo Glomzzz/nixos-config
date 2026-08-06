@@ -122,12 +122,12 @@ Singleton {
                 "notification": notification,
                 "actions": root.actionsForNotification(notification),
                 "appIcon": notification.appIcon || notification.desktopEntry || "",
-                "appName": notification.appName || notification.desktopEntry || qsTr("系统"),
+                "appName": notification.appName || notification.desktopEntry || qsTr("System"),
                 "body": notification.body || "",
                 "image": notification.image || "",
                 "isTransient": notification.hints ? notification.hints.transient : false,
                 "replaceKey": replaceKey,
-                "summary": notification.summary || notification.appName || qsTr("通知"),
+                "summary": notification.summary || notification.appName || qsTr("Notification"),
                 "time": now,
                 "urgency": notification.urgency ? notification.urgency.toString() : NotificationUrgency.Normal.toString(),
             });
@@ -172,11 +172,11 @@ Singleton {
                         "notificationId": notificationId,
                         "actions": [],
                         "appIcon": notif.appIcon || "",
-                        "appName": notif.appName || qsTr("系统"),
+                        "appName": notif.appName || qsTr("System"),
                         "body": notif.body || "",
                         "image": notif.image || "",
                         "replaceKey": notif.replaceKey || root.replaceKeyForValues(notif.appName || "System", notif.summary || notif.appName || "Notification"),
-                        "summary": notif.summary || notif.appName || qsTr("通知"),
+                        "summary": notif.summary || notif.appName || qsTr("Notification"),
                         "time": Number(notif.time) || Date.now(),
                         "urgency": notif.urgency || NotificationUrgency.Normal.toString(),
                     });
@@ -256,7 +256,7 @@ Singleton {
     function groupsForList(notifications) {
         const groups = {};
         notifications.forEach((notif) => {
-            const appName = notif.appName || qsTr("系统");
+            const appName = notif.appName || qsTr("System");
             if (!groups[appName]) {
                 groups[appName] = {
                     appName,

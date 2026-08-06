@@ -84,11 +84,11 @@ Item {
                 Layout.fillWidth: true
                 spacing: 8
 
-                property var week: [qsTr("周日"), qsTr("周一"), qsTr("周二"), qsTr("周三"), qsTr("周四"), qsTr("周五"), qsTr("周六")]
+                property var week: [qsTr("Sun"), qsTr("Mon"), qsTr("Tue"), qsTr("Wed"), qsTr("Thu"), qsTr("Fri"), qsTr("Sat")]
 
                 Text {
                     Layout.preferredWidth: 40
-                    text: index === 0 ? qsTr("今天") : week[modelData.dayIndex]
+                    text: index === 0 ? qsTr("Today") : week[modelData.dayIndex]
                     color: index === 0 ? Appearance.colors.colOnSurface : Appearance.colors.colOnSurfaceVariant
                     font.family: Sizes.fontFamily
                     font.pixelSize: 16

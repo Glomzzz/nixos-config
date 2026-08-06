@@ -26,17 +26,6 @@ Singleton {
     property var systemGridLayout: ({})
 
     function normalizedLanguage(value) {
-        const normalized = String(value || "").replace(/-/g, "_").toLowerCase();
-        if (normalized.startsWith("en"))
-            return "en_US";
-        if (normalized.startsWith("zh")) {
-            if (normalized === "zh_tw"
-                    || normalized === "zh_hk"
-                    || normalized === "zh_mo"
-                    || normalized.indexOf("hant") >= 0)
-                return "zh_TW";
-            return "zh_CN";
-        }
         return "en_US";
     }
 

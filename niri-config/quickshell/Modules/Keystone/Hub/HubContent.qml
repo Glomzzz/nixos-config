@@ -104,10 +104,10 @@ Item {
             }
         }
 
-        TabBtn { icon: "dashboard"; title: qsTr("仪表板"); index: 0 }
-        TabBtn { icon: "queue_music"; title: qsTr("媒体"); index: 1 }
-        TabBtn { icon: "wallpaper"; title: qsTr("壁纸"); index: 2 }
-        TabBtn { icon: "sunny"; title: qsTr("天气"); index: 3 }
+        TabBtn { icon: "dashboard"; title: qsTr("Dashboard"); index: 0 }
+        TabBtn { icon: "queue_music"; title: qsTr("Media"); index: 1 }
+        TabBtn { icon: "wallpaper"; title: qsTr("Wallpaper"); index: 2 }
+        TabBtn { icon: "sunny"; title: qsTr("Weather"); index: 3 }
     }
 
     Item {

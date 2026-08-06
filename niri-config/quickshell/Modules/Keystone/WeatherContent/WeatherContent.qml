@@ -16,7 +16,7 @@ Item {
     property bool active: false
     property real latitude: 0
     property real longitude: 0
-    property string locationName: qsTr("天气")
+    property string locationName: qsTr("Weather")
     property string currentTemp: "--"
     property string currentIcon: "cloud"
     property string currentDesc: "--"
@@ -113,23 +113,23 @@ Item {
 
     function updatedText() {
         if (WeatherPlugin.loading)
-            return root.hasWeather ? qsTr("正在刷新") : qsTr("正在定位")
+            return root.hasWeather ? qsTr("Refreshing") : qsTr("Locating")
         if (WeatherPlugin.status === "stale")
-            return qsTr("数据可能已过期")
+            return qsTr("Data may be stale")
         if (WeatherPlugin.status === "partial")
-            return qsTr("部分数据已更新")
+            return qsTr("Partially updated")
         if (WeatherPlugin.status === "error")
-            return qsTr("更新失败")
+            return qsTr("Update failed")
         if (WeatherPlugin.lastUpdated) {
             const updated = new Date(WeatherPlugin.lastUpdated)
             if (!isNaN(updated.getTime()))
-                return qsTr("更新于 %1").arg(Qt.formatDateTime(updated, "hh:mm"))
+                return qsTr("Updated %1").arg(Qt.formatDateTime(updated, "hh:mm"))
         }
-        return qsTr("实时天气")
+        return qsTr("Live weather")
     }
 
     function weatherErrorText() {
-        return WeatherPlugin.errorMessage || qsTr("天气数据不可用")
+        return WeatherPlugin.errorMessage || qsTr("Weather data unavailable")
     }
 
     function hourlyTemperatureBound(findMaximum) {
@@ -168,7 +168,7 @@ Item {
 
     function syncWeatherData() {
         if (!WeatherPlugin.hasValidData) {
-            root.locationName = WeatherPlugin.locationName || qsTr("天气")
+            root.locationName = WeatherPlugin.locationName || qsTr("Weather")
             root.currentTemp = "--"
             root.currentIcon = "cloud"
             root.currentDesc = "--"
@@ -183,10 +183,10 @@ Item {
 
         root.latitude = Number(WeatherPlugin.latitude)
         root.longitude = Number(WeatherPlugin.longitude)
-        root.locationName = WeatherPlugin.locationName || qsTr("未知")
+        root.locationName = WeatherPlugin.locationName || qsTr("Unknown")
         root.currentTemp = Math.round(WeatherPlugin.currentTemperatureC) + "°"
         root.currentIcon = WeatherPlugin.currentIconName || "cloud"
-        root.currentDesc = WeatherPlugin.currentWeatherText || qsTr("未知")
+        root.currentDesc = WeatherPlugin.currentWeatherText || qsTr("Unknown")
         root.feelsLike = Math.round(WeatherPlugin.currentFeelsLikeC) + "°C"
         root.humidity = Math.round(WeatherPlugin.currentRelativeHumidity) + "%"
         root.windSpeed = Math.round(WeatherPlugin.currentWindSpeedMs * 3.6) + " km/h"
@@ -201,7 +201,7 @@ Item {
                 time: Qt.formatDateTime(timeObject, "hh:00"),
                 temp: Math.round(Number(item.temperatureC || 0)),
                 icon: item.iconName || "cloud",
-                description: item.weatherText || qsTr("未知"),
+                description: item.weatherText || qsTr("Unknown"),
                 isDaylight: item.isDaylight === undefined ? true : item.isDaylight
             })
         }
@@ -216,10 +216,10 @@ Item {
                 : new Date(Number(item.time || 0) * 1000)
             const dayPart = item.day || ({})
             nextDaily.push({
-                day: dayIndex === 0 ? qsTr("今天") : Qt.formatDate(dateObject, "ddd"),
+                day: dayIndex === 0 ? qsTr("Today") : Qt.formatDate(dateObject, "ddd"),
                 date: Qt.formatDate(dateObject, "MMM d"),
                 icon: dayPart.iconName || item.iconName || "cloud",
-                description: dayPart.weatherText || item.weatherText || qsTr("未知"),
+                description: dayPart.weatherText || item.weatherText || qsTr("Unknown"),
                 maxTemp: Math.round(
                     Number(item.temperatureMaxC || dayPart.temperatureC || 0)
                 ) + "°",
@@ -318,8 +318,8 @@ Item {
                         Text {
                             Layout.fillWidth: true
                             text: WeatherPlugin.loading
-                                ? qsTr("正在加载天气")
-                                : qsTr("天气不可用")
+                                ? qsTr("Loading weather")
+                                : qsTr("Weather unavailable")
                             color: Appearance.colors.colOnSurface
                             font.family: Sizes.fontFamily
                             font.pixelSize: 16
@@ -330,7 +330,7 @@ Item {
                         Text {
                             Layout.fillWidth: true
                             text: WeatherPlugin.loading
-                                ? qsTr("正在查找本地天气预报…")
+                                ? qsTr("Finding your local forecast…")
                                 : root.weatherErrorText()
                             color: Appearance.colors.colOnSurfaceVariant
                             font.family: Sizes.fontFamily

@@ -65,6 +65,6 @@ Item {
 
     PopupToolTip {
         extraVisibleCondition: mouseArea.containsMouse
-        text: qsTr("左键：快捷设置\n右键：控制中心")
+        text: qsTr("Left click: Quick Settings\nRight click: Control Center")
     }
 }

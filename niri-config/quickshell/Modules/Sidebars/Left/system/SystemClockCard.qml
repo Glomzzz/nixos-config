@@ -27,18 +27,18 @@ Item {
             })
             : ({})
     readonly property var dayNames: [
-        qsTr("星期日"),
-        qsTr("星期一"),
-        qsTr("星期二"),
-        qsTr("星期三"),
-        qsTr("星期四"),
-        qsTr("星期五"),
-        qsTr("星期六")
+        qsTr("Sunday"),
+        qsTr("Monday"),
+        qsTr("Tuesday"),
+        qsTr("Wednesday"),
+        qsTr("Thursday"),
+        qsTr("Friday"),
+        qsTr("Saturday")
     ]
     readonly property var monthNames: [
-        qsTr("一月"), qsTr("二月"), qsTr("三月"), qsTr("四月"),
-        qsTr("五月"), qsTr("六月"), qsTr("七月"), qsTr("八月"),
-        qsTr("九月"), qsTr("十月"), qsTr("十一月"), qsTr("十二月")
+        qsTr("January"), qsTr("February"), qsTr("March"), qsTr("April"),
+        qsTr("May"), qsTr("June"), qsTr("July"), qsTr("August"),
+        qsTr("September"), qsTr("October"), qsTr("November"), qsTr("December")
     ]
     readonly property string dateText: I18nService.language.startsWith("zh")
         ? DateFormat.compactDate(

@@ -111,7 +111,7 @@ StyledFlickable {
                 textRole: "label"
                 valueRole: "value"
                 maxVisibleItems: 6
-                noResultText: qsTr("无匹配结果")
+                noResultText: qsTr("No matches")
                 onAccepted: value => selectRow.accepted(value)
             }
         }
@@ -126,14 +126,14 @@ StyledFlickable {
         spacing: 30
 
         Section {
-            title: qsTr("钥石样式")
+            title: qsTr("Keystone style")
             iconName: "toggle_off"
 
             SearchSelectSettingRow {
-                title: qsTr("样式")
+                title: qsTr("Style")
                 options: PersonalizationConfig.keystoneStyles
                 value: PersonalizationConfig.keystoneStyle
-                placeholder: qsTr("选择钥石样式")
+                placeholder: qsTr("Choose Keystone style")
                 onAccepted: value => PersonalizationConfig.setKeystoneStyle(value)
             }
         }

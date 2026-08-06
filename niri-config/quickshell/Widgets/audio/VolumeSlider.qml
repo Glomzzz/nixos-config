@@ -109,7 +109,9 @@ Item {
                 visible: root.showMuteButton
                 enabled: root.available
                 hoverEnabled: true
-                Accessible.name: root.muted ? qsTr("取消静音 ") + root.title : qsTr("静音 ") + root.title
+                Accessible.name: root.muted
+                    ? qsTr("Unmute %1").arg(root.title)
+                    : qsTr("Mute %1").arg(root.title)
                 onClicked: root.muteRequested()
 
                 background: Rectangle {
@@ -131,7 +133,7 @@ Item {
                 }
 
                 StyledToolTip {
-                    text: root.muted ? qsTr("取消静音") : qsTr("静音")
+                    text: root.muted ? qsTr("Unmute") : qsTr("Mute")
                     extraVisibleCondition: parent.hovered
                 }
             }
@@ -143,9 +145,9 @@ Item {
             Layout.fillWidth: true
             enabled: root.available
             materialSymbol: root.muted ? root.mutedIconName : root.iconName
-            percentText: root.muted ? qsTr("静音") : Math.round(value * 100) + "%"
+            percentText: root.muted ? qsTr("Muted") : Math.round(value * 100) + "%"
             tooltipContent: Math.round(value * 100) + "%"
-            Accessible.name: root.title + qsTr("音量")
+            Accessible.name: qsTr("%1 volume").arg(root.title)
 
             Binding {
                 target: volumeControl

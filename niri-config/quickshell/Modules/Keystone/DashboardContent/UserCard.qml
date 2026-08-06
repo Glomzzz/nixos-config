@@ -16,7 +16,7 @@ Rectangle {
     readonly property string hostName: SysmonPlugin.hostName || "host"
     readonly property string wmName: SysmonPlugin.wmName || "unknown"
     readonly property string distroName: SysmonPlugin.distroName || "Linux"
-    readonly property string chassis: SysmonPlugin.chassis || qsTr("电脑")
+    readonly property string chassis: SysmonPlugin.chassis || qsTr("Computer")
     readonly property string uptime: SysmonPlugin.uptime || "0m"
 
     function distroLogo() {
@@ -314,7 +314,7 @@ Rectangle {
         anchors.verticalCenter: uptimeShape.verticalCenter
         anchors.leftMargin: 5
         anchors.rightMargin: 16
-        text: qsTr("已运行 ") + root.uptime
+        text: qsTr("Up for ") + root.uptime
         color: Appearance.colors.colOnSurfaceVariant
         font.family: Sizes.fontFamilyMono
         font.pixelSize: 12

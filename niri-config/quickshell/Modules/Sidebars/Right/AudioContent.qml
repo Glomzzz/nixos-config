@@ -11,7 +11,7 @@ import qs.Widgets.common
 WidgetPanel {
     id: root
 
-    title: qsTr("声音")
+    title: qsTr("Sound")
     icon: "volume_up"
     showBackButton: true
     backAction: () => WidgetState.qsView = "settings"
@@ -23,9 +23,9 @@ WidgetPanel {
         if (Volume.lastError.length > 0)
             return Volume.lastError;
         if (!Volume.ready)
-            return qsTr("正在连接 PipeWire 音频服务");
+            return qsTr("Connecting to the PipeWire audio service");
         if (Volume.outputDevices.length === 0 && !Volume.outputAvailable)
-            return qsTr("未检测到可用的声音输出设备");
+            return qsTr("No audio output devices detected");
         return "";
     }
 
@@ -38,7 +38,7 @@ WidgetPanel {
         Layout.preferredWidth: 40
         Layout.preferredHeight: 40
         hoverEnabled: true
-        Accessible.name: qsTr("打开高级声音设置")
+        Accessible.name: qsTr("Open advanced sound settings")
         onClicked: Volume.openMixer()
 
         background: Rectangle {
@@ -54,7 +54,7 @@ WidgetPanel {
             color: Appearance.colors.colOnLayer2
         }
 
-        StyledToolTip { text: qsTr("高级声音设置") }
+        StyledToolTip { text: qsTr("Advanced sound settings") }
     }
 
     ColumnLayout {
@@ -98,12 +98,12 @@ WidgetPanel {
                 SettingsSection {
                     Layout.fillWidth: true
                     visible: Volume.ready && (Volume.outputDevices.length > 0 || Volume.outputAvailable)
-                    title: qsTr("输出")
+                    title: qsTr("Output")
 
                     VolumeSlider {
                         Layout.fillWidth: true
                         visible: Volume.outputAvailable
-                        title: Volume.sinkName || qsTr("默认输出")
+                        title: Volume.sinkName || qsTr("Default output")
                         iconName: Volume.nodeIconName(Volume.sink)
                         volume: Volume.sinkVolume
                         muted: Volume.sinkMuted
@@ -119,7 +119,7 @@ WidgetPanel {
 
                         Text {
                             Layout.fillWidth: true
-                            text: qsTr("输出设备")
+                            text: qsTr("Output devices")
                             color: Appearance.colors.colOnLayer1
                             font.family: Sizes.fontFamily
                             font.pixelSize: 12
@@ -132,7 +132,7 @@ WidgetPanel {
                             Layout.preferredWidth: 40
                             Layout.preferredHeight: 40
                             hoverEnabled: true
-                            Accessible.name: root.outputDevicesExpanded ? qsTr("收起输出设备") : qsTr("展开输出设备")
+                            Accessible.name: root.outputDevicesExpanded ? qsTr("Collapse output devices") : qsTr("Expand output devices")
                             onClicked: root.outputDevicesExpanded = !root.outputDevicesExpanded
 
                             background: Rectangle {
@@ -156,7 +156,7 @@ WidgetPanel {
                             }
 
                             StyledToolTip {
-                                text: root.outputDevicesExpanded ? qsTr("收起输出设备") : qsTr("展开输出设备")
+                                text: root.outputDevicesExpanded ? qsTr("Collapse output devices") : qsTr("Expand output devices")
                             }
                         }
                     }
@@ -206,7 +206,7 @@ WidgetPanel {
                 SettingsSection {
                     Layout.fillWidth: true
                     visible: Volume.ready && Volume.outputAvailable
-                    title: qsTr("应用音量")
+                    title: qsTr("Application volume")
 
                     StyledListView {
                         id: playbackStreamList
@@ -246,7 +246,7 @@ WidgetPanel {
                         Layout.fillWidth: true
                         visible: Volume.playbackStreams.length === 0
                         iconName: "music_off"
-                        title: qsTr("没有活动的应用音频")
+                        title: qsTr("No active application audio")
                     }
                 }
 

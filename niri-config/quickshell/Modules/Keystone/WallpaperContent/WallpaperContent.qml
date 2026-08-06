@@ -388,10 +388,10 @@ Item {
 
                 Text {
                     text: WallpaperService.scanning
-                        ? qsTr("正在扫描壁纸")
+                        ? qsTr("Scanning wallpapers")
                         : root.query.trim().length > 0
-                            ? qsTr("未找到匹配壁纸")
-                            : qsTr("未找到壁纸")
+                            ? qsTr("No matching wallpapers found")
+                            : qsTr("No wallpapers found")
                     color: Appearance.colors.colOnSurfaceVariant
                     font.family: Sizes.fontFamily
                     font.pixelSize: 17
@@ -402,8 +402,8 @@ Item {
                     text: WallpaperService.scanning
                         ? PersonalizationConfig.wallpaperFolder
                         : root.query.trim().length > 0
-                            ? qsTr("请尝试其他搜索内容")
-                            : qsTr("请将图片放入 ") + PersonalizationConfig.wallpaperFolder
+                            ? qsTr("Try a different search")
+                            : qsTr("Place images in ") + PersonalizationConfig.wallpaperFolder
                     color: Appearance.applyAlpha(Appearance.colors.colOnSurfaceVariant, 0.72)
                     font.family: Sizes.fontFamily
                     font.pixelSize: 13
@@ -494,7 +494,7 @@ Item {
             anchors.right: clearButton.left
             anchors.verticalCenter: parent.verticalCenter
 
-            text: qsTr("搜索壁纸")
+            text: qsTr("Search wallpapers")
             color: Appearance.applyAlpha(Appearance.colors.colOnSurfaceVariant, 0.72)
             font.family: Sizes.fontFamily
             font.pixelSize: WallpaperPickerTokens.searchFontSize

@@ -288,7 +288,7 @@ Item {
 
                             NotificationActionButton {
                                 Layout.fillWidth: true
-                                buttonText: root.notificationActions.length === 0 ? qsTr("关闭") : ""
+                                buttonText: root.notificationActions.length === 0 ? qsTr("Close") : ""
                                 iconName: root.notificationActions.length === 0 ? "" : "close"
                                 urgency: root.notificationUrgency
                                 onClicked: root.destroyWithAnimation()

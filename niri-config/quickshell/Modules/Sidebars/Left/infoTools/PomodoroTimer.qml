@@ -39,10 +39,10 @@ Item {
                 Text {
                     Layout.alignment: Qt.AlignHCenter
                     text: TimerService.pomodoroLongBreak
-                        ? qsTr("长休息")
+                        ? qsTr("Long break")
                         : TimerService.pomodoroBreak
-                            ? qsTr("休息")
-                            : qsTr("专注")
+                            ? qsTr("Break")
+                            : qsTr("Focus")
                     color: Appearance.colors.colSubtext
                     font.family: Sizes.fontFamily
                     font.pixelSize: 14
@@ -85,15 +85,15 @@ Item {
                     ? Appearance.colors.colSecondaryContainerActive
                     : Appearance.colors.colPrimaryActive
                 Accessible.name: TimerService.pomodoroRunning
-                    ? qsTr("暂停番茄钟") : qsTr("开始番茄钟")
+                    ? qsTr("Pause Pomodoro") : qsTr("Start Pomodoro")
                 onClicked: TimerService.togglePomodoro()
 
                 contentItem: Text {
                     text: TimerService.pomodoroRunning
-                        ? qsTr("暂停")
+                        ? qsTr("Pause")
                         : TimerService.pomodoroSecondsLeft === TimerService.pomodoroLapDuration
-                            ? qsTr("开始")
-                            : qsTr("继续")
+                            ? qsTr("Start")
+                            : qsTr("Resume")
                     color: TimerService.pomodoroRunning
                         ? Appearance.colors.colOnSecondaryContainer
                         : Appearance.colors.colOnPrimary
@@ -115,11 +115,11 @@ Item {
                 colBackground: Appearance.colors.colErrorContainer
                 colBackgroundHover: Appearance.colors.colErrorContainerHover
                 colRipple: Appearance.colors.colErrorContainerActive
-                Accessible.name: qsTr("重置番茄钟")
+                Accessible.name: qsTr("Reset Pomodoro")
                 onClicked: TimerService.resetPomodoro()
 
                 contentItem: Text {
-                    text: qsTr("重置")
+                    text: qsTr("Reset")
                     color: Appearance.colors.colOnErrorContainer
                     font.family: Sizes.fontFamily
                     font.pixelSize: 14

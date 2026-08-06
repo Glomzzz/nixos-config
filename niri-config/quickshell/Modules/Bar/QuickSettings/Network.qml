@@ -75,7 +75,7 @@ Rectangle {
     PopupToolTip {
         extraVisibleCondition: mouseArea.containsMouse
         text: NetworkService.connected
-              ? ((NetworkService.activeConnection || qsTr("网络已连接")) + qsTr("\n点击打开网络设置"))
-              : qsTr("网络未连接\n点击打开网络设置")
+              ? ((NetworkService.activeConnection || qsTr("Network connected")) + qsTr("\nClick to open network settings"))
+              : qsTr("Network disconnected\nClick to open network settings")
     }
 }

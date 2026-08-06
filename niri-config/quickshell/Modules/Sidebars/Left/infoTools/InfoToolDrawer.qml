@@ -20,9 +20,9 @@ Rectangle {
     property date currentDate: new Date()
 
     readonly property var tabs: [
-        { "name": qsTr("日历"), "icon": "calendar_month" },
-        { "name": qsTr("待办"), "icon": "done_outline" },
-        { "name": qsTr("计时器"), "icon": "schedule" }
+        { "name": qsTr("Calendar"), "icon": "calendar_month" },
+        { "name": qsTr("To-do"), "icon": "done_outline" },
+        { "name": qsTr("Timer"), "icon": "schedule" }
     ]
 
     implicitHeight: collapsed ? collapsedRow.implicitHeight : 350
@@ -154,7 +154,7 @@ Rectangle {
             colBackground: Appearance.colors.colLayer2
             colBackgroundHover: Appearance.colors.colLayer2Hover
             colRipple: Appearance.colors.colLayer2Active
-            Accessible.name: qsTr("展开工具")
+            Accessible.name: qsTr("Expand tools")
             onClicked: root.setCollapsed(false)
 
             contentItem: MaterialSymbol {
@@ -164,7 +164,7 @@ Rectangle {
             }
 
             StyledToolTip {
-                text: qsTr("展开工具")
+                text: qsTr("Expand tools")
                 alternativeVisibleCondition: expandButton.activeFocus
             }
         }
@@ -178,7 +178,7 @@ Rectangle {
             Layout.rightMargin: 10
             Layout.alignment: Qt.AlignVCenter
             text: root.formattedDate(root.currentDate)
-                + qsTr("   •   %1 项任务").arg(remainingTasks)
+                + qsTr("   •   %1 tasks").arg(remainingTasks)
             color: Appearance.colors.colOnLayer1
             font.family: Sizes.fontFamily
             font.pixelSize: 15
@@ -210,7 +210,7 @@ Rectangle {
                 colBackground: Appearance.colors.colLayer2
                 colBackgroundHover: Appearance.colors.colLayer2Hover
                 colRipple: Appearance.colors.colLayer2Active
-            Accessible.name: qsTr("收起工具")
+            Accessible.name: qsTr("Collapse tools")
                 onClicked: root.setCollapsed(true)
 
                 contentItem: MaterialSymbol {
@@ -220,7 +220,7 @@ Rectangle {
                 }
 
                 StyledToolTip {
-                text: qsTr("收起工具")
+                text: qsTr("Collapse tools")
                     alternativeVisibleCondition: collapseButton.activeFocus
                 }
             }

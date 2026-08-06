@@ -51,7 +51,7 @@ Singleton {
             if (response.schemaVersion !== root.schemaVersion) {
                 root.error = {
                     code: "unsupported_schema",
-                    message: qsTr("key 返回了不受支持的 JSON schema")
+                    message: qsTr("key returned an unsupported JSON schema")
                 };
                 root.commandError(root.error.code, root.error.message);
                 return false;
@@ -74,13 +74,13 @@ Singleton {
                 root.selectionCancelled();
             if (root.error)
                 root.commandError(root.error.code || "key_error",
-                                  root.error.message || qsTr("key 命令执行失败"));
+                                  root.error.message || qsTr("The key command failed"));
             root.commandFinished(command, response.ok === true);
             return true;
         } catch (exception) {
             root.error = {
                 code: "invalid_key_json",
-                message: qsTr("无法解析 key 返回的 JSON: ") + exception
+                message: qsTr("Could not parse JSON returned by key: ") + exception
             };
             root.commandError(root.error.code, root.error.message);
             return false;
@@ -163,7 +163,7 @@ Singleton {
                 root.transientState = "";
                 root.error = {
                     code: "record_start_unavailable",
-                    message: qsTr("无法启动录制命令")
+                    message: qsTr("Could not start the recording command")
                 };
                 root.commandError(root.error.code, root.error.message);
             }
@@ -217,7 +217,7 @@ Singleton {
             if (exitCode !== 0 && !root.error) {
                 root.error = {
                     code: "key_unavailable",
-                    message: qsTr("无法通过 key 查询录制状态")
+                    message: qsTr("Could not query recording status through key")
                 };
                 root.commandError(root.error.code, root.error.message);
             }

@@ -74,7 +74,7 @@ def extracted_messages() -> dict[tuple[str, str], str]:
                 "-extensions",
                 "qml,js",
                 "-source-language",
-                "zh_CN",
+                "en_US",
                 "-target-language",
                 "en_US",
                 "-locations",

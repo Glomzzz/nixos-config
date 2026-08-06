@@ -64,6 +64,6 @@ Item {
 
     PopupToolTip {
         extraVisibleCondition: mouseArea.containsMouse
-        text: root.viewName === "sys" ? qsTr("系统监控") : qsTr("通知中心")
+        text: root.viewName === "sys" ? qsTr("System monitor") : qsTr("Notification center")
     }
 }

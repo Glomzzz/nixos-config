@@ -30,13 +30,13 @@ FloatingWindow {
     property int currentPage: 0
     property bool navExpanded: width > 900
     readonly property var pages: [
-        ({ "id": "account", "title": qsTr("账户"), "icon": "account_circle", "source": "AccountPage.qml" }),
-        ({ "id": "general", "title": qsTr("通用"), "icon": "settings", "source": "GeneralPage.qml" }),
-        ({ "id": "wallpaper", "title": qsTr("壁纸"), "icon": "wallpaper", "source": "WallpaperPage.qml" }),
-        ({ "id": "theme", "title": qsTr("主题"), "icon": "palette", "source": "ThemePage.qml" }),
-        ({ "id": "keystone", "title": qsTr("钥石"), "icon": "toggle_off", "source": "KeystonePage.qml" }),
-        ({ "id": "weather", "title": qsTr("天气"), "icon": "partly_cloudy_day", "source": "WeatherPage.qml" }),
-        ({ "id": "advanced", "title": qsTr("高级"), "icon": "tune", "source": "AdvancedPage.qml" })
+        ({ "id": "account", "title": qsTr("Account"), "icon": "account_circle", "source": "AccountPage.qml" }),
+        ({ "id": "general", "title": qsTr("General"), "icon": "settings", "source": "GeneralPage.qml" }),
+        ({ "id": "wallpaper", "title": qsTr("Wallpaper"), "icon": "wallpaper", "source": "WallpaperPage.qml" }),
+        ({ "id": "theme", "title": qsTr("Theme"), "icon": "palette", "source": "ThemePage.qml" }),
+        ({ "id": "keystone", "title": qsTr("Keystone"), "icon": "toggle_off", "source": "KeystonePage.qml" }),
+        ({ "id": "weather", "title": qsTr("Weather"), "icon": "partly_cloudy_day", "source": "WeatherPage.qml" }),
+        ({ "id": "advanced", "title": qsTr("Advanced"), "icon": "tune", "source": "AdvancedPage.qml" })
     ]
 
     function pageSource(index) {
@@ -100,7 +100,7 @@ FloatingWindow {
                 id: titleText
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
-                text: qsTr("设置")
+                text: qsTr("Settings")
                 color: Appearance.colors.colOnLayer0
                 font.family: Sizes.fontFamily
                 font.pixelSize: 24
@@ -189,7 +189,7 @@ FloatingWindow {
                             property bool justCopied: copiedTimer.running
 
                             iconText: justCopied ? "check" : "edit"
-                            buttonText: justCopied ? qsTr("路径已复制") : qsTr("配置文件")
+                            buttonText: justCopied ? qsTr("Path copied") : qsTr("config file")
                             expanded: root.navExpanded
                             onClicked: root.openConfig()
                             onAltClicked: root.copyConfigPath()

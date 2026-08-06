@@ -89,7 +89,7 @@ Item {
                     Layout.alignment: Qt.AlignHCenter
                 }
                 Text {
-                    text: qsTr("日出")
+                    text: qsTr("Sunrise")
                     color: Appearance.colors.colOnSurfaceVariant
                     font.family: Sizes.fontFamily
                     font.pixelSize: 16
@@ -109,7 +109,7 @@ Item {
                     Layout.alignment: Qt.AlignHCenter
                 }
                 Text {
-                    text: qsTr("日落")
+                    text: qsTr("Sunset")
                     color: Appearance.colors.colOnSurfaceVariant
                     font.family: Sizes.fontFamily
                     font.pixelSize: 16

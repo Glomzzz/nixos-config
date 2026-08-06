@@ -291,7 +291,7 @@ Item {
             Text {
                 width: 70
                 anchors.verticalCenter: parent.verticalCenter
-                text: qsTr("正在处理")
+                text: qsTr("Processing")
                 color: Appearance.colors.colOnLayer0
                 font {
                     family: "LXGW WenKai Screen"
@@ -361,7 +361,7 @@ Item {
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
 
-            Accessible.name: qsTr("停止录制")
+            Accessible.name: qsTr("Stop recording")
             Accessible.role: Accessible.Button
 
             onClicked: root.stopRequested()
@@ -369,7 +369,7 @@ Item {
 
         StyledToolTip {
             extraVisibleCondition: satelliteMouse.containsMouse && satelliteMouse.enabled
-            text: qsTr("停止录制")
+            text: qsTr("Stop recording")
         }
     }
 }

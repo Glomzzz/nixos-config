@@ -84,7 +84,7 @@ Item {
             stopIndicatorValues: []
             showTooltipOnHover: true
             tooltipContent: Math.round(value * 100) + "%"
-            Accessible.name: root.title + qsTr("音量")
+            Accessible.name: qsTr("%1 volume").arg(root.title)
 
             Binding {
                 target: volumeControl
@@ -104,7 +104,9 @@ Item {
             Layout.alignment: Qt.AlignVCenter
             enabled: root.available
             hoverEnabled: true
-            Accessible.name: root.muted ? qsTr("取消静音 ") + root.title : qsTr("静音 ") + root.title
+            Accessible.name: root.muted
+                ? qsTr("Unmute %1").arg(root.title)
+                : qsTr("Mute %1").arg(root.title)
             onClicked: root.muteRequested()
 
             background: Rectangle {
@@ -134,7 +136,7 @@ Item {
             }
 
             StyledToolTip {
-                text: root.muted ? qsTr("取消静音") : qsTr("静音")
+                text: root.muted ? qsTr("Unmute") : qsTr("Mute")
                 extraVisibleCondition: muteButton.hovered
             }
         }

@@ -96,14 +96,14 @@ Rectangle {
 
     function phaseText(angle) {
         const a = ((angle % 360) + 360) % 360
-        if (a < 22.5 || a >= 337.5) return qsTr("新月")
-        if (a < 67.5) return qsTr("娥眉月")
-        if (a < 112.5) return qsTr("上弦月")
-        if (a < 157.5) return qsTr("盈凸月")
-        if (a < 202.5) return qsTr("满月")
-        if (a < 247.5) return qsTr("亏凸月")
-        if (a < 292.5) return qsTr("下弦月")
-        return qsTr("残月")
+        if (a < 22.5 || a >= 337.5) return qsTr("New moon")
+        if (a < 67.5) return qsTr("Waxing crescent")
+        if (a < 112.5) return qsTr("First quarter")
+        if (a < 157.5) return qsTr("Waxing gibbous")
+        if (a < 202.5) return qsTr("Full moon")
+        if (a < 247.5) return qsTr("Waning gibbous")
+        if (a < 292.5) return qsTr("Last quarter")
+        return qsTr("Waning crescent")
     }
 
     function pathAnimationDuration() {
@@ -285,7 +285,7 @@ Rectangle {
         }
 
         Text {
-            text: root.moon ? qsTr("月亮") : qsTr("太阳")
+            text: root.moon ? qsTr("Moon") : qsTr("Sun")
             color: root.titleInk
             font.family: "LXGW WenKai Screen"
             font.pixelSize: 18

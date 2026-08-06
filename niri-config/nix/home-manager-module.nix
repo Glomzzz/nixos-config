@@ -31,9 +31,9 @@ in {
     };
 
     language = lib.mkOption {
-      type = lib.types.enum ["en_US" "zh_CN" "zh_TW"];
+      type = lib.types.enum ["en_US"];
       default = "en_US";
-      description = "Display language enforced for Clavis Shell.";
+      description = "English display language enforced for Clavis Shell.";
     };
 
     primaryOutput = lib.mkOption {

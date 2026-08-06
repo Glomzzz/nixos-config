@@ -93,37 +93,37 @@ Rectangle {
             return Format.isNumber(
                 root.battery.timeRemainingSeconds
             )
-                ? qsTr("充满还需 ") + Format.duration(
+                ? qsTr("Fully charged in ") + Format.duration(
                     root.battery.timeRemainingSeconds
                 )
-                : qsTr("充满时长未知");
+                : qsTr("Time to full is unknown");
         }
 
         if (!root.powerConnected) {
             return Format.isNumber(
                 root.battery.timeRemainingSeconds
             )
-                ? qsTr("耗电时长 ") + Format.duration(
+                ? qsTr("Time remaining ") + Format.duration(
                     root.battery.timeRemainingSeconds
                 )
-                : qsTr("耗电时长未知");
+                : qsTr("Remaining time is unknown");
         }
 
-        return qsTr("已接通电源，未在充电");
+        return qsTr("Plugged in, not charging");
     }
 
     radius: Appearance.rounding.extraLarge
     color: Appearance.colors.colSecondaryContainer
-    Accessible.name: qsTr("电池，")
+    Accessible.name: qsTr("Battery,")
         + (root.present
             ? Format.percent(root.battery.chargePercent, 0)
                 + ", " + Format.batteryStatus(root.battery.status)
                 + ", " + (
                     root.powerConnected
-                        ? qsTr("已接通电源")
-                        : qsTr("未接通电源")
+                        ? qsTr("Plugged in")
+                        : qsTr("On battery")
                 )
-            : qsTr("未检测到电池"))
+            : qsTr("No battery detected"))
 
     Behavior on animatedLevel {
         NumberAnimation {
@@ -227,7 +227,7 @@ Rectangle {
                 left: parent.left
                 top: parent.top
             }
-            text: qsTr("电池")
+            text: qsTr("Battery")
             color: contents.foregroundColor
             font.family: Sizes.fontFamily
             font.pixelSize: Sizes.typeTitleSmall
@@ -282,14 +282,14 @@ Rectangle {
                             root.powerConnected
                                 ? (
                                     root.charging
-                                        ? qsTr("充电 ")
-                                        : qsTr("功率 ")
+                                        ? qsTr("Charging ")
+                                        : qsTr("Power ")
                                 )
-                                : qsTr("放电 ")
+                                : qsTr("Discharging ")
                         ) + Format.watts(
                             root.battery.powerWatts
                         )
-                        : qsTr("功率未知")
+                        : qsTr("Power unknown")
                     color: contents.foregroundColor
                     opacity: 0.78
                     font.family: Sizes.fontFamilyMono
@@ -311,7 +311,7 @@ Rectangle {
 
                 Text {
                     Layout.fillWidth: true
-                    text: qsTr("健康 ")
+                    text: qsTr("Health ")
                         + Format.percent(
                             root.battery.healthPercent,
                             0
@@ -328,7 +328,7 @@ Rectangle {
         Text {
             anchors.centerIn: parent
             visible: !root.present
-            text: qsTr("未检测到\n电池")
+            text: qsTr("No battery\ndetected")
             color: contents.foregroundColor
             opacity: 0.76
             font.family: Sizes.fontFamily
@@ -349,7 +349,7 @@ Rectangle {
                 Layout.alignment: Qt.AlignRight
                 text: root.present
                     ? Format.batteryStatus(root.battery.status)
-                    : qsTr("不可用")
+                    : qsTr("Unavailable")
                 color: contents.foregroundColor
                 opacity: 0.74
                 font.family: Sizes.fontFamily

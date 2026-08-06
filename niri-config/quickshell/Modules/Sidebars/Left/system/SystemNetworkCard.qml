@@ -17,11 +17,11 @@ Rectangle {
     radius: Appearance.rounding.extraLarge
     color: Appearance.colors.colSurfaceContainer
     clip: true
-    Accessible.name: qsTr("网络，下载 ")
+    Accessible.name: qsTr("Network, download ")
         + Format.bytesPerSecond(
             root.network.downloadBytesPerSecond
         )
-        + qsTr("，上传 ")
+        + qsTr(", upload ")
         + Format.bytesPerSecond(
             root.network.uploadBytesPerSecond
         )
@@ -61,7 +61,7 @@ Rectangle {
 
                 Text {
                     Layout.fillWidth: true
-                    text: qsTr("网络")
+                    text: qsTr("Network")
                     color: Appearance.colors.colOnSurface
                     font.family: Sizes.fontFamily
                     font.pixelSize: Sizes.typeTitleSmall
@@ -71,7 +71,7 @@ Rectangle {
                 Text {
                     Layout.fillWidth: true
                     text: root.network.defaultInterface
-                        || qsTr("全部接口")
+                        || qsTr("All interfaces")
                     color: Appearance.colors.colOnSurfaceVariant
                     font.family: Sizes.fontFamilyMono
                     font.pixelSize: Sizes.typeLabelSmall
@@ -90,7 +90,7 @@ Rectangle {
 
                 Text {
                     Layout.fillWidth: true
-                    text: qsTr("下载")
+                    text: qsTr("Download")
                     color: Appearance.colors.colOnSurfaceVariant
                     font.family: Sizes.fontFamily
                     font.pixelSize: 9
@@ -118,7 +118,7 @@ Rectangle {
 
                 Text {
                     Layout.fillWidth: true
-                    text: qsTr("上传")
+                    text: qsTr("Upload")
                     color: Appearance.colors.colOnSurfaceVariant
                     font.family: Sizes.fontFamily
                     font.pixelSize: 9
@@ -153,12 +153,12 @@ Rectangle {
             historyLength: 60
             updateInterval: root.updateInterval
             active: root.chartActive
-            accessibilityName: qsTr("网络最近一分钟趋势")
-            accessibilityDescription: qsTr("下载 ")
+            accessibilityName: qsTr("Network trend over the last minute")
+            accessibilityDescription: qsTr("Download ")
                 + Format.bytesPerSecond(
                     root.network.downloadBytesPerSecond
                 )
-                + qsTr("，上传 ")
+                + qsTr(", upload ")
                 + Format.bytesPerSecond(
                     root.network.uploadBytesPerSecond
                 )

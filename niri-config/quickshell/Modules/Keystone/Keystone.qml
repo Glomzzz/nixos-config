@@ -35,8 +35,8 @@ Item {
     FilePickerWindow {
         id: avatarFilePicker
 
-        dialogTitle: qsTr("选择用户头像")
-        description: qsTr("图片将复制到 ~/.face，并同步用于 Dashboard 与锁屏")
+        dialogTitle: qsTr("Choose user avatar")
+        description: qsTr("The image will be copied to ~/.face and used by the Dashboard and lock screen")
         onAccepted: path => AvatarService.setAvatar(path)
     }
 

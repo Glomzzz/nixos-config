@@ -47,8 +47,10 @@ WidgetPanel {
     }
 
     onPresentationForegroundChanged: {
-        if (presentationForeground)
+        if (presentationForeground) {
+            PowerProfileService.refresh();
             startPresentation()
+        }
     }
     onPresentationLayoutReadyChanged: {
         if (presentationLayoutReady)
@@ -123,13 +125,13 @@ WidgetPanel {
 
     function titleForType(type) {
         switch (type) {
-        case "network": return qsTr("网络");
-        case "bluetooth": return qsTr("蓝牙");
-        case "caffeine": return qsTr("咖啡因");
-        case "mic": return qsTr("麦克风");
-        case "audio": return qsTr("声音");
-        case "theme": return qsTr("外观");
-        case "dnd": return qsTr("免打扰");
+        case "network": return qsTr("Network");
+        case "bluetooth": return qsTr("Bluetooth");
+        case "caffeine": return qsTr("Caffeine");
+        case "mic": return qsTr("Microphone");
+        case "audio": return qsTr("Sound");
+        case "theme": return qsTr("Appearance");
+        case "dnd": return qsTr("Do not disturb");
         default: return type;
         }
     }
@@ -138,26 +140,26 @@ WidgetPanel {
         switch (type) {
         case "network":
             if (!NetworkService.available)
-                return qsTr("不可用");
+                return qsTr("Unavailable");
             if (!NetworkService.wifiAvailable)
-                return qsTr("无 Wi-Fi 设备");
-            return NetworkService.wifiEnabled ? NetworkService.activeConnection : qsTr("已关闭");
+                return qsTr("No Wi-Fi device");
+            return NetworkService.wifiEnabled ? NetworkService.activeConnection : qsTr("Off");
         case "bluetooth":
             if (!BluetoothService.available)
-                return qsTr("不可用");
+                return qsTr("Unavailable");
             if (!BluetoothService.enabled)
-                return qsTr("已关闭");
-            return BluetoothService.connected ? (BluetoothService.connectedName || qsTr("已连接")) : qsTr("已开启");
+                return qsTr("Off");
+            return BluetoothService.connected ? (BluetoothService.connectedName || qsTr("Connected")) : qsTr("On");
         case "caffeine":
-            return IdleService.inhibited ? qsTr("保持唤醒") : qsTr("正常休眠");
+            return IdleService.inhibited ? qsTr("Keep awake") : qsTr("Normal sleep");
         case "mic":
-            return Volume.sourceMuted ? qsTr("已静音") : qsTr("已开启");
+            return Volume.sourceMuted ? qsTr("Muted") : qsTr("On");
         case "audio":
-            return Volume.sinkMuted ? qsTr("已静音") : Math.round(Volume.sinkVolume * 100) + "%";
+            return Volume.sinkMuted ? qsTr("Muted") : Math.round(Volume.sinkVolume * 100) + "%";
         case "theme":
-            return PersonalizationConfig.themeMode === "dark" ? qsTr("深色") : qsTr("浅色");
+            return PersonalizationConfig.themeMode === "dark" ? qsTr("Dark") : qsTr("Light");
         case "dnd":
-            return UiPreferences.dndEnabled ? qsTr("已开启") : qsTr("已关闭");
+            return UiPreferences.dndEnabled ? qsTr("On") : qsTr("Off");
         default:
             return "";
         }
@@ -253,9 +255,9 @@ WidgetPanel {
     function tooltipForType(type) {
         const base = titleForType(type) + " | " + subtitleForType(type);
         if (root.editMode)
-            return base + qsTr("\n右键切换形状，滚轮调整顺序");
+            return base + qsTr("\nRight-click to change shape; scroll to reorder");
         if (root.hasAltActionForType(type))
-            return base + qsTr("\n右键打开详情面板");
+            return base + qsTr("\nRight-click to open the details panel");
         return base;
     }
 
@@ -277,7 +279,7 @@ WidgetPanel {
             padding: root.headerButtonPadding
             iconName: "edit"
             toggled: root.editMode
-            tooltipText: root.editMode ? qsTr("编辑快捷按钮\n右键切换形状，滚轮调整顺序") : qsTr("编辑快捷按钮")
+            tooltipText: root.editMode ? qsTr("Edit quick actions\nRight-click to change shape; scroll to reorder") : qsTr("Edit quick actions")
             onTriggered: root.editMode = !root.editMode
         }
 
@@ -286,7 +288,7 @@ WidgetPanel {
             cellSpacing: root.headerButtonSpacing
             padding: root.headerButtonPadding
             iconName: "restart_alt"
-            tooltipText: qsTr("重启 Quickshell")
+            tooltipText: qsTr("Restart Quickshell")
             onTriggered: Quickshell.reload(true)
         }
 
@@ -295,7 +297,7 @@ WidgetPanel {
             cellSpacing: root.headerButtonSpacing
             padding: root.headerButtonPadding
             iconName: "settings"
-            tooltipText: qsTr("设置")
+            tooltipText: qsTr("Settings")
             onTriggered: root.openControlCenter()
         }
 
@@ -304,7 +306,7 @@ WidgetPanel {
             cellSpacing: root.headerButtonSpacing
             padding: root.headerButtonPadding
             iconName: "power_settings_new"
-            tooltipText: qsTr("电源菜单")
+            tooltipText: qsTr("Power menu")
             onTriggered: Quickshell.execDetached([
                 Paths.systemScriptsDir + "/power-menu.sh",
                 PersonalizationConfig.powerMenuStyle
@@ -319,6 +321,10 @@ WidgetPanel {
 
         QuickSliders {
             screen: root.screen
+            Layout.fillWidth: true
+        }
+
+        PowerProfileSelector {
             Layout.fillWidth: true
         }
 

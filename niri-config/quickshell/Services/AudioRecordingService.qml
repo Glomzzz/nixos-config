@@ -48,7 +48,7 @@ Singleton {
         if (!errorObject)
             return;
         const code = errorObject.code || "audio_recording_error";
-        const message = errorObject.message || qsTr("录音命令执行失败");
+        const message = errorObject.message || qsTr("The audio recording command failed");
         const key = code + "\u001f" + message + "\u001f" + root.sessionId;
         if (key === root._lastErrorKey)
             return;
@@ -58,7 +58,7 @@ Singleton {
             "notify-send",
             "-a", "Clavis Shell",
             "-u", "critical",
-            qsTr("录音失败"),
+            qsTr("Audio recording failed"),
             message
         ]);
     }
@@ -73,7 +73,7 @@ Singleton {
             if (response.schemaVersion !== root.schemaVersion) {
                 root.error = {
                     code: "unsupported_schema",
-                    message: qsTr("key audio 返回了不受支持的 JSON schema")
+                    message: qsTr("key audio returned an unsupported JSON schema")
                 };
                 root.notifyError(root.error);
                 return false;
@@ -118,7 +118,7 @@ Singleton {
                     "notify-send",
                     "-a", "Clavis Shell",
                     "-u", "low",
-                    qsTr("录音已保存"),
+                    qsTr("Audio recording saved"),
                     root.outputPath
                 ]);
             }
@@ -127,7 +127,7 @@ Singleton {
         } catch (exception) {
             root.error = {
                 code: "invalid_key_json",
-                message: qsTr("无法解析 key audio 返回的 JSON: ") + exception
+                message: qsTr("Could not parse JSON returned by key audio: ") + exception
             };
             root.notifyError(root.error);
             return false;
@@ -223,7 +223,7 @@ Singleton {
             if (exitCode !== 0 && !root.error) {
                 root.error = {
                     code: "key_unavailable",
-                    message: qsTr("无法通过 key 查询录音状态")
+                    message: qsTr("Could not query audio recording status through key")
                 };
                 root.notifyError(root.error);
             }

@@ -179,15 +179,15 @@ Item {
                     ? Appearance.colors.colSecondaryContainerActive
                     : Appearance.colors.colPrimaryActive
                 Accessible.name: TimerService.stopwatchRunning
-                    ? qsTr("暂停秒表") : qsTr("启动秒表")
+                    ? qsTr("Pause stopwatch") : qsTr("Start stopwatch")
                 onClicked: TimerService.toggleStopwatch()
 
                 contentItem: Text {
                     text: TimerService.stopwatchRunning
-                        ? qsTr("暂停")
+                        ? qsTr("Pause")
                         : TimerService.stopwatchTime === 0
-                            ? qsTr("开始")
-                            : qsTr("继续")
+                            ? qsTr("Start")
+                            : qsTr("Resume")
                     color: TimerService.stopwatchRunning
                         ? Appearance.colors.colOnSecondaryContainer
                         : Appearance.colors.colOnPrimary
@@ -214,7 +214,7 @@ Item {
                     ? Appearance.colors.colLayer2Active
                     : Appearance.colors.colErrorContainerActive
                 Accessible.name: TimerService.stopwatchRunning
-                    ? qsTr("记录单圈") : qsTr("重置秒表")
+                    ? qsTr("Record lap") : qsTr("Reset stopwatch")
                 onClicked: {
                     if (TimerService.stopwatchRunning)
                         TimerService.stopwatchRecordLap();
@@ -223,7 +223,7 @@ Item {
                 }
 
                 contentItem: Text {
-                    text: TimerService.stopwatchRunning ? qsTr("单圈") : qsTr("重置")
+                    text: TimerService.stopwatchRunning ? qsTr("Lap") : qsTr("Reset")
                     color: TimerService.stopwatchRunning
                         ? Appearance.colors.colOnLayer2
                         : Appearance.colors.colOnErrorContainer

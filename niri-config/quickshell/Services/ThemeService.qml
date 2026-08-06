@@ -11,8 +11,8 @@ Singleton {
 
     property bool generating: false
     property string lastSource: ""
-    property var availableIconThemes: [({ "label": qsTr("系统默认"), "value": "" })]
-    property var availableCursorThemes: [({ "label": qsTr("系统默认"), "value": "" })]
+    property var availableIconThemes: [({ "label": qsTr("System default"), "value": "" })]
+    property var availableCursorThemes: [({ "label": qsTr("System default"), "value": "" })]
     property string systemDefaultIconTheme: ""
     property string systemDefaultCursorTheme: ""
 
@@ -366,7 +366,7 @@ cursor {
         id: detectIconThemesProcess
         stdout: StdioCollector {
             onStreamFinished: {
-                root.availableIconThemes = root.parseDetectedThemes(this.text, qsTr("系统默认"), PersonalizationConfig.iconTheme, false);
+                root.availableIconThemes = root.parseDetectedThemes(this.text, qsTr("System default"), PersonalizationConfig.iconTheme, false);
             }
         }
     }
@@ -375,7 +375,7 @@ cursor {
         id: detectCursorThemesProcess
         stdout: StdioCollector {
             onStreamFinished: {
-                root.availableCursorThemes = root.parseDetectedThemes(this.text, qsTr("系统默认"), PersonalizationConfig.cursorTheme, true);
+                root.availableCursorThemes = root.parseDetectedThemes(this.text, qsTr("System default"), PersonalizationConfig.cursorTheme, true);
             }
         }
     }

@@ -244,7 +244,7 @@ Item {
     }
 
     function handleViewportFailure(viewport, source) {
-        const message = qsTr("无法解码壁纸：") + source;
+        const message = qsTr("Could not decode wallpaper: ") + source;
         root.lastError = message;
         if (viewport === root.nextViewport) {
             root.nextViewport.sourcePath = "";

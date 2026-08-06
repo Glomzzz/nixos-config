@@ -57,6 +57,10 @@ function frequencyMHz(value) {
     return value.toFixed(0) + " MHz";
 }
 
+function quantity(value, singular, plural) {
+    return value + " " + (value === 1 ? singular : plural);
+}
+
 function duration(seconds) {
     if (!isNumber(seconds) || seconds < 0)
         return unavailable();
@@ -67,26 +71,28 @@ function duration(seconds) {
     const minutes = Math.floor((total % 3600) / 60);
 
     if (days > 0)
-        return days + qsTr(" 天 ") + hours + qsTr(" 小时");
+        return quantity(days, qsTr("day"), qsTr("days")) + " "
+            + quantity(hours, qsTr("hour"), qsTr("hours"));
     if (hours > 0)
-        return hours + qsTr(" 小时 ") + minutes + qsTr(" 分钟");
+        return quantity(hours, qsTr("hour"), qsTr("hours")) + " "
+            + quantity(minutes, qsTr("minute"), qsTr("minutes"));
     if (minutes > 0)
-        return minutes + qsTr(" 分钟");
-    return total + qsTr(" 秒");
+        return quantity(minutes, qsTr("minute"), qsTr("minutes"));
+    return quantity(total, qsTr("second"), qsTr("seconds"));
 }
 
 function batteryStatus(value) {
     switch (String(value || "").toLowerCase()) {
     case "charging":
-        return qsTr("充电中");
+        return qsTr("Charging");
     case "discharging":
-        return qsTr("使用电池");
+        return qsTr("On battery");
     case "full":
-        return qsTr("已充满");
+        return qsTr("Fully charged");
     case "not charging":
-        return qsTr("未充电");
+        return qsTr("Not charging");
     case "unknown":
-        return qsTr("状态未知");
+        return qsTr("Unknown status");
     default:
         return value ? String(value) : unavailable();
     }
@@ -95,5 +101,5 @@ function batteryStatus(value) {
 function yesNo(value) {
     if (value === null || value === undefined)
         return unavailable();
-    return value ? qsTr("是") : qsTr("否");
+    return value ? qsTr("Yes") : qsTr("No");
 }

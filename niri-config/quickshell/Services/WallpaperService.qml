@@ -47,7 +47,7 @@ Singleton {
             return "";
         const value = String(path);
         if (root.isColorSource(value))
-            return qsTr("纯色壁纸 ") + value;
+            return qsTr("Solid color ") + value;
         return value.substring(value.lastIndexOf("/") + 1);
     }
 
@@ -161,7 +161,7 @@ Singleton {
         const next = {};
         for (let key in current)
             next[key] = current[key];
-        const name = String(screenName || qsTr("全局"));
+        const name = String(screenName || qsTr("Global"));
         if (message)
             next[name] = String(message);
         else
@@ -207,7 +207,7 @@ Singleton {
         function pruned(source, preserveGlobal) {
             const result = {};
             for (let key in source) {
-                if (names[key] || (preserveGlobal && key === qsTr("全局")))
+                if (names[key] || (preserveGlobal && key === qsTr("Global")))
                     result[key] = source[key];
             }
             return result;

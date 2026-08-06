@@ -76,7 +76,7 @@ Singleton {
             return {};
         const deviceAdapter = device.adapter;
         return {
-            "name": String(device.name || device.deviceName || device.address || qsTr("未知设备")),
+            "name": String(device.name || device.deviceName || device.address || qsTr("Unknown device")),
             "deviceName": String(device.deviceName || ""),
             "address": String(device.address || ""),
             "icon": String(device.icon || ""),
@@ -148,7 +148,7 @@ Singleton {
 
     function _beginOperation(operation) {
         if (root._pendingOperation.length > 0) {
-            root.operationFailed(operation, qsTr("另一项蓝牙操作仍在进行"));
+            root.operationFailed(operation, qsTr("Another Bluetooth operation is still in progress"));
             return false;
         }
         root.lastError = "";
@@ -173,7 +173,7 @@ Singleton {
         if (root._pendingOperation.length === 0)
             return;
         const operation = root._pendingOperation;
-        root.lastError = String(message || qsTr("蓝牙操作失败"));
+        root.lastError = String(message || qsTr("The Bluetooth operation failed"));
         operationTimeout.stop();
         root._clearPendingOperation();
         root.operationFailed(operation, root.lastError);
@@ -194,12 +194,12 @@ Singleton {
         const nativeAdapter = root._resolveAdapter(adapterLike);
         const requested = !!value;
         if (!nativeAdapter) {
-            root.lastError = qsTr("未检测到蓝牙适配器");
+            root.lastError = qsTr("No Bluetooth adapter detected");
             root.operationFailed("set-adapter-enabled", root.lastError);
             return;
         }
         if (requested && nativeAdapter.state === BluetoothAdapterState.Blocked) {
-            root.lastError = qsTr("蓝牙适配器已被 rfkill 阻止");
+            root.lastError = qsTr("The Bluetooth adapter is blocked by rfkill");
             root.operationFailed("set-adapter-enabled", root.lastError);
             return;
         }
@@ -226,7 +226,7 @@ Singleton {
         const nativeAdapter = root._resolveAdapter(adapterLike);
         const requested = !!value;
         if (!nativeAdapter || !nativeAdapter.enabled) {
-            root.lastError = nativeAdapter ? qsTr("蓝牙适配器已关闭") : qsTr("未检测到蓝牙适配器");
+            root.lastError = nativeAdapter ? qsTr("The Bluetooth adapter is off") : qsTr("No Bluetooth adapter detected");
             root.operationFailed("set-discoverable", root.lastError);
             return;
         }
@@ -243,7 +243,7 @@ Singleton {
         const nativeAdapter = root._resolveAdapter(adapterLike);
         const requested = !!value;
         if (!nativeAdapter || !nativeAdapter.enabled) {
-            root.lastError = nativeAdapter ? qsTr("蓝牙适配器已关闭") : qsTr("未检测到蓝牙适配器");
+            root.lastError = nativeAdapter ? qsTr("The Bluetooth adapter is off") : qsTr("No Bluetooth adapter detected");
             root.operationFailed("set-pairable", root.lastError);
             return;
         }
@@ -283,12 +283,12 @@ Singleton {
 
     function requestDiscovery() {
         if (!root.available) {
-            root.lastError = qsTr("未检测到蓝牙适配器或 BlueZ 不可用");
+            root.lastError = qsTr("No Bluetooth adapter was detected, or BlueZ is unavailable");
             root.operationFailed("discovery", root.lastError);
             return;
         }
         if (!root.enabled) {
-            root.lastError = qsTr("蓝牙适配器已关闭");
+            root.lastError = qsTr("The Bluetooth adapter is off");
             root.operationFailed("discovery", root.lastError);
             return;
         }
@@ -321,12 +321,12 @@ Singleton {
     function _beginDeviceOperation(operation, deviceLike, targetState) {
         const nativeDevice = root._resolveDevice(deviceLike);
         if (!nativeDevice) {
-            root.lastError = qsTr("目标蓝牙设备已不可用");
+            root.lastError = qsTr("The selected Bluetooth device is no longer available");
             root.operationFailed(operation, root.lastError);
             return null;
         }
         if (nativeDevice.blocked && (operation === "connect" || operation === "pair")) {
-            root.lastError = qsTr("目标蓝牙设备已被阻止");
+            root.lastError = qsTr("The selected Bluetooth device is blocked");
             root.operationFailed(operation, root.lastError);
             return null;
         }
@@ -475,7 +475,7 @@ Singleton {
             if (root._pendingOperation === "connect"
                     && root._pendingStateWasChanging
                     && root._pendingDevice.state === BluetoothDeviceState.Disconnected)
-                root._finishOperationFailed(qsTr("设备连接失败"));
+                root._finishOperationFailed(qsTr("Could not connect to the device"));
         }
 
         function onPairingChanged() {
@@ -488,7 +488,7 @@ Singleton {
             else if (root._pendingOperation === "pair"
                     && root._pendingPairingStarted
                     && !root._pendingDevice.paired)
-                root._finishOperationFailed(qsTr("配对失败；需要 PIN/Passkey 交互的设备将在第二阶段支持"));
+                root._finishOperationFailed(qsTr("Pairing failed; devices that require PIN or passkey interaction are not yet supported"));
         }
 
         function onPairedChanged() {
@@ -532,7 +532,7 @@ Singleton {
         id: operationTimeout
         interval: 60000
         repeat: false
-        onTriggered: root._finishOperationFailed(qsTr("蓝牙操作超时；当前 Quickshell API 未提供更详细的 BlueZ 错误"))
+        onTriggered: root._finishOperationFailed(qsTr("The Bluetooth operation timed out; the current Quickshell API provides no further BlueZ details"))
     }
 
     Component.onCompleted: root._applyDiscovery()

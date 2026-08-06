@@ -71,8 +71,8 @@ Item {
         const physical = Number(system.physicalCoreCount || 0);
         const logical = Number(system.logicalCpuCount || 0);
         if (physical > 0 && logical > 0)
-            return physical + qsTr(" 核 · ") + logical + qsTr(" 线程");
-        return qsTr("总体利用率");
+            return physical + qsTr(" cores · ") + logical + qsTr(" threads");
+        return qsTr("Overall utilization");
     }
 
     function cpuSupporting() {
@@ -87,7 +87,7 @@ Item {
 
     function gpuSupporting() {
         if (SystemMonitorService.gpus.length === 0)
-            return qsTr("未检测到可用图形设备");
+            return qsTr("No graphics device detected");
         const gpu = root.primaryGpu;
         if (Format.isNumber(gpu.vramUsedBytes)
                 && Format.isNumber(gpu.vramTotalBytes)) {
@@ -338,7 +338,7 @@ Item {
         ExpressiveMetricTile {
             label: "GPU"
             iconName: "developer_board"
-            detailText: root.primaryGpu.name || qsTr("图形设备")
+            detailText: root.primaryGpu.name || qsTr("Graphics device")
             valueText: SystemMonitorService.gpus.length > 0
                 ? Format.percent(
                     root.primaryGpu.utilizationPercent,
@@ -390,7 +390,7 @@ Item {
             valueAvailable: Format.isNumber(
                 SystemMonitorService.memory.usagePercent
             )
-            accessibilityName: qsTr("内存已使用 ")
+            accessibilityName: qsTr("Memory used ")
                 + Format.percent(
                     SystemMonitorService.memory.usagePercent,
                     0
@@ -425,19 +425,19 @@ Item {
                         0
                     )
                     : "—"
-            supportingText: qsTr("Wi-Fi 信号强度")
+            supportingText: qsTr("Wi-Fi signal strength")
             level: root.normalizedPercent(
                 NetworkService.signalStrength
             )
             valueAvailable: NetworkService.wifiConnected
             accessibilityName:
                 NetworkService.wifiConnected
-                    ? qsTr("Wi-Fi 信号强度 ")
+                    ? qsTr("Wi-Fi signal strength ")
                         + Format.percent(
                             NetworkService.signalStrength,
                             0
                         )
-                    : qsTr("Wi-Fi 未连接")
+                    : qsTr("Wi-Fi is not connected")
             shapeId: MaterialShape.Pentagon
             shapeColor:
                 Appearance.colors.colTertiaryContainer
@@ -497,7 +497,7 @@ Item {
             visible: !SystemMonitorService.hasData
                 && !SystemMonitorService.error
                 && !SystemMonitorService.reconnecting
-            message: qsTr("正在连接系统监测服务")
+            message: qsTr("Connecting to the system monitor service")
         }
 
         SystemUnavailableState {
@@ -510,12 +510,12 @@ Item {
                 && (SystemMonitorService.error
                     || SystemMonitorService.reconnecting)
             title: SystemMonitorService.reconnecting
-                ? qsTr("正在重新连接")
+                ? qsTr("Reconnecting")
                 : (SystemMonitorService.errorMessage
-                    || qsTr("系统监测服务不可用"))
+                    || qsTr("System monitor service unavailable"))
             message: SystemMonitorService.error
-                ? qsTr("请确认 key 已重新构建并可从当前环境运行。")
-                : qsTr("连接中断后会使用有限指数退避自动恢复。")
+                ? qsTr("Confirm that key has been rebuilt and can run in the current environment.")
+                : qsTr("After a disconnection, recovery uses limited exponential backoff.")
             reconnecting: SystemMonitorService.reconnecting
             onRetryRequested: SystemMonitorService.retry()
         }
@@ -535,8 +535,8 @@ Item {
             showVerticalScrollBar: contentHeight > height + 1
             activeFocusOnTab: contentHeight > height + 1
             Accessible.name: contentHeight > height + 1
-                ? qsTr("系统信息网格，可滚动并可拖动卡片")
-                : qsTr("系统信息网格，可拖动卡片")
+                ? qsTr("System information grid; scrollable with draggable cards")
+                : qsTr("System information grid with draggable cards")
 
             function scrollBy(delta) {
                 const next = dashboardScroll.clampContentY(

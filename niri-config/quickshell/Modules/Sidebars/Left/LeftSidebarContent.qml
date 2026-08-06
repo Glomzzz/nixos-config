@@ -20,9 +20,9 @@ Item {
             id: tabToolbar
 
             readonly property var tabs: [
-                { id: "info", icon: "info", label: qsTr("信息") },
-                { id: "sys", icon: "monitoring", label: qsTr("系统") },
-                { id: "weather", icon: "cloud", label: qsTr("天气") }
+                { id: "info", icon: "info", label: qsTr("Information") },
+                { id: "sys", icon: "monitoring", label: qsTr("System") },
+                { id: "weather", icon: "cloud", label: qsTr("Weather") }
             ]
             readonly property int currentIndex: Math.max(0,
                 tabs.findIndex(tab =>

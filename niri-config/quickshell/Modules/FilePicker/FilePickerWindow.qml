@@ -25,14 +25,14 @@ FloatingWindow {
 
     property var targetScreen: null
     property int selectionMode: FilePickerWindow.Files
-    property string description: qsTr("选择一张图片作为用户头像")
-    property string dialogTitle: qsTr("选择图片")
+    property string description: qsTr("Choose an image for your user avatar")
+    property string dialogTitle: qsTr("Choose image")
     property string startPath: picturesDir
     property var nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp", "*.bmp", "*.gif"]
     property string windowIconName: "add_photo_alternate"
-    property string emptyStateText: qsTr("当前文件夹没有可选择的图片")
-    property string selectionPrompt: qsTr("选择一张图片")
-    property string acceptLabel: qsTr("选择")
+    property string emptyStateText: qsTr("No selectable images in this folder")
+    property string selectionPrompt: qsTr("Choose an image")
+    property string acceptLabel: qsTr("Choose")
     property string formatSummary: "JPG · PNG · WebP\nBMP · GIF"
     property bool acceptFilesOnSingleClick: false
     property string currentPath: startPath
@@ -138,10 +138,10 @@ FloatingWindow {
         let remainder = normalized;
 
         if (insideHome) {
-            items.push({ label: qsTr("主文件夹"), path: normalizedHome, iconName: "home" });
+            items.push({ label: qsTr("Home"), path: normalizedHome, iconName: "home" });
             remainder = normalized.substring(normalizedHome.length);
         } else {
-            items.push({ label: qsTr("文件系统"), path: "/", iconName: "hard_drive" });
+            items.push({ label: qsTr("File system"), path: "/", iconName: "hard_drive" });
         }
 
         for (const part of remainder.split("/").filter(component => component !== "")) {
@@ -442,7 +442,7 @@ FloatingWindow {
 
                     PickerToolButton {
                         iconName: "close"
-                        tooltipText: qsTr("关闭")
+                        tooltipText: qsTr("Close")
                         onClicked: root.dismiss()
                     }
                 }
@@ -477,18 +477,18 @@ FloatingWindow {
                             Layout.leftMargin: 12
                             Layout.topMargin: 4
                             Layout.bottomMargin: 6
-                            text: qsTr("位置")
+                            text: qsTr("Location")
                             color: Appearance.colors.colOnSurface
                             font.family: Sizes.fontFamily
                             font.pixelSize: 15
                             font.weight: Font.DemiBold
                         }
 
-                        LocationButton { label: qsTr("主文件夹"); iconName: "home"; path: root.homeDir }
-                        LocationButton { label: qsTr("桌面"); iconName: "desktop_windows"; path: root.desktopDir; visible: path !== "" }
-                        LocationButton { label: qsTr("文档"); iconName: "description"; path: root.documentsDir; visible: path !== "" }
-                        LocationButton { label: qsTr("图片"); iconName: "image"; path: root.picturesDir; visible: path !== "" }
-                        LocationButton { label: qsTr("下载"); iconName: "download"; path: root.downloadsDir; visible: path !== "" }
+                        LocationButton { label: qsTr("Home"); iconName: "home"; path: root.homeDir }
+                        LocationButton { label: qsTr("Desktop"); iconName: "desktop_windows"; path: root.desktopDir; visible: path !== "" }
+                        LocationButton { label: qsTr("Documents"); iconName: "description"; path: root.documentsDir; visible: path !== "" }
+                        LocationButton { label: qsTr("Pictures"); iconName: "image"; path: root.picturesDir; visible: path !== "" }
+                        LocationButton { label: qsTr("Downloads"); iconName: "download"; path: root.downloadsDir; visible: path !== "" }
 
                         Item { Layout.fillHeight: true }
 
@@ -535,7 +535,7 @@ FloatingWindow {
 
                             PickerToolButton {
                                 iconName: "arrow_upward"
-                                tooltipText: qsTr("上一级")
+                                tooltipText: qsTr("Up one level")
                                 enabled: root.currentPath !== "/"
                                 onClicked: root.navigateUp()
                             }
@@ -666,7 +666,7 @@ FloatingWindow {
 
                             PickerToolButton {
                                 iconName: root.showHiddenFiles ? "visibility_off" : "visibility"
-                                tooltipText: root.showHiddenFiles ? qsTr("隐藏隐藏文件") : qsTr("显示隐藏文件")
+                                tooltipText: root.showHiddenFiles ? qsTr("Hide hidden files") : qsTr("Show hidden files")
                                 active: root.showHiddenFiles
                                 onClicked: root.showHiddenFiles = !root.showHiddenFiles
                             }
@@ -927,7 +927,7 @@ FloatingWindow {
                                         text: root.selectedPath === ""
                                             ? root.selectionPrompt
                                             : root.selectedIsDir
-                                              ? qsTr("双击进入 ") + root.selectedName
+                                              ? qsTr("Double-click to open ") + root.selectedName
                                               : root.selectedName
                                         color: Appearance.colors.colOnSurfaceVariant
                                         font.family: Sizes.fontFamily
@@ -938,7 +938,7 @@ FloatingWindow {
                             }
 
                             PickerActionButton {
-                                label: qsTr("取消")
+                                label: qsTr("Cancel")
                                 iconName: "close"
                                 enabled: root.hasSelection
                                 onClicked: root.clearSelection()

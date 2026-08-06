@@ -133,7 +133,7 @@ Singleton {
     function configureStage(stage, enabled, timeout, respectInhibitors = true) {
         const name = String(stage || "");
         if (["dim", "lock", "displayOff", "suspend"].indexOf(name) === -1) {
-            root.lastError = qsTr("未知 Idle 阶段: ") + name;
+            root.lastError = qsTr("Unknown idle stage: ") + name;
             root.operationFailed("configure-stage", root.lastError);
             return;
         }
@@ -279,7 +279,7 @@ Singleton {
             root.operationSucceeded("lock");
             return;
         }
-        root.lastError = qsTr("锁屏请求失败: ") + String(result || "unknown");
+        root.lastError = qsTr("Lock request failed: ") + String(result || "unknown");
         root.operationFailed("lock", root.lastError);
     }
 
@@ -415,7 +415,7 @@ Singleton {
                 root.displaysOff = root._displayCommandTargetOff;
                 root.operationSucceeded(operation);
             } else {
-                root.lastError = qsTr("niri 显示器电源动作失败，退出码 ") + exitCode;
+                root.lastError = qsTr("The niri display power action failed with exit code ") + exitCode;
                 root.operationFailed(operation, root.lastError);
             }
 
@@ -432,7 +432,7 @@ Singleton {
                 root.operationSucceeded("suspend");
                 return;
             }
-            root.lastError = qsTr("systemd-logind 挂起动作失败，退出码 ") + exitCode;
+            root.lastError = qsTr("The systemd-logind suspend action failed with exit code ") + exitCode;
             root.operationFailed("suspend", root.lastError);
         }
     }

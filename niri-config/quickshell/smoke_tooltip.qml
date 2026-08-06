@@ -49,7 +49,7 @@ ShellRoot {
             StyledToolTip {
                 id: tooltip
 
-                text: qsTr("工具提示文字")
+                text: qsTr("Tooltip text")
                 alternativeVisibleCondition: showTooltip
             }
         }
@@ -71,7 +71,7 @@ ShellRoot {
             StyledToolTip {
                 id: fallbackTooltip
 
-                text: qsTr("窗口工具提示")
+                text: qsTr("Window tooltip")
                 alternativeVisibleCondition: true
             }
         }
@@ -91,7 +91,7 @@ ShellRoot {
                 if (!content.shown || content.blurBackgroundItem.width <= 0)
                     return;
 
-                root.verify(content.text === qsTr("工具提示文字"),
+                root.verify(content.text === qsTr("Tooltip text"),
                     "tooltip text");
                 root.verify(content.width === content.implicitWidth
                     && content.height === content.implicitHeight,

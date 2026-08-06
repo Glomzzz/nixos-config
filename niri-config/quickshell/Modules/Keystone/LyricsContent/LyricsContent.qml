@@ -61,9 +61,9 @@ Item {
                         root.lyricsModel = json; root.currentLineIndex = 0;
                         root.currentLoadedTitle = root.trackTitle
                     } else {
-                        root.lyricsModel = [{time: 0, text: qsTr("暂无歌词")}]
+                        root.lyricsModel = [{time: 0, text: qsTr("No lyrics")}]
                     }
-                } catch (e) { root.lyricsModel = [{time: 0, text: qsTr("歌词错误")}] }
+                } catch (e) { root.lyricsModel = [{time: 0, text: qsTr("Lyrics error")}] }
             }
         }
     }

@@ -133,7 +133,7 @@ Singleton {
 
         if (!root.available) {
             root.lastError =
-                qsTr("未找到 awww 或 awww-daemon，已回退到 Quickshell");
+                qsTr("awww or awww-daemon was not found; falling back to Quickshell");
             root.quickshellContentVisible = true;
             root.effectiveBackend = "quickshell";
             root.state = "error";
@@ -189,7 +189,7 @@ Singleton {
     }
 
     function failAwwwActivation(message) {
-        root.lastError = message || qsTr("awww 桌面后端启动失败");
+        root.lastError = message || qsTr("The awww desktop backend failed to start");
         root.quickshellContentVisible = true;
         root.effectiveBackend = "quickshell";
         root.state = "error";
@@ -295,7 +295,7 @@ Singleton {
         const source = target.source;
         if (!source) {
             root.failAwwwActivation(
-                qsTr("没有可应用到 %1 的桌面壁纸").arg(output));
+                qsTr("No desktop wallpaper is available for %1").arg(output));
             return;
         }
 
@@ -425,7 +425,7 @@ Singleton {
                 return;
             }
             root.failAwwwActivation(
-                qsTr("awww-daemon 意外退出，退出码 %1")
+                qsTr("awww-daemon exited unexpectedly with exit code %1")
                     .arg(exitCode));
         }
     }
@@ -465,7 +465,7 @@ Singleton {
             root.queryAttempts += 1;
             if (root.queryAttempts >= 20) {
                 root.failAwwwActivation(
-                    qsTr("awww namespace clavis-desktop 未在超时前就绪"));
+                    qsTr("The clavis-desktop awww namespace did not become ready before the timeout"));
                 return;
             }
             queryRetry.restart();
@@ -498,7 +498,7 @@ Singleton {
 
             if (exitCode !== 0) {
                 const message =
-                    qsTr("awww 无法为 %1 应用桌面壁纸，退出码 %2")
+                    qsTr("awww could not apply the desktop wallpaper to %1; exit code %2")
                         .arg(outputName).arg(exitCode);
                 WallpaperService.reportDesktopError(
                     outputName, message);
@@ -519,7 +519,7 @@ Singleton {
             if (exitCode !== 0) {
                 root.daemonStopRequested = false;
                 root.lastError =
-                    qsTr("停止 clavis-desktop awww namespace 失败，退出码 %1")
+                    qsTr("Could not stop the clavis-desktop awww namespace; exit code %1")
                         .arg(exitCode);
                 root.state = "error";
                 return;

@@ -17,31 +17,31 @@ StyledButtonGroup {
     model: [
         ({
             "value": "temp",
-            "label": qsTr("温度"),
-            "tooltip": qsTr("温度热力图")
+            "label": qsTr("Temp"),
+            "tooltip": qsTr("Temperature heat map")
         }),
         ({
             "value": "rain",
-            "label": qsTr("降水"),
-            "tooltip": qsTr("当前降水地图")
+            "label": qsTr("Rain"),
+            "tooltip": qsTr("Current precipitation map")
         }),
         ({
             "value": "clouds",
-            "label": qsTr("云量"),
-            "tooltip": qsTr("当前云量地图")
+            "label": qsTr("Cloud"),
+            "tooltip": qsTr("Current cloud-cover map")
         }),
         ({
             "value": "wind",
-            "label": qsTr("风速"),
-            "tooltip": qsTr("当前风速地图")
+            "label": qsTr("Wind"),
+            "tooltip": qsTr("Current wind-speed map")
         }),
         ({
             "value": "pressure",
-            "label": qsTr("气压"),
-            "tooltip": qsTr("当前大气压地图")
+            "label": qsTr("Pressure"),
+            "tooltip": qsTr("Current atmospheric-pressure map")
         })
     ]
 
-    Accessible.name: qsTr("天气地图图层")
+    Accessible.name: qsTr("Weather map layer")
     onValueSelected: value => root.modeSelected(value)
 }

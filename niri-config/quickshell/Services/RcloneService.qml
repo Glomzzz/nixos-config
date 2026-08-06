@@ -63,7 +63,7 @@ Singleton {
             .replace(/[\\/:*?"<>|]/g, "_")
             .replace(/^\.+$/, "_")
             .trim();
-        return normalized || qsTr("备份");
+        return normalized || qsTr("Backup");
     }
 
     function selectRemote(name) {
@@ -128,7 +128,7 @@ Singleton {
             return false;
         if (isReadOnly(remote)) {
             backupState = "error";
-            backupMessage = qsTr("所选云存储为只读服务");
+            backupMessage = qsTr("The selected cloud storage service is read-only");
             return false;
         }
 
@@ -148,7 +148,7 @@ Singleton {
         backupSource = source;
         backupDestination = destinationRoot;
         backupState = "running";
-        backupMessage = qsTr("正在备份 %1").arg(sourceName);
+        backupMessage = qsTr("Backing up %1").arg(sourceName);
         backupProgress = -1;
         backupProcess.command = command;
         backupProcess.running = true;
@@ -189,7 +189,7 @@ Singleton {
                 root.remotes = [];
                 root.selectedRemoteName = "";
                 root.quotaState = "error";
-                root.quotaMessage = qsTr("无法读取 rclone 配置");
+                root.quotaMessage = qsTr("Could not read the rclone configuration");
                 return;
             }
 
@@ -203,13 +203,13 @@ Singleton {
             } catch (error) {
                 root.remotes = [];
                 root.quotaState = "error";
-                root.quotaMessage = qsTr("rclone 返回了无效的 remote 列表");
+                root.quotaMessage = qsTr("rclone returned an invalid remote list");
             }
 
             if (root.remotes.length === 0) {
                 root.selectedRemoteName = "";
                 root.quotaState = "unavailable";
-                root.quotaMessage = qsTr("尚未配置云存储");
+                root.quotaMessage = qsTr("No cloud storage is configured");
                 return;
             }
 
@@ -233,7 +233,7 @@ Singleton {
             quotaTimeout.stop();
             if (exitCode !== 0) {
                 root.quotaState = "unavailable";
-                root.quotaMessage = qsTr("此云存储暂不提供容量信息");
+                root.quotaMessage = qsTr("Storage capacity information is not available for this service");
                 return;
             }
 
@@ -250,11 +250,11 @@ Singleton {
                     root.quotaMessage = "";
                 } else {
                     root.quotaState = "unavailable";
-                    root.quotaMessage = qsTr("此云存储未报告总容量");
+                    root.quotaMessage = qsTr("This storage service did not report its total capacity");
                 }
             } catch (error) {
                 root.quotaState = "error";
-                root.quotaMessage = qsTr("无法解析云存储容量");
+                root.quotaMessage = qsTr("Could not parse cloud storage capacity");
             }
         }
     }
@@ -274,8 +274,8 @@ Singleton {
             root.backupProgress = exitCode === 0 ? 1 : root.backupProgress;
             root.backupState = exitCode === 0 ? "success" : "error";
             root.backupMessage = exitCode === 0
-                ? qsTr("备份已完成")
-                : qsTr("备份失败，请检查网络和远程权限");
+                ? qsTr("Backup complete")
+                : qsTr("Backup failed; check the network connection and remote permissions");
             if (exitCode === 0)
                 root.refreshQuota();
         }

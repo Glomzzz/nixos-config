@@ -23,71 +23,71 @@ Singleton {
         String(Quickshell.env("CLAVIS_DEFAULT_WALLPAPER") || "").trim()
 
     readonly property var fillModes: [
-        ({ "value": "Stretch", "label": qsTr("拉伸") }),
-        ({ "value": "Fit", "label": qsTr("适合") }),
-        ({ "value": "Fill", "label": qsTr("填充") }),
-        ({ "value": "Tile", "label": qsTr("平铺") }),
-        ({ "value": "TileVertically", "label": qsTr("垂直平铺") }),
-        ({ "value": "TileHorizontally", "label": qsTr("水平平铺") }),
-        ({ "value": "Pad", "label": qsTr("覆盖") })
+        ({ "value": "Stretch", "label": qsTr("Stretch") }),
+        ({ "value": "Fit", "label": qsTr("Fit") }),
+        ({ "value": "Fill", "label": qsTr("Fill") }),
+        ({ "value": "Tile", "label": qsTr("Tile") }),
+        ({ "value": "TileVertically", "label": qsTr("Tile vertically") }),
+        ({ "value": "TileHorizontally", "label": qsTr("Tile horizontally") }),
+        ({ "value": "Pad", "label": qsTr("Pad") })
     ]
     readonly property var desktopFillModes: root.fillModes.concat([
-        ({ "value": "panorama", "label": qsTr("全景") })
+        ({ "value": "panorama", "label": qsTr("Panorama") })
     ])
 
     readonly property var transitionTypes: [
-        ({ "value": "random", "label": qsTr("随机") }),
-        ({ "value": "none", "label": qsTr("无") }),
-        ({ "value": "fade", "label": qsTr("淡入淡出") }),
-        ({ "value": "wipe", "label": qsTr("擦除") }),
-        ({ "value": "disc", "label": qsTr("圆盘") }),
-        ({ "value": "stripes", "label": qsTr("条纹") }),
-        ({ "value": "iris bloom", "label": qsTr("光圈绽放") }),
-        ({ "value": "pixelate", "label": qsTr("像素化") }),
-        ({ "value": "portal", "label": qsTr("门户") })
+        ({ "value": "random", "label": qsTr("Random") }),
+        ({ "value": "none", "label": qsTr("None") }),
+        ({ "value": "fade", "label": qsTr("Fade") }),
+        ({ "value": "wipe", "label": qsTr("Wipe") }),
+        ({ "value": "disc", "label": qsTr("Disc") }),
+        ({ "value": "stripes", "label": qsTr("Stripes") }),
+        ({ "value": "iris bloom", "label": qsTr("Iris bloom") }),
+        ({ "value": "pixelate", "label": qsTr("Pixelate") }),
+        ({ "value": "portal", "label": qsTr("Portal") })
     ]
 
     readonly property var awwwTransitionTypes: [
-        ({ "value": "none", "label": qsTr("无") }),
-        ({ "value": "simple", "label": qsTr("简单") }),
-        ({ "value": "fade", "label": qsTr("淡入淡出") }),
-        ({ "value": "left", "label": qsTr("从左侧") }),
-        ({ "value": "right", "label": qsTr("从右侧") }),
-        ({ "value": "top", "label": qsTr("从顶部") }),
-        ({ "value": "bottom", "label": qsTr("从底部") }),
-        ({ "value": "wipe", "label": qsTr("擦除") }),
-        ({ "value": "wave", "label": qsTr("波浪") }),
-        ({ "value": "grow", "label": qsTr("扩散") }),
-        ({ "value": "center", "label": qsTr("中心扩散") }),
-        ({ "value": "any", "label": qsTr("随机位置扩散") }),
-        ({ "value": "outer", "label": qsTr("向内收缩") }),
-        ({ "value": "random", "label": qsTr("随机") })
+        ({ "value": "none", "label": qsTr("None") }),
+        ({ "value": "simple", "label": qsTr("Simple") }),
+        ({ "value": "fade", "label": qsTr("Fade") }),
+        ({ "value": "left", "label": qsTr("From left") }),
+        ({ "value": "right", "label": qsTr("From right") }),
+        ({ "value": "top", "label": qsTr("From top") }),
+        ({ "value": "bottom", "label": qsTr("From bottom") }),
+        ({ "value": "wipe", "label": qsTr("Wipe") }),
+        ({ "value": "wave", "label": qsTr("Wave") }),
+        ({ "value": "grow", "label": qsTr("Grow") }),
+        ({ "value": "center", "label": qsTr("Grow from center") }),
+        ({ "value": "any", "label": qsTr("Grow from random position") }),
+        ({ "value": "outer", "label": qsTr("Shrink inward") }),
+        ({ "value": "random", "label": qsTr("Random") })
     ]
 
     readonly property var transitionEasingModes: [
-        ({ "value": "linear", "label": qsTr("线性") }),
-        ({ "value": "quad", "label": qsTr("二次方") }),
-        ({ "value": "cubic", "label": qsTr("三次方") }),
-        ({ "value": "quart", "label": qsTr("四次方") }),
-        ({ "value": "quint", "label": qsTr("五次方") }),
-        ({ "value": "sine", "label": qsTr("正弦") }),
-        ({ "value": "expo", "label": qsTr("指数") }),
-        ({ "value": "circ", "label": qsTr("圆形") }),
-        ({ "value": "customBezier", "label": qsTr("自定义贝塞尔") })
+        ({ "value": "linear", "label": qsTr("Linear") }),
+        ({ "value": "quad", "label": qsTr("Quadratic") }),
+        ({ "value": "cubic", "label": qsTr("Cubic") }),
+        ({ "value": "quart", "label": qsTr("Quartic") }),
+        ({ "value": "quint", "label": qsTr("Quintic") }),
+        ({ "value": "sine", "label": qsTr("Sine") }),
+        ({ "value": "expo", "label": qsTr("Exponential") }),
+        ({ "value": "circ", "label": qsTr("Circular") }),
+        ({ "value": "customBezier", "label": qsTr("Custom Bezier") })
     ]
 
     readonly property var baseTransitions: ["fade", "wipe", "disc", "stripes", "iris bloom", "pixelate", "portal"]
 
     readonly property var matugenSchemes: [
-        ({ "value": "scheme-tonal-spot", "label": qsTr("音色斑点") }),
-        ({ "value": "scheme-vibrant", "label": qsTr("鲜艳") }),
-        ({ "value": "scheme-content", "label": qsTr("内容") }),
-        ({ "value": "scheme-expressive", "label": qsTr("具有表现力的") }),
-        ({ "value": "scheme-fidelity", "label": qsTr("保真") }),
-        ({ "value": "scheme-fruit-salad", "label": qsTr("水果沙拉") }),
-        ({ "value": "scheme-monochrome", "label": qsTr("单色") }),
-        ({ "value": "scheme-neutral", "label": qsTr("中性") }),
-        ({ "value": "scheme-rainbow", "label": qsTr("彩虹") })
+        ({ "value": "scheme-tonal-spot", "label": qsTr("Tonal Spot") }),
+        ({ "value": "scheme-vibrant", "label": qsTr("Vibrant") }),
+        ({ "value": "scheme-content", "label": qsTr("Content") }),
+        ({ "value": "scheme-expressive", "label": qsTr("Expressive") }),
+        ({ "value": "scheme-fidelity", "label": qsTr("Fidelity") }),
+        ({ "value": "scheme-fruit-salad", "label": qsTr("Fruit Salad") }),
+        ({ "value": "scheme-monochrome", "label": qsTr("Monochrome") }),
+        ({ "value": "scheme-neutral", "label": qsTr("Neutral") }),
+        ({ "value": "scheme-rainbow", "label": qsTr("Rainbow") })
     ]
     readonly property var matugenTemplateIds: [
         "btop",
@@ -99,12 +99,12 @@ Singleton {
     ]
 
     readonly property var keystoneStyles: [
-        ({ "value": "bangs", "label": qsTr("刘海") }),
-        ({ "value": "pill", "label": qsTr("药丸") })
+        ({ "value": "bangs", "label": qsTr("Notch") }),
+        ({ "value": "pill", "label": qsTr("Pill") })
     ]
     readonly property var powerMenuStyles: [
-        ({ "value": "grid", "label": qsTr("四宫格") }),
-        ({ "value": "row", "label": qsTr("横向六项") })
+        ({ "value": "grid", "label": qsTr("Grid") }),
+        ({ "value": "row", "label": qsTr("Six-item row") })
     ]
 
     property bool storeReady: false

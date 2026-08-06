@@ -75,7 +75,7 @@ Rectangle {
 
             Text {
                 Layout.alignment: Qt.AlignHCenter
-                text: qsTr("暂无通知")
+                text: qsTr("No notifications")
                 font.family: Sizes.fontFamily
                 font.pixelSize: 14
                 font.weight: Font.Medium

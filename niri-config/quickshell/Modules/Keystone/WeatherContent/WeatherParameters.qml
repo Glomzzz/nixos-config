@@ -55,12 +55,12 @@ Item {
 
         Repeater {
             model: [
-                { icon: "sunny", label: qsTr("紫外线"), value: root.uv },
-                { icon: "thermostat", label: qsTr("体感"), value: root.feelsLike },
-                { icon: "water_drop", label: qsTr("湿度"), value: root.humidity },
-                { icon: "air", label: qsTr("风速"), value: root.wind },
-                { icon: "compress", label: qsTr("气压"), value: root.pressure },
-                { icon: "visibility", label: qsTr("能见度"), value: root.visibility }
+                { icon: "sunny", label: qsTr("UV index"), value: root.uv },
+                { icon: "thermostat", label: qsTr("Feels like"), value: root.feelsLike },
+                { icon: "water_drop", label: qsTr("Humidity"), value: root.humidity },
+                { icon: "air", label: qsTr("Wind speed"), value: root.wind },
+                { icon: "compress", label: qsTr("Pressure"), value: root.pressure },
+                { icon: "visibility", label: qsTr("Visibility"), value: root.visibility }
             ]
 
             delegate: ColumnLayout {

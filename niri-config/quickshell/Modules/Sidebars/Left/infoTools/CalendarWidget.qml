@@ -64,7 +64,7 @@ Item {
 
             HeaderButton {
                 buttonText: `${root.monthShift !== 0 ? "• " : ""}${root.monthTitle(root.viewingDate)}`
-                tooltipText: root.monthShift === 0 ? "" : qsTr("跳转到当前月份")
+                tooltipText: root.monthShift === 0 ? "" : qsTr("Jump to current month")
                 onClicked: root.monthShift = 0
             }
 
@@ -75,14 +75,14 @@ Item {
             HeaderButton {
                 forceCircle: true
                 iconName: "chevron_left"
-                accessibleName: qsTr("上个月")
+                accessibleName: qsTr("Previous month")
                 onClicked: root.monthShift -= 1
             }
 
             HeaderButton {
                 forceCircle: true
                 iconName: "chevron_right"
-                accessibleName: qsTr("下个月")
+                accessibleName: qsTr("Next month")
                 onClicked: root.monthShift += 1
             }
         }

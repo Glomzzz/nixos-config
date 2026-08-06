@@ -155,6 +155,6 @@ Item {
 
     PopupToolTip {
         extraVisibleCondition: mouseArea.containsMouse
-        text: qsTr("天气")
+        text: qsTr("Weather")
     }
 }

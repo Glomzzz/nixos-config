@@ -27,20 +27,20 @@ Rectangle {
         const value = mapTilerApiKeyField.text.trim()
         if (value.length < 16) {
             feedbackError = true
-            feedbackText = qsTr("请输入有效的 MapTiler API key")
+            feedbackText = qsTr("Enter a valid MapTiler API key")
             mapTilerApiKeyField.forceActiveFocus()
             return
         }
 
         const result = WeatherMapPlugin.storeMapTilerApiKey(value)
         feedbackError = !result.ok
-        feedbackText = result.message || qsTr("无法更新 MapTiler API key")
+        feedbackText = result.message || qsTr("Could not update the MapTiler API key")
     }
 
     function clearApiKey() {
         const result = WeatherMapPlugin.clearMapTilerApiKey()
         feedbackError = !result.ok
-        feedbackText = result.message || qsTr("无法清除 MapTiler API key")
+        feedbackText = result.message || qsTr("Could not clear the MapTiler API key")
     }
 
     function notifyMainShell() {
@@ -116,7 +116,7 @@ Rectangle {
 
                 Text {
                     Layout.fillWidth: true
-                    text: qsTr("用于 Dataviz 天气地图底图")
+                    text: qsTr("Used for the Dataviz weather map base layer")
                     color: Appearance.colors.colOnSurfaceVariant
                     font.family: Sizes.fontFamily
                     font.pixelSize: 12
@@ -164,14 +164,14 @@ Rectangle {
                         text: !WeatherMapPlugin.credentialsReady
                             || WeatherMapPlugin.mapTilerStatus
                                 === "loading_credentials"
-                            ? qsTr("正在检查")
+                            ? qsTr("Checking")
                             : WeatherMapPlugin.credentialBusy
-                                ? qsTr("处理中")
+                                ? qsTr("Processing")
                                 : root.statusError
-                                    ? qsTr("读取失败")
+                                    ? qsTr("Read failed")
                                     : WeatherMapPlugin.mapTilerConfigured
-                                        ? qsTr("已配置")
-                                        : qsTr("未配置")
+                                        ? qsTr("Configured")
+                                        : qsTr("Not configured")
                         color: root.statusError
                             ? Appearance.colors.colOnErrorContainer
                             : WeatherMapPlugin.mapTilerConfigured
@@ -210,7 +210,7 @@ Rectangle {
                 id: mapTilerApiKeyField
 
                 anchors.fill: parent
-                placeholderText: qsTr("输入 MapTiler API key")
+                placeholderText: qsTr("Enter MapTiler API key")
                 echoMode: root.revealApiKey
                     ? TextInput.Normal
                     : TextInput.Password
@@ -229,7 +229,7 @@ Rectangle {
                 Material.containerStyle: Material.Outlined
                 Material.foreground: Appearance.colors.colOnSurface
                 Accessible.name: "MapTiler API key"
-                Accessible.description: qsTr("安全保存到系统密钥环")
+                Accessible.description: qsTr("Saved securely in the system keyring")
                 onTextChanged: {
                     if (root.feedbackError) {
                         root.feedbackError = false
@@ -250,8 +250,8 @@ Rectangle {
                 hoverEnabled: true
                 focusPolicy: Qt.StrongFocus
                 Accessible.name: root.revealApiKey
-                    ? qsTr("隐藏 API key")
-                    : qsTr("显示 API key")
+                    ? qsTr("Hide API key")
+                    : qsTr("Show API key")
                 onClicked: root.revealApiKey = !root.revealApiKey
 
                 background: Rectangle {
@@ -275,15 +275,15 @@ Rectangle {
                 StyledToolTip {
                     extraVisibleCondition: visibilityButton.hovered
                     text: root.revealApiKey
-                        ? qsTr("隐藏 API key")
-                        : qsTr("显示 API key")
+                        ? qsTr("Hide API key")
+                        : qsTr("Show API key")
                 }
             }
         }
 
         Text {
             Layout.fillWidth: true
-            text: qsTr("密钥保存在系统密钥环中，保存后立即生效。")
+            text: qsTr("The key is stored in the system keyring and takes effect immediately after saving.")
             color: Appearance.colors.colOnSurfaceVariant
             font.family: Sizes.fontFamily
             font.pixelSize: 12
@@ -344,20 +344,20 @@ Rectangle {
             }
 
             Button {
-                text: qsTr("清除密钥")
+                text: qsTr("Clear key")
                 flat: true
                 enabled: WeatherMapPlugin.mapTilerConfigured
                     && !WeatherMapPlugin.credentialBusy
                 focusPolicy: Qt.StrongFocus
                 Material.foreground: Appearance.colors.colOnSurfaceVariant
-                Accessible.description: qsTr("从系统密钥环移除 MapTiler API key")
+                Accessible.description: qsTr("Remove the MapTiler API key from the system keyring")
                 onClicked: root.clearApiKey()
             }
 
             Button {
                 id: saveButton
 
-                text: qsTr("保存密钥")
+                text: qsTr("Save key")
                 highlighted: true
                 enabled: WeatherMapPlugin.credentialsReady
                     && !WeatherMapPlugin.credentialBusy
@@ -366,7 +366,7 @@ Rectangle {
                 Material.background: Appearance.colors.colPrimary
                 Material.foreground: Appearance.colors.colOnPrimary
                 Material.elevation: 2
-                Accessible.description: qsTr("安全保存并立即应用，无需重启")
+                Accessible.description: qsTr("Save securely and apply immediately without restarting")
                 onClicked: root.applyApiKey()
 
                 contentItem: Text {

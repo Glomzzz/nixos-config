@@ -24,8 +24,11 @@ in {
       useNautilus = lib.mkDefault false;
     };
 
-    services.displayManager.defaultSession = lib.mkDefault "niri";
-    services.upower.enable = lib.mkDefault true;
+    services = {
+      displayManager.defaultSession = lib.mkDefault "niri";
+      power-profiles-daemon.enable = lib.mkDefault true;
+      upower.enable = lib.mkDefault true;
+    };
 
     environment.systemPackages = [cfg.package];
 

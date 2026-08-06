@@ -18,11 +18,11 @@ Item {
 
     property string title: (isActive && MediaManager.active.trackTitle)
         ? MediaManager.active.trackTitle
-        : qsTr("没有媒体")
+        : qsTr("No media")
 
     property string artist: (isActive && MediaManager.active.trackArtist)
         ? MediaManager.active.trackArtist
-        : qsTr("未知艺术家")
+        : qsTr("Unknown artist")
 
     property double currentPos: 0
 

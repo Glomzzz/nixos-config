@@ -36,7 +36,7 @@ StyledFlickable {
             : PersonalizationConfig.wallpaperTransitionType !== "none"
     readonly property var outputOptions: {
         const result = [
-            ({ "value": "", "label": qsTr("全局") })
+            ({ "value": "", "label": qsTr("Global") })
         ];
         for (let index = 0; index < Quickshell.screens.length;
                 index += 1) {
@@ -295,7 +295,7 @@ StyledFlickable {
 
                 HoverActionButton {
                     iconName: "folder_open"
-                    tooltipText: qsTr("选择文件夹")
+                    tooltipText: qsTr("Choose folder")
                     darkOverlay: true
                     enabled: preview.actionsEnabled
                     onClicked: preview.chooseFile()
@@ -303,7 +303,7 @@ StyledFlickable {
 
                 HoverActionButton {
                     iconName: "palette"
-                    tooltipText: qsTr("选择颜色")
+                    tooltipText: qsTr("Choose color")
                     darkOverlay: true
                     enabled: preview.actionsEnabled
                     onClicked: preview.chooseColor()
@@ -311,7 +311,7 @@ StyledFlickable {
 
                 HoverActionButton {
                     iconName: "clear"
-                    tooltipText: qsTr("清除壁纸")
+                    tooltipText: qsTr("Clear wallpaper")
                     darkOverlay: true
                     enabled: preview.actionsEnabled
                     onClicked: preview.clearWallpaper()
@@ -336,9 +336,9 @@ StyledFlickable {
         horizontalPadding: 23
         currentValue: group.playing ? "play" : ""
         model: [
-            ({ "value": "play", "icon": group.playing ? "pause" : "play_arrow", "tooltip": group.playing ? qsTr("暂停") : qsTr("播放") }),
-            ({ "value": "replay", "icon": "keyboard_double_arrow_left", "tooltip": qsTr("倒放") }),
-            ({ "value": "flip", "icon": "swap_vert", "tooltip": qsTr("翻转"), "enabled": group.flipEnabled })
+            ({ "value": "play", "icon": group.playing ? "pause" : "play_arrow", "tooltip": group.playing ? qsTr("Pause") : qsTr("Play") }),
+            ({ "value": "replay", "icon": "keyboard_double_arrow_left", "tooltip": qsTr("Reverse") }),
+            ({ "value": "flip", "icon": "swap_vert", "tooltip": qsTr("Flip"), "enabled": group.flipEnabled })
         ]
         onValueSelected: value => {
             if (value === "play")
@@ -361,7 +361,7 @@ StyledFlickable {
             id: desktopManagerSectionComponent
 
             Section {
-                title: qsTr("桌面壁纸管理器")
+                title: qsTr("Desktop wallpaper manager")
                 iconName: "display_settings"
 
                 FlatSettingsSection {
@@ -370,7 +370,7 @@ StyledFlickable {
                 MaterialRadioGroup {
                     Layout.fillWidth: true
                     horizontal: true
-                    accessibleName: qsTr("桌面壁纸管理器")
+                    accessibleName: qsTr("Desktop wallpaper manager")
                     currentValue:
                         PersonalizationConfig.desktopWallpaperBackend
                     model: [
@@ -386,8 +386,8 @@ StyledFlickable {
                             "tooltip": AwwwWallpaperService.available
                                 ? ""
                                 : AwwwWallpaperService.probeComplete
-                                    ? qsTr("缺少 awww 或 awww-daemon 命令")
-                                    : qsTr("正在检测 awww…")
+                                    ? qsTr("The awww or awww-daemon command is missing")
+                                    : qsTr("Detecting awww…")
                         })
                     ]
                     onValueSelected: value => {
@@ -415,7 +415,7 @@ StyledFlickable {
             id: currentWallpaperSectionComponent
 
             Section {
-                title: qsTr("当前壁纸")
+                title: qsTr("Current wallpaper")
                 iconName: "wallpaper"
 
                 RowLayout {
@@ -445,7 +445,7 @@ StyledFlickable {
                             text: root.currentWallpaperPath !== ""
                                 ? WallpaperService.basename(
                                     root.currentWallpaperPath)
-                                : qsTr("未选择壁纸")
+                                : qsTr("No wallpaper selected")
                             color: Appearance.colors.colOnSurface
                             font.family: Sizes.fontFamily
                             font.pixelSize: 22
@@ -469,11 +469,11 @@ StyledFlickable {
                             Layout.alignment: Qt.AlignLeft
                             model: [
                                 ({ "value": "previous",
-                                    "label": qsTr("上一张") }),
+                                    "label": qsTr("Previous") }),
                                 ({ "value": "random",
-                                    "label": qsTr("随机") }),
+                                    "label": qsTr("Random") }),
                                 ({ "value": "next",
-                                    "label": qsTr("下一张") })
+                                    "label": qsTr("Next") })
                             ]
                             currentValue: ""
                             onValueSelected: value => {
@@ -507,13 +507,13 @@ StyledFlickable {
                 SettingsRow {
                     Layout.fillWidth: true
                     iconName: "splitscreen"
-                    title: qsTr("每显示器独立壁纸")
+                    title: qsTr("Per-monitor wallpapers")
 
                     trailing: StyledSwitch {
                         checked:
                             PersonalizationConfig.perMonitorWallpaper
                         Accessible.name:
-                            qsTr("每显示器独立壁纸")
+                            qsTr("Per-monitor wallpapers")
                         onToggled:
                             PersonalizationConfig
                                 .setPerMonitorWallpaper(checked)
@@ -524,8 +524,8 @@ StyledFlickable {
                     Layout.fillWidth: true
                     options: root.outputOptions
                     value: root.selectedDesktopOutput
-                    placeholder: qsTr("选择输出")
-                    Accessible.name: qsTr("桌面壁纸输出")
+                    placeholder: qsTr("Select output")
+                    Accessible.name: qsTr("Desktop wallpaper output")
                     onAccepted: value =>
                         root.selectedDesktopOutput = value
                 }
@@ -544,7 +544,7 @@ StyledFlickable {
         }
 
         Section {
-            title: qsTr("过渡效果")
+            title: qsTr("Transition")
             iconName: "animation"
 
             ColumnLayout {
@@ -553,7 +553,7 @@ StyledFlickable {
 
                 Text {
                     Layout.fillWidth: true
-                    text: qsTr("转场类型")
+                    text: qsTr("Transition type")
                     color: Appearance.colors.colOnSurface
                     font.family: Sizes.fontFamily
                     font.pixelSize: 15
@@ -666,7 +666,7 @@ StyledFlickable {
                     value: PersonalizationConfig.awwwTransitionFps
                     enabled: root.desktopUsesAwww
                         && root.awwwStepSupported
-                    accessibleName: qsTr("awww 转场 FPS")
+                    accessibleName: qsTr("awww transition FPS")
                     valueFormatter: sliderValue =>
                         Math.round(sliderValue) + " FPS"
                     onMoved: PersonalizationConfig
@@ -679,8 +679,8 @@ StyledFlickable {
                         && (!root.desktopUsesAwww
                             || !root.awwwStepSupported)
                     text: root.desktopUsesAwww
-                        ? qsTr("none 转场不会使用 FPS。")
-                        : qsTr("独立 FPS 仅适用于 awww。")
+                        ? qsTr("The none transition does not use FPS.")
+                        : qsTr("Independent FPS is available only with awww.")
                 }
             }
 
@@ -700,7 +700,7 @@ StyledFlickable {
 
                 Text {
                     Layout.fillWidth: true
-                    text: qsTr("过渡步长 · %1").arg(
+                    text: qsTr("Transition step · %1").arg(
                         PersonalizationConfig.awwwTransitionStep)
                     color: Appearance.colors.colOnSurface
                     font.family: Sizes.fontFamily
@@ -718,7 +718,7 @@ StyledFlickable {
                     value: PersonalizationConfig.awwwTransitionStep
                     enabled: root.desktopUsesAwww
                         && root.awwwStepSupported
-                    accessibleName: qsTr("awww 过渡步长")
+                    accessibleName: qsTr("awww transition step")
                     valueFormatter: sliderValue =>
                         Math.round(sliderValue).toString()
                     onMoved: PersonalizationConfig
@@ -728,10 +728,10 @@ StyledFlickable {
                 StyledToolTip {
                     extraVisibleCondition: stepHover.hovered
                     text: !root.desktopUsesAwww
-                        ? qsTr("过渡步长仅适用于 awww 桌面后端。")
+                        ? qsTr("Transition step is only available with the awww desktop backend.")
                         : !root.awwwStepSupported
-                            ? qsTr("none 转场不会使用过渡步长。")
-                            : qsTr("步长控制每帧的变化幅度。")
+                            ? qsTr("The none transition does not use transition step.")
+                            : qsTr("Step controls the amount of change per frame.")
                 }
             }
 
@@ -751,7 +751,7 @@ StyledFlickable {
 
                 Text {
                     Layout.fillWidth: true
-                    text: qsTr("过渡时间")
+                    text: qsTr("Transition duration")
                     color: Appearance.colors.colOnSurface
                     font.family: Sizes.fontFamily
                     font.pixelSize: 15
@@ -775,7 +775,7 @@ StyledFlickable {
                         stepSize: 50
                         value: PersonalizationConfig.transitionDurationMs
                         enabled: root.sharedTransitionParametersEnabled
-                        accessibleName: qsTr("壁纸过渡时间")
+                        accessibleName: qsTr("Wallpaper transition duration")
                         valueFormatter: sliderValue => Math.round(sliderValue).toString()
                         onMoved: WallpaperService.setTransitionDurationMs(Math.round(transitionDurationSlider.value))
                     }
@@ -914,7 +914,7 @@ StyledFlickable {
                     extraVisibleCondition:
                         durationHover.hovered
                         && !root.sharedTransitionParametersEnabled
-                    text: qsTr("当前转场不使用持续时间。")
+                    text: qsTr("The current transition does not use duration.")
                 }
             }
 
@@ -934,7 +934,7 @@ StyledFlickable {
 
                 Text {
                     Layout.fillWidth: true
-                    text: qsTr("缓动曲线")
+                    text: qsTr("Easing curve")
                     color: Appearance.colors.colOnSurface
                     font.family: Sizes.fontFamily
                     font.pixelSize: 15
@@ -1066,7 +1066,7 @@ StyledFlickable {
                                 }
 
                                 Text {
-                                    text: qsTr("编辑贝塞尔")
+                                    text: qsTr("Edit Bézier curve")
                                     color: Appearance.colors.colOnPrimaryContainer
                                     font.family: Sizes.fontFamily
                                     font.pixelSize: 14
@@ -1104,13 +1104,13 @@ StyledFlickable {
                     extraVisibleCondition:
                         bezierHover.hovered
                         && !root.sharedTransitionParametersEnabled
-                    text: qsTr("当前转场不使用缓动曲线。")
+                    text: qsTr("The current transition does not use an easing curve.")
                 }
             }
         }
 
         Section {
-            title: qsTr("视差效果")
+            title: qsTr("Parallax effects")
             iconName: "view_in_ar"
 
             FlatSettingsSection {
@@ -1128,13 +1128,13 @@ StyledFlickable {
                 SettingsRow {
                     Layout.fillWidth: true
                     iconName: "swap_vert"
-                    title: qsTr("垂直视差")
+                    title: qsTr("Vertical parallax")
 
                     trailing: StyledSwitch {
                         enabled: !root.desktopUsesAwww
                         checked: PersonalizationConfig
                             .parallaxVerticalEnabled
-                        Accessible.name: qsTr("垂直视差")
+                        Accessible.name: qsTr("Vertical parallax")
                         onToggled: PersonalizationConfig
                             .setParallaxVerticalEnabled(checked)
                     }
@@ -1143,7 +1143,7 @@ StyledFlickable {
                 SettingsRow {
                     Layout.fillWidth: true
                     iconName: "workspaces"
-                    title: qsTr("随工作区移动")
+                    title: qsTr("Follow workspaces")
 
                     trailing: Item {
                         Layout.preferredWidth:
@@ -1166,7 +1166,7 @@ StyledFlickable {
                                     .parallaxVerticalEnabled
                             checked: PersonalizationConfig
                                 .parallaxFollowWorkspaces
-                            Accessible.name: qsTr("随工作区移动")
+                            Accessible.name: qsTr("Follow workspaces")
                             onToggled: PersonalizationConfig
                                 .setParallaxFollowWorkspaces(checked)
                         }
@@ -1177,7 +1177,7 @@ StyledFlickable {
                                 && !root.desktopUsesAwww
                                 && !PersonalizationConfig
                                     .parallaxVerticalEnabled
-                            text: qsTr("需要先启用垂直视差。")
+                            text: qsTr("Enable vertical parallax first.")
                         }
                     }
                 }
@@ -1185,13 +1185,13 @@ StyledFlickable {
                 SettingsRow {
                     Layout.fillWidth: true
                     iconName: "dock_to_left"
-                    title: qsTr("随侧边栏移动")
+                    title: qsTr("Follow sidebars")
 
                     trailing: StyledSwitch {
                         enabled: !root.desktopUsesAwww
                         checked: PersonalizationConfig
                             .parallaxFollowSidebars
-                        Accessible.name: qsTr("随侧边栏移动")
+                        Accessible.name: qsTr("Follow sidebars")
                         onToggled: PersonalizationConfig
                             .setParallaxFollowSidebars(checked)
                     }
@@ -1200,14 +1200,14 @@ StyledFlickable {
                 SettingsRow {
                     Layout.fillWidth: true
                     iconName: "view_column"
-                    title: qsTr("随平铺窗口焦点移动")
+                    title: qsTr("Follow tiled-window focus")
 
                     trailing: StyledSwitch {
                         enabled: !root.desktopUsesAwww
                         checked: PersonalizationConfig
                             .parallaxFollowTiledColumns
                         Accessible.name:
-                            qsTr("随平铺窗口焦点移动")
+                            qsTr("Follow tiled-window focus")
                         onToggled: PersonalizationConfig
                             .setParallaxFollowTiledColumns(checked)
                     }
@@ -1219,7 +1219,7 @@ StyledFlickable {
 
                     Text {
                         Layout.fillWidth: true
-                        text: qsTr("壁纸缩放")
+                        text: qsTr("Wallpaper scale")
                         color: Appearance.colors.colOnSurface
                         font.family: Sizes.fontFamily
                         font.pixelSize: Sizes.typeBodyMedium
@@ -1234,7 +1234,7 @@ StyledFlickable {
                         stepSize: 0.01
                         value: root.effectivePreferredScale
                         accessibleName:
-                            qsTr("壁纸缩放")
+                            qsTr("Wallpaper scale")
                         valueFormatter: sliderValue =>
                             Number(sliderValue).toFixed(2)
                         onMoved: PersonalizationConfig
@@ -1248,7 +1248,7 @@ StyledFlickable {
 
                     Text {
                         Layout.fillWidth: true
-                        text: qsTr("横向行程列数")
+                        text: qsTr("Horizontal travel columns")
                         color: Appearance.colors.colOnSurface
                         font.family: Sizes.fontFamily
                         font.pixelSize: Sizes.typeBodyMedium
@@ -1264,7 +1264,7 @@ StyledFlickable {
                         value: PersonalizationConfig
                             .parallaxTiledColumnSpan
                         accessibleName:
-                            qsTr("横向行程列数")
+                            qsTr("Horizontal travel columns")
                         valueFormatter: sliderValue =>
                             Math.round(sliderValue).toString()
                         onMoved: PersonalizationConfig
@@ -1277,13 +1277,13 @@ StyledFlickable {
                     extraVisibleCondition:
                         parallaxHover.hovered
                         && root.desktopUsesAwww
-                    text: qsTr("桌面视差仅适用于 Quickshell。")
+                    text: qsTr("Desktop parallax is available only with Quickshell.")
                 }
             }
         }
 
         Section {
-            title: qsTr("Overview 背景")
+            title: qsTr("Overview background")
             iconName: "overview"
 
             FlatSettingsSection {
@@ -1297,7 +1297,7 @@ StyledFlickable {
                             .overviewBackdropRuleDetected
                     tone: "error"
                     message: qsTr(
-                        "缺少 niri backdrop 规则，请按文档手动配置 clavis-overview-wallpaper。")
+                        "The niri backdrop rule is missing. Configure clavis-overview-wallpaper manually as documented.")
                 }
 
                 InlineStatusBanner {
@@ -1308,7 +1308,7 @@ StyledFlickable {
                             .niriTransparentBackgroundDetected
                     tone: "error"
                     message: qsTr(
-                        "niri 工作区背景不透明，请在 layout 中手动设置 background-color \"transparent\"。")
+                        "The niri workspace background is opaque. Manually set background-color \"transparent\" in layout.")
                 }
 
                 WallpaperPreview {
@@ -1344,13 +1344,13 @@ StyledFlickable {
                 SettingsRow {
                     Layout.fillWidth: true
                     iconName: "visibility"
-                    title: qsTr("启用背景")
+                    title: qsTr("Enable background")
 
                     trailing: StyledSwitch {
                         checked:
                             PersonalizationConfig.overviewEnabled
                         Accessible.name:
-                            qsTr("启用背景")
+                            qsTr("Enable background")
                         onToggled: PersonalizationConfig
                             .setOverviewEnabled(checked)
                     }
@@ -1359,12 +1359,12 @@ StyledFlickable {
                 SettingsRow {
                     Layout.fillWidth: true
                     iconName: "sync"
-                    title: qsTr("使用桌面壁纸")
+                    title: qsTr("Use desktop wallpaper")
 
                     trailing: StyledSwitch {
                         checked: PersonalizationConfig
                             .overviewUseDesktopWallpaper
-                        Accessible.name: qsTr("使用桌面壁纸")
+                        Accessible.name: qsTr("Use desktop wallpaper")
                         onToggled: PersonalizationConfig
                             .setOverviewUseDesktopWallpaper(checked)
                     }
@@ -1373,13 +1373,13 @@ StyledFlickable {
                 SettingsRow {
                     Layout.fillWidth: true
                     iconName: "splitscreen"
-                    title: qsTr("每显示器独立壁纸")
+                    title: qsTr("Per-monitor wallpapers")
 
                     trailing: StyledSwitch {
                         checked: PersonalizationConfig
                             .overviewPerMonitorWallpaper
                         Accessible.name:
-                            qsTr("每显示器独立壁纸")
+                            qsTr("Per-monitor wallpapers")
                         onToggled: PersonalizationConfig
                             .setOverviewPerMonitorWallpaper(checked)
                     }
@@ -1389,8 +1389,8 @@ StyledFlickable {
                     Layout.fillWidth: true
                     options: root.outputOptions
                     value: root.selectedOverviewOutput
-                    placeholder: qsTr("选择输出")
-                    Accessible.name: qsTr("overview 壁纸输出")
+                    placeholder: qsTr("Select output")
+                    Accessible.name: qsTr("Overview wallpaper output")
                     onAccepted: value =>
                         root.selectedOverviewOutput = value
                 }
@@ -1398,7 +1398,7 @@ StyledFlickable {
 
             FlatSettingsSection {
                 Layout.fillWidth: true
-                title: qsTr("转场类型")
+                title: qsTr("Transition type")
 
                 StyledButtonGroup {
                     Layout.alignment: Qt.AlignHCenter
@@ -1425,7 +1425,7 @@ StyledFlickable {
 
             FlatSettingsSection {
                 Layout.fillWidth: true
-                title: qsTr("图像效果")
+                title: qsTr("Image effects")
                 opacity:
                     PersonalizationConfig.overviewEnabled ? 1 : 0.45
 
@@ -1434,7 +1434,7 @@ StyledFlickable {
                     spacing: 0
 
                     Text {
-                        text: qsTr("模糊")
+                        text: qsTr("Blur")
                         color: Appearance.colors.colOnSurface
                         font.family: Sizes.fontFamily
                         font.pixelSize: Sizes.typeBodyMedium
@@ -1449,7 +1449,7 @@ StyledFlickable {
                         stepSize: 1
                         value:
                             PersonalizationConfig.overviewBlurRadius
-                        accessibleName: qsTr("overview 模糊")
+                        accessibleName: qsTr("Overview blur")
                         valueFormatter: value =>
                             Math.round(value) + "%"
                         onMoved: PersonalizationConfig
@@ -1462,7 +1462,7 @@ StyledFlickable {
                     spacing: 0
 
                     Text {
-                        text: qsTr("暗化")
+                        text: qsTr("Dim")
                         color: Appearance.colors.colOnSurface
                         font.family: Sizes.fontFamily
                         font.pixelSize: Sizes.typeBodyMedium
@@ -1476,7 +1476,7 @@ StyledFlickable {
                         to: 1
                         stepSize: 0.01
                         value: PersonalizationConfig.overviewDim
-                        accessibleName: qsTr("overview 暗化")
+                        accessibleName: qsTr("Overview dimming")
                         valueFormatter: value =>
                             Math.round(value * 100) + "%"
                         onMoved: PersonalizationConfig
@@ -1489,7 +1489,7 @@ StyledFlickable {
                     spacing: 0
 
                     Text {
-                        text: qsTr("饱和度")
+                        text: qsTr("Saturation")
                         color: Appearance.colors.colOnSurface
                         font.family: Sizes.fontFamily
                         font.pixelSize: Sizes.typeBodyMedium
@@ -1504,7 +1504,7 @@ StyledFlickable {
                         stepSize: 0.05
                         value:
                             PersonalizationConfig.overviewSaturation
-                        accessibleName: qsTr("overview 饱和度")
+                        accessibleName: qsTr("Overview saturation")
                         valueFormatter: value =>
                             Number(value).toFixed(2)
                         onMoved: PersonalizationConfig
@@ -1517,7 +1517,7 @@ StyledFlickable {
                     spacing: 0
 
                     Text {
-                        text: qsTr("对比度")
+                        text: qsTr("Contrast")
                         color: Appearance.colors.colOnSurface
                         font.family: Sizes.fontFamily
                         font.pixelSize: Sizes.typeBodyMedium
@@ -1532,7 +1532,7 @@ StyledFlickable {
                         stepSize: 0.05
                         value:
                             PersonalizationConfig.overviewContrast
-                        accessibleName: qsTr("overview 对比度")
+                        accessibleName: qsTr("Overview contrast")
                         valueFormatter: value =>
                             Number(value).toFixed(2)
                         onMoved: PersonalizationConfig

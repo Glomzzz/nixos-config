@@ -223,7 +223,7 @@ PanelWindow {
             }
 
             Text {
-                text: qsTr("拖拽选择区域  ·  Esc 取消")
+                text: qsTr("Drag to select a region  ·  Esc to cancel")
                 font.family: "LXGW WenKai Screen"
                 font.pixelSize: 13
                 color: Appearance.colors.colOnPrimaryContainer

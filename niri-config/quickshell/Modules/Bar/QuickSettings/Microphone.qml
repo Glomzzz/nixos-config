@@ -53,7 +53,7 @@ Item {
 
     PopupToolTip {
         extraVisibleCondition: mouseArea.containsMouse
-        text: (Volume.sourceMuted ? qsTr("麦克风: 静音") : qsTr("麦克风: ") + Math.round(Volume.sourceVolume * 100) + "%")
-              + qsTr("\n滚轮调节，点击打开麦克风")
+        text: (Volume.sourceMuted ? qsTr("Microphone: muted") : qsTr("Microphone: ") + Math.round(Volume.sourceVolume * 100) + "%")
+              + qsTr("\nScroll to adjust; click to open microphone controls")
     }
 }

@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+case "${1:-}" in
+  list)
+    cat <<'EOF'
+  performance:
+    CpuDriver:	amd_pstate
+    PlatformDriver:	platform_profile
+    Degraded:   no
+
+* balanced:
+    CpuDriver:	amd_pstate
+    PlatformDriver:	platform_profile
+
+  power-saver:
+    CpuDriver:	amd_pstate
+    PlatformDriver:	platform_profile
+EOF
+    ;;
+  set)
+    case "${2:-}" in
+      performance | balanced | power-saver) ;;
+      *) exit 2 ;;
+    esac
+    ;;
+  get)
+    printf '%s\n' balanced
+    ;;
+  *)
+    exit 2
+    ;;
+esac

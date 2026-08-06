@@ -142,9 +142,9 @@ Singleton {
                 && root.supportsVersion(root.niriVersion);
             if (!root.compositorSupported) {
                 root.lastError = exitCode === 0
-                    ? qsTr("当前 Niri 版本不支持背景模糊")
+                    ? qsTr("The installed Niri version does not support background blur")
                     : (versionError.text.trim()
-                        || qsTr("无法检测 Niri 版本"));
+                        || qsTr("Could not detect the Niri version"));
                 return;
             }
 
@@ -167,7 +167,7 @@ Singleton {
                 root.lastError = "";
             } else {
                 root.lastError = effectsWriteError.text.trim()
-                    || qsTr("无法写入 Niri 效果配置");
+                    || qsTr("Could not write the Niri effects configuration");
             }
             if (root.effectsWritePending)
                 Qt.callLater(root.writeEffectsConfig);
@@ -190,7 +190,7 @@ Singleton {
             }
 
             root.lastError = integrationError.text.trim()
-                || qsTr("无法配置 Niri 集成");
+                || qsTr("Could not configure Niri integration");
             root.integrationFailed(root.lastError);
         }
     }
