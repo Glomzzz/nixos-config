@@ -47,6 +47,10 @@
   in {
     formatter = forAllSystems (system: (pkgsFor system).alejandra);
 
+    devShells = forAllSystems (system: {
+      default = inputs.niri-config.devShells.${system}.default;
+    });
+
     checks = forAllSystems (
       system: let
         pkgs = pkgsFor system;
