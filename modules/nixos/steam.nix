@@ -4,12 +4,15 @@
   steamGameLaptop = pkgs.writeShellApplication {
     name = "steam-game-laptop";
     text = ''
+      # Niri presents eDP-1 as 1707x1067 logical pixels at scale 1.5. Keep
+      # Gamescope's outer SDL surface in that space while the nested game
+      # surface stays at the panel's native 2560x1600 pixels.
       exec ${pkgs.gamemode}/bin/gamemoderun \
         /run/wrappers/bin/gamescope \
         --backend sdl \
         --fullscreen \
-        --output-width 2560 \
-        --output-height 1600 \
+        --output-width 1707 \
+        --output-height 1067 \
         --nested-width 2560 \
         --nested-height 1600 \
         --nested-refresh 240 \
