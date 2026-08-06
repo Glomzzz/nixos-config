@@ -135,7 +135,7 @@ def fetch_netease(track, artist):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print(json.dumps([{"time": 0, "text": "等待播放..."}]))
+        print(json.dumps([{"time": 0, "text": "Waiting for playback..."}]))
         sys.exit(0)
 
     title = sys.argv[1]
@@ -160,7 +160,7 @@ if __name__ == "__main__":
         lyrics = fetch_netease(title, artist)
 
     if not lyrics:
-        lyrics = [{"time": 0, "text": "暂无歌词"}]
+        lyrics = [{"time": 0, "text": "No lyrics available"}]
     else:
         with open(cache_file, "w") as f:
             json.dump(lyrics, f)

@@ -399,7 +399,7 @@ Singleton {
             root._fatalError = true;
             root.errorMessage = qsTr("系统监测协议版本不兼容");
             root.errorDetails = qsTr("需要重新构建 key 后端（需要 schema v")
-                + root.supportedSchemaVersion + "）。";
+                + root.supportedSchemaVersion + ").";
             root.state = "error";
             root._terminateStream("schema_mismatch");
             return;

@@ -12,7 +12,9 @@ PanelWindow {
 
     readonly property bool anySidebarOpen:
         WidgetState.leftSidebarOpen || WidgetState.qsOpen
-    readonly property var fallbackScreen: Brightness.activeScreen
+    readonly property var fallbackScreen:
+        Brightness.getScreenByName(Brightness.primaryScreenName)
+        || Brightness.activeScreen
         || (Quickshell.screens.length > 0 ? Quickshell.screens[0] : null)
     // DPMS cycles can replace the Screen instance while preserving its name.
     property string retainedScreenName: ""

@@ -14,8 +14,16 @@ Singleton {
     property real fallbackBrightnessValue: 0.5
     property var monitors: []
     property string focusedScreenName: ""
-    readonly property var activeScreen: root.getScreenByName(root.focusedScreenName) || (Quickshell.screens.length > 0 ? Quickshell.screens[0] : null)
-    readonly property var activeMonitor: root.getMonitorByName(root.focusedScreenName) || (root.monitors.length > 0 ? root.monitors[0] : null)
+    readonly property string primaryScreenName:
+        Quickshell.env("CLAVIS_PRIMARY_OUTPUT") || ""
+    readonly property var activeScreen:
+        root.getScreenByName(root.focusedScreenName)
+        || root.getScreenByName(root.primaryScreenName)
+        || (Quickshell.screens.length > 0 ? Quickshell.screens[0] : null)
+    readonly property var activeMonitor:
+        root.getMonitorByName(root.focusedScreenName)
+        || root.getMonitorByName(root.primaryScreenName)
+        || (root.monitors.length > 0 ? root.monitors[0] : null)
     readonly property real brightnessValue: root.activeMonitor ? root.activeMonitor.brightness : root.fallbackBrightnessValue
 
     Component.onCompleted: {

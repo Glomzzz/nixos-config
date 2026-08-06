@@ -237,7 +237,7 @@ Item {
         visible: !root.hasData
         text: qsTr("风况数据暂不可用")
         color: Appearance.colors.colOnSurfaceVariant
-        font.family: "LXGW WenKai GB Screen"
+        font.family: "LXGW WenKai Screen"
         font.pixelSize: 16
     }
 }

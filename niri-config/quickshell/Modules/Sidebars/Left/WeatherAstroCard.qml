@@ -287,7 +287,7 @@ Rectangle {
         Text {
             text: root.moon ? qsTr("月亮") : qsTr("太阳")
             color: root.titleInk
-            font.family: "LXGW WenKai GB Screen"
+            font.family: "LXGW WenKai Screen"
             font.pixelSize: 18
             font.bold: true
             anchors.verticalCenter: parent.verticalCenter
@@ -519,7 +519,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             text: root.phaseText(root.phaseAngle)
             color: Appearance.colors.colOnWeatherCardSurfaceVariant
-            font.family: "LXGW WenKai GB Screen"
+            font.family: "LXGW WenKai Screen"
             font.pixelSize: 11
         }
     }

@@ -151,8 +151,7 @@ Item {
                 distroId: SystemIdentityService.distroId
                 distroName: SystemIdentityService.distroName
                 uptimeText: SystemIdentityService.uptimeText
-                totalPackageCount: PackageService.totalPackages
-                pendingUpdateCount: PackageService.pendingUpdates
+                showPackageStats: false
                 onAvatarActivated: avatarPicker.openAt(avatarPicker.picturesDir)
             }
 
@@ -362,12 +361,6 @@ Item {
                         horizontalAlignment: Text.AlignHCenter
                     }
 
-                    SettingsActionRow {
-                        Layout.fillWidth: true
-                        text: qsTr("更多蓝牙设置")
-                        trailingIconName: "chevron_right"
-                        onClicked: console.log("TODO: open detailed Bluetooth settings")
-                    }
                 }
 
                 MaterialCard {
@@ -487,13 +480,6 @@ Item {
                             onClicked: backupPicker.openAt(backupPicker.homeDir)
                         }
 
-                        SettingsActionRow {
-                            Layout.fillWidth: true
-                            text: qsTr("管理云存储")
-                            iconName: "settings"
-                            trailingIconName: "chevron_right"
-                            onClicked: console.log("TODO: open cloud storage management")
-                        }
                     }
                 }
 

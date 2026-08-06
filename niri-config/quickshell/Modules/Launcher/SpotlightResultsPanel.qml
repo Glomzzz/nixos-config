@@ -253,14 +253,31 @@ Item {
                     anchors.rightMargin: 16
                     spacing: 14
 
-                    Image {
+                    Item {
                         Layout.preferredWidth: root.style.resultIconSize
                         Layout.preferredHeight: root.style.resultIconSize
-                        source: root.iconSource(appDelegate.modelData.icon)
-                        sourceSize.width: root.style.resultIconSize * 2
-                        sourceSize.height: root.style.resultIconSize * 2
-                        asynchronous: true
-                        fillMode: Image.PreserveAspectFit
+
+                        MaterialSymbol {
+                            anchors.centerIn: parent
+                            visible: appIcon.status !== Image.Ready
+                            text: "apps"
+                            iconSize: root.style.resultIconSize * 0.72
+                            color: appDelegate.index === root.selectedIndex
+                                ? root.style.selectedContentColor
+                                : Appearance.colors.colOnSurfaceVariant
+                        }
+
+                        Image {
+                            id: appIcon
+
+                            anchors.fill: parent
+                            visible: status === Image.Ready
+                            source: root.iconSource(appDelegate.modelData.icon)
+                            sourceSize.width: root.style.resultIconSize * 2
+                            sourceSize.height: root.style.resultIconSize * 2
+                            asynchronous: true
+                            fillMode: Image.PreserveAspectFit
+                        }
                     }
 
                     ColumnLayout {

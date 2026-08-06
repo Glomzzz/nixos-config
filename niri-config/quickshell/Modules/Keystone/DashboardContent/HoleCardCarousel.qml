@@ -9,7 +9,7 @@ Item {
     property int currentIndex: 0
     property var player: null
     property var screen: null
-    readonly property int cardCount: 4
+    readonly property int cardCount: 3
     readonly property real switchThreshold: width * 0.2
 
     property real cardOffset: 0
@@ -112,8 +112,10 @@ Item {
         height: root.height
         x: root.cardX(0)
 
-        ScheduleWidget {
+        DashboardMediaCard {
             anchors.fill: parent
+            player: root.player
+            active: root.visible && root.currentIndex === 0
         }
     }
 
@@ -121,10 +123,10 @@ Item {
         width: root.width
         height: root.height
         x: root.cardX(1)
+        contentMargin: 0
 
-        DashboardMediaCard {
+        DashboardWeatherCard {
             anchors.fill: parent
-            player: root.player
             active: root.visible && root.currentIndex === 1
         }
     }
@@ -133,18 +135,6 @@ Item {
         width: root.width
         height: root.height
         x: root.cardX(2)
-        contentMargin: 0
-
-        DashboardWeatherCard {
-            anchors.fill: parent
-            active: root.visible && root.currentIndex === 2
-        }
-    }
-
-    CarouselCard {
-        width: root.width
-        height: root.height
-        x: root.cardX(3)
         contentMargin: 0
 
         DashboardQuickSettingsCard {
@@ -204,7 +194,7 @@ Item {
         }
 
         onWheel: event => {
-            if (root.currentIndex === 3) {
+            if (root.currentIndex === 2) {
                 const point = quickSettingsCard.mapFromItem(root, event.x, event.y);
                 if (quickSettingsCard.capturesWheelAt(point.x, point.y)) {
                     event.accepted = false;

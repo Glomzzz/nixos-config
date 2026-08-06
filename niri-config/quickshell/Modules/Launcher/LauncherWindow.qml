@@ -10,6 +10,8 @@ import qs.Widgets.common
 PanelWindow {
     id: root
 
+    screen: Brightness.getScreenByName(Brightness.primaryScreenName)
+        || Brightness.activeScreen
     visible: false
     color: "transparent"
 

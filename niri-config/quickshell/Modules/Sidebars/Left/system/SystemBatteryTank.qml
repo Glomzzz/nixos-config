@@ -117,8 +117,8 @@ Rectangle {
     Accessible.name: qsTr("电池，")
         + (root.present
             ? Format.percent(root.battery.chargePercent, 0)
-                + "，" + Format.batteryStatus(root.battery.status)
-                + "，" + (
+                + ", " + Format.batteryStatus(root.battery.status)
+                + ", " + (
                     root.powerConnected
                         ? qsTr("已接通电源")
                         : qsTr("未接通电源")

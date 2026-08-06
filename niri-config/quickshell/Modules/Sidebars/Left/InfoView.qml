@@ -13,10 +13,15 @@ Item {
 
     readonly property bool isForeground: root.foreground
     onIsForegroundChanged: {
-        if (isForeground) {
-            NotificationManager.timeoutAll();
-            NotificationManager.markAllRead();
-        }
+        if (isForeground)
+            Qt.callLater(root.markNotificationsSeen);
+    }
+
+    function markNotificationsSeen() {
+        if (!root.isForeground)
+            return;
+        NotificationManager.timeoutAll();
+        NotificationManager.markAllRead();
     }
 
     ColumnLayout {

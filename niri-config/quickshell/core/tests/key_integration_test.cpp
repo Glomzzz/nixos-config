@@ -507,7 +507,7 @@ void KeyIntegrationTest::clipboardHandlesHtmlImages()
     QCOMPARE(remote.json.value(QStringLiteral("payloadKind")).toString(),
              QStringLiteral("text"));
     QCOMPARE(remote.json.value(QStringLiteral("title")).toString(),
-             QStringLiteral("图片引用"));
+             QStringLiteral("Image reference"));
     QVERIFY(!remote.json.value(QStringLiteral("title")).toString().contains(
         QStringLiteral("<img")));
     QVERIFY(!remote.json.value(QStringLiteral("subtitle")).toString().contains(
@@ -525,7 +525,7 @@ void KeyIntegrationTest::clipboardFormatsMultilineText()
     QCOMPARE(oneLine.json.value(QStringLiteral("title")).toString(),
              QStringLiteral("Hello world"));
     QCOMPARE(oneLine.json.value(QStringLiteral("subtitle")).toString(),
-             QStringLiteral("文本"));
+             QStringLiteral("Text"));
     QCOMPARE(oneLine.json.value(QStringLiteral("multiline")).toBool(), false);
 
     const KeyResult twoLines = runKey({

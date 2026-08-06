@@ -112,7 +112,7 @@ Qt/C++ plugin 统一位于 `core/`：可复用 backend 代码在 `core/src/`，Q
 
 - 主题风格优先参考 Material Design 的设计风格。
 - 所有 UI 的主题颜色优先使用 `Common/Appearance.qml` 中定义的颜色，避免在组件内重复声明或硬编码主题色。
-- 字体可选 `LXGW WenKai GB Screen`、`Maple Mono NF CN`、`JetBrainsMono Nerd Font`。中文和英文优先使用 `LXGW WenKai GB Screen`，数字优先使用 `JetBrainsMono Nerd Font`。
+- 字体可选 `LXGW WenKai Screen`、`Maple Mono NF CN`、`JetBrainsMono Nerd Font`。中文和英文优先使用 `LXGW WenKai Screen`，数字优先使用 `JetBrainsMono Nerd Font`。
 - 图标可选 Nerd Font 图标，也可以使用 `ttf-material-symbols-variable` 中的 Material Symbols 图标；优先使用 `ttf-material-symbols-variable`。
 
 ## Material 组件优先原则

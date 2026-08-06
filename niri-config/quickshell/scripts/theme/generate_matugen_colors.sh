@@ -76,14 +76,11 @@ fi
 
 all_external_templates=(
     btop
-    cava
     kitty
     fcitx5
     fcitx5_panel_svg
     fcitx5_highlight_svg
     niri
-    yazi
-    zsh_prompt
 )
 
 selected_templates=(quickshell)
@@ -93,7 +90,7 @@ elif [[ -n "$templates_csv" ]]; then
     IFS=',' read -r -a requested_templates <<< "$templates_csv"
     for template_id in "${requested_templates[@]}"; do
         case "$template_id" in
-            btop|cava|kitty|fcitx5|fcitx5_panel_svg|fcitx5_highlight_svg|niri|yazi|zsh_prompt)
+            btop|kitty|fcitx5|fcitx5_panel_svg|fcitx5_highlight_svg|niri)
                 ;;
             *)
                 printf 'Unknown matugen template: %s\n' "$template_id" >&2
@@ -118,14 +115,11 @@ template_file() {
     case "$1" in
         quickshell) printf '%s\n' "quickshell-colors.json" ;;
         btop) printf '%s\n' "btop.theme" ;;
-        cava) printf '%s\n' "cava-colors.ini" ;;
         kitty) printf '%s\n' "kitty-colors.conf" ;;
         fcitx5) printf '%s\n' "fcitx5-theme.conf" ;;
         fcitx5_panel_svg) printf '%s\n' "fcitx5-panel.svg" ;;
         fcitx5_highlight_svg) printf '%s\n' "fcitx5-highlight.svg" ;;
         niri) printf '%s\n' "niri-colors.kdl" ;;
-        yazi) printf '%s\n' "yazi-theme.toml" ;;
-        zsh_prompt) printf '%s\n' "zsh-prompt-colors.zsh" ;;
     esac
 }
 
@@ -142,13 +136,11 @@ mkdir -p "$HOME/.cache/quickshell-dev-colorscheme"
 for template_id in "${selected_templates[@]}"; do
     case "$template_id" in
         btop) mkdir -p "$HOME/.config/btop/themes" ;;
-        cava) mkdir -p "$HOME/.config/cava/themes" ;;
         kitty) mkdir -p "$HOME/.config/kitty/themes" ;;
         fcitx5|fcitx5_panel_svg|fcitx5_highlight_svg)
             mkdir -p "$HOME/.local/share/fcitx5/themes/Matugen"
             ;;
         niri) mkdir -p "$HOME/.config/niri" ;;
-        yazi) mkdir -p "$HOME/.config/yazi" ;;
     esac
 done
 

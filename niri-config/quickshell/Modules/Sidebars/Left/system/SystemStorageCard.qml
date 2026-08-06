@@ -64,7 +64,7 @@ Rectangle {
     color: Appearance.colors.colSurfaceContainer
     Accessible.name: qsTr("存储 ")
         + String(root.disk.mountPoint || "")
-        + "，" + Format.percent(root.disk.usagePercent, 0)
+        + ", " + Format.percent(root.disk.usagePercent, 0)
         + qsTr("，已使用 ") + Format.bytes(root.disk.usedBytes)
 
     RowLayout {

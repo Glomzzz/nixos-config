@@ -54,7 +54,7 @@ Item {
     }
 
     Accessible.name: hourText + ":" + minuteText
-        + " " + periodText + "，" + dateText
+        + " " + periodText + ", " + dateText
 
     FontLoader {
         id: displayFont

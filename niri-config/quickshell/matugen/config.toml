@@ -10,11 +10,6 @@ input_path = "templates/btop.theme"
 output_path = "~/.config/btop/themes/matugen.theme"
 post_hook = "pkill -USR2 btop >/dev/null 2>&1 || true"
 
-[templates.cava]
-input_path = "templates/cava-colors.ini"
-output_path = "~/.config/cava/themes/matugen"
-post_hook = "pkill -USR1 cava >/dev/null 2>&1 || true"
-
 [templates.kitty]
 input_path = "templates/kitty-colors.conf"
 output_path = "~/.config/kitty/themes/Matugen.conf"
@@ -29,14 +24,6 @@ post_hook = "busctl --user call org.fcitx.Fcitx5 /controller org.fcitx.Fcitx.Con
 input_path = "templates/niri-colors.kdl"
 output_path = "~/.config/niri/colors.kdl"
 post_hook = "niri msg action load-config-file >/dev/null 2>&1 || true"
-
-[templates.yazi]
-input_path = "templates/yazi-theme.toml"
-output_path = "~/.config/yazi/theme.toml"
-
-[templates.zsh_prompt]
-input_path = "templates/zsh-prompt-colors.zsh"
-output_path = "~/.cache/quickshell-dev-colorscheme/zsh-prompt-colors.zsh"
 
 [templates.fcitx5_panel_svg]
 input_path = "templates/fcitx5-panel.svg"

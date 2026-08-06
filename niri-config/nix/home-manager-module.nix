@@ -30,6 +30,18 @@ in {
       description = "Wallpaper used on first start when no personalization file exists.";
     };
 
+    language = lib.mkOption {
+      type = lib.types.enum ["en_US" "zh_CN" "zh_TW"];
+      default = "en_US";
+      description = "Display language enforced for Clavis Shell.";
+    };
+
+    primaryOutput = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "Output preferred before Niri reports a focused output.";
+    };
+
     enableClipboard =
       lib.mkEnableOption "the Clavis MIME-aware clipboard watcher"
       // {
@@ -124,8 +136,11 @@ in {
         };
         Service = {
           Environment =
-            lib.optional (cfg.defaultWallpaper != null)
-            "CLAVIS_DEFAULT_WALLPAPER=${toString cfg.defaultWallpaper}";
+            ["CLAVIS_LANGUAGE=${cfg.language}"]
+            ++ lib.optional (cfg.defaultWallpaper != null)
+            "CLAVIS_DEFAULT_WALLPAPER=${toString cfg.defaultWallpaper}"
+            ++ lib.optional (cfg.primaryOutput != null)
+            "CLAVIS_PRIMARY_OUTPUT=${cfg.primaryOutput}";
           ExecStart = "${cfg.package}/bin/qs --no-duplicate";
           Restart = "on-failure";
           RestartSec = 2;

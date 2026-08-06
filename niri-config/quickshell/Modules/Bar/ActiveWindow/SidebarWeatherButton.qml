@@ -7,6 +7,8 @@ import qs.Widgets.common
 Item {
     id: root
 
+    property var screen: null
+
     readonly property string temperatureText: WeatherPlugin.hasValidData ? Math.round(WeatherPlugin.currentTemperatureC) + "°" : "--°"
     readonly property int iconSize: 20
     readonly property int temperatureSize: 12
@@ -88,6 +90,9 @@ Item {
     }
 
     function toggleView() {
+        if (root.screen && root.screen.name)
+            WidgetState.qsScreenName = root.screen.name;
+
         if (WidgetState.leftSidebarOpen && WidgetState.leftSidebarView === "weather") {
             WidgetState.leftSidebarOpen = false;
             return;

@@ -97,12 +97,6 @@ Singleton {
             "-autoexit",
             soundRoot + soundName + ".oga"
         ]);
-        Quickshell.execDetached([
-            "ffplay",
-            "-nodisp",
-            "-autoexit",
-            soundRoot + soundName + ".ogg"
-        ]);
     }
 
     function notifyPomodoroStage() {

@@ -30,13 +30,16 @@ QString I18nManager::normalizeLanguage(const QString &language)
     const QString lower = normalized.toLower();
     if (lower.startsWith(QStringLiteral("en")))
         return QStringLiteral("en_US");
-    if (lower == QStringLiteral("zh_tw")
-            || lower == QStringLiteral("zh_hk")
-            || lower == QStringLiteral("zh_mo")
-            || lower.contains(QStringLiteral("hant"))) {
-        return QStringLiteral("zh_TW");
+    if (lower.startsWith(QStringLiteral("zh"))) {
+        if (lower == QStringLiteral("zh_tw")
+                || lower == QStringLiteral("zh_hk")
+                || lower == QStringLiteral("zh_mo")
+                || lower.contains(QStringLiteral("hant"))) {
+            return QStringLiteral("zh_TW");
+        }
+        return QStringLiteral("zh_CN");
     }
-    return QStringLiteral("zh_CN");
+    return QStringLiteral("en_US");
 }
 
 void I18nManager::setLastError(const QString &message)

@@ -67,24 +67,17 @@ Material 配色。项目自己的 `matugen/config.toml` 和 `matugen/templates/`
 | --- | --- |
 | Quickshell | `~/.cache/quickshell-dev-colorscheme/colors.json` |
 | btop | `~/.config/btop/themes/matugen.theme` |
-| Cava | `~/.config/cava/themes/matugen` |
 | Kitty | `~/.config/kitty/themes/Matugen.conf` |
 | Fcitx5 | `~/.local/share/fcitx5/themes/Matugen/theme.conf` |
 | Niri | `~/.config/niri/colors.kdl` |
-| Yazi | `~/.config/yazi/theme.toml` |
-| Zsh prompt | `~/.cache/quickshell-dev-colorscheme/zsh-prompt-colors.zsh` |
 
 Clavis 只生成配色文件并通知正在运行的程序重载，不会修改这些程序的主配置。
-Kitty、Cava、Fcitx5 和 Niri 会在文件生成后立即热重载；Zsh prompt 会在下一次
-显示提示行时读取新配色；Yazi 会在下次启动时读取新主题。
+Kitty、Fcitx5 和 Niri 会在文件生成后立即热重载。
 首次使用时需要手工启用以下程序：
 
 ```ini
 # ~/.config/btop/btop.conf
 color_theme = "matugen.theme"
-
-# ~/.config/cava/config 的 [color] 段
-theme = 'matugen'
 
 # ~/.config/kitty/kitty.conf
 include current-theme.conf
@@ -99,17 +92,12 @@ Niri 的 `~/.config/niri/config.kdl` 需要包含：
 include "colors.kdl"
 ```
 
-Yazi 会自动读取 `~/.config/yazi/theme.toml`，无需修改主配置。自制 Zsh prompt
-需要在 `.zshrc` 的 `precmd` 中加载生成的配色片段；对应源码仓库内维护了
-完整示例配置。
-
 热重载直接由 `matugen/config.toml` 中各模板的官方 `post_hook` 处理，不需要
 额外脚本：
 
 | 程序 | 运行时重载 |
 | --- | --- |
 | Kitty | `kitten themes --reload-in=all Matugen` |
-| Cava | `pkill -USR1 cava`，重新读取主配置和 `theme = 'matugen'` |
 | Fcitx5 | 通过 D-Bus 调用 `ReloadAddonConfig("classicui")`，直接重载 ClassicUI 配置和主题 |
 | Niri | 调用 `niri msg action load-config-file` 重新加载 `colors.kdl` |
 
@@ -117,8 +105,8 @@ Kitty 首次启用时运行一次 `kitten themes --reload-in=all Matugen`，让
 themes kitten 创建 `current-theme.conf` 并维护 `kitty.conf` 的主题引用。各
 hook 末尾使用 `|| true`，因此目标程序没有运行时不会阻断其他模板生成。
 
-控制中心最后一页“高级”可以分别启用或停用 btop、Cava、Kitty、Fcitx5、
-Niri、Yazi 和 Zsh prompt 的模板生成。Quickshell 配色始终生成；关闭某个
+控制中心最后一页“高级”可以分别启用或停用 btop、Kitty、Fcitx5 和
+Niri 的模板生成。Quickshell 配色始终生成；关闭某个
 开关只会停止后续生成和热重载，不会删除该程序已有的配色文件。重新开启时会
 立即使用当前壁纸和配色方案补生成。
 
@@ -132,10 +120,6 @@ bash scripts/theme/generate_matugen_colors.sh \
   --templates 'kitty,fcitx5,niri' \
   --dry-run
 ```
-
-### 天气图标
-
-Meteocons 资源不纳入 Git；动画图标可从 npm 包 [`@meteocons/lottie`](https://www.npmjs.com/package/@meteocons/lottie) 下载，并将包内容放入 `assets/icons/weather/meteocons/lottie/`。
 
 ### 电源菜单
 

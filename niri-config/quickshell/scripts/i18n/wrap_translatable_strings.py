@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Wrap untranslated Han-containing QML/JS string literals in qsTr()."""
+"""Wrap untranslated CJK-containing QML/JS string literals in qsTr()."""
 
 from __future__ import annotations
 
@@ -8,7 +8,9 @@ import re
 from pathlib import Path
 
 
-HAN_RE = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff]")
+CJK_RE = re.compile(
+    r"[\u3000-\u303f\u3400-\u4dbf\u4e00-\u9fff\uff00-\uffef]"
+)
 TRANSLATION_PREFIX_RE = re.compile(
     r"(?:qsTr|qsTranslate|QT_TR_NOOP)\s*\(\s*$"
 )
@@ -91,7 +93,7 @@ def wrap_source(source: str) -> tuple[str, int]:
             previous_code.endswith("{") or previous_code.endswith(",")
         )
 
-        if HAN_RE.search(contents) and not already_wrapped and not object_key:
+        if CJK_RE.search(contents) and not already_wrapped and not object_key:
             output.extend(("qsTr(", literal, ")"))
             wrapped += 1
         else:

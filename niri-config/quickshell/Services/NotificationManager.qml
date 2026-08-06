@@ -377,6 +377,8 @@ Singleton {
     }
 
     function timeoutAll() {
+        if (root.popupList.length === 0)
+            return;
         root.popupList.forEach((notif) => {
             root.timeout(notif.notificationId);
             if (notif.timer)

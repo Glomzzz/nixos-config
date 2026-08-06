@@ -395,7 +395,7 @@ Item {
                     SystemMonitorService.memory.usagePercent,
                     0
                 )
-                + "，" + Format.bytes(
+                + ", " + Format.bytes(
                     SystemMonitorService.memory.usedBytes
                 )
                 + " / " + Format.bytes(

@@ -294,7 +294,7 @@ Item {
                 text: qsTr("正在处理")
                 color: Appearance.colors.colOnLayer0
                 font {
-                    family: "LXGW WenKai GB Screen"
+                    family: "LXGW WenKai Screen"
                     pixelSize: 15
                     weight: Font.DemiBold
                 }

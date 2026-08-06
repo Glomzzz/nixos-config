@@ -9,8 +9,10 @@ Singleton {
     id: root
 
     readonly property string avatarPath: Paths.profileAvatar
-    readonly property string avatarUrl: Paths.fileUrl(avatarPath) + "?revision=" + revision
+    readonly property string avatarUrl: available
+        ? Paths.fileUrl(avatarPath) + "?revision=" + revision : ""
     property int revision: 0
+    property bool available: false
     property bool busy: false
     property string pendingSource: ""
 
@@ -20,7 +22,7 @@ Singleton {
         const source = String(path || "");
         if (source === "" || busy) {
             if (source === "")
-                updateFinished(false, qsTr("未选择有效的头像文件"));
+                updateFinished(false, qsTr("Select a valid avatar image"));
             return;
         }
 
@@ -37,25 +39,32 @@ Singleton {
             root.busy = false;
             if (exitCode === 0) {
                 root.revision += 1;
-                root.updateFinished(true, qsTr("头像已更新"));
+                root.available = true;
+                root.updateFinished(true, qsTr("Avatar updated"));
                 Quickshell.execDetached([
                     "notify-send",
                     "-a", "quickshell",
                     "-u", "low",
-                    qsTr("头像已更新"),
+                    qsTr("Avatar updated"),
                     root.pendingSource
                 ]);
             } else {
-                root.updateFinished(false, qsTr("无法更新头像"));
+                root.updateFinished(false, qsTr("Unable to update avatar"));
                 Quickshell.execDetached([
                     "notify-send",
                     "-a", "quickshell",
                     "-u", "critical",
-                    qsTr("头像更新失败"),
+                    qsTr("Avatar update failed"),
                     root.pendingSource
                 ]);
             }
             root.pendingSource = "";
         }
+    }
+
+    Process {
+        command: ["test", "-r", root.avatarPath]
+        running: true
+        onExited: exitCode => root.available = exitCode === 0
     }
 }

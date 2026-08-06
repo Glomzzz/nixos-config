@@ -3,33 +3,33 @@
 <context>
     <name>AdvancedPage</name>
     <message>
-        <location filename="../Modules/ControlCenter/AdvancedPage.qml" line="65" />
-        <source>正在为已启用的程序生成 Matugen 配色…</source>
+        <location filename="../Modules/ControlCenter/AdvancedPage.qml" line="50" />
+        <source>Generating Matugen colors for enabled applications…</source>
         <translation>Generating Matugen colors for enabled applications…</translation>
     </message>
     <message>
+        <location filename="../Modules/ControlCenter/AdvancedPage.qml" line="56" />
+        <source>Matugen templates</source>
+        <translation>Matugen templates</translation>
+    </message>
+    <message>
+        <location filename="../Modules/ControlCenter/AdvancedPage.qml" line="57" />
+        <source>Wallpaper and theme changes update only enabled applications. Quickshell colors are always generated, and disabling an entry keeps its existing files.</source>
+        <translation>Wallpaper and theme changes update only enabled applications. Quickshell colors are always generated, and disabling an entry keeps its existing files.</translation>
+    </message>
+    <message>
         <location filename="../Modules/ControlCenter/AdvancedPage.qml" line="71" />
-        <source>Matugen 模板生成</source>
-        <translation>Matugen template generation</translation>
-    </message>
-    <message>
-        <location filename="../Modules/ControlCenter/AdvancedPage.qml" line="72" />
-        <source>壁纸或主题变化时，仅为已启用的程序生成模板。Quickshell 配色始终生成。关闭开关不会删除已有配色文件。</source>
-        <translation>When the wallpaper or theme changes, templates are generated only for enabled applications. Quickshell colors are always generated. Turning off a switch does not delete existing color files.</translation>
-    </message>
-    <message>
-        <location filename="../Modules/ControlCenter/AdvancedPage.qml" line="86" />
-        <source>生成并更新 Matugen 配色</source>
+        <source>Generate and update Matugen colors</source>
         <translation>Generate and update Matugen colors</translation>
     </message>
     <message>
-        <location filename="../Modules/ControlCenter/AdvancedPage.qml" line="87" />
-        <source>已停止后续生成；现有配色文件会保留</source>
-        <translation>Future generation stopped; existing color files are kept</translation>
+        <location filename="../Modules/ControlCenter/AdvancedPage.qml" line="72" />
+        <source>Generation disabled; existing files are kept</source>
+        <translation>Generation disabled; existing files are kept</translation>
     </message>
     <message>
-        <location filename="../Modules/ControlCenter/AdvancedPage.qml" line="94" />
-        <source>启用 %1 Matugen 模板</source>
+        <location filename="../Modules/ControlCenter/AdvancedPage.qml" line="79" />
+        <source>Enable the %1 Matugen template</source>
         <translation>Enable the %1 Matugen template</translation>
     </message>
 </context>
@@ -132,11 +132,6 @@
         <translation>Unnamed device</translation>
     </message>
     <message>
-        <location filename="../Modules/ControlCenter/AccountPage.qml" line="327" />
-        <source>更多蓝牙设置</source>
-        <translation>More Bluetooth settings</translation>
-    </message>
-    <message>
         <location filename="../Modules/ControlCenter/AccountPage.qml" line="339" />
         <source>云存储</source>
         <translation>Cloud storage</translation>
@@ -160,11 +155,6 @@
         <location filename="../Modules/ControlCenter/AccountPage.qml" line="440" />
         <source>电脑备份</source>
         <translation>Back up computer</translation>
-    </message>
-    <message>
-        <location filename="../Modules/ControlCenter/AccountPage.qml" line="450" />
-        <source>管理云存储</source>
-        <translation>Manage cloud storage</translation>
     </message>
     <message>
         <location filename="../Modules/ControlCenter/AccountPage.qml" line="464" />
@@ -458,24 +448,24 @@
 <context>
     <name>AvatarService</name>
     <message>
-        <location filename="../Services/AvatarService.qml" line="23" />
-        <source>未选择有效的头像文件</source>
-        <translation>No valid avatar file selected</translation>
+        <location filename="../Services/AvatarService.qml" line="25" />
+        <source>Select a valid avatar image</source>
+        <translation>Select a valid avatar image</translation>
     </message>
     <message>
-        <location filename="../Services/AvatarService.qml" line="40" />
-        <location filename="../Services/AvatarService.qml" line="45" />
-        <source>头像已更新</source>
+        <location filename="../Services/AvatarService.qml" line="43" />
+        <location filename="../Services/AvatarService.qml" line="48" />
+        <source>Avatar updated</source>
         <translation>Avatar updated</translation>
     </message>
     <message>
-        <location filename="../Services/AvatarService.qml" line="49" />
-        <source>无法更新头像</source>
-        <translation>Could not update avatar</translation>
+        <location filename="../Services/AvatarService.qml" line="52" />
+        <source>Unable to update avatar</source>
+        <translation>Unable to update avatar</translation>
     </message>
     <message>
-        <location filename="../Services/AvatarService.qml" line="54" />
-        <source>头像更新失败</source>
+        <location filename="../Services/AvatarService.qml" line="57" />
+        <source>Avatar update failed</source>
         <translation>Avatar update failed</translation>
     </message>
 </context>
@@ -490,10 +480,6 @@
         <location filename="../Services/AwwwWallpaperService.qml" line="99" />
         <source>未找到 awww 或 awww-daemon，已回退到 Quickshell</source>
         <translation>awww or awww-daemon was not found; fell back to Quickshell</translation>
-    </message>
-    <message>
-        <source>Quickshell 桌面壁纸未能就绪，继续使用 awww</source>
-        <translation type="vanished">The Quickshell desktop wallpaper did not become ready; continuing to use awww</translation>
     </message>
     <message>
         <location filename="../Services/AwwwWallpaperService.qml" line="227" />
@@ -516,17 +502,9 @@
         <translation>Failed to stop the clavis-desktop awww namespace; exit code %1</translation>
     </message>
     <message>
-        <source>Quickshell 桌面壁纸未在超时前就绪，继续使用 awww</source>
-        <translation type="vanished">The Quickshell desktop wallpaper did not become ready before the timeout; continuing to use awww</translation>
-    </message>
-    <message>
         <location filename="../Services/AwwwWallpaperService.qml" line="423" />
         <source>awww 无法为 %1 应用桌面壁纸，退出码 %2</source>
         <translation>awww could not apply the desktop wallpaper to %1; exit code %2</translation>
-    </message>
-    <message>
-        <source>无法停止 clavis-desktop awww namespace，退出码 %1</source>
-        <translation type="vanished">Could not stop the clavis-desktop awww namespace; exit code %1</translation>
     </message>
 </context>
 <context>
@@ -1794,24 +1772,15 @@ Scroll to adjust</translation>
 <context>
     <name>LauncherWindow</name>
     <message>
-        <location filename="../Modules/Launcher/LauncherWindow.qml" line="33" />
-        <source>应用</source>
-        <translation>Applications</translation>
+        <location filename="../Modules/Launcher/LauncherWindow.qml" line="385" />
+        <source>已有剪贴板操作正在执行</source>
+        <translation>Another clipboard operation is already in progress</translation>
     </message>
     <message>
-        <location filename="../Modules/Launcher/LauncherWindow.qml" line="34" />
-        <source>窗口</source>
-        <translation>Windows</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Launcher/LauncherWindow.qml" line="35" />
-        <source>壁纸</source>
-        <translation>Wallpapers</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Launcher/LauncherWindow.qml" line="354" />
-        <source>搜索</source>
-        <translation>Search</translation>
+        <location filename="../Modules/Launcher/LauncherWindow.qml" line="397" />
+        <location filename="../Modules/Launcher/LauncherWindow.qml" line="428" />
+        <source>复制失败</source>
+        <translation>Copy failed</translation>
     </message>
 </context>
 <context>
@@ -2827,6 +2796,16 @@ Click to open network settings</translation>
         <source>药丸</source>
         <translation>Pill</translation>
     </message>
+    <message>
+        <location filename="../Services/PersonalizationConfig.qml" line="109" />
+        <source>四宫格</source>
+        <translation>Four-button grid</translation>
+    </message>
+    <message>
+        <location filename="../Services/PersonalizationConfig.qml" line="110" />
+        <source>横向六项</source>
+        <translation>Six-button row</translation>
+    </message>
 </context>
 <context>
     <name>PillRecordingVisual</name>
@@ -2901,11 +2880,6 @@ Click to open network settings</translation>
         <location filename="../Modules/Bar/PowerButton/PowerButton.qml" line="34" />
         <source>电源菜单</source>
         <translation>Power menu</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Bar/QuickSettings/PowerButton.qml" line="46" />
-        <source>电源</source>
-        <translation>Power</translation>
     </message>
 </context>
 <context>
@@ -3047,8 +3021,8 @@ Right-click to change shape; scroll to reorder</translation>
     </message>
     <message>
         <location filename="../Modules/QuickSettings/QuickSettingsSurface.qml" line="307" />
-        <source>会话</source>
-        <translation>Session</translation>
+        <source>电源菜单</source>
+        <translation>Power menu</translation>
     </message>
 </context>
 <context>
@@ -3189,54 +3163,6 @@ Right-click to change shape; scroll to reorder</translation>
     </message>
 </context>
 <context>
-    <name>ScheduleWidget</name>
-    <message>
-        <location filename="../Modules/Keystone/DashboardContent/ScheduleWidget.qml" line="13" />
-        <source>周一</source>
-        <translation>Mon</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/DashboardContent/ScheduleWidget.qml" line="13" />
-        <source>周二</source>
-        <translation>Tue</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/DashboardContent/ScheduleWidget.qml" line="13" />
-        <source>周三</source>
-        <translation>Wed</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/DashboardContent/ScheduleWidget.qml" line="13" />
-        <source>周四</source>
-        <translation>Thu</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/DashboardContent/ScheduleWidget.qml" line="14" />
-        <source>周五</source>
-        <translation>Fri</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/DashboardContent/ScheduleWidget.qml" line="14" />
-        <source>周六</source>
-        <translation>Sat</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/DashboardContent/ScheduleWidget.qml" line="14" />
-        <source>周日</source>
-        <translation>Sun</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/DashboardContent/ScheduleWidget.qml" line="55" />
-        <source>课表 JSON 解析错误:</source>
-        <translation>Schedule JSON parse error:</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/DashboardContent/ScheduleWidget.qml" line="69" />
-        <source>时间</source>
-        <translation>Time</translation>
-    </message>
-</context>
-<context>
     <name>ScreencastService</name>
     <message>
         <location filename="../Services/ScreencastService.qml" line="14" />
@@ -3255,9 +3181,11 @@ Right-click to change shape; scroll to reorder</translation>
 <context>
     <name>SettingsButton</name>
     <message>
-        <location filename="../Modules/Bar/QuickSettings/SettingsButton.qml" line="59" />
-        <source>设置</source>
-        <translation>Settings</translation>
+        <location filename="../Modules/Bar/QuickSettings/SettingsButton.qml" line="68" />
+        <source>左键：快捷设置
+右键：控制中心</source>
+        <translation>Left click: Quick Settings
+Right click: Control Center</translation>
     </message>
 </context>
 <context>
@@ -4322,6 +4250,21 @@ detected</translation>
         <source>选择图标主题</source>
         <translation>Choose icon theme</translation>
     </message>
+    <message>
+        <location filename="../Modules/ControlCenter/ThemePage.qml" line="678" />
+        <source>电源菜单</source>
+        <translation>Power menu</translation>
+    </message>
+    <message>
+        <location filename="../Modules/ControlCenter/ThemePage.qml" line="682" />
+        <source>布局</source>
+        <translation>Layout</translation>
+    </message>
+    <message>
+        <location filename="../Modules/ControlCenter/ThemePage.qml" line="685" />
+        <source>选择布局</source>
+        <translation>Choose layout</translation>
+    </message>
 </context>
 <context>
     <name>ThemeService</name>
@@ -4442,53 +4385,33 @@ detected</translation>
     <name>ToolsContent</name>
     <message>
         <location filename="../Modules/Keystone/Tools/ToolsContent.qml" line="17" />
-        <source>取色器</source>
+        <source>Color picker</source>
         <translation>Color picker</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/Tools/ToolsContent.qml" line="18" />
-        <source>录屏</source>
-        <translation>Screen recording</translation>
+        <source>Record screen</source>
+        <translation>Record screen</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/Tools/ToolsContent.qml" line="19" />
-        <source>录制 GIF</source>
+        <source>Record GIF</source>
         <translation>Record GIF</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/Tools/ToolsContent.qml" line="20" />
-        <source>普通截屏</source>
+        <source>Screenshot</source>
         <translation>Screenshot</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/Tools/ToolsContent.qml" line="21" />
-        <source>截长屏</source>
-        <translation>Scrolling screenshot</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/Tools/ToolsContent.qml" line="22" />
-        <source>OCR 识别</source>
-        <translation>OCR</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/Tools/ToolsContent.qml" line="23" />
-        <source>录麦克风</source>
+        <source>Record microphone</source>
         <translation>Record microphone</translation>
     </message>
     <message>
-        <location filename="../Modules/Keystone/Tools/ToolsContent.qml" line="24" />
-        <source>录电脑声音</source>
+        <location filename="../Modules/Keystone/Tools/ToolsContent.qml" line="22" />
+        <source>Record system audio</source>
         <translation>Record system audio</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/Tools/ToolsContent.qml" line="49" />
-        <source>触发工具: </source>
-        <translation>Trigger tool: </translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/Tools/ToolsContent.qml" line="66" />
-        <source>该工具的后端尚未实现！</source>
-        <translation>This tool’s backend has not been implemented yet!</translation>
     </message>
 </context>
 <context>
@@ -4725,89 +4648,29 @@ Scroll to adjust; click to open sound</translation>
 <context>
     <name>WallpaperFileBrowser</name>
     <message>
-        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="173" />
-        <source>选择文件夹</source>
-        <translation>Choose folder</translation>
+        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="9" />
+        <source>选择壁纸或文件夹</source>
+        <translation>Choose wallpaper or folder</translation>
     </message>
     <message>
-        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="182" />
-        <source>选择图片，或使用当前文件夹作为壁纸目录</source>
-        <translation>Choose an image, or use the current folder as the wallpaper directory</translation>
+        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="10" />
+        <source>选择图片作为壁纸，或选择文件夹作为壁纸目录</source>
+        <translation>Choose an image as the wallpaper, or choose a folder as the wallpaper directory</translation>
     </message>
     <message>
-        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="192" />
-        <source>关闭</source>
-        <translation>Close</translation>
+        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="12" />
+        <source>当前文件夹没有可选择的壁纸</source>
+        <translation>No selectable wallpapers in this folder</translation>
     </message>
     <message>
-        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="210" />
-        <source>主文件夹</source>
-        <translation>Home</translation>
+        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="13" />
+        <source>选择一张壁纸或一个文件夹</source>
+        <translation>Choose a wallpaper or folder</translation>
     </message>
     <message>
-        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="216" />
-        <source>桌面</source>
-        <translation>Desktop</translation>
-    </message>
-    <message>
-        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="223" />
-        <source>文档</source>
-        <translation>Documents</translation>
-    </message>
-    <message>
-        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="230" />
-        <source>图片</source>
-        <translation>Pictures</translation>
-    </message>
-    <message>
-        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="236" />
-        <source>下载</source>
-        <translation>Downloads</translation>
-    </message>
-    <message>
-        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="242" />
-        <source>音乐</source>
-        <translation>Music</translation>
-    </message>
-    <message>
-        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="249" />
-        <source>视频</source>
-        <translation>Videos</translation>
-    </message>
-    <message>
-        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="272" />
-        <source>上一级</source>
-        <translation>Up one level</translation>
-    </message>
-    <message>
-        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="300" />
-        <source>隐藏隐藏文件</source>
-        <translation>Hide hidden files</translation>
-    </message>
-    <message>
-        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="300" />
-        <source>显示隐藏文件</source>
-        <translation>Show hidden files</translation>
-    </message>
-    <message>
-        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="307" />
-        <source>切换到列表布局</source>
-        <translation>Switch to list layout</translation>
-    </message>
-    <message>
-        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="307" />
-        <source>切换到网格布局</source>
-        <translation>Switch to grid layout</translation>
-    </message>
-    <message>
-        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="312" />
-        <source>使用当前文件夹</source>
-        <translation>Use current folder</translation>
-    </message>
-    <message>
-        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="545" />
-        <source>文件夹</source>
-        <translation>Folder</translation>
+        <location filename="../Modules/ControlCenter/WallpaperFileBrowser.qml" line="14" />
+        <source>应用</source>
+        <translation>Apply</translation>
     </message>
 </context>
 <context>
@@ -4844,18 +4707,6 @@ Scroll to adjust; click to open sound</translation>
         <translation>Desktop wallpaper manager</translation>
     </message>
     <message>
-        <source>仅决定普通桌面壁纸由谁渲染；niri overview 背景始终由 Quickshell 独立管理。</source>
-        <translation type="vanished">Only selects who renders the regular desktop wallpaper; the niri overview background is always managed independently by Quickshell.</translation>
-    </message>
-    <message>
-        <source>使用当前 DMS shader 转场并支持桌面视差。</source>
-        <translation type="vanished">Uses the current DMS shader transitions and supports desktop parallax.</translation>
-    </message>
-    <message>
-        <source>使用 clavis-desktop namespace 渲染普通桌面壁纸。</source>
-        <translation type="vanished">Renders the regular desktop wallpaper in the clavis-desktop namespace.</translation>
-    </message>
-    <message>
         <location filename="../Modules/ControlCenter/WallpaperPage.qml" line="357" />
         <source>缺少 awww 或 awww-daemon 命令</source>
         <translation>The awww or awww-daemon command is missing</translation>
@@ -4866,49 +4717,9 @@ Scroll to adjust; click to open sound</translation>
         <translation>Detecting awww…</translation>
     </message>
     <message>
-        <source>awww 可用</source>
-        <translation type="vanished">awww available</translation>
-    </message>
-    <message>
-        <source>awww 不可用</source>
-        <translation type="vanished">awww unavailable</translation>
-    </message>
-    <message>
-        <source>daemon 运行中</source>
-        <translation type="vanished">daemon running</translation>
-    </message>
-    <message>
-        <source>daemon 未运行</source>
-        <translation type="vanished">daemon not running</translation>
-    </message>
-    <message>
-        <source>当前桌面后端：</source>
-        <translation type="vanished">Current desktop backend: </translation>
-    </message>
-    <message>
         <location filename="../Modules/ControlCenter/WallpaperPage.qml" line="386" />
         <source>当前壁纸</source>
         <translation>Current wallpaper</translation>
-    </message>
-    <message>
-        <source>多显示器桌面壁纸</source>
-        <translation type="vanished">Multi-monitor desktop wallpaper</translation>
-    </message>
-    <message>
-        <source>选择“全局”或为某个实际输出保存独立壁纸与填充模式。</source>
-        <translation type="vanished">Select “Global” or save an independent wallpaper and fill mode for a physical output.</translation>
-    </message>
-    <message>
-        <source>每显示器使用不同桌面壁纸</source>
-        <translation type="vanished">Use a different desktop wallpaper per monitor</translation>
-    </message>
-    <message>
-        <source>输出移除后会保留其持久化映射。</source>
-        <translation type="vanished">Persistent mappings are retained when an output is removed.</translation>
-    </message>
-    <message>
-        <source>选择桌面壁纸输出</source>
-        <translation type="vanished">Select desktop wallpaper output</translation>
     </message>
     <message>
         <location filename="../Modules/ControlCenter/WallpaperPage.qml" line="499" />
@@ -5040,14 +4851,6 @@ Scroll to adjust; click to open sound</translation>
         <translation>Image effects</translation>
     </message>
     <message>
-        <source>awww 转场类型</source>
-        <translation type="vanished">awww transition type</translation>
-    </message>
-    <message>
-        <source>Quickshell DMS 动画效果</source>
-        <translation type="vanished">Quickshell DMS animation</translation>
-    </message>
-    <message>
         <location filename="../Modules/ControlCenter/WallpaperPage.qml" line="623" />
         <source>awww FPS</source>
         <translation>awww FPS</translation>
@@ -5061,22 +4864,6 @@ Scroll to adjust; click to open sound</translation>
         <location filename="../Modules/ControlCenter/WallpaperPage.qml" line="653" />
         <source>none 转场不会使用 FPS。</source>
         <translation>The none transition does not use FPS.</translation>
-    </message>
-    <message>
-        <source>Quickshell 壁纸动画由 Qt Quick 渲染循环驱动，不提供独立 FPS 参数。</source>
-        <translation type="vanished">Quickshell wallpaper animations are driven by the Qt Quick render loop and do not provide an independent FPS setting.</translation>
-    </message>
-    <message>
-        <source>随横向平铺窗口焦点移动</source>
-        <translation type="vanished">Follow horizontal tiled-window focus</translation>
-    </message>
-    <message>
-        <source>根据当前聚焦的横向平铺窗口位置调整壁纸。浮动窗口以及同一列中上下堆叠的窗口不会改变横向位置。</source>
-        <translation type="vanished">Adjusts the wallpaper for the focused horizontal tiled-window position. Floating windows and vertically stacked windows in the same column do not change the horizontal position.</translation>
-    </message>
-    <message>
-        <source>当前 awww 转场不会使用贝塞尔曲线，但该共享值仍会用于 overview 转场。</source>
-        <translation type="vanished">The current awww transition does not use the Bézier curve, but this shared value is still used by overview transitions.</translation>
     </message>
     <message>
         <location filename="../Modules/ControlCenter/WallpaperPage.qml" line="674" />
@@ -5099,37 +4886,9 @@ Scroll to adjust; click to open sound</translation>
         <translation>The none transition does not use transition step.</translation>
     </message>
     <message>
-        <source>数值越大，每帧越快接近新图片，变化更直接；数值越小，颜色过渡更缓慢。它与 FPS 和持续时间不是同一个参数。</source>
-        <translation type="vanished">Higher values approach the new image faster each frame and look more direct; lower values blend colors more gradually. This is separate from FPS and duration.</translation>
-    </message>
-    <message>
-        <source>当前 awww 转场不会使用持续时间；切换到 fade、grow、wipe 等转场后可继续编辑共享值。</source>
-        <translation type="vanished">The current awww transition does not use duration. Switch to fade, grow, wipe, or another supported transition to edit the shared value.</translation>
-    </message>
-    <message>
-        <source>none 转场不会使用持续时间。</source>
-        <translation type="vanished">The none transition does not use duration.</translation>
-    </message>
-    <message>
-        <source>当前 awww 转场不会使用缓动或贝塞尔曲线；切换到 fade、grow、wipe 等转场后可继续编辑共享值。</source>
-        <translation type="vanished">The current awww transition does not use easing or a Bézier curve. Switch to fade, grow, wipe, or another supported transition to edit the shared value.</translation>
-    </message>
-    <message>
-        <source>none 转场不会使用缓动或贝塞尔曲线。</source>
-        <translation type="vanished">The none transition does not use easing or a Bézier curve.</translation>
-    </message>
-    <message>
         <location filename="../Modules/ControlCenter/WallpaperPage.qml" line="1084" />
         <source>视差效果</source>
         <translation>Parallax effects</translation>
-    </message>
-    <message>
-        <source>桌面视差</source>
-        <translation type="vanished">Desktop parallax</translation>
-    </message>
-    <message>
-        <source>仅移动 Quickshell 桌面壁纸的 X/Y 取景，不影响 overview。</source>
-        <translation type="vanished">Only moves the X/Y framing of the Quickshell desktop wallpaper; the overview is unaffected.</translation>
     </message>
     <message>
         <location filename="../Modules/ControlCenter/WallpaperPage.qml" line="1102" />
@@ -5138,18 +4897,10 @@ Scroll to adjust; click to open sound</translation>
         <translation>Vertical parallax</translation>
     </message>
     <message>
-        <source>允许壁纸在垂直溢出范围内移动。</source>
-        <translation type="vanished">Allows the wallpaper to move within its vertical overflow.</translation>
-    </message>
-    <message>
         <location filename="../Modules/ControlCenter/WallpaperPage.qml" line="1117" />
         <location filename="../Modules/ControlCenter/WallpaperPage.qml" line="1140" />
         <source>随工作区移动</source>
         <translation>Follow workspaces</translation>
-    </message>
-    <message>
-        <source>每块显示器按自己的活动工作区位置计算。</source>
-        <translation type="vanished">Each monitor uses the position of its own active workspace.</translation>
     </message>
     <message>
         <location filename="../Modules/ControlCenter/WallpaperPage.qml" line="1151" />
@@ -5163,53 +4914,9 @@ Scroll to adjust; click to open sound</translation>
         <translation>Follow sidebars</translation>
     </message>
     <message>
-        <source>左侧栏向右偏移，右侧栏向左偏移。</source>
-        <translation type="vanished">The left sidebar shifts the wallpaper right; the right sidebar shifts it left.</translation>
-    </message>
-    <message>
-        <source>随平铺窗口移动</source>
-        <translation type="vanished">Follow tiled windows</translation>
-    </message>
-    <message>
-        <source>仅使用活动工作区去重后的平铺列数。</source>
-        <translation type="vanished">Uses only the deduplicated tiled-column count of the active workspace.</translation>
-    </message>
-    <message>
-        <source>首选壁纸缩放比例</source>
-        <translation type="vanished">Preferred wallpaper scale</translation>
-    </message>
-    <message>
-        <source>横向完整行程列数</source>
-        <translation type="vanished">Columns for full horizontal travel</translation>
-    </message>
-    <message>
-        <source>awww 当前未提供持续修改壁纸取景偏移的接口，因此桌面视差仅适用于 Quickshell 后端。</source>
-        <translation type="vanished">awww does not currently provide an interface for continuously changing wallpaper framing, so desktop parallax is available only with the Quickshell backend.</translation>
-    </message>
-    <message>
         <location filename="../Modules/ControlCenter/WallpaperPage.qml" line="1258" />
         <source>Overview 背景</source>
         <translation>Overview background</translation>
-    </message>
-    <message>
-        <source>niri overview 背景</source>
-        <translation type="vanished">niri overview background</translation>
-    </message>
-    <message>
-        <source>该表面始终由 Quickshell 管理，与桌面壁纸管理器无关。</source>
-        <translation type="vanished">This surface is always managed by Quickshell, independently of the desktop wallpaper manager.</translation>
-    </message>
-    <message>
-        <source>未检测到 clavis-overview-wallpaper 的 niri backdrop 规则。当前表面会停留在普通 Background 层，因此这里的参数看起来会改变桌面背景。请由人工将文档中的 layer-rule 加入 niri 配置。</source>
-        <translation type="vanished">No niri backdrop rule for clavis-overview-wallpaper was detected. The surface will remain on the regular Background layer, so these settings can appear to alter the desktop background. Manually add the documented layer-rule to the niri configuration.</translation>
-    </message>
-    <message>
-        <source>niri workspace 背景仍不透明，会遮住 kitty 等窗口的透明与 xray 模糊背景。请由人工在 layout 中设置 background-color "transparent"。</source>
-        <translation type="vanished">The niri workspace background is still opaque, which blocks transparency and xray blur behind windows such as kitty. Manually set background-color "transparent" in layout.</translation>
-    </message>
-    <message>
-        <source>启用 overview 背景</source>
-        <translation type="vanished">Enable overview background</translation>
     </message>
     <message>
         <location filename="../Modules/ControlCenter/WallpaperPage.qml" line="1334" />
@@ -5218,53 +4925,9 @@ Scroll to adjust; click to open sound</translation>
         <translation>Use desktop wallpaper</translation>
     </message>
     <message>
-        <source>读取 Clavis 保存的原始路径，不读取 awww surface 或缓存。</source>
-        <translation type="vanished">Reads the original path saved by Clavis, not the awww surface or cache.</translation>
-    </message>
-    <message>
-        <source>每显示器使用不同 overview 壁纸</source>
-        <translation type="vanished">Use a different overview wallpaper per monitor</translation>
-    </message>
-    <message>
-        <source>每个输出保持独立的路径与填充模式。</source>
-        <translation type="vanished">Each output keeps an independent path and fill mode.</translation>
-    </message>
-    <message>
-        <source>选择 overview 输出</source>
-        <translation type="vanished">Select overview output</translation>
-    </message>
-    <message>
         <location filename="../Modules/ControlCenter/WallpaperPage.qml" line="1365" />
         <source>overview 壁纸输出</source>
         <translation>Overview wallpaper output</translation>
-    </message>
-    <message>
-        <source>未选择 overview 壁纸</source>
-        <translation type="vanished">No overview wallpaper selected</translation>
-    </message>
-    <message>
-        <source>选择独立壁纸</source>
-        <translation type="vanished">Select independent wallpaper</translation>
-    </message>
-    <message>
-        <source>清除</source>
-        <translation type="vanished">Clear</translation>
-    </message>
-    <message>
-        <source>overview 转场</source>
-        <translation type="vanished">Overview transition</translation>
-    </message>
-    <message>
-        <source>使用 DMS shader，并与桌面共享持续时间、缓动和贝塞尔曲线。</source>
-        <translation type="vanished">Uses DMS shaders and shares duration, easing, and the Bézier curve with the desktop.</translation>
-    </message>
-    <message>
-        <source>overview 图像效果</source>
-        <translation type="vanished">Overview image effects</translation>
-    </message>
-    <message>
-        <source>所有输出共享效果参数；源图实时处理，不生成缓存图片。</source>
-        <translation type="vanished">All outputs share effect settings; source images are processed live without generated cache images.</translation>
     </message>
     <message>
         <location filename="../Modules/ControlCenter/WallpaperPage.qml" line="1409" />
@@ -5307,22 +4970,6 @@ Scroll to adjust; click to open sound</translation>
         <translation>Overview contrast</translation>
     </message>
     <message>
-        <source>overview Quickshell 表面已就绪</source>
-        <translation type="vanished">Overview Quickshell surfaces are ready</translation>
-    </message>
-    <message>
-        <source>overview Quickshell 表面正在加载</source>
-        <translation type="vanished">Overview Quickshell surfaces are loading</translation>
-    </message>
-    <message>
-        <source>overview Quickshell 表面已加载但当前禁用</source>
-        <translation type="vanished">Overview Quickshell surfaces are loaded but currently disabled</translation>
-    </message>
-    <message>
-        <source>动画效果</source>
-        <translation type="vanished">Animation</translation>
-    </message>
-    <message>
         <location filename="../Modules/ControlCenter/WallpaperPage.qml" line="725" />
         <source>过渡时间</source>
         <translation>Transition duration</translation>
@@ -5331,10 +4978,6 @@ Scroll to adjust; click to open sound</translation>
         <location filename="../Modules/ControlCenter/WallpaperPage.qml" line="749" />
         <source>壁纸过渡时间</source>
         <translation>Wallpaper transition duration</translation>
-    </message>
-    <message>
-        <source>当前 awww 转场不会使用持续时间，但该共享值仍会用于 overview 转场。</source>
-        <translation type="vanished">The current awww transition does not use duration, but this shared value is still used by overview transitions.</translation>
     </message>
     <message>
         <location filename="../Modules/ControlCenter/WallpaperPage.qml" line="908" />
@@ -5375,37 +5018,37 @@ Scroll to adjust; click to open sound</translation>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherAQIIndicator.qml" line="38" />
         <source>优</source>
-        <translation type="unfinished">Excellent</translation>
+        <translation>Excellent</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherAQIIndicator.qml" line="39" />
         <source>良</source>
-        <translation type="unfinished">Good</translation>
+        <translation>Good</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherAQIIndicator.qml" line="40" />
         <source>轻度污染</source>
-        <translation type="unfinished" />
+        <translation>Light pollution</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherAQIIndicator.qml" line="41" />
         <source>中度污染</source>
-        <translation type="unfinished" />
+        <translation>Moderate pollution</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherAQIIndicator.qml" line="42" />
         <source>重度污染</source>
-        <translation type="unfinished" />
+        <translation>Heavy pollution</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherAQIIndicator.qml" line="43" />
         <source>严重污染</source>
-        <translation type="unfinished" />
+        <translation>Severe pollution</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherAQIIndicator.qml" line="70" />
         <source>空气质量</source>
-        <translation type="unfinished">Air quality</translation>
+        <translation>Air quality</translation>
     </message>
 </context>
 <context>
@@ -5677,30 +5320,6 @@ Scroll to adjust; click to open sound</translation>
         <translation>Today</translation>
     </message>
     <message>
-        <source>刷新天气</source>
-        <translation type="vanished">Refresh weather</translation>
-    </message>
-    <message>
-        <source>正在刷新天气</source>
-        <translation type="vanished">Refreshing weather</translation>
-    </message>
-    <message>
-        <source>体感温度</source>
-        <translation type="vanished">Feels like</translation>
-    </message>
-    <message>
-        <source>湿度</source>
-        <translation type="vanished">Humidity</translation>
-    </message>
-    <message>
-        <source>风速</source>
-        <translation type="vanished">Wind speed</translation>
-    </message>
-    <message>
-        <source>气压</source>
-        <translation type="vanished">Pressure</translation>
-    </message>
-    <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherContent.qml" line="345" />
         <source>正在加载天气</source>
         <translation>Loading weather</translation>
@@ -5714,58 +5333,6 @@ Scroll to adjust; click to open sound</translation>
         <location filename="../Modules/Keystone/WeatherContent/WeatherContent.qml" line="357" />
         <source>正在查找本地天气预报…</source>
         <translation>Finding your local forecast…</translation>
-    </message>
-    <message>
-        <source>八小时天气预报</source>
-        <translation type="vanished">Eight-hour weather forecast</translation>
-    </message>
-    <message>
-        <source>七天天气预报</source>
-        <translation type="vanished">Seven-day weather forecast</translation>
-    </message>
-    <message>
-        <source>天气预报</source>
-        <translation type="vanished">Forecast</translation>
-    </message>
-    <message>
-        <source>8 小时</source>
-        <translation type="vanished">8 hours</translation>
-    </message>
-    <message>
-        <source>显示未来八小时</source>
-        <translation type="vanished">Show the next eight hours</translation>
-    </message>
-    <message>
-        <source>7 天</source>
-        <translation type="vanished">7 days</translation>
-    </message>
-    <message>
-        <source>显示未来七天</source>
-        <translation type="vanished">Show the next seven days</translation>
-    </message>
-    <message>
-        <source>预报范围</source>
-        <translation type="vanished">Forecast range</translation>
-    </message>
-    <message>
-        <source>，%1 度</source>
-        <translation type="vanished">, %1 degrees</translation>
-    </message>
-    <message>
-        <source>逐小时预报不可用</source>
-        <translation type="vanished">Hourly forecast unavailable</translation>
-    </message>
-    <message>
-        <source>，最高 %1</source>
-        <translation type="vanished">, high %1</translation>
-    </message>
-    <message>
-        <source>，最低 %1</source>
-        <translation type="vanished">, low %1</translation>
-    </message>
-    <message>
-        <source>每日预报不可用</source>
-        <translation type="vanished">Daily forecast unavailable</translation>
     </message>
 </context>
 <context>
@@ -5781,6 +5348,11 @@ Scroll to adjust; click to open sound</translation>
         <location filename="../Modules/Keystone/WeatherContent/WeatherCurrent.qml" line="35" />
         <source>未知</source>
         <translation>Unknown</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Keystone/WeatherContent/WeatherCurrent.qml" line="116" />
+        <source>刷新天气</source>
+        <translation>Refresh weather</translation>
     </message>
 </context>
 <context>
@@ -5977,42 +5549,42 @@ Scroll to adjust; click to open sound</translation>
         <location filename="../Modules/Keystone/WeatherContent/WeatherMoonPhase.qml" line="14" />
         <location filename="../Modules/Keystone/WeatherContent/WeatherMoonPhase.qml" line="42" />
         <source>新月</source>
-        <translation type="unfinished">New moon</translation>
+        <translation>New moon</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherMoonPhase.qml" line="42" />
         <source>蛾眉月</source>
-        <translation type="unfinished" />
+        <translation>Waxing crescent</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherMoonPhase.qml" line="42" />
         <source>上弦月</source>
-        <translation type="unfinished">First quarter</translation>
+        <translation>First quarter</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherMoonPhase.qml" line="42" />
         <source>盈凸月</source>
-        <translation type="unfinished">Waxing gibbous</translation>
+        <translation>Waxing gibbous</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherMoonPhase.qml" line="43" />
         <source>满月</source>
-        <translation type="unfinished">Full moon</translation>
+        <translation>Full moon</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherMoonPhase.qml" line="43" />
         <source>亏凸月</source>
-        <translation type="unfinished">Waning gibbous</translation>
+        <translation>Waning gibbous</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherMoonPhase.qml" line="43" />
         <source>下弦月</source>
-        <translation type="unfinished">Last quarter</translation>
+        <translation>Last quarter</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherMoonPhase.qml" line="43" />
         <source>残月</source>
-        <translation type="unfinished">Waning crescent</translation>
+        <translation>Waning crescent</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherMoonPhase.qml" line="89" />
@@ -6025,32 +5597,32 @@ Scroll to adjust; click to open sound</translation>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherParameters.qml" line="57" />
         <source>紫外线</source>
-        <translation type="unfinished" />
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/WeatherContent/WeatherParameters.qml" line="58" />
-        <source>体感温度</source>
-        <translation type="unfinished">Feels like</translation>
+        <translation>UV index</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherParameters.qml" line="59" />
         <source>湿度</source>
-        <translation type="unfinished">Humidity</translation>
+        <translation>Humidity</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherParameters.qml" line="60" />
         <source>风速</source>
-        <translation type="unfinished" />
+        <translation>Wind speed</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherParameters.qml" line="61" />
         <source>气压</source>
-        <translation type="unfinished">Pressure</translation>
+        <translation>Pressure</translation>
     </message>
     <message>
         <location filename="../Modules/Keystone/WeatherContent/WeatherParameters.qml" line="62" />
         <source>能见度</source>
-        <translation type="unfinished">Visibility</translation>
+        <translation>Visibility</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Keystone/WeatherContent/WeatherParameters.qml" line="59" />
+        <source>体感</source>
+        <translation>Feels like</translation>
     </message>
 </context>
 <context>
@@ -6103,9 +5675,14 @@ Scroll to adjust; click to open sound</translation>
 <context>
     <name>WeatherSunriseSunset</name>
     <message>
-        <location filename="../Modules/Keystone/WeatherContent/WeatherSunriseSunset.qml" line="62" />
-        <source>日出日落</source>
-        <translation type="unfinished" />
+        <location filename="../Modules/Keystone/WeatherContent/WeatherSunriseSunset.qml" line="92" />
+        <source>日出</source>
+        <translation>Sunrise</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Keystone/WeatherContent/WeatherSunriseSunset.qml" line="112" />
+        <source>日落</source>
+        <translation>Sunset</translation>
     </message>
 </context>
 <context>
@@ -6518,6 +6095,220 @@ Scroll to adjust; click to open sound</translation>
 窗口: </source>
         <translation>
 Windows: </translation>
+    </message>
+</context>
+<context>
+    <name>ClipboardService</name>
+    <message>
+        <location filename="../Services/ClipboardService.qml" line="72" />
+        <source>cliphist 监听服务未运行；请启用服务后重新复制内容</source>
+        <translation>The cliphist listener is not running; enable the service and copy the content again</translation>
+    </message>
+    <message>
+        <location filename="../Services/ClipboardService.qml" line="74" />
+        <source>缺少 cliphist，无法读取剪贴板历史</source>
+        <translation>cliphist is missing; clipboard history cannot be read</translation>
+    </message>
+    <message>
+        <location filename="../Services/ClipboardService.qml" line="76" />
+        <source>缺少 wl-copy，无法恢复剪贴板内容</source>
+        <translation>wl-copy is missing; clipboard content cannot be restored</translation>
+    </message>
+    <message>
+        <location filename="../Services/ClipboardService.qml" line="78" />
+        <source>缺少 cliphist 或 wl-copy，剪贴板历史不可用</source>
+        <translation>cliphist or wl-copy is missing; clipboard history is unavailable</translation>
+    </message>
+    <message>
+        <location filename="../Services/ClipboardService.qml" line="80" />
+        <source>无法从 cliphist 解码该条目</source>
+        <translation>Could not decode this cliphist entry</translation>
+    </message>
+    <message>
+        <location filename="../Services/ClipboardService.qml" line="82" />
+        <source>无法检查该剪贴板条目</source>
+        <translation>Could not inspect this clipboard entry</translation>
+    </message>
+    <message>
+        <location filename="../Services/ClipboardService.qml" line="84" />
+        <source>无法生成剪贴板预览</source>
+        <translation>Could not generate a clipboard preview</translation>
+    </message>
+    <message>
+        <location filename="../Services/ClipboardService.qml" line="86" />
+        <source>该剪贴板内容超过安全大小限制</source>
+        <translation>This clipboard content exceeds the safe size limit</translation>
+    </message>
+    <message>
+        <location filename="../Services/ClipboardService.qml" line="88" />
+        <source>图片数据已损坏或尺寸过大</source>
+        <translation>The image data is corrupt or too large</translation>
+    </message>
+    <message>
+        <location filename="../Services/ClipboardService.qml" line="90" />
+        <source>剪贴板中的文件已不存在</source>
+        <translation>The file in the clipboard no longer exists</translation>
+    </message>
+    <message>
+        <location filename="../Services/ClipboardService.qml" line="92" />
+        <source>无法可靠恢复该剪贴板格式</source>
+        <translation>This clipboard format cannot be restored reliably</translation>
+    </message>
+    <message>
+        <location filename="../Services/ClipboardService.qml" line="94" />
+        <source>wl-copy 写入系统剪贴板失败</source>
+        <translation>wl-copy failed to write to the system clipboard</translation>
+    </message>
+    <message>
+        <location filename="../Services/ClipboardService.qml" line="96" />
+        <location filename="../Services/ClipboardService.qml" line="138" />
+        <source>剪贴板服务返回了无效数据</source>
+        <translation>The clipboard service returned invalid data</translation>
+    </message>
+    <message>
+        <location filename="../Services/ClipboardService.qml" line="98" />
+        <source>当前 key CLI 版本过旧；请构建并安装仓库中的新版 key</source>
+        <translation>The installed key CLI is outdated; build and install the current version from this repository</translation>
+    </message>
+    <message>
+        <location filename="../Services/ClipboardService.qml" line="100" />
+        <location filename="../Services/ClipboardService.qml" line="208" />
+        <source>已有剪贴板操作正在执行</source>
+        <translation>Another clipboard operation is already in progress</translation>
+    </message>
+    <message>
+        <location filename="../Services/ClipboardService.qml" line="153" />
+        <source>当前 key CLI 不支持新版剪贴板协议</source>
+        <translation>The installed key CLI does not support the current clipboard protocol</translation>
+    </message>
+    <message>
+        <location filename="../Services/ClipboardService.qml" line="173" />
+        <source>剪贴板历史不可用</source>
+        <translation>Clipboard history is unavailable</translation>
+    </message>
+    <message>
+        <location filename="../Services/ClipboardService.qml" line="259" />
+        <source>剪贴板操作失败</source>
+        <translation>Clipboard operation failed</translation>
+    </message>
+    <message>
+        <location filename="../Services/ClipboardService.qml" line="352" />
+        <source>无法检查剪贴板条目</source>
+        <translation>Could not inspect the clipboard entry</translation>
+    </message>
+</context>
+<context>
+    <name>SpotlightClipboardProvider</name>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightClipboardProvider.qml" line="37" />
+        <source>空内容</source>
+        <translation>Empty content</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightClipboardProvider.qml" line="111" />
+        <source>剪贴板恢复不可用</source>
+        <translation>Clipboard restore is unavailable</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightClipboardProvider.qml" line="118" />
+        <source>该格式无法可靠恢复</source>
+        <translation>This format cannot be restored reliably</translation>
+    </message>
+</context>
+<context>
+    <name>SpotlightResultsPanel</name>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightResultsPanel.qml" line="511" />
+        <source>缺少 wl-copy：恢复功能不可用</source>
+        <translation>wl-copy is missing: restore is unavailable</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightResultsPanel.qml" line="512" />
+        <source>剪贴板历史</source>
+        <translation>Clipboard history</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightResultsPanel.qml" line="541" />
+        <source>清空</source>
+        <translation>Clear</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightResultsPanel.qml" line="731" />
+        <source>删除剪贴板条目</source>
+        <translation>Delete clipboard entry</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightResultsPanel.qml" line="779" />
+        <source>已复制</source>
+        <translation>Copied</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightResultsPanel.qml" line="779" />
+        <source>复制失败</source>
+        <translation>Copy failed</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightResultsPanel.qml" line="846" />
+        <source>正在读取…</source>
+        <translation>Loading…</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightResultsPanel.qml" line="850" />
+        <source>当前 Provider 不可用</source>
+        <translation>Current provider is unavailable</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightResultsPanel.qml" line="851" />
+        <source>没有匹配结果</source>
+        <translation>No matching results</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightResultsPanel.qml" line="866" />
+        <source>清空剪贴板历史？</source>
+        <translation>Clear clipboard history?</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightResultsPanel.qml" line="872" />
+        <source>此操作会清除 cliphist 中的全部历史记录，无法撤销。</source>
+        <translation>This will clear all history from cliphist and cannot be undone.</translation>
+    </message>
+</context>
+<context>
+    <name>SpotlightSearchBar</name>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightSearchBar.qml" line="189" />
+        <source>搜索应用</source>
+        <translation>Search applications</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightSearchBar.qml" line="202" />
+        <source>搜索网页</source>
+        <translation>Search the web</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightSearchBar.qml" line="229" />
+        <source>网页搜索</source>
+        <translation>Web search</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightSearchBar.qml" line="229" />
+        <source>聚焦搜索</source>
+        <translation>Spotlight search</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightSearchBar.qml" line="250" />
+        <source>应用</source>
+        <translation>Applications</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightSearchBar.qml" line="251" />
+        <source>壁纸</source>
+        <translation>Wallpaper</translation>
+    </message>
+    <message>
+        <location filename="../Modules/Launcher/SpotlightSearchBar.qml" line="252" />
+        <source>剪贴板</source>
+        <translation>Clipboard</translation>
     </message>
 </context>
 </TS>

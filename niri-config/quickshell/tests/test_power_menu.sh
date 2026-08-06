@@ -68,7 +68,9 @@ run_style() {
     assert_contains "$args" "$repo_dir/assets/wlogout/$expected_layout"
     assert_contains "$args" "--protocol"
     assert_contains "$args" "layer-shell"
-    assert_contains "$css" 'font-family: "LXGW WenKai GB Screen"'
+    assert_contains "$repo_dir/assets/wlogout/$expected_layout" \
+        '"action": "clavis-shell ipc call lock open'
+    assert_contains "$css" 'font-family: "LXGW WenKai Screen"'
     assert_contains "$css" "$repo_dir/assets/wlogout/icons/lock_white.png"
     assert_contains "$css" "cubic-bezier(.55, 0, .28, 1.682)"
     assert_contains "$css" "background-color: alpha(#2a4a5f, 0.42)"

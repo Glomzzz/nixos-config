@@ -54,7 +54,7 @@ Rectangle {
         root.temperatureText
     ].filter(function(value) {
         return String(value || "").length > 0;
-    }).join("，")
+    }).join(", ")
 
     Behavior on color {
         ColorAnimation {

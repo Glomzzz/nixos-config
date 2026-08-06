@@ -93,7 +93,7 @@ Item {
         Text {
             text: root.title
             color: Appearance.colors.colOnWeatherCardSurfaceVariant
-            font.family: "LXGW WenKai GB Screen"
+            font.family: "LXGW WenKai Screen"
             font.bold: true
             font.pixelSize: 19
             anchors.verticalCenter: parent.verticalCenter
@@ -119,7 +119,7 @@ Item {
         width: parent.width * 0.40
         text: root.level
         color: Appearance.colors.colOnWeatherCardSurface
-        font.family: "LXGW WenKai GB Screen"
+        font.family: "LXGW WenKai Screen"
         font.pixelSize: 22
         font.bold: true
         horizontalAlignment: Text.AlignHCenter

@@ -1,4 +1,6 @@
 .direnv/
+__pycache__/
+*.py[cod]
 /build/
 /result
 /result-*

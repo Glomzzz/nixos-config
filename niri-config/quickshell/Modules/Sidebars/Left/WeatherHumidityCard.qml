@@ -109,7 +109,7 @@ WeatherInsightCard {
         Text {
             text: qsTr("相对湿度")
             color: Appearance.colors.colOnWeatherCardSurfaceVariant
-            font.family: "LXGW WenKai GB Screen"
+            font.family: "LXGW WenKai Screen"
             font.pixelSize: 18
             font.bold: true
         }
@@ -184,7 +184,7 @@ WeatherInsightCard {
         Text {
             text: qsTr("露点")
             color: Appearance.colors.colOnWeatherCardSurface
-            font.family: "LXGW WenKai GB Screen"
+            font.family: "LXGW WenKai Screen"
             font.pixelSize: 18
             font.bold: true
             anchors.verticalCenter: parent.verticalCenter

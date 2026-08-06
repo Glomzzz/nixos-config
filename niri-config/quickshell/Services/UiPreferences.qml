@@ -10,25 +10,34 @@ Singleton {
 
     readonly property string configDir: Paths.homeDir + "/.cache/quickshell"
     readonly property string filePath: configDir + "/ui-preferences.json"
+    readonly property string configuredLanguageValue: String(
+        Quickshell.env("CLAVIS_LANGUAGE") || "").trim()
+    readonly property bool languageForced: configuredLanguageValue !== ""
+    readonly property string configuredLanguage:
+        normalizedLanguage(configuredLanguageValue)
 
     property bool dndEnabled: false
     property bool darkMode: false
-    property string language: normalizedLanguage(Qt.locale().name)
+    property string language: languageForced
+        ? configuredLanguage : normalizedLanguage(Qt.locale().name)
     property bool storeReady: false
     property bool preferencesReady: false
     property bool savePending: false
     property var systemGridLayout: ({})
 
     function normalizedLanguage(value) {
-        const normalized = String(value || "").replace("-", "_").toLowerCase();
+        const normalized = String(value || "").replace(/-/g, "_").toLowerCase();
         if (normalized.startsWith("en"))
             return "en_US";
-        if (normalized === "zh_tw"
-                || normalized === "zh_hk"
-                || normalized === "zh_mo"
-                || normalized.indexOf("hant") >= 0)
-            return "zh_TW";
-        return "zh_CN";
+        if (normalized.startsWith("zh")) {
+            if (normalized === "zh_tw"
+                    || normalized === "zh_hk"
+                    || normalized === "zh_mo"
+                    || normalized.indexOf("hant") >= 0)
+                return "zh_TW";
+            return "zh_CN";
+        }
+        return "en_US";
     }
 
     function setDndEnabled(value) {
@@ -41,7 +50,8 @@ Singleton {
     }
 
     function setLanguage(value) {
-        const normalized = root.normalizedLanguage(value);
+        const normalized = root.languageForced
+            ? root.configuredLanguage : root.normalizedLanguage(value);
         if (root.language === normalized)
             return;
         root.language = normalized;
@@ -113,16 +123,21 @@ Singleton {
         onLoaded: {
             try {
                 const parsed = JSON.parse(prefsFile.text().trim() || "{}");
+                const persistedLanguage = String(parsed.language || "");
                 if (typeof parsed.dndEnabled === "boolean")
                     root.dndEnabled = parsed.dndEnabled;
-                root.language = root.normalizedLanguage(
-                    parsed.language || Qt.locale().name
-                );
+                root.language = root.languageForced
+                    ? root.configuredLanguage
+                    : root.normalizedLanguage(
+                        persistedLanguage || Qt.locale().name
+                    );
                 if (parsed.systemGridLayout
                         && typeof parsed.systemGridLayout === "object") {
                     root.systemGridLayout =
                         parsed.systemGridLayout;
                 }
+                if (persistedLanguage !== root.language)
+                    root.save();
             } catch (error) {
                 console.log("UiPreferences failed to load:", error);
             } finally {

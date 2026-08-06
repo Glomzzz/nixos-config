@@ -130,9 +130,9 @@ binds {
     Mod+Return hotkey-overlay-title="Open Terminal" { spawn "kitty"; }
     Mod+C hotkey-overlay-title="Open Editor" { spawn "emacsclient" "-c" "-a" "emacs"; }
     Mod+E hotkey-overlay-title="Open Files" { spawn "dolphin"; }
-    Mod+Space repeat=false hotkey-overlay-title="Spotlight" { spawn "qs" "ipc" "call" "spotlight" "toggle"; }
-    Ctrl+Space repeat=false hotkey-overlay-title="Spotlight" { spawn "qs" "ipc" "call" "spotlight" "toggle"; }
-    Mod+V repeat=false hotkey-overlay-title="Clipboard" { spawn "qs" "ipc" "call" "spotlight" "openMode" "clipboard"; }
+    Mod+Space repeat=false hotkey-overlay-title="Spotlight" { spawn "clavis-shell" "ipc" "call" "spotlight" "toggle"; }
+    Ctrl+Space repeat=false hotkey-overlay-title="Spotlight" { spawn "clavis-shell" "ipc" "call" "spotlight" "toggle"; }
+    Mod+V repeat=false hotkey-overlay-title="Clipboard" { spawn "clavis-shell" "ipc" "call" "spotlight" "openMode" "clipboard"; }
 
     Mod+Q repeat=false { close-window; }
     Mod+T repeat=false { toggle-window-floating; }

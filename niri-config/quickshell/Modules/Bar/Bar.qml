@@ -60,6 +60,7 @@ Variants {
                 }
                 SidebarButton {
                     id: sidebarButton
+                    screen: barWindow.screen
                 }
                 ActiveWindow {
                     id: activeWindow

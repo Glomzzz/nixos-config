@@ -14,14 +14,12 @@ Item {
     signal requestHideKeystone()
 
     property var toolsModel: [
-        { icon: "colorize",         tip: qsTr("取色器") },
-        { icon: "videocam",         tip: qsTr("录屏") },
-        { icon: "gif",              tip: qsTr("录制 GIF") },
-        { icon: "crop_free",        tip: qsTr("普通截屏") },
-        { icon: "height",           tip: qsTr("截长屏") },
-        { icon: "document_scanner", tip: qsTr("OCR 识别") },
-        { icon: "mic",              tip: qsTr("录麦克风") },
-        { icon: "speaker",          tip: qsTr("录电脑声音") }
+        { action: "color", icon: "colorize", tip: qsTr("Color picker") },
+        { action: "video", icon: "videocam", tip: qsTr("Record screen") },
+        { action: "gif", icon: "gif", tip: qsTr("Record GIF") },
+        { action: "screenshot", icon: "crop_free", tip: qsTr("Screenshot") },
+        { action: "microphone", icon: "mic", tip: qsTr("Record microphone") },
+        { action: "systemAudio", icon: "speaker", tip: qsTr("Record system audio") }
     ]
 
     property int selectedIndex: 0
@@ -46,24 +44,24 @@ Item {
     Keys.onEnterPressed: triggerSelected()
 
     function triggerSelected() {
-        console.log(qsTr("触发工具: ") + toolsModel[selectedIndex].tip)
+        const tool = toolsModel[selectedIndex]
+        if (!tool)
+            return
 
         toolsRoot.requestHideKeystone()
 
-        if (selectedIndex === 0) {
+        if (tool.action === "color") {
             toolsBackend.pickColor()
-        } else if (selectedIndex === 1) {
+        } else if (tool.action === "video") {
             toolsBackend.startRecord("video")
-        } else if (selectedIndex === 2) {
+        } else if (tool.action === "gif") {
             toolsBackend.startRecord("gif")
-        } else if (selectedIndex === 3) {
+        } else if (tool.action === "screenshot") {
             toolsBackend.takeScreenshot()
-        } else if (selectedIndex === 6) {
+        } else if (tool.action === "microphone") {
             toolsBackend.startAudio("mic")
-        } else if (selectedIndex === 7) {
+        } else if (tool.action === "systemAudio") {
             toolsBackend.startAudio("system")
-        } else {
-            console.log(qsTr("该工具的后端尚未实现！"))
         }
     }
 

@@ -7,6 +7,8 @@ import qs.Services
 Item {
     id: root
 
+    property var screen: null
+
     implicitHeight: 36
     implicitWidth: buttonRow.implicitWidth + 16
 
@@ -37,6 +39,7 @@ Item {
         spacing: 8
 
         SidebarPillButton {
+            screen: root.screen
             viewName: "info"
             iconName: "notifications"
             activeColor: Appearance.colors.colSecondary
@@ -44,12 +47,15 @@ Item {
         }
 
         SidebarPillButton {
+            screen: root.screen
             viewName: "sys"
             iconName: "memory"
             activeColor: Appearance.colors.colTertiary
             activeContentColor: Appearance.colors.colOnTertiary
         }
 
-        SidebarWeatherButton {}
+        SidebarWeatherButton {
+            screen: root.screen
+        }
     }
 }

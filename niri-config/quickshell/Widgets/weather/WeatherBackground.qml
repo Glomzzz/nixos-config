@@ -1104,7 +1104,7 @@ Item {
                 y2: model.y2
                 startRotation: model.startRotation
                 endRotation: model.endRotation
-                onFinished: root.removeLeaf(leafId)
+                onFinished: leafId => root.removeLeaf(leafId)
             }
         }
     }

@@ -224,7 +224,7 @@ PanelWindow {
 
             Text {
                 text: qsTr("拖拽选择区域  ·  Esc 取消")
-                font.family: "LXGW WenKai GB Screen"
+                font.family: "LXGW WenKai Screen"
                 font.pixelSize: 13
                 color: Appearance.colors.colOnPrimaryContainer
             }

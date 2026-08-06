@@ -30,7 +30,6 @@ in {
     environment.systemPackages = [cfg.package];
 
     fonts.packages = with pkgs; [
-      font-awesome
       lxgw-wenkai-screen
       material-symbols
       nerd-fonts.jetbrains-mono

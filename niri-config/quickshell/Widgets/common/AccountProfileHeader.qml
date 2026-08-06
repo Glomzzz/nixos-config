@@ -271,7 +271,8 @@ Rectangle {
                 }
 
                 Text {
-                    Layout.maximumWidth: parent.width * 0.44
+                    Layout.maximumWidth: root.width
+                        * (root.showPackageStats ? 0.22 : 0.35)
                     text: root.distroName
                     color: Appearance.colors.colOnSurfaceVariant
                     font.family: Sizes.fontFamily

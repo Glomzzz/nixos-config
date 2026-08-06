@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import qs.Common
+import qs.Components
 import qs.Widgets.common
 
 Rectangle {
@@ -26,14 +27,12 @@ Rectangle {
         }
     }
 
-    Text {
-        id: icon
+    MaterialSymbol {
         anchors.centerIn: parent
-        text: "\uf0f3"
-        font.family: "Font Awesome 6 Free Solid"
-        font.pixelSize: root.isHovered ? 14 : 12
+        text: "notifications"
+        iconSize: root.isHovered ? 14 : 12
         color: Appearance.colors.colOnSecondaryContainer
-        Behavior on font.pixelSize { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        Behavior on iconSize { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
     }
 
     PopupToolTip {

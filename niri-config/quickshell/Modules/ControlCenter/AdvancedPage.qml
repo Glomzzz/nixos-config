@@ -19,11 +19,6 @@ StyledFlickable {
             "icon": "monitoring"
         }),
         ({
-            "id": "cava",
-            "title": "Cava",
-            "icon": "graphic_eq"
-        }),
-        ({
             "id": "kitty",
             "title": "Kitty",
             "icon": "terminal"
@@ -37,16 +32,6 @@ StyledFlickable {
             "id": "niri",
             "title": "Niri",
             "icon": "window"
-        }),
-        ({
-            "id": "yazi",
-            "title": "Yazi",
-            "icon": "folder"
-        }),
-        ({
-            "id": "zsh_prompt",
-            "title": "Zsh prompt",
-            "icon": "code"
         })
     ]
 
@@ -62,14 +47,14 @@ StyledFlickable {
         InlineStatusBanner {
             Layout.fillWidth: true
             visible: ThemeService.generating
-            message: qsTr("正在为已启用的程序生成 Matugen 配色…")
+            message: qsTr("Generating Matugen colors for enabled applications…")
             iconName: "progress_activity"
         }
 
         SettingsSection {
             Layout.fillWidth: true
-            title: qsTr("Matugen 模板生成")
-            supportingText: qsTr("壁纸或主题变化时，仅为已启用的程序生成模板。Quickshell 配色始终生成。关闭开关不会删除已有配色文件。")
+            title: qsTr("Matugen templates")
+            supportingText: qsTr("Wallpaper and theme changes update only enabled applications. Quickshell colors are always generated, and disabling an entry keeps its existing files.")
 
             Repeater {
                 model: root.templatePrograms
@@ -83,15 +68,15 @@ StyledFlickable {
                     supportingText:
                         PersonalizationConfig
                             .isMatugenTemplateEnabled(modelData.id)
-                        ? qsTr("生成并更新 Matugen 配色")
-                        : qsTr("已停止后续生成；现有配色文件会保留")
+                        ? qsTr("Generate and update Matugen colors")
+                        : qsTr("Generation disabled; existing files are kept")
 
                     trailing: StyledSwitch {
                         enabled: !ThemeService.generating
                         checked: PersonalizationConfig
                             .isMatugenTemplateEnabled(modelData.id)
                         Accessible.name:
-                            qsTr("启用 %1 Matugen 模板")
+                            qsTr("Enable the %1 Matugen template")
                                 .arg(modelData.title)
                         onToggled:
                             ThemeService.setMatugenTemplateEnabled(

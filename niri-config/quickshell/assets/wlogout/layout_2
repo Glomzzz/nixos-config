@@ -1,27 +1,27 @@
 {
     "label": "lock",
-    "action": "qs ipc call lock open",
-    "text": "锁定",
+    "action": "clavis-shell ipc call lock open",
+    "text": "Lock",
     "keybind": "l"
 }
 
 {
     "label": "logout",
     "action": "niri msg action quit --skip-confirmation",
-    "text": "退出",
+    "text": "Log Out",
     "keybind": "e"
 }
 
 {
     "label": "shutdown",
     "action": "systemctl poweroff",
-    "text": "关机",
+    "text": "Shut Down",
     "keybind": "s"
 }
 
 {
     "label": "reboot",
     "action": "systemctl reboot",
-    "text": "重启",
+    "text": "Restart",
     "keybind": "r"
 }

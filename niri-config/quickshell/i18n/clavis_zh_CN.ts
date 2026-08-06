@@ -3189,54 +3189,6 @@
     </message>
 </context>
 <context>
-    <name>ScheduleWidget</name>
-    <message>
-        <location filename="../Modules/Keystone/DashboardContent/ScheduleWidget.qml" line="13" />
-        <source>周一</source>
-        <translation>周一</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/DashboardContent/ScheduleWidget.qml" line="13" />
-        <source>周二</source>
-        <translation>周二</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/DashboardContent/ScheduleWidget.qml" line="13" />
-        <source>周三</source>
-        <translation>周三</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/DashboardContent/ScheduleWidget.qml" line="13" />
-        <source>周四</source>
-        <translation>周四</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/DashboardContent/ScheduleWidget.qml" line="14" />
-        <source>周五</source>
-        <translation>周五</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/DashboardContent/ScheduleWidget.qml" line="14" />
-        <source>周六</source>
-        <translation>周六</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/DashboardContent/ScheduleWidget.qml" line="14" />
-        <source>周日</source>
-        <translation>周日</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/DashboardContent/ScheduleWidget.qml" line="55" />
-        <source>课表 JSON 解析错误:</source>
-        <translation>课表 JSON 解析错误:</translation>
-    </message>
-    <message>
-        <location filename="../Modules/Keystone/DashboardContent/ScheduleWidget.qml" line="69" />
-        <source>时间</source>
-        <translation>时间</translation>
-    </message>
-</context>
-<context>
     <name>ScreencastService</name>
     <message>
         <location filename="../Services/ScreencastService.qml" line="14" />

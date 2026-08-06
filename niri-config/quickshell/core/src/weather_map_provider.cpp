@@ -79,7 +79,7 @@ void WeatherMapProvider::setActive(bool active)
     } else if (m_apiKey.isEmpty()) {
         setStatus(
             QStringLiteral("not_configured"),
-            QStringLiteral("OpenWeather 地图服务未配置")
+            QStringLiteral("OpenWeather map service is not configured")
         );
     }
     emit activeChanged();
@@ -212,7 +212,7 @@ QVariantMap WeatherMapProvider::requestTile(
         else {
             setStatus(
                 QStringLiteral("not_configured"),
-                QStringLiteral("OpenWeather 地图服务未配置")
+                QStringLiteral("OpenWeather map service is not configured")
             );
         }
         return result;
@@ -249,7 +249,7 @@ QVariantMap WeatherMapProvider::storeApiKey(const QString &apiKey)
     if (!validApiKey(normalized)) {
         result.insert(
             QStringLiteral("message"),
-            QStringLiteral("请输入有效的 OpenWeather API key")
+            QStringLiteral("Enter a valid OpenWeather API key")
         );
         return result;
     }
@@ -257,7 +257,7 @@ QVariantMap WeatherMapProvider::storeApiKey(const QString &apiKey)
     if (m_credentialBusy) {
         result.insert(
             QStringLiteral("message"),
-            QStringLiteral("系统密钥环正在处理另一项操作")
+            QStringLiteral("The system keyring is busy with another operation")
         );
         return result;
     }
@@ -279,7 +279,7 @@ QVariantMap WeatherMapProvider::storeApiKey(const QString &apiKey)
                 emit credentialOperationFinished(
                     QStringLiteral("openweather_store"),
                     false,
-                    QStringLiteral("无法保存 OpenWeather 密钥")
+                    QStringLiteral("Could not save the OpenWeather key")
                 );
                 return;
             }
@@ -291,7 +291,7 @@ QVariantMap WeatherMapProvider::storeApiKey(const QString &apiKey)
             emit credentialOperationFinished(
                 QStringLiteral("openweather_store"),
                 true,
-                QStringLiteral("OpenWeather 密钥已保存")
+                QStringLiteral("OpenWeather key saved")
             );
         }
     );
@@ -302,7 +302,7 @@ QVariantMap WeatherMapProvider::storeApiKey(const QString &apiKey)
     result.insert(QStringLiteral("pending"), true);
     result.insert(
         QStringLiteral("message"),
-        QStringLiteral("正在安全保存到系统密钥环")
+        QStringLiteral("Saving securely to the system keyring")
     );
     return result;
 }
@@ -317,7 +317,7 @@ QVariantMap WeatherMapProvider::clearApiKey()
     if (m_credentialBusy) {
         result.insert(
             QStringLiteral("message"),
-            QStringLiteral("系统密钥环正在处理另一项操作")
+            QStringLiteral("The system keyring is busy with another operation")
         );
         return result;
     }
@@ -339,7 +339,7 @@ QVariantMap WeatherMapProvider::clearApiKey()
                 emit credentialOperationFinished(
                     QStringLiteral("openweather_clear"),
                     false,
-                    QStringLiteral("无法清除 OpenWeather 密钥")
+                    QStringLiteral("Could not clear the OpenWeather key")
                 );
                 return;
             }
@@ -347,14 +347,14 @@ QVariantMap WeatherMapProvider::clearApiKey()
             setCredentialsReady(true);
             setStatus(
                 QStringLiteral("not_configured"),
-                QStringLiteral("OpenWeather 地图服务未配置")
+                QStringLiteral("OpenWeather map service is not configured")
             );
             replaceApiKey({}, true);
             finishCredentialOperation();
             emit credentialOperationFinished(
                 QStringLiteral("openweather_clear"),
                 true,
-                QStringLiteral("OpenWeather 密钥已清除")
+                QStringLiteral("OpenWeather key cleared")
             );
         }
     );
@@ -365,7 +365,7 @@ QVariantMap WeatherMapProvider::clearApiKey()
     result.insert(QStringLiteral("pending"), true);
     result.insert(
         QStringLiteral("message"),
-        QStringLiteral("正在从系统密钥环清除密钥")
+        QStringLiteral("Clearing the key from the system keyring")
     );
     return result;
 }
@@ -381,7 +381,7 @@ QVariantMap WeatherMapProvider::storeMapTilerApiKey(const QString &apiKey)
     if (!validApiKey(normalized)) {
         result.insert(
             QStringLiteral("message"),
-            QStringLiteral("请输入有效的 MapTiler API key")
+            QStringLiteral("Enter a valid MapTiler API key")
         );
         return result;
     }
@@ -389,7 +389,7 @@ QVariantMap WeatherMapProvider::storeMapTilerApiKey(const QString &apiKey)
     if (m_credentialBusy) {
         result.insert(
             QStringLiteral("message"),
-            QStringLiteral("系统密钥环正在处理另一项操作")
+            QStringLiteral("The system keyring is busy with another operation")
         );
         return result;
     }
@@ -412,7 +412,7 @@ QVariantMap WeatherMapProvider::storeMapTilerApiKey(const QString &apiKey)
                 emit credentialOperationFinished(
                     QStringLiteral("maptiler_store"),
                     false,
-                    QStringLiteral("无法保存 MapTiler 密钥")
+                    QStringLiteral("Could not save the MapTiler key")
                 );
                 return;
             }
@@ -424,7 +424,7 @@ QVariantMap WeatherMapProvider::storeMapTilerApiKey(const QString &apiKey)
             emit credentialOperationFinished(
                 QStringLiteral("maptiler_store"),
                 true,
-                QStringLiteral("MapTiler 密钥已保存")
+                QStringLiteral("MapTiler key saved")
             );
         }
     );
@@ -435,7 +435,7 @@ QVariantMap WeatherMapProvider::storeMapTilerApiKey(const QString &apiKey)
     result.insert(QStringLiteral("pending"), true);
     result.insert(
         QStringLiteral("message"),
-        QStringLiteral("正在安全保存到系统密钥环")
+        QStringLiteral("Saving securely to the system keyring")
     );
     return result;
 }
@@ -450,7 +450,7 @@ QVariantMap WeatherMapProvider::clearMapTilerApiKey()
     if (m_credentialBusy) {
         result.insert(
             QStringLiteral("message"),
-            QStringLiteral("系统密钥环正在处理另一项操作")
+            QStringLiteral("The system keyring is busy with another operation")
         );
         return result;
     }
@@ -473,7 +473,7 @@ QVariantMap WeatherMapProvider::clearMapTilerApiKey()
                 emit credentialOperationFinished(
                     QStringLiteral("maptiler_clear"),
                     false,
-                    QStringLiteral("无法清除 MapTiler 密钥")
+                    QStringLiteral("Could not clear the MapTiler key")
                 );
                 return;
             }
@@ -485,7 +485,7 @@ QVariantMap WeatherMapProvider::clearMapTilerApiKey()
             emit credentialOperationFinished(
                 QStringLiteral("maptiler_clear"),
                 true,
-                QStringLiteral("MapTiler 密钥已清除")
+                QStringLiteral("MapTiler key cleared")
             );
         }
     );
@@ -496,7 +496,7 @@ QVariantMap WeatherMapProvider::clearMapTilerApiKey()
     result.insert(QStringLiteral("pending"), true);
     result.insert(
         QStringLiteral("message"),
-        QStringLiteral("正在从系统密钥环清除密钥")
+        QStringLiteral("Clearing the key from the system keyring")
     );
     return result;
 }
@@ -792,7 +792,7 @@ void WeatherMapProvider::finishRequest(QNetworkReply *reply)
             else {
                 setStatus(
                     QStringLiteral("invalid_key"),
-                    QStringLiteral("OpenWeather API key 无效或尚未激活")
+                    QStringLiteral("OpenWeather API key is invalid or not yet active")
                 );
             }
         } else if (httpStatus == 429) {
@@ -802,7 +802,7 @@ void WeatherMapProvider::finishRequest(QNetworkReply *reply)
             else {
                 setStatus(
                     QStringLiteral("rate_limited"),
-                    QStringLiteral("OpenWeather 请求频率受限")
+                    QStringLiteral("OpenWeather request rate limited")
                 );
             }
         } else {
@@ -812,7 +812,7 @@ void WeatherMapProvider::finishRequest(QNetworkReply *reply)
             else {
                 setStatus(
                     QStringLiteral("network_error"),
-                    QStringLiteral("天气图层网络不可用，正在使用已有缓存")
+                    QStringLiteral("Weather layer network unavailable; using cached data")
                 );
             }
         }
@@ -937,7 +937,7 @@ void WeatherMapProvider::loadOpenWeatherApiKey(bool forceRefresh)
                 replaceApiKey({}, forceRefresh);
                 setStatus(
                     QStringLiteral("not_configured"),
-                    QStringLiteral("OpenWeather 地图服务未配置")
+                    QStringLiteral("OpenWeather map service is not configured")
                 );
                 loadMapTilerApiKey(forceRefresh);
                 return;
@@ -947,7 +947,7 @@ void WeatherMapProvider::loadOpenWeatherApiKey(bool forceRefresh)
                 replaceApiKey({}, forceRefresh);
                 setStatus(
                     QStringLiteral("keychain_error"),
-                    QStringLiteral("无法访问系统密钥环")
+                    QStringLiteral("Could not access the system keyring")
                 );
                 loadMapTilerApiKey(forceRefresh);
                 return;
@@ -958,7 +958,7 @@ void WeatherMapProvider::loadOpenWeatherApiKey(bool forceRefresh)
                 replaceApiKey({}, forceRefresh);
                 setStatus(
                     QStringLiteral("not_configured"),
-                    QStringLiteral("OpenWeather 地图服务未配置")
+                    QStringLiteral("OpenWeather map service is not configured")
                 );
                 loadMapTilerApiKey(forceRefresh);
                 return;

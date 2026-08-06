@@ -3,9 +3,8 @@ pragma Singleton
 import Quickshell
 
 Singleton {
-    readonly property string fontFamily: "LXGW WenKai GB Screen"
+    readonly property string fontFamily: "LXGW WenKai Screen"
     readonly property string fontFamilyMono: "JetBrainsMono Nerd Font"
-    readonly property string fontIcon: "LXGW WenKai GB Screen"
     readonly property string fontMaterialSymbols: "Material Symbols Rounded"
 
     // Material 3 type scale used by shell surfaces. Keep numeric metrics on

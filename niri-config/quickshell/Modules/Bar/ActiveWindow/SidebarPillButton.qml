@@ -5,6 +5,7 @@ import qs.Widgets.common
 Item {
     id: root
 
+    property var screen: null
     property string viewName: "info"
     property string iconName: "notifications"
     property color activeColor: Appearance.colors.colSecondaryContainer
@@ -41,6 +42,9 @@ Item {
     }
 
     function toggleView() {
+        if (root.screen && root.screen.name)
+            WidgetState.qsScreenName = root.screen.name;
+
         if (WidgetState.leftSidebarOpen && WidgetState.leftSidebarView === viewName) {
             WidgetState.leftSidebarOpen = false;
             return;

@@ -90,11 +90,11 @@ Rectangle {
     color: Appearance.colors.colSurfaceContainerHigh
     clip: true
     Accessible.name: qsTr("天气，")
-        + root.temperatureText() + "，"
+        + root.temperatureText() + ", "
         + (root.dataAvailable
             ? WeatherPlugin.currentWeatherText
             : qsTr("正在获取"))
-        + "，" + (WeatherPlugin.locationName || qsTr("位置未知"))
+        + ", " + (WeatherPlugin.locationName || qsTr("位置未知"))
         + qsTr("，坐标 ") + root.coordinateText()
         + qsTr("，湿度 ")
         + root.percentText(WeatherPlugin.currentRelativeHumidity)

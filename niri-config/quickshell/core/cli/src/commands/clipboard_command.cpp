@@ -382,23 +382,23 @@ QString fileCategoryLabel(const QJsonObject &file)
 {
     const QString category = file.value(QStringLiteral("category")).toString();
     if (category == QStringLiteral("folder"))
-        return QStringLiteral("文件夹");
+        return QStringLiteral("Folder");
     if (category == QStringLiteral("image"))
-        return QStringLiteral("图片文件");
+        return QStringLiteral("Image file");
     if (category == QStringLiteral("video"))
-        return QStringLiteral("视频");
+        return QStringLiteral("Video");
     if (category == QStringLiteral("audio"))
-        return QStringLiteral("音频");
+        return QStringLiteral("Audio");
     if (category == QStringLiteral("archive"))
-        return QStringLiteral("压缩包");
+        return QStringLiteral("Archive");
     if (category == QStringLiteral("pdf"))
         return QStringLiteral("PDF");
     if (category == QStringLiteral("source-code"))
         return file.value(QStringLiteral("language")).toString()
-            + QStringLiteral(" 源文件");
+            + QStringLiteral(" source file");
     if (category == QStringLiteral("document"))
-        return QStringLiteral("文档");
-    return QStringLiteral("文件");
+        return QStringLiteral("Document");
+    return QStringLiteral("File");
 }
 
 QString cacheDirectory()
@@ -513,13 +513,13 @@ TextDisplay textDisplay(const QString &text)
     display.lineCount = effectiveLines.size();
     display.multiline = effectiveLines.size() > 1;
     if (effectiveLines.isEmpty()) {
-        display.title = QStringLiteral("空文本");
-        display.subtitle = QStringLiteral("文本");
+        display.title = QStringLiteral("Empty text");
+        display.subtitle = QStringLiteral("Text");
         return display;
     }
     display.title = effectiveLines.first();
     if (effectiveLines.size() == 1) {
-        display.subtitle = QStringLiteral("文本");
+        display.subtitle = QStringLiteral("Text");
     } else {
         display.subtitle = effectiveLines.at(1);
         if (effectiveLines.size() > 2)
@@ -596,8 +596,8 @@ QJsonObject basePayload(const QString &id, qsizetype byteSize)
         {QStringLiteral("id"), id},
         {QStringLiteral("payloadKind"), QStringLiteral("binary")},
         {QStringLiteral("textSubtype"), QJsonValue(QJsonValue::Null)},
-        {QStringLiteral("title"), QStringLiteral("二进制剪贴板")},
-        {QStringLiteral("subtitle"), QStringLiteral("未知二进制内容")},
+        {QStringLiteral("title"), QStringLiteral("Binary clipboard data")},
+        {QStringLiteral("subtitle"), QStringLiteral("Unknown binary content")},
         {QStringLiteral("icon"), QStringLiteral("data_object")},
         {QStringLiteral("preview"), QString()},
         {QStringLiteral("previewUrl"), QString()},
@@ -640,7 +640,7 @@ PayloadInspection inspectPayload(const QString &id,
                                                ? QStringLiteral("jpeg") : format);
         result.mimeType = mime;
         result.json.insert(QStringLiteral("payloadKind"), QStringLiteral("image"));
-        result.json.insert(QStringLiteral("title"), QStringLiteral("图片剪贴板"));
+        result.json.insert(QStringLiteral("title"), QStringLiteral("Clipboard image"));
         result.json.insert(QStringLiteral("subtitle"),
                            QStringLiteral("%1 · %2×%3 · %4")
                                .arg(format.toUpper())
@@ -765,22 +765,22 @@ PayloadInspection inspectPayload(const QString &id,
             } else if (imageWrapper) {
                 const QString host = sourceUrl.host();
                 result.json.insert(QStringLiteral("title"),
-                                   alt.isEmpty() ? QStringLiteral("图片引用")
+                                   alt.isEmpty() ? QStringLiteral("Image reference")
                                                  : alt.left(240));
                 result.json.insert(
                     QStringLiteral("subtitle"),
                     remoteImage && !host.isEmpty()
-                        ? QStringLiteral("远程图片 · %1（未下载）").arg(host)
-                        : QStringLiteral("图片内容未提供可持久化像素"));
+                        ? QStringLiteral("Remote image · %1 (not downloaded)").arg(host)
+                        : QStringLiteral("Image content has no persistable pixels"));
                 result.json.insert(QStringLiteral("preview"), alt.left(4096));
                 result.json.insert(QStringLiteral("searchText"),
                                    (alt + QLatin1Char(' ') + host)
                                        .left(MaximumSearchTextCharacters));
             } else {
                 result.json.insert(QStringLiteral("title"),
-                                   QStringLiteral("HTML 内容"));
+                                   QStringLiteral("HTML content"));
                 result.json.insert(QStringLiteral("subtitle"),
-                                   QStringLiteral("没有可安全显示的正文"));
+                                   QStringLiteral("No safely displayable text"));
                 result.json.insert(QStringLiteral("preview"), QString());
                 result.json.insert(QStringLiteral("searchText"), QString());
             }
@@ -852,9 +852,9 @@ PayloadInspection inspectPayload(const QString &id,
                                         : first.value(QStringLiteral("previewUrl")).toString());
             if (multiple) {
                 result.json.insert(QStringLiteral("title"),
-                                   QStringLiteral("%1 个文件").arg(files.size()));
+                                   QStringLiteral("%1 files").arg(files.size()));
                 result.json.insert(QStringLiteral("subtitle"),
-                                   names.join(QStringLiteral("、"))
+                                   names.join(QStringLiteral(", "))
                                        + (files.size() > 3 ? QStringLiteral("…") : QString()));
             } else {
                 result.json.insert(QStringLiteral("title"),
@@ -894,7 +894,7 @@ PayloadInspection inspectPayload(const QString &id,
         result.json.insert(QStringLiteral("mimeType"), result.mimeType);
         result.json.insert(QStringLiteral("icon"), icon);
         result.json.insert(QStringLiteral("title"),
-                           title.isEmpty() ? QStringLiteral("空文本") : title.left(240));
+                           title.isEmpty() ? QStringLiteral("Empty text") : title.left(240));
         result.json.insert(QStringLiteral("subtitle"), subtitle.left(300));
         result.json.insert(QStringLiteral("multiline"), display.multiline);
         result.json.insert(QStringLiteral("lineCount"), display.lineCount);
@@ -915,7 +915,7 @@ PayloadInspection inspectPayload(const QString &id,
                            detectedMime + QStringLiteral(" · ") + humanBytes(bytes.size()));
     } else {
         result.json.insert(QStringLiteral("subtitle"),
-                           QStringLiteral("未知二进制 · ") + humanBytes(bytes.size()));
+                           QStringLiteral("Unknown binary · ") + humanBytes(bytes.size()));
     }
     return result;
 }
@@ -936,11 +936,11 @@ QJsonObject lightweightEntry(const QByteArray &line)
     const TextDisplay display = textDisplay(preview);
     entry.insert(QStringLiteral("preview"), html ? QString() : preview);
     entry.insert(QStringLiteral("title"),
-                 htmlImage ? QStringLiteral("图片引用")
-                           : html ? QStringLiteral("HTML 内容")
+                 htmlImage ? QStringLiteral("Image reference")
+                           : html ? QStringLiteral("HTML content")
                                   : display.title);
     entry.insert(QStringLiteral("subtitle"),
-                 html ? QStringLiteral("正在检查内容") : display.subtitle);
+                 html ? QStringLiteral("Checking content") : display.subtitle);
     entry.insert(QStringLiteral("payloadKind"), QStringLiteral("text"));
     entry.insert(QStringLiteral("textSubtype"), QStringLiteral("plain"));
     entry.insert(QStringLiteral("mimeType"), QStringLiteral("text/plain;charset=utf-8"));
@@ -958,7 +958,7 @@ QJsonObject lightweightEntry(const QByteArray &line)
         const QString format = imageMatch.captured(2).toLower();
         entry.insert(QStringLiteral("payloadKind"), QStringLiteral("image"));
         entry.insert(QStringLiteral("textSubtype"), QJsonValue(QJsonValue::Null));
-        entry.insert(QStringLiteral("title"), QStringLiteral("图片剪贴板"));
+        entry.insert(QStringLiteral("title"), QStringLiteral("Clipboard image"));
         entry.insert(QStringLiteral("subtitle"),
                      QStringLiteral("%1 · %2×%3")
                          .arg(format.toUpper())
@@ -974,8 +974,8 @@ QJsonObject lightweightEntry(const QByteArray &line)
     } else if (preview.contains(QChar::ReplacementCharacter)) {
         entry.insert(QStringLiteral("payloadKind"), QStringLiteral("binary"));
         entry.insert(QStringLiteral("textSubtype"), QJsonValue(QJsonValue::Null));
-        entry.insert(QStringLiteral("title"), QStringLiteral("二进制剪贴板"));
-        entry.insert(QStringLiteral("subtitle"), QStringLiteral("按需检查内容"));
+        entry.insert(QStringLiteral("title"), QStringLiteral("Binary clipboard data"));
+        entry.insert(QStringLiteral("subtitle"), QStringLiteral("Inspect on demand"));
         entry.insert(QStringLiteral("icon"), QStringLiteral("data_object"));
         entry.insert(QStringLiteral("mimeType"), QString());
     }

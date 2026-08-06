@@ -110,7 +110,7 @@ Item {
         Text {
             text: qsTr("能见度")
             color: Appearance.colors.colOnWeatherCardSurfaceVariant
-            font.family: "LXGW WenKai GB Screen"
+            font.family: "LXGW WenKai Screen"
             font.pixelSize: 19
             font.bold: true
             anchors.verticalCenter: parent.verticalCenter
@@ -135,7 +135,7 @@ Item {
         Text {
             text: root.valueUnitText()
             color: Appearance.colors.colOnWeatherCardSurface
-            font.family: "LXGW WenKai GB Screen"
+            font.family: "LXGW WenKai Screen"
             font.pixelSize: Math.round(root.width * 0.12)
             font.bold: true
             anchors.verticalCenter: parent.verticalCenter
@@ -150,7 +150,7 @@ Item {
         width: parent.width * 0.36
         text: root.descriptionText()
         color: Appearance.colors.colOnWeatherCardSurface
-        font.family: "LXGW WenKai GB Screen"
+        font.family: "LXGW WenKai Screen"
         font.pixelSize: 22
         font.bold: true
         horizontalAlignment: Text.AlignHCenter

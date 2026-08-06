@@ -1,12 +1,13 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import qs.Services
 
 PanelWindow {
     id: root
 
     visible: true
-    screen: Quickshell.screens.length > 0 ? Quickshell.screens[0] : null
+    screen: Brightness.activeScreen
     implicitWidth: 1
     implicitHeight: 1
     color: "transparent"

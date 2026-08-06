@@ -178,7 +178,6 @@ Item {
             root.pressure = "--"
             root.hourlyData = []
             root.dailyData = []
-            hourlyCanvas.requestPaint()
             return
         }
 
@@ -228,8 +227,6 @@ Item {
             })
         }
         root.dailyData = nextDaily
-
-        hourlyCanvas.requestPaint()
     }
 
     Component.onCompleted: {

@@ -69,7 +69,7 @@ Rectangle {
                 Text {
                     text: qsTr("逐小时预报")
                     color: Appearance.colors.colOnSurface
-                    font.family: "LXGW WenKai GB Screen"
+                    font.family: "LXGW WenKai Screen"
                     font.bold: true
                     font.pixelSize: 22
                     Layout.alignment: Qt.AlignVCenter
@@ -94,30 +94,6 @@ Rectangle {
 
                 Item { Layout.fillWidth: true }
 
-                Rectangle {
-                    Layout.preferredWidth: 36
-                    Layout.preferredHeight: 36
-                    Layout.alignment: Qt.AlignVCenter
-                    radius: 18
-                    color: moreMouse.containsMouse ? Appearance.colors.colLayer4 : Appearance.colors.colLayer2
-
-                    Behavior on color { ColorAnimation { duration: 150 } }
-
-                    Text {
-                        anchors.centerIn: parent
-                        text: "more_horiz"
-                        color: Appearance.colors.colOnSurfaceVariant
-                        font.family: "Material Symbols Outlined"
-                        font.pixelSize: 20
-                    }
-
-                    MouseArea {
-                        id: moreMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onClicked: console.log("Open hourly weather menu")
-                    }
-                }
             }
         }
 

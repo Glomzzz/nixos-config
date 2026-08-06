@@ -306,7 +306,7 @@ Item {
                     activeColor: "white"
                     inactiveColor: "#99ffffff"
                     fontSize: 18
-                    fontFamily: "LXGW WenKai GB Screen"
+                    fontFamily: "LXGW WenKai Screen"
                     fontBold: true
                     horizontalAlignment: Text.AlignLeft
                     wrapMode: Text.WordWrap

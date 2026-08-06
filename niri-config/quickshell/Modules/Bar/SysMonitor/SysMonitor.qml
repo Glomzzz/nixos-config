@@ -70,7 +70,7 @@ Item {
                 // 同时保全了原始流的传递。并在这里调取新的 ramUsedGB。toFixed(1) 可保留如 14.2G 格式：
                 text: SysmonPlugin.ramUsedGB.toFixed(1) + "G"
                 color: Appearance.colors.colOnSurface
-                font.family: "LXGW WenKai GB Screen"
+                font.family: "LXGW WenKai Screen"
                 font.bold: true
                 font.pixelSize: 13
             }
@@ -93,7 +93,7 @@ Item {
             Text {
                 text: Math.round(SysmonPlugin.diskUsage) + "%"
                 color: Appearance.colors.colOnSurface
-                font.family: "LXGW WenKai GB Screen"
+                font.family: "LXGW WenKai Screen"
                 font.bold: true
                 font.pixelSize: 13
             }
@@ -116,7 +116,7 @@ Item {
             Text {
                 text: Math.round(SysmonPlugin.coreTemp) + "°C"
                 color: Appearance.colors.colOnSurface
-                font.family: "LXGW WenKai GB Screen"
+                font.family: "LXGW WenKai Screen"
                 font.bold: true
                 font.pixelSize: 13
             }
@@ -139,7 +139,7 @@ Item {
             Text {
                 text: Math.round(SysmonPlugin.cpuUsage) + "%"
                 color: Appearance.colors.colOnSurface
-                font.family: "LXGW WenKai GB Screen"
+                font.family: "LXGW WenKai Screen"
                 font.bold: true
                 font.pixelSize: 13
             }

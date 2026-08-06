@@ -13,6 +13,8 @@ import qs.Widgets.common
 FloatingWindow {
     id: root
 
+    screen: Brightness.getScreenByName(Brightness.primaryScreenName)
+        || Brightness.activeScreen
     visible: true
     title: "clavis-control-center"
     implicitWidth: 1100

@@ -59,17 +59,37 @@
         pkgs.quickshell
         pkgs.qt6.qt5compat
         pkgs.qt6.qtdeclarative
-        pkgs.qt6.qtlottie
       ];
+    desktopEntryFor = pkgs:
+      pkgs.makeDesktopItem {
+        name = "org.quickshell";
+        desktopName = "Clavis Shell";
+        comment = "Desktop shell for Niri";
+        exec = "clavis-shell";
+        icon = "preferences-desktop-display-symbolic";
+        noDisplay = true;
+        categories = ["System"];
+      };
+    desktopDataDirsFor = pkgs: desktopEntry:
+      pkgs.lib.makeSearchPath "share" [
+        desktopEntry
+        pkgs.adwaita-icon-theme
+        pkgs.gsettings-desktop-schemas
+        pkgs.hicolor-icon-theme
+      ];
+    gsettingsSchemaDirFor = pkgs: "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}/glib-2.0/schemas";
   in {
     packages = forAllSystems (system: let
       pkgs = pkgsFor system;
       core = pkgs.callPackage ./nix/package.nix {};
       runtimePackages = runtimePackagesFor pkgs;
       qmlImportPath = qmlImportPathFor pkgs core;
+      desktopEntry = desktopEntryFor pkgs;
+      desktopDataDirs = desktopDataDirsFor pkgs desktopEntry;
+      gsettingsSchemaDir = gsettingsSchemaDirFor pkgs;
       shell = pkgs.symlinkJoin {
         name = "clavis-shell-${core.version}";
-        paths = [core];
+        paths = [core desktopEntry];
         nativeBuildInputs = [pkgs.makeWrapper];
         postBuild = ''
           rm "$out/bin/key"
@@ -80,8 +100,10 @@
             --prefix PATH : "$out/bin:${pkgs.lib.makeBinPath runtimePackages}" \
             --prefix QML_IMPORT_PATH : "${qmlImportPath}" \
             --prefix QML2_IMPORT_PATH : "${qmlImportPath}" \
+            --prefix XDG_DATA_DIRS : "$out/share:${desktopDataDirs}" \
+            --set GSETTINGS_SCHEMA_DIR "${gsettingsSchemaDir}" \
+            --set QSG_USE_SIMPLE_ANIMATION_DRIVER "1" \
             --set CLAVIS_KEY "$out/bin/key" \
-            --set CLAVIS_PACKAGE_SERVICE_DISABLED "1" \
             --set CLAVIS_SOUND_DIR "${pkgs.sound-theme-freedesktop}/share/sounds/freedesktop/stereo"
           ln -s qs "$out/bin/clavis-shell"
         '';
@@ -110,6 +132,9 @@
       pkgs = pkgsFor system;
       core = self.packages.${system}.clavis-core;
       qmlImportPath = qmlImportPathFor pkgs core;
+      desktopEntry = desktopEntryFor pkgs;
+      desktopDataDirs = desktopDataDirsFor pkgs desktopEntry;
+      gsettingsSchemaDir = gsettingsSchemaDirFor pkgs;
     in {
       default = pkgs.mkShell {
         inputsFrom = [core];
@@ -125,10 +150,12 @@
             statix
           ]);
         CLAVIS_KEY = "${core}/bin/key";
-        CLAVIS_PACKAGE_SERVICE_DISABLED = "1";
         CLAVIS_SOUND_DIR = "${pkgs.sound-theme-freedesktop}/share/sounds/freedesktop/stereo";
         QML_IMPORT_PATH = qmlImportPath;
         QML2_IMPORT_PATH = qmlImportPath;
+        QSG_USE_SIMPLE_ANIMATION_DRIVER = "1";
+        XDG_DATA_DIRS = desktopDataDirs;
+        GSETTINGS_SCHEMA_DIR = gsettingsSchemaDir;
       };
     });
 
@@ -208,9 +235,8 @@
             matugen
             niri
             python3
+            qt6.qttools
             ripgrep
-            yazi
-            zsh
           ];
           src = ./quickshell;
         } ''
@@ -227,6 +253,8 @@
             tests/test_shell_blur_audit.sh; do
             "$test_script"
           done
+          python3 tests/test_i18n.py
+          python3 scripts/i18n/wrap_translatable_strings.py --root .
           touch "$out"
         '';
     });

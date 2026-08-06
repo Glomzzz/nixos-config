@@ -323,37 +323,11 @@ Item {
                         Text {
                             text: WeatherPlugin.locationName || qsTr("天气")
                             color: root.headerInk
-                            font.family: "LXGW WenKai GB Screen"
+                            font.family: "LXGW WenKai Screen"
                             font.pixelSize: 19
                             font.bold: true
                             elide: Text.ElideRight
                             Layout.fillWidth: true
-                        }
-                    }
-
-                    ToolButton {
-                        id: editButton
-                        implicitWidth: 38
-                        implicitHeight: 38
-                        Layout.alignment: Qt.AlignVCenter
-                        onClicked: console.log("Open weather settings")
-
-                        background: Rectangle {
-                            radius: width / 2
-                            color: editButton.down
-                                   ? Qt.rgba(root.headerInkMuted.r, root.headerInkMuted.g, root.headerInkMuted.b, 0.18)
-                                   : editButton.hovered
-                                     ? Qt.rgba(root.headerInkMuted.r, root.headerInkMuted.g, root.headerInkMuted.b, 0.10)
-                                     : "transparent"
-                        }
-
-                        contentItem: Text {
-                            text: "edit"
-                            color: root.headerInk
-                            font.family: "Material Symbols Outlined"
-                            font.pixelSize: 22
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
                         }
                     }
 
@@ -447,7 +421,7 @@ Item {
                             width: parent.width
                             text: WeatherPlugin.currentWeatherText || qsTr("未知")
                             color: Appearance.colors.colOnImage
-                            font.family: "LXGW WenKai GB Screen"
+                            font.family: "LXGW WenKai Screen"
                             font.pixelSize: 26
                             font.bold: true
                             horizontalAlignment: Text.AlignHCenter
@@ -488,7 +462,7 @@ Item {
                             width: parent.width
                             text: qsTr("体感温度: ") + fmtTemp(WeatherPlugin.currentFeelsLikeC)
                             color: Appearance.colors.colOnImage
-                            font.family: "LXGW WenKai GB Screen"
+                            font.family: "LXGW WenKai Screen"
                             font.pixelSize: 18
                             horizontalAlignment: Text.AlignHCenter
                             elide: Text.ElideRight
@@ -499,7 +473,7 @@ Item {
                             text: qsTr("最高 ") + fmtTemp(today().temperatureMaxC)
                                   + qsTr(" · 最低 ") + fmtTemp(today().temperatureMinC)
                             color: Appearance.colors.colOnImage
-                            font.family: "LXGW WenKai GB Screen"
+                            font.family: "LXGW WenKai Screen"
                             font.pixelSize: 18
                             horizontalAlignment: Text.AlignHCenter
                             elide: Text.ElideRight
@@ -775,7 +749,7 @@ Item {
             Text {
                 text: card.title
                 color: Appearance.colors.colOnSurface
-                font.family: "LXGW WenKai GB Screen"
+                font.family: "LXGW WenKai Screen"
                 font.bold: true
                 font.pixelSize: 15
                 anchors.verticalCenter: parent.verticalCenter
