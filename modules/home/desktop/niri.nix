@@ -13,6 +13,8 @@ in {
   services.clavis-shell = {
     enable = true;
     defaultWallpaper = ../../../assets/e022.jpg;
+    language = "en_US";
+    primaryOutput = "eDP-1";
     extraPackages = with pkgs; [
       brightnessctl
       kdePackages.dolphin
