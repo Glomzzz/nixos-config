@@ -82,8 +82,8 @@
     # Prefer Wayland, but allow X11 fallback for SDK-bundled Qt apps such as
     # the Android emulator, which does not ship the Wayland platform plugin.
     QT_QPA_PLATFORM = "wayland;xcb";
-    # Ensure SDL2 applications use Wayland
-    SDL_VIDEODRIVER = "wayland";
+    # Prefer Wayland while preserving compatibility with X11-only games.
+    SDL_VIDEODRIVER = "wayland,x11";
     # Force Firefox to use Wayland
     MOZ_ENABLE_WAYLAND = "1";
     # Ozone platform for Chromium/Electron apps

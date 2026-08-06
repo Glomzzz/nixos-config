@@ -26,10 +26,11 @@ input {
 }
 
 output "eDP-1" {
-    mode "2560x1600@240"
+    mode "2560x1600@240.001"
     scale 1.5
     position x=0 y=0
     focus-at-startup
+    variable-refresh-rate on-demand=true
 }
 
 output "HDMI-A-1" {
@@ -117,6 +118,26 @@ layer-rule {
 window-rule {
     geometry-corner-radius 6
     clip-to-geometry true
+}
+
+// Keep the Steam client and game surfaces on the high-refresh laptop panel.
+window-rule {
+    match app-id=r#"(?i)^(steam|steamwebhelper)$"#
+    open-on-output "eDP-1"
+}
+
+// Gamescope and common Steam game windows should use the laptop's native
+// fullscreen geometry and variable refresh rate.
+window-rule {
+    match app-id=r#"(?i)^(steam_app_[0-9]+|dota2|cs2|gamescope|\.gamescope-wrapped)$"#
+    open-on-output "eDP-1"
+    open-fullscreen true
+    variable-refresh-rate true
+    geometry-corner-radius 0
+    clip-to-geometry false
+    shadow {
+        off
+    }
 }
 
 window-rule {
