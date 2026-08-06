@@ -24,7 +24,10 @@ in {
     ];
     xwaylandSatellite = {
       package = xwaylandSatellite;
-      baseScale = 1.5;
+      # Niri reports physical wl_output mode dimensions. Pin satellite's X11
+      # render grid to native pixels so its compositor-scaling bridge does not
+      # multiply the 2560x1600 laptop mode by Niri's 1.5 desktop scale again.
+      baseScale = 1.0;
     };
   };
 

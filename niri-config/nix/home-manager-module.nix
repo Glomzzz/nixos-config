@@ -71,8 +71,12 @@ in {
 
       baseScale = lib.mkOption {
         type = lib.types.number;
-        default = 1.5;
-        description = "Base scale used for X11 clients on mixed-DPI outputs.";
+        default = 1.0;
+        description = ''
+          Base X11 render scale. Keep this at 1 for Niri, whose wl_output mode
+          dimensions are already physical pixels; the compositor still applies
+          the configured per-output scale to the resulting surface.
+        '';
       };
     };
 
