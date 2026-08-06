@@ -1,0 +1,346 @@
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import qs.Common
+import qs.Widgets.common
+import qs.Widgets.weather
+
+Rectangle {
+    id: root
+
+    property var sourceModel
+    property real itemWidth: trendFlick.width > 0 ? trendFlick.width / 6 : 122
+    property int maxItems: 25
+    property int currentTab: 0
+    property bool foreground: false
+
+    radius: 26
+    color: Appearance.colors.colWeatherCardSurface
+    border.width: 1
+    border.color: Qt.rgba(Appearance.colors.colOutlineVariant.r, Appearance.colors.colOutlineVariant.g, Appearance.colors.colOutlineVariant.b, 0.42)
+    clip: true
+
+    function modelCount() {
+        return sourceModel && sourceModel.count ? Math.min(maxItems, sourceModel.count()) : 0
+    }
+
+    function itemAt(index) {
+        return sourceModel && sourceModel.get ? sourceModel.get(index) : ({})
+    }
+
+    function valueAt(map, key, fallback) {
+        const v = map ? map[key] : undefined
+        return (v === undefined || v === null || isNaN(v)) ? fallback : Number(v)
+    }
+
+    function fmtTemp(value) {
+        return value !== undefined && value !== null && !isNaN(value) ? Math.round(value) + "°" : "--"
+    }
+
+    function hourLabel(epoch) {
+        return epoch ? Qt.formatDateTime(new Date(epoch * 1000), "hh:00") : "--"
+    }
+
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: 0
+        spacing: 10
+
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.leftMargin: 14
+            Layout.rightMargin: 14
+            Layout.topMargin: 16
+            Layout.preferredHeight: 82
+            spacing: 10
+
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 8
+
+                Text {
+                    text: "schedule"
+                    color: Appearance.colors.colOnSurfaceVariant
+                    font.family: "Material Symbols Outlined"
+                    font.pixelSize: 22
+                    Layout.alignment: Qt.AlignVCenter
+                }
+
+                Text {
+                    text: qsTr("逐小时预报")
+                    color: Appearance.colors.colOnSurface
+                    font.family: "LXGW WenKai GB Screen"
+                    font.bold: true
+                    font.pixelSize: 22
+                    Layout.alignment: Qt.AlignVCenter
+                }
+
+                Item { Layout.fillWidth: true }
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 10
+
+                StyledButtonGroup {
+                    currentValue: root.currentTab
+                    model: [
+                        ({ "value": 0, "label": qsTr("天气情况") }),
+                        ({ "value": 1, "label": qsTr("空气质量") }),
+                        ({ "value": 2, "label": qsTr("风况") })
+                    ]
+                    onValueSelected: value => root.currentTab = value
+                }
+
+                Item { Layout.fillWidth: true }
+
+                Rectangle {
+                    Layout.preferredWidth: 36
+                    Layout.preferredHeight: 36
+                    Layout.alignment: Qt.AlignVCenter
+                    radius: 18
+                    color: moreMouse.containsMouse ? Appearance.colors.colLayer4 : Appearance.colors.colLayer2
+
+                    Behavior on color { ColorAnimation { duration: 150 } }
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "more_horiz"
+                        color: Appearance.colors.colOnSurfaceVariant
+                        font.family: "Material Symbols Outlined"
+                        font.pixelSize: 20
+                    }
+
+                    MouseArea {
+                        id: moreMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: console.log("Open hourly weather menu")
+                    }
+                }
+            }
+        }
+
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            StyledFlickable {
+                id: trendFlick
+
+                anchors.fill: parent
+                clip: true
+                interactive: root.currentTab === 0
+                boundsBehavior: Flickable.StopAtBounds
+                flickableDirection: Flickable.HorizontalFlick
+                showVerticalScrollBar: false
+                smoothWheelEnabled: false
+                contentWidth: Math.max(width, root.modelCount() * root.itemWidth)
+                contentHeight: height
+                visible: root.currentTab === 0
+
+                onContentXChanged: trendCanvas.requestPaint()
+
+                Item {
+                    id: trendContent
+                    width: trendFlick.contentWidth
+                    height: trendFlick.height
+
+                    property real topTextY: 6
+                    property real iconY: 28
+                    property real iconSize: Math.max(46, Math.min(60, root.itemWidth * 0.46))
+                    property real chartTopInset: 96
+                    property real chartBottomInset: Math.max(chartTopInset + 70, height - 30)
+
+                    Canvas {
+                        id: trendCanvas
+                        anchors.fill: parent
+                        antialiasing: true
+
+                        property color primaryColor:
+                            Appearance.colors.colPrimary
+                        property color pointInnerColor:
+                            Appearance.colors.colLayer4
+                        property color textColor:
+                            Appearance.colors.colOnSurface
+                        property real chartTop: trendContent.chartTopInset
+                        property real chartBottom: trendContent.chartBottomInset
+
+                        onPrimaryColorChanged: requestPaint()
+                        onPointInnerColorChanged: requestPaint()
+                        onTextColorChanged: requestPaint()
+
+                        function pointX(index) {
+                            return root.itemWidth * index + root.itemWidth / 2
+                        }
+
+                        function yAt(value, minValue, maxValue) {
+                            return chartBottom - (value - minValue) / (maxValue - minValue) * (chartBottom - chartTop)
+                        }
+
+                        onPaint: {
+                            const ctx = getContext("2d")
+                            ctx.clearRect(0, 0, width, height)
+
+                            const count = root.modelCount()
+                            if (count < 2) return
+
+                            let values = []
+                            let minTemp = 999
+                            let maxTemp = -999
+
+                            for (let i = 0; i < count; ++i) {
+                                const item = root.itemAt(i)
+                                const temp = root.valueAt(item, "temperatureC", NaN)
+                                values.push(temp)
+                                if (!isNaN(temp)) {
+                                    minTemp = Math.min(minTemp, temp)
+                                    maxTemp = Math.max(maxTemp, temp)
+                                }
+                            }
+
+                            if (maxTemp < minTemp) return
+                            if (Math.abs(maxTemp - minTemp) < 0.1) {
+                                maxTemp += 1
+                                minTemp -= 1
+                            }
+
+                            ctx.strokeStyle = primaryColor
+                            ctx.lineWidth = 3
+                            ctx.lineJoin = "round"
+                            ctx.lineCap = "round"
+                            ctx.beginPath()
+                            for (let j = 0; j < count; ++j) {
+                                const x2 = pointX(j)
+                                const y2 = yAt(values[j], minTemp, maxTemp)
+                                if (j === 0) ctx.moveTo(x2, y2)
+                                else ctx.lineTo(x2, y2)
+                            }
+                            ctx.stroke()
+
+                            for (let p = 0; p < count; ++p) {
+                                const px = pointX(p)
+                                const py = yAt(values[p], minTemp, maxTemp)
+                                ctx.fillStyle = primaryColor
+                                ctx.beginPath()
+                                ctx.arc(px, py, 4.5, 0, Math.PI * 2)
+                                ctx.fill()
+                                ctx.fillStyle = pointInnerColor
+                                ctx.beginPath()
+                                ctx.arc(px, py, 2.4, 0, Math.PI * 2)
+                                ctx.fill()
+                            }
+
+                            ctx.fillStyle = textColor
+                            ctx.font = "bold 13px \"JetBrainsMono Nerd Font\""
+                            ctx.textAlign = "center"
+                            for (let n = 0; n < count; ++n) {
+                                ctx.fillText(root.fmtTemp(values[n]), pointX(n), yAt(values[n], minTemp, maxTemp) - 10)
+                            }
+                        }
+                    }
+
+                    Repeater {
+                        model: root.modelCount()
+
+                        delegate: Item {
+                            x: root.itemWidth * index
+                            width: root.itemWidth
+                            height: trendContent.height
+
+                            property var hourItem: root.itemAt(index)
+
+                            Text {
+                                width: parent.width
+                                y: trendContent.topTextY
+                                text: root.hourLabel(hourItem.time)
+                                color: Appearance.colors.colOnSurfaceVariant
+                                font.family: "JetBrainsMono Nerd Font"
+                                font.pixelSize: 13
+                                horizontalAlignment: Text.AlignHCenter
+                            }
+
+                            MeteoIcon {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                y: trendContent.iconY
+                                width: trendContent.iconSize
+                                height: trendContent.iconSize
+                                weatherCode: root.valueAt(hourItem, "weatherCode", -1)
+                                iconName: hourItem.iconName || ""
+                                night: hourItem.isDaylight === undefined ? false : !hourItem.isDaylight
+                                style: "fill"
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        id: dragArea
+                        x: trendFlick.contentX
+                        y: 0
+                        z: 20
+                        width: trendFlick.width
+                        height: trendFlick.height
+                        acceptedButtons: Qt.LeftButton
+                        preventStealing: true
+                        cursorShape: pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+
+                        property real lastMouseX: 0
+
+                        onPressed: function(mouse) {
+                            lastMouseX = mouse.x
+                        }
+
+                        onPositionChanged: function(mouse) {
+                            if (!pressed) return
+                            const dx = mouse.x - lastMouseX
+                            const maxX = Math.max(0, trendFlick.contentWidth - trendFlick.width)
+                            trendFlick.contentX = Math.max(0, Math.min(maxX, trendFlick.contentX - dx))
+                            lastMouseX = mouse.x
+                        }
+                    }
+                }
+            }
+
+            Item {
+                anchors.fill: parent
+                visible: root.currentTab === 1
+
+                HourlyAirQualityTrendPane {
+                    anchors.fill: parent
+                    sourceModel: root.sourceModel
+                }
+            }
+
+            Item {
+                anchors.fill: parent
+                visible: root.currentTab === 2
+
+                HourlyWindTrendPane {
+                    anchors.fill: parent
+                    sourceModel: root.sourceModel
+                }
+            }
+        }
+    }
+
+    Connections {
+        target: root.sourceModel
+        ignoreUnknownSignals: true
+        function onModelReset() { trendCanvas.requestPaint() }
+        function onDataChanged() { trendCanvas.requestPaint() }
+        function onRowsInserted() { trendCanvas.requestPaint() }
+        function onRowsRemoved() { trendCanvas.requestPaint() }
+    }
+
+    onSourceModelChanged: trendCanvas.requestPaint()
+    onCurrentTabChanged: {
+        if (root.currentTab === 0)
+            trendCanvas.requestPaint()
+    }
+    onForegroundChanged: {
+        if (root.foreground)
+            trendCanvas.requestPaint()
+    }
+    onWidthChanged: trendCanvas.requestPaint()
+    onHeightChanged: trendCanvas.requestPaint()
+}

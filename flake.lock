@@ -43,15 +43,14 @@
         ]
       },
       "locked": {
-        "lastModified": 1785982695,
-        "narHash": "sha256-+qcg2rfsITJtKCch4WLKiA7eiEKP2S+SYmuWr1Kv7HM=",
-        "path": "/home/glom/git/niri-config",
+        "path": "./niri-config",
         "type": "path"
       },
       "original": {
-        "path": "/home/glom/git/niri-config",
+        "path": "./niri-config",
         "type": "path"
-      }
+      },
+      "parent": []
     },
     "nix-alien-source": {
       "inputs": {

@@ -15,7 +15,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     niri-config = {
-      url = "path:/home/glom/git/niri-config";
+      url = "path:./niri-config";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # PR #452 adds compositor-side mixed-DPI scaling for X11 applications.
@@ -51,6 +51,15 @@
       system: let
         pkgs = pkgsFor system;
       in {
+        inherit
+          (inputs.niri-config.checks.${system})
+          clavis-core
+          clavis-shell
+          niri-config
+          qml-tests
+          shell-tests
+          ;
+
         formatting =
           pkgs.runCommand "alejandra-check"
           {

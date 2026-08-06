@@ -1,0 +1,27 @@
+set(key_path
+    "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/@CMAKE_INSTALL_BINDIR@/key")
+
+if(NOT EXISTS "${key_path}")
+    message(WARNING
+        "Cannot grant CPU power capability because ${key_path} does not exist")
+    return()
+endif()
+
+execute_process(
+    COMMAND "@CLAVIS_SETCAP_EXECUTABLE@"
+            "cap_dac_read_search=ep"
+            "${key_path}"
+    RESULT_VARIABLE setcap_result
+    ERROR_VARIABLE setcap_error
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_STRIP_TRAILING_WHITESPACE
+)
+
+if(NOT setcap_result EQUAL 0)
+    message(WARNING
+        "Unable to grant cap_dac_read_search to ${key_path}; "
+        "CPU package power will remain unavailable. ${setcap_error}")
+else()
+    message(STATUS
+        "Granted cap_dac_read_search to ${key_path} for Intel RAPL CPU power")
+endif()

@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+set -u
+
+mock_state="${CLAVIS_AWWW_MOCK_STATE:-/tmp/clavis-awww-mock-${UID}}"
+mock_log="${mock_state}.log"
+mock_command="${1:-}"
+
+if [[ "${mock_command}" == "--version" ]]; then
+    if [[ "${CLAVIS_AWWW_MOCK_FAIL_PROBE:-0}" == "1" ]]; then
+        exit 127
+    fi
+    printf '%s\n' "awww 0.12.1-mock"
+    exit 0
+fi
+
+printf 'client' >> "${mock_log}"
+printf ' %q' "$@" >> "${mock_log}"
+printf '\n' >> "${mock_log}"
+
+case "${mock_command}" in
+query)
+    [[ -e "${mock_state}.socket" ]]
+    ;;
+img|clear)
+    mock_delay_ms="${CLAVIS_AWWW_MOCK_APPLY_DELAY_MS:-0}"
+    if [[ "${mock_delay_ms}" =~ ^[0-9]+$ ]] \
+            && (( mock_delay_ms > 0 )); then
+        mock_delay_seconds="$(
+            printf '%d.%03d' \
+                "$((mock_delay_ms / 1000))" \
+                "$((mock_delay_ms % 1000))"
+        )"
+        sleep "${mock_delay_seconds}"
+    fi
+    [[ "${CLAVIS_AWWW_MOCK_FAIL_APPLY:-0}" != "1" ]]
+    ;;
+kill)
+    if [[ -r "${mock_state}.pid" ]]; then
+        mock_pid="$(<"${mock_state}.pid")"
+        if [[ "${mock_pid}" =~ ^[0-9]+$ ]]; then
+            kill "${mock_pid}" 2>/dev/null || true
+        fi
+    fi
+    ;;
+*)
+    exit 2
+    ;;
+esac
