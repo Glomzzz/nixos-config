@@ -30,7 +30,7 @@ Item {
             color: "transparent"
 
             readonly property string imageSource: modelData && modelData.image ? modelData.image : ""
-            readonly property string appIconSource: modelData && modelData.appIcon ? Quickshell.iconPath(modelData.appIcon, "image-missing") : ""
+            readonly property string appIconSource: modelData && modelData.appIcon ? Quickshell.iconPath(modelData.appIcon, true) : ""
             readonly property string iconSource: imageSource !== "" ? imageSource : appIconSource
             readonly property bool hasImage: imageSource !== ""
             readonly property bool hasIcon: iconSource !== ""

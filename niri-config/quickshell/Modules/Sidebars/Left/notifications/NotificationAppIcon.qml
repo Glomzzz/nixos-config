@@ -21,10 +21,11 @@ Item {
     readonly property bool hasImage: image !== "" && !image.startsWith("icon:")
     readonly property bool hasAppIcon: appIcon !== ""
     readonly property string appIconSource: !hasAppIcon ? "" : appIconIsFile ? cleanFileAppIcon : resolvedIconSource(appIcon)
+    readonly property bool hasUsableAppIcon: appIconIsFile || appIconSource !== ""
     readonly property bool showImage: hasImage && imageLoaded && !imageLoadFailed
     readonly property bool showFallback: !showImage
-    readonly property bool showAppIcon: showFallback && hasAppIcon && !appIconLoadFailed
-    readonly property bool showSymbol: showFallback && (!hasAppIcon || appIconLoadFailed)
+    readonly property bool showAppIcon: showFallback && hasUsableAppIcon && !appIconLoadFailed
+    readonly property bool showSymbol: showFallback && (!hasUsableAppIcon || appIconLoadFailed)
     readonly property real materialIconSize: implicitWidth * 0.6
     readonly property real appIconSize: implicitWidth * 0.8
     readonly property real smallAppIconSize: implicitWidth * 0.42
@@ -42,10 +43,7 @@ Item {
     onAppIconChanged: appIconLoadFailed = false
 
     function resolvedIconSource(iconName) {
-        const iconPath = Quickshell.iconPath(iconName, "image-missing");
-        if (iconPath && iconPath !== "")
-            return iconPath;
-        return "image://icon/" + iconName;
+        return Quickshell.iconPath(iconName, true);
     }
 
     Rectangle {

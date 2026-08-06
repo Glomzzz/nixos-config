@@ -173,7 +173,7 @@ Singleton {
             return String(icon);
         if (String(icon).startsWith("/"))
             return "file://" + icon;
-        return "image://icon/" + icon;
+        return Quickshell.iconPath(icon, true);
     }
 
     function nodeVolume(node) {

@@ -112,6 +112,7 @@ Singleton {
 
     property string wallpaperFolder: Paths.homeDir + "/.config/wallpaper"
     property string wallpaperPath: ""
+    property bool wallpaperUsesDefault: false
     property string wallpaperPathLight: ""
     property string wallpaperPathDark: ""
     property bool perModeWallpaper: false
@@ -201,6 +202,22 @@ Singleton {
 
     function normalizedOption(options, value, fallback) {
         return optionExists(options, value) ? value : fallback;
+    }
+
+    function nixStorePayloadPath(value) {
+        const path = String(value || "");
+        const prefix = "/nix/store/";
+        if (!path.startsWith(prefix))
+            return "";
+        const separator = path.indexOf("/", prefix.length);
+        return separator >= 0 ? path.slice(separator) : "";
+    }
+
+    function matchesPackagedDefaultWallpaper(value) {
+        const configuredSuffix = nixStorePayloadPath(value);
+        const defaultSuffix = nixStorePayloadPath(root.defaultWallpaperPath);
+        return configuredSuffix !== ""
+            && configuredSuffix === defaultSuffix;
     }
 
     function normalizedTransition(value) {
@@ -311,7 +328,13 @@ Singleton {
     }
 
     function setWallpaperPath(value) {
-        setValue("wallpaperPath", value || "");
+        const nextPath = value || "";
+        if (!root.wallpaperUsesDefault
+                && root.wallpaperPath === nextPath)
+            return;
+        root.wallpaperUsesDefault = false;
+        root.wallpaperPath = nextPath;
+        root.save();
     }
 
     function setWallpaperPathForMode(mode, value) {
@@ -727,6 +750,7 @@ Singleton {
             "wallpaper": {
                 "folder": root.wallpaperFolder,
                 "path": root.wallpaperPath,
+                "useDefault": root.wallpaperUsesDefault,
                 "pathLight": root.wallpaperPathLight,
                 "pathDark": root.wallpaperPathDark,
                 "perMode": root.perModeWallpaper,
@@ -840,7 +864,17 @@ Singleton {
         const autoCycle = wallpaper.autoCycle || {};
 
         root.wallpaperFolder = wallpaper.folder || Paths.homeDir + "/.config/wallpaper";
-        root.wallpaperPath = wallpaper.path === Paths.currentWallpaper ? "" : (wallpaper.path || "");
+        const configuredWallpaperPath = wallpaper.path === Paths.currentWallpaper
+            ? "" : (wallpaper.path || "");
+        const legacyDefault = wallpaper.useDefault === undefined
+            && root.defaultWallpaperPath !== ""
+            && (configuredWallpaperPath === ""
+                || root.matchesPackagedDefaultWallpaper(
+                    configuredWallpaperPath));
+        root.wallpaperUsesDefault = wallpaper.useDefault === true
+            || legacyDefault;
+        root.wallpaperPath = root.wallpaperUsesDefault
+            ? root.defaultWallpaperPath : configuredWallpaperPath;
         root.wallpaperPathLight = wallpaper.pathLight || "";
         root.wallpaperPathDark = wallpaper.pathDark || "";
         root.perModeWallpaper = !!wallpaper.perMode;
@@ -951,6 +985,7 @@ Singleton {
         if (!wallpaper || typeof wallpaper !== "object")
             return true;
         return wallpaper.desktopBackend === undefined
+            || wallpaper.useDefault === undefined
             || wallpaper.awww === undefined
             || wallpaper.overview === undefined
             || wallpaper.parallax === undefined;
@@ -1049,6 +1084,7 @@ Singleton {
                 return;
             }
 
+            root.wallpaperUsesDefault = true;
             root.wallpaperPath = root.defaultWallpaperPath;
             root.save();
         }

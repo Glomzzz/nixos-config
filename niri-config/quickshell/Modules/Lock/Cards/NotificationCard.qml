@@ -36,7 +36,7 @@ Rectangle {
         if (notificationObject.appIcon && notificationObject.appIcon !== "") {
             if (notificationObject.appIcon.startsWith("/") || notificationObject.appIcon.startsWith("file://"))
                 return normalizeSource(notificationObject.appIcon);
-            return Quickshell.iconPath(notificationObject.appIcon, "image-missing");
+            return Quickshell.iconPath(notificationObject.appIcon, true);
         }
         return "";
     }
