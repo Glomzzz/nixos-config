@@ -12,6 +12,7 @@
 in {
   services.clavis-shell = {
     enable = true;
+    defaultWallpaper = ../../../assets/e022.jpg;
     extraPackages = with pkgs; [
       brightnessctl
       kdePackages.dolphin

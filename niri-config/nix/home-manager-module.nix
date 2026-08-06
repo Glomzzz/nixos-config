@@ -24,6 +24,12 @@ in {
       description = "Niri configuration installed as config.kdl.";
     };
 
+    defaultWallpaper = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = "Wallpaper used on first start when no personalization file exists.";
+    };
+
     enableClipboard =
       lib.mkEnableOption "the Clavis MIME-aware clipboard watcher"
       // {
@@ -117,6 +123,9 @@ in {
           Requisite = ["graphical-session.target"];
         };
         Service = {
+          Environment =
+            lib.optional (cfg.defaultWallpaper != null)
+            "CLAVIS_DEFAULT_WALLPAPER=${toString cfg.defaultWallpaper}";
           ExecStart = "${cfg.package}/bin/qs --no-duplicate";
           Restart = "on-failure";
           RestartSec = 2;

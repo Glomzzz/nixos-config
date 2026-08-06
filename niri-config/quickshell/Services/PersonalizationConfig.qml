@@ -19,6 +19,8 @@ Singleton {
             ? root.filePath.slice(0, separator)
             : Paths.homeDir + "/.cache/quickshell";
     }
+    readonly property string defaultWallpaperPath:
+        String(Quickshell.env("CLAVIS_DEFAULT_WALLPAPER") || "").trim()
 
     readonly property var fillModes: [
         ({ "value": "Stretch", "label": qsTr("拉伸") }),
@@ -1042,6 +1044,19 @@ Singleton {
                 root.save();
         }
 
-        onLoadFailed: root.save()
+        onLoadFailed: error => {
+            if (!root.storeReady)
+                return;
+
+            if (error !== FileViewError.FileNotFound) {
+                console.log(
+                    "PersonalizationConfig failed to open:",
+                    FileViewError.toString(error));
+                return;
+            }
+
+            root.wallpaperPath = root.defaultWallpaperPath;
+            root.save();
+        }
     }
 }
