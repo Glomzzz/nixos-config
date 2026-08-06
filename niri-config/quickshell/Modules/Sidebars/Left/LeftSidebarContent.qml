@@ -10,6 +10,28 @@ Item {
     property string screenName: ""
     property bool foreground: false
     property bool presentationActive: false
+    property var retainedViews: ({ "info": true })
+
+    function retainView(view) {
+        if (root.retainedViews[view])
+            return;
+        const next = {};
+        for (const key in root.retainedViews)
+            next[key] = root.retainedViews[key];
+        next[view] = true;
+        root.retainedViews = next;
+    }
+
+    Component.onCompleted:
+        root.retainView(WidgetState.leftSidebarView)
+
+    Connections {
+        target: WidgetState
+
+        function onLeftSidebarViewChanged() {
+            root.retainView(WidgetState.leftSidebarView);
+        }
+    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -199,21 +221,41 @@ Item {
                     && WidgetState.leftSidebarView === "info"
             }
 
-            SystemView {
+            Loader {
                 anchors.fill: parent
                 visible: WidgetState.leftSidebarView === "sys"
-                foreground: root.foreground
-                    && WidgetState.leftSidebarView === "sys"
+                active: !!root.retainedViews.sys
+                asynchronous: true
+                sourceComponent: systemViewComponent
             }
 
-            WeatherView {
+            Loader {
                 anchors.fill: parent
                 visible: WidgetState.leftSidebarView === "weather"
-                foreground: root.foreground
-                    && WidgetState.leftSidebarView === "weather"
-                presentationActive: root.presentationActive
-                    && WidgetState.leftSidebarView === "weather"
+                active: !!root.retainedViews.weather
+                asynchronous: true
+                sourceComponent: weatherViewComponent
             }
+        }
+    }
+
+    Component {
+        id: systemViewComponent
+
+        SystemView {
+            foreground: root.foreground
+                && WidgetState.leftSidebarView === "sys"
+        }
+    }
+
+    Component {
+        id: weatherViewComponent
+
+        WeatherView {
+            foreground: root.foreground
+                && WidgetState.leftSidebarView === "weather"
+            presentationActive: root.presentationActive
+                && WidgetState.leftSidebarView === "weather"
         }
     }
 }

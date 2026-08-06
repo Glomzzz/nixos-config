@@ -196,6 +196,59 @@ void LinuxCollector::loadStaticSystemInfo()
         ? physicalCores.size()
         : (fallbackCores > 0 ? fallbackCores : m_staticSystem.logicalCpuCount);
 
+    // Discover cpufreq policies once. A machine can expose hundreds of
+    // offline cpuN directories even though only a small subset is online;
+    // walking all of them for every one-second sample keeps the shell hot.
+    const QDir cpufreq(QStringLiteral("/sys/devices/system/cpu/cpufreq"));
+    QSet<QString> frequencyPaths;
+    const auto addFrequencyPath = [this, &frequencyPaths](const QString &base) {
+        QString currentPath = base + QStringLiteral("/scaling_cur_freq");
+        if (!QFileInfo::exists(currentPath))
+            currentPath = base + QStringLiteral("/cpuinfo_cur_freq");
+        if (!QFileInfo::exists(currentPath) || frequencyPaths.contains(currentPath))
+            return;
+
+        frequencyPaths.insert(currentPath);
+        m_cpuFrequencyPaths.push_back(currentPath);
+
+        const OptionalNumber minimum =
+            readNumber(base + QStringLiteral("/cpuinfo_min_freq"), 0.001);
+        const OptionalNumber maximum =
+            readNumber(base + QStringLiteral("/cpuinfo_max_freq"), 0.001);
+        if (minimum
+            && (!m_frequencyMinMHz || *minimum < *m_frequencyMinMHz)) {
+            m_frequencyMinMHz = minimum;
+        }
+        if (maximum
+            && (!m_frequencyMaxMHz || *maximum > *m_frequencyMaxMHz)) {
+            m_frequencyMaxMHz = maximum;
+        }
+    };
+
+    const QStringList policyEntries =
+        cpufreq.entryList(QStringList{QStringLiteral("policy[0-9]*")},
+                          QDir::Dirs | QDir::NoDotAndDotDot);
+    for (const QString &entry : policyEntries)
+        addFrequencyPath(cpufreq.absoluteFilePath(entry));
+
+    // Some drivers expose only per-CPU cpufreq directories. In that case,
+    // use online CPUs (and cpu0, which has no online marker) as a fallback.
+    if (m_cpuFrequencyPaths.isEmpty()) {
+        const QDir cpuDir(QStringLiteral("/sys/devices/system/cpu"));
+        const QStringList cpuEntries =
+            cpuDir.entryList(QStringList{QStringLiteral("cpu[0-9]*")},
+                             QDir::Dirs | QDir::NoDotAndDotDot);
+        for (const QString &entry : cpuEntries) {
+            const QString cpuPath = cpuDir.absoluteFilePath(entry);
+            const QString onlinePath = cpuPath + QStringLiteral("/online");
+            if (QFileInfo::exists(onlinePath)
+                && readText(onlinePath) != QStringLiteral("1")) {
+                continue;
+            }
+            addFrequencyPath(cpuPath + QStringLiteral("/cpufreq"));
+        }
+    }
+
     m_staticSystem.vendor =
         normalizedDmi(QStringLiteral("/sys/class/dmi/id/sys_vendor"));
     m_staticSystem.productName =
@@ -360,33 +413,13 @@ RawCpuInfo LinuxCollector::collectCpu(QVector<Error> *errors) const
     }
 
     QVector<double> frequencies;
-    const QDir cpuDir(QStringLiteral("/sys/devices/system/cpu"));
-    const QStringList cpuEntries =
-        cpuDir.entryList(QStringList{QStringLiteral("cpu[0-9]*")},
-                         QDir::Dirs | QDir::NoDotAndDotDot);
-    for (const QString &entry : cpuEntries) {
-        const QString base = cpuDir.absoluteFilePath(entry)
-            + QStringLiteral("/cpufreq/");
-        OptionalNumber frequency =
-            readNumber(base + QStringLiteral("scaling_cur_freq"), 0.001);
-        if (!frequency)
-            frequency = readNumber(base + QStringLiteral("cpuinfo_cur_freq"), 0.001);
+    for (const QString &path : m_cpuFrequencyPaths) {
+        const OptionalNumber frequency = readNumber(path, 0.001);
         if (frequency)
             frequencies.push_back(*frequency);
-
-        const OptionalNumber minimum =
-            readNumber(base + QStringLiteral("cpuinfo_min_freq"), 0.001);
-        const OptionalNumber maximum =
-            readNumber(base + QStringLiteral("cpuinfo_max_freq"), 0.001);
-        if (minimum
-            && (!result.frequencyMinMHz || *minimum < *result.frequencyMinMHz)) {
-            result.frequencyMinMHz = minimum;
-        }
-        if (maximum
-            && (!result.frequencyMaxMHz || *maximum > *result.frequencyMaxMHz)) {
-            result.frequencyMaxMHz = maximum;
-        }
     }
+    result.frequencyMinMHz = m_frequencyMinMHz;
+    result.frequencyMaxMHz = m_frequencyMaxMHz;
     if (!frequencies.isEmpty()) {
         double sum = 0.0;
         for (double value : frequencies)

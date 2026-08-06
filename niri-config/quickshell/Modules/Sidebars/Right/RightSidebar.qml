@@ -161,6 +161,7 @@ Item {
             active: PersonalizationConfig.keepSidebarsLoaded
                 || WidgetState.qsOpen
                 || root.contentRetained
+            asynchronous: true
             sourceComponent: quickSettingsComponent
         }
     }

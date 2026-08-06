@@ -51,7 +51,6 @@ Singleton {
         root.darkMode = value;
         root.save();
         Quickshell.execDetached(["gsettings", "set", "org.gnome.desktop.interface", "color-scheme", value ? "prefer-dark" : "default"]);
-        themeDebounce.start();
     }
 
     function toggleDarkMode() {
@@ -148,7 +147,7 @@ Singleton {
     }
 
     Process {
-        id: themePoller
+        id: initialThemeReader
         command: ["gsettings", "get", "org.gnome.desktop.interface", "color-scheme"]
         running: true
 
@@ -157,18 +156,16 @@ Singleton {
         }
     }
 
-    Timer {
-        interval: 5000
+    Process {
+        id: themeMonitor
+        command: ["gsettings", "monitor", "org.gnome.desktop.interface", "color-scheme"]
         running: true
-        repeat: true
-        onTriggered: themePoller.running = true
-    }
 
-    Timer {
-        id: themeDebounce
-        interval: 350
-        running: false
-        repeat: false
-        onTriggered: themePoller.running = true
+        stdout: SplitParser {
+            onRead: data => {
+                root.darkMode = String(data)
+                    .toLowerCase().includes("prefer-dark");
+            }
+        }
     }
 }

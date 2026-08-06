@@ -16,6 +16,7 @@ Item {
     implicitHeight: 480
 
     required property var player
+    property bool active: false
 
     property string artUrl: (player && player.trackArtUrl) ? player.trackArtUrl : ""
     property string title: (player && player.trackTitle) ? player.trackTitle : qsTr("Not playing")
@@ -23,17 +24,19 @@ Item {
     property string album: (player && player.trackAlbum) ? player.trackAlbum : ""
     readonly property string playerName: player ? (player.identity || player.busName || "") : ""
 
-    readonly property bool isActive: root.visible && root.player
+    readonly property bool isActive: root.active && !!root.player
     property bool showLyrics: false
 
     property bool _isReady: false
     readonly property string spectrumToken: "keystone-media"
     Component.onCompleted: {
         _isReady = true;
-        if (root.isActive)
+        if (root.isActive) {
             AudioSpectrum.acquire(root.spectrumToken);
-        MediaPalette.extract(root.artUrl, Appearance.colors.colPrimary);
-        root.reloadLyrics();
+            MediaPalette.extract(
+                root.artUrl, Appearance.colors.colPrimary);
+            root.reloadLyrics();
+        }
     }
     Component.onDestruction: AudioSpectrum.release(root.spectrumToken)
 
@@ -66,7 +69,8 @@ Item {
     Connections {
         target: root
         function onTitleChanged() {
-            root.reloadLyrics();
+            if (root.isActive)
+                root.reloadLyrics();
         }
     }
 
@@ -84,7 +88,10 @@ Item {
     Connections {
         target: root
         function onArtUrlChanged() {
-            MediaPalette.extract(root.artUrl, Appearance.colors.colPrimary);
+            if (root.isActive) {
+                MediaPalette.extract(
+                    root.artUrl, Appearance.colors.colPrimary);
+            }
         }
     }
 
@@ -100,10 +107,17 @@ Item {
     Connections {
         target: root
         function onIsActiveChanged() {
-            if (root.isActive)
+            if (!root._isReady)
+                return;
+            if (root.isActive) {
                 AudioSpectrum.acquire(root.spectrumToken);
-            else
+                MediaPalette.extract(
+                    root.artUrl, Appearance.colors.colPrimary);
+                root.reloadLyrics();
+            } else {
                 AudioSpectrum.release(root.spectrumToken);
+                lyricsProc.running = false;
+            }
         }
     }
 

@@ -66,7 +66,7 @@ QHash<int, QByteArray> NiriWorkspaceModel::roleNames() const
     };
 }
 
-void NiriWorkspaceModel::setWorkspaces(const QList<NiriWorkspace> &workspaces)
+bool NiriWorkspaceModel::setWorkspaces(const QList<NiriWorkspace> &workspaces)
 {
     bool sameRows = m_workspaces.count() == workspaces.count();
     if (sameRows) {
@@ -79,25 +79,45 @@ void NiriWorkspaceModel::setWorkspaces(const QList<NiriWorkspace> &workspaces)
     }
 
     if (sameRows) {
+        bool changed = false;
         for (int i = 0; i < workspaces.count(); ++i) {
-            m_workspaces[i] = workspaces.at(i);
+            const NiriWorkspace &oldWorkspace = m_workspaces.at(i);
+            const NiriWorkspace &newWorkspace = workspaces.at(i);
+            QList<int> changedRoles;
+            if (oldWorkspace.id != newWorkspace.id)
+                changedRoles.append(IdRole);
+            if (oldWorkspace.index != newWorkspace.index)
+                changedRoles.append(IndexRole);
+            if (oldWorkspace.name != newWorkspace.name)
+                changedRoles.append(NameRole);
+            if (oldWorkspace.output != newWorkspace.output)
+                changedRoles.append(OutputRole);
+            if (oldWorkspace.isActive != newWorkspace.isActive)
+                changedRoles.append(IsActiveRole);
+            if (oldWorkspace.isFocused != newWorkspace.isFocused)
+                changedRoles.append(IsFocusedRole);
+            if (oldWorkspace.isUrgent != newWorkspace.isUrgent)
+                changedRoles.append(IsUrgentRole);
+            if (oldWorkspace.activeWindowId != newWorkspace.activeWindowId)
+                changedRoles.append(ActiveWindowIdRole);
+            if (oldWorkspace.windowCount != newWorkspace.windowCount)
+                changedRoles.append(WindowCountRole);
+            if (oldWorkspace.tiledWindowCount != newWorkspace.tiledWindowCount)
+                changedRoles.append(TiledWindowCountRole);
+            if (oldWorkspace.tiledColumnCount != newWorkspace.tiledColumnCount)
+                changedRoles.append(TiledColumnCountRole);
+            if (oldWorkspace.icons != newWorkspace.icons)
+                changedRoles.append(IconsRole);
+
+            if (changedRoles.isEmpty())
+                continue;
+
+            m_workspaces[i] = newWorkspace;
             const QModelIndex modelIndex = index(i);
-            emit dataChanged(modelIndex, modelIndex, {
-                IdRole,
-                IndexRole,
-                NameRole,
-                OutputRole,
-                IsActiveRole,
-                IsFocusedRole,
-                IsUrgentRole,
-                ActiveWindowIdRole,
-                WindowCountRole,
-                TiledWindowCountRole,
-                TiledColumnCountRole,
-                IconsRole,
-            });
+            emit dataChanged(modelIndex, modelIndex, changedRoles);
+            changed = true;
         }
-        return;
+        return changed;
     }
 
     const int oldCount = m_workspaces.count();
@@ -106,6 +126,7 @@ void NiriWorkspaceModel::setWorkspaces(const QList<NiriWorkspace> &workspaces)
     endResetModel();
     if (oldCount != m_workspaces.count())
         emit countChanged();
+    return true;
 }
 
 const QList<NiriWorkspace> &NiriWorkspaceModel::workspaces() const

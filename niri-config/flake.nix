@@ -109,7 +109,7 @@
             --prefix XDG_DATA_DIRS : "$out/share:${desktopDataDirs}" \
             --set GSETTINGS_SCHEMA_DIR "${gsettingsSchemaDir}" \
             --set QS_ICON_THEME "Adwaita" \
-            --set QSG_USE_SIMPLE_ANIMATION_DRIVER "1" \
+            --unset QSG_USE_SIMPLE_ANIMATION_DRIVER \
             --set QT_QPA_PLATFORMTHEME "gtk3" \
             --set CLAVIS_KEY "$out/bin/key" \
             --set CLAVIS_POWERPROFILESCTL "${powerProfilesDaemon}/bin/powerprofilesctl" \
@@ -165,10 +165,12 @@
         QML_IMPORT_PATH = qmlImportPath;
         QML2_IMPORT_PATH = qmlImportPath;
         QS_ICON_THEME = "Adwaita";
-        QSG_USE_SIMPLE_ANIMATION_DRIVER = "1";
         QT_QPA_PLATFORMTHEME = "gtk3";
         XDG_DATA_DIRS = desktopDataDirs;
         GSETTINGS_SCHEMA_DIR = gsettingsSchemaDir;
+        shellHook = ''
+          unset QSG_USE_SIMPLE_ANIMATION_DRIVER
+        '';
       };
     });
 

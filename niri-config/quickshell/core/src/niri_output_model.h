@@ -30,7 +30,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
-    void setOutputs(const QList<NiriOutput> &outputs);
+    bool setOutputs(const QList<NiriOutput> &outputs);
     const QList<NiriOutput> &outputs() const;
     QVariantMap outputByName(const QString &name) const;
 

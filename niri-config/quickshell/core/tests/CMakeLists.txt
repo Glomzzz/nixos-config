@@ -28,6 +28,21 @@ add_test(
     COMMAND niri_workspace_deriver_tests
 )
 
+qt_add_executable(niri_model_update_tests
+    niri_model_update_test.cpp
+)
+
+target_link_libraries(niri_model_update_tests PRIVATE
+    ClavisNiriCore
+    Qt6::Core
+    Qt6::Test
+)
+
+add_test(
+    NAME niri_model_update_tests
+    COMMAND niri_model_update_tests
+)
+
 qt_add_executable(audio_visual_analyzer_tests
     audio_visual_analyzer_test.cpp
 )

@@ -17,6 +17,7 @@ Item {
     property real endRotation: 0
     property int duration: 2000
     property real progress: 0
+    property bool active: true
 
     signal finished(int leafId)
 
@@ -63,7 +64,7 @@ Item {
         to: 1
         duration: root.duration
         easing.type: Easing.Linear
-        running: true
+        running: root.active
         onFinished: root.finished(root.leafId)
     }
 }

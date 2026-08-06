@@ -347,7 +347,6 @@ void NiriPlugin::handleEvent(const QJsonObject &event)
         for (auto it = outputs.begin(); it != outputs.end(); ++it)
             m_outputs.append(parseOutput(it.key(), it.value().toObject()));
         outputChanged = true;
-        windowChanged = true;
     } else if (type == QStringLiteral("OverviewOpenedOrClosed")) {
         m_inOverview = event.value(type).toObject().value(QStringLiteral("is_open")).toBool();
         emit overviewChanged();
@@ -497,7 +496,7 @@ void NiriPlugin::fetchOutputs()
     const QJsonObject object = outputs.toObject();
     for (auto it = object.begin(); it != object.end(); ++it)
         m_outputs.append(parseOutput(it.key(), it.value().toObject()));
-    publishState(false, true, true);
+    publishState(false, false, true);
 }
 
 void NiriPlugin::setError(const QString &message)
@@ -513,24 +512,32 @@ void NiriPlugin::publishState(bool workspaceChanged, bool windowChanged, bool ou
     if (!workspaceChanged && !windowChanged && !outputChanged)
         return;
 
+    const QVariantMap oldFocusedWindow = m_focusedWindow;
+    const QVariantMap oldFocusedWorkspace = m_focusedWorkspace;
+    const QString oldCurrentOutput = m_currentOutput;
+
     sortWorkspaces();
     sortWindows();
     recomputeDerivedState();
 
-    if (workspaceChanged || windowChanged) {
-        m_workspaceModel.setWorkspaces(m_workspaces);
+    const bool workspaceModelChanged = (workspaceChanged || windowChanged)
+        && m_workspaceModel.setWorkspaces(m_workspaces);
+    const bool windowModelChanged = (windowChanged || outputChanged)
+        && m_windowModel.setWindows(m_windows);
+    const bool outputModelChanged = outputChanged
+        && m_outputModel.setOutputs(m_outputs);
+
+    if (workspaceModelChanged)
         emit workspacesChanged();
-    }
-    if (windowChanged || outputChanged) {
-        m_windowModel.setWindows(m_windows);
+    if (windowModelChanged)
         emit windowsChanged();
-    }
-    if (outputChanged) {
-        m_outputModel.setOutputs(m_outputs);
+    if (outputModelChanged)
         emit outputsChanged();
-    }
-    emit focusedWindowChanged();
-    emit focusedWorkspaceChanged();
+
+    if (oldFocusedWindow != m_focusedWindow)
+        emit focusedWindowChanged();
+    if (oldFocusedWorkspace != m_focusedWorkspace || oldCurrentOutput != m_currentOutput)
+        emit focusedWorkspaceChanged();
 }
 
 void NiriPlugin::recomputeDerivedState()

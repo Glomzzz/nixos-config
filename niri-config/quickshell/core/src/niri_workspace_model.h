@@ -30,7 +30,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
-    void setWorkspaces(const QList<NiriWorkspace> &workspaces);
+    bool setWorkspaces(const QList<NiriWorkspace> &workspaces);
     const QList<NiriWorkspace> &workspaces() const;
     QVariantMap workspaceById(quint64 id) const;
     QVariantList workspacesForOutput(const QString &output) const;

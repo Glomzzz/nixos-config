@@ -2,7 +2,6 @@ import QtQuick
 import Qt5Compat.GraphicalEffects
 import Quickshell
 import Quickshell.Io
-import Quickshell.Services.Mpris
 import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 import qs.Services
@@ -27,12 +26,31 @@ Variants {
     property int topMargin: 0
     property int maxPillRadius: 24
     property bool showTopEdgeCurves: !detached
+    readonly property string preferredOutputName:
+        String(Quickshell.env("CLAVIS_PRIMARY_OUTPUT") || "").trim()
+
+    function outputMatches(screen, requestedName): bool {
+        if (!screen || requestedName === "")
+            return false;
+
+        const screenName = String(screen.name || "");
+        return screenName === requestedName
+            || screenName.replace(/^card[0-9]+-/, "") === requestedName;
+    }
 
     function invoke(methodName) {
         if (instances.length === 0)
             return "KEYSTONE_UNAVAILABLE";
 
-        const instance = instances[0];
+        let instance = null;
+        for (let i = 0; i < instances.length; i += 1) {
+            if (outputMatches(instances[i].screen, preferredOutputName)) {
+                instance = instances[i];
+                break;
+            }
+        }
+        if (!instance)
+            instance = instances[0];
         if (!instance || typeof instance[methodName] !== "function")
             return "KEYSTONE_UNAVAILABLE";
         return instance[methodName]();
@@ -980,33 +998,7 @@ Variants {
                     root.triggerSliderOSD("volume")
                 }
 
-                property var currentPlayer: null
-
-                Timer {
-                    id: stickyTimer
-                    interval: 500; repeat: true; triggeredOnStart: true
-                    running: Mpris.players.values.length > 0
-                    onRunningChanged: { if (!running) root.currentPlayer = null }
-                    onTriggered: {
-                        var players = Mpris.players.values
-                        if (players.length === 0) { root.currentPlayer = null; return }
-                        var playingPlayer = null
-                        for (let i = 0; i < players.length; i++) {
-                            if (players[i].isPlaying) { playingPlayer = players[i]; break }
-                        }
-                        if (playingPlayer) {
-                            if (root.currentPlayer !== playingPlayer) root.currentPlayer = playingPlayer
-                        } else {
-                            var currentIsValid = false
-                            if (root.currentPlayer) {
-                                for (let i = 0; i < players.length; i++) {
-                                    if (players[i] === root.currentPlayer) { currentIsValid = true; break }
-                                }
-                            }
-                            if (!currentIsValid) root.currentPlayer = players[0]
-                        }
-                    }
-                }
+                readonly property var currentPlayer: MediaManager.active
 
                 MouseArea {
                     id: keystoneMouseArea
@@ -1136,6 +1128,7 @@ Variants {
 
                         player: root.currentPlayer
                         screen: keystoneWindow.screen
+                        active: root.isHubMode
                         currentIndex: root.hubTabIndex
                         onCurrentIndexChanged: root.hubTabIndex = currentIndex
                         onCloseRequested: root.showHub = false
@@ -1236,6 +1229,7 @@ Variants {
                 height: root.collapsedH
 
                 player: root.currentPlayer
+                active: root.isCollapsedMode
 
                 opacity: root.isCollapsedMode ? 1 : 0
                 scale: 0.96 + 0.04 * opacity

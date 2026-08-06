@@ -160,6 +160,7 @@ Item {
             active: PersonalizationConfig.keepSidebarsLoaded
                 || WidgetState.leftSidebarOpen
                 || root.contentRetained
+            asynchronous: true
             sourceComponent: leftSidebarContentComponent
         }
     }

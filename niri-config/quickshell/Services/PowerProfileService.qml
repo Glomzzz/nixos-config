@@ -32,7 +32,11 @@ Singleton {
     signal operationFailed(string operation, string message)
 
     function refresh() {
-        if (root.setting || root.refreshing) {
+        // Foreground changes can arrive while the initial probe is running.
+        // Coalesce those reads; only a write needs a queued follow-up.
+        if (root.refreshing)
+            return;
+        if (root.setting) {
             root._refreshQueued = true;
             return;
         }
@@ -114,13 +118,6 @@ Singleton {
     }
 
     Component.onCompleted: refresh()
-
-    Timer {
-        interval: 30000
-        repeat: true
-        running: true
-        onTriggered: root.refresh()
-    }
 
     Process {
         id: listProcess

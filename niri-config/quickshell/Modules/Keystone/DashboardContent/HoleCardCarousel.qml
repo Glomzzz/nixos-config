@@ -9,6 +9,7 @@ Item {
     property int currentIndex: 0
     property var player: null
     property var screen: null
+    property bool active: false
     readonly property int cardCount: 3
     readonly property real switchThreshold: width * 0.2
 
@@ -115,7 +116,7 @@ Item {
         DashboardMediaCard {
             anchors.fill: parent
             player: root.player
-            active: root.visible && root.currentIndex === 0
+            active: root.active && root.currentIndex === 0
         }
     }
 
@@ -127,7 +128,7 @@ Item {
 
         DashboardWeatherCard {
             anchors.fill: parent
-            active: root.visible && root.currentIndex === 1
+            active: root.active && root.currentIndex === 1
         }
     }
 

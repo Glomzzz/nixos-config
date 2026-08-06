@@ -1093,6 +1093,7 @@ Item {
             model: leafModel
 
             delegate: LeafItem {
+                active: root.animate && root.visible
                 leafId: model.leafId
                 leafColor: model.color
                 leafScale: model.scale
@@ -1151,7 +1152,7 @@ Item {
     }
 
     FrameAnimation {
-        running: root.animate
+        running: root.animate && root.visible
 
         onTriggered: {
             const dt = Math.max(0, Math.min(0.05, frameTime))

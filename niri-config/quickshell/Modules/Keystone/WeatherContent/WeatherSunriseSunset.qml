@@ -11,6 +11,8 @@ Item {
     implicitHeight: childrenRect.height
     implicitWidth: 300
 
+    property bool active: false
+    property bool componentReady: false
     property var sunriseTime: 0
     property var sunsetTime: 0
     property real progress: 0
@@ -27,42 +29,43 @@ Item {
         root.progress = Math.max(0, Math.min(1, p));
     }
 
-    Connections {
-        target: WeatherPlugin
-        function onDataChanged() {
-            if (WeatherPlugin.hasValidData && WeatherPlugin.current) {
-                root.sunriseTime = WeatherPlugin.current().sunrise || 0;
-                root.sunsetTime = WeatherPlugin.current().sunset || 0;
-            } else {
-                const today = WeatherPlugin.dailyForecast.count() > 0 ? WeatherPlugin.dailyForecast.get(0) : null;
-                if (today) {
-                    root.sunriseTime = today.sunrise || 0;
-                    root.sunsetTime = today.sunset || 0;
-                }
-            }
-            updateProgress();
-        }
-    }
-
-    Component.onCompleted: {
+    function syncData() {
         if (WeatherPlugin.hasValidData && WeatherPlugin.current) {
             root.sunriseTime = WeatherPlugin.current().sunrise || 0;
             root.sunsetTime = WeatherPlugin.current().sunset || 0;
         } else {
-            const today = WeatherPlugin.dailyForecast.count() > 0 ? WeatherPlugin.dailyForecast.get(0) : null;
-            if (today) {
-                root.sunriseTime = today.sunrise || 0;
-                root.sunsetTime = today.sunset || 0;
-            }
+            const today = WeatherPlugin.dailyForecast.count() > 0
+                ? WeatherPlugin.dailyForecast.get(0) : null;
+            root.sunriseTime = today ? today.sunrise || 0 : 0;
+            root.sunsetTime = today ? today.sunset || 0 : 0;
         }
-        updateProgress();
+        root.updateProgress();
+    }
+
+    Connections {
+        target: WeatherPlugin
+        enabled: root.active
+        function onDataChanged() {
+            root.syncData();
+        }
+    }
+
+    Component.onCompleted: {
+        root.componentReady = true
+        if (root.active)
+            root.syncData()
+    }
+
+    onActiveChanged: {
+        if (root.active && root.componentReady)
+            root.syncData()
     }
 
     Timer {
         interval: 60000
-        running: true
+        running: root.active
         repeat: true
-        onTriggered: updateProgress()
+        onTriggered: root.updateProgress()
     }
 
     Item {

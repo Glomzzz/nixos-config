@@ -30,7 +30,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
-    void setWindows(const QList<NiriWindow> &windows);
+    bool setWindows(const QList<NiriWindow> &windows);
     const QList<NiriWindow> &windows() const;
     QVariantMap windowById(quint64 id) const;
     QVariantList windowsForWorkspace(quint64 workspaceId) const;

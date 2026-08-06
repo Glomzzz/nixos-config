@@ -66,14 +66,67 @@ QHash<int, QByteArray> NiriWindowModel::roleNames() const
     };
 }
 
-void NiriWindowModel::setWindows(const QList<NiriWindow> &windows)
+bool NiriWindowModel::setWindows(const QList<NiriWindow> &windows)
 {
-    beginResetModel();
+    bool sameRows = m_windows.count() == windows.count();
+    if (sameRows) {
+        for (int i = 0; i < m_windows.count(); ++i) {
+            if (m_windows.at(i).id != windows.at(i).id) {
+                sameRows = false;
+                break;
+            }
+        }
+    }
+
+    if (sameRows) {
+        bool changed = false;
+        for (int i = 0; i < windows.count(); ++i) {
+            const NiriWindow &oldWindow = m_windows.at(i);
+            const NiriWindow &newWindow = windows.at(i);
+            QList<int> changedRoles;
+            if (oldWindow.id != newWindow.id)
+                changedRoles.append(IdRole);
+            if (oldWindow.title != newWindow.title)
+                changedRoles.append(TitleRole);
+            if (oldWindow.appId != newWindow.appId)
+                changedRoles.append(AppIdRole);
+            if (oldWindow.appName != newWindow.appName)
+                changedRoles.append(AppNameRole);
+            if (oldWindow.pid != newWindow.pid)
+                changedRoles.append(PidRole);
+            if (oldWindow.workspaceId != newWindow.workspaceId)
+                changedRoles.append(WorkspaceIdRole);
+            if (oldWindow.isFocused != newWindow.isFocused)
+                changedRoles.append(IsFocusedRole);
+            if (oldWindow.isFloating != newWindow.isFloating)
+                changedRoles.append(IsFloatingRole);
+            if (oldWindow.isUrgent != newWindow.isUrgent)
+                changedRoles.append(IsUrgentRole);
+            if (oldWindow.layoutColumn != newWindow.layoutColumn)
+                changedRoles.append(LayoutColumnRole);
+            if (oldWindow.layoutRow != newWindow.layoutRow)
+                changedRoles.append(LayoutRowRole);
+            if (oldWindow.iconPath != newWindow.iconPath)
+                changedRoles.append(IconPathRole);
+
+            if (changedRoles.isEmpty())
+                continue;
+
+            m_windows[i] = newWindow;
+            const QModelIndex modelIndex = index(i);
+            emit dataChanged(modelIndex, modelIndex, changedRoles);
+            changed = true;
+        }
+        return changed;
+    }
+
     const int oldCount = m_windows.count();
+    beginResetModel();
     m_windows = windows;
     endResetModel();
     if (oldCount != m_windows.count())
         emit countChanged();
+    return true;
 }
 
 const QList<NiriWindow> &NiriWindowModel::windows() const

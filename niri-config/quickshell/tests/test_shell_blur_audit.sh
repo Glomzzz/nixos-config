@@ -20,6 +20,12 @@ reject_text() {
     fi
 }
 
+require_count() {
+    actual=$(grep -Fc -- "$2" "$1")
+    [ "$actual" -eq "$3" ] \
+        || fail "$1 contains '$2' $actual times; expected $3"
+}
+
 for file in \
     Modules/Bar/Bar.qml \
     Modules/Bar/Tray/Tray.qml \
@@ -92,6 +98,51 @@ require_text Modules/Launcher/LauncherWindow.qml \
     'searchBar.blurRegionItems.slice(1).concat(['
 require_text Modules/Keystone/Styles/Shared/KeystoneSurface.qml \
     'property color color: BlurService.backgroundColor('
+require_text Modules/Keystone/Styles/Shared/KeystoneSurface.qml \
+    'readonly property string preferredOutputName:'
+require_text Modules/Keystone/Styles/Shared/KeystoneSurface.qml \
+    'function outputMatches(screen, requestedName): bool'
+require_text Modules/Keystone/Styles/Shared/KeystoneSurface.qml \
+    'if (outputMatches(instances[i].screen, preferredOutputName))'
+require_text Modules/Keystone/Styles/Shared/KeystoneSurface.qml \
+    'instance = instances[0]'
+require_count Modules/Keystone/Hub/HubContent.qml \
+    'RetainedPageLoader {' 4
+require_count Modules/Keystone/Hub/RetainedPageLoader.qml \
+    'asynchronous: true' 1
+require_text Modules/Keystone/Hub/RetainedPageLoader.qml \
+    'active: presented || retained'
+require_text Modules/Keystone/Hub/RetainedPageLoader.qml \
+    'onLoaded: retained = true'
+require_text Modules/Keystone/Hub/RetainedPageLoader.qml \
+    'visible: status === Loader.Ready && (presented || opacity > 0.01)'
+require_text Modules/Keystone/Hub/RetainedPageLoader.qml \
+    'opacity: presented && status === Loader.Ready ? 1 : 0'
+for component in dashboard media wallpaper weather
+do
+    require_text Modules/Keystone/Hub/HubContent.qml \
+        "sourceComponent: ${component}Component"
+done
+require_text Modules/Keystone/WeatherContent/WeatherContent.qml \
+    'property bool componentReady: false'
+require_text Modules/Keystone/WeatherContent/WeatherContent.qml \
+    'running: root.active && WeatherPlugin.loading'
+require_text Modules/Keystone/WeatherContent/WeatherContent.qml \
+    'active: root.active'
+require_text Modules/Keystone/WeatherContent/WeatherCurrent.qml \
+    'property bool active: false'
+require_text Modules/Keystone/WeatherContent/WeatherCurrent.qml \
+    'running: root.active && WeatherPlugin.loading'
+require_text Modules/Keystone/WeatherContent/WeatherCurrent.qml \
+    'enabled: root.active'
+require_text Modules/Keystone/WeatherContent/WeatherSunriseSunset.qml \
+    'property bool active: false'
+require_text Modules/Keystone/WeatherContent/WeatherSunriseSunset.qml \
+    'running: root.active'
+require_text Modules/Keystone/WeatherContent/WeatherSunriseSunset.qml \
+    'enabled: root.active'
+reject_text Modules/Keystone/WeatherContent/WeatherSunriseSunset.qml \
+    'running: true'
 require_text Modules/Keystone/Styles/Shared/KeystoneSurface.qml \
     'context.globalCompositeOperation ='
 require_text Modules/Keystone/Styles/Shared/KeystoneSurface.qml \

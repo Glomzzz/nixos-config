@@ -185,7 +185,9 @@ Singleton {
 
     property bool pomodoroSoundEnabled: false
 
-    property bool keepSidebarsLoaded: true
+    // Defer sidebar construction until first use so the shell can present
+    // the bar immediately after the compositor starts.
+    property bool keepSidebarsLoaded: false
 
     property bool scrollSmoothEnabled: true
     property int scrollMouseFactor: 50
@@ -973,7 +975,7 @@ Singleton {
         root.keystoneStyle = normalizedOption(root.keystoneStyles, keystone.style, "bangs");
         root.pomodoroSoundEnabled = !!sounds.pomodoro;
         root.keepSidebarsLoaded = sidebar.keepLoaded === undefined
-            ? true : !!sidebar.keepLoaded;
+            ? false : !!sidebar.keepLoaded;
         root.scrollSmoothEnabled = scrolling.smoothEnabled === undefined ? true : !!scrolling.smoothEnabled;
         root.scrollMouseFactor = normalizedBoundedInt(scrolling.mouseFactor, 50, 10, 240);
         root.scrollTouchpadFactor = normalizedBoundedInt(scrolling.touchpadFactor, 100, 10, 300);

@@ -10,6 +10,7 @@ Item {
 
     property var player: null
     property var screen: null
+    property bool active: false
 
     implicitWidth: 860
     implicitHeight: 520
@@ -50,6 +51,7 @@ Item {
                 anchors.bottom: parent.bottom
                 player: root.player
                 screen: root.screen
+                active: root.active
             }
         }
     }

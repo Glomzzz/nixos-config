@@ -88,6 +88,11 @@ private:
 
     SystemInfo m_staticSystem;
     mutable QStringList m_cpuTemperaturePaths;
+    // Frequency files are discovered once. Enumerating every cpuN directory
+    // on each sample is surprisingly expensive on systems with offline CPUs.
+    mutable QStringList m_cpuFrequencyPaths;
+    OptionalNumber m_frequencyMinMHz;
+    OptionalNumber m_frequencyMaxMHz;
     mutable QString m_packageTemperaturePath;
     mutable QString m_packageEnergyPath;
     mutable QString m_packageEnergyRangePath;

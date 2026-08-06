@@ -3,6 +3,7 @@ pragma Singleton
 import Quickshell
 import Quickshell.Io
 import QtQuick
+import Clavis.Niri 1.0
 
 Singleton {
     id: root
@@ -28,7 +29,7 @@ Singleton {
 
     Component.onCompleted: {
         root.rebuildMonitors();
-        root.refreshFocusedOutput();
+        root.syncFocusedOutput();
     }
 
     Connections {
@@ -36,6 +37,14 @@ Singleton {
 
         function onScreensChanged() {
             root.rebuildMonitors();
+        }
+    }
+
+    Connections {
+        target: Niri
+
+        function onFocusedWorkspaceChanged() {
+            root.syncFocusedOutput();
         }
     }
 
@@ -53,18 +62,8 @@ Singleton {
         root.rescanDdcMonitors();
     }
 
-    function refreshFocusedOutput() {
-        if (!focusedOutputProcess.running)
-            focusedOutputProcess.running = true;
-    }
-
-    function parseFocusedOutput(text) {
-        const firstLine = String(text || "").split("\n")[0] || "";
-        const match = firstLine.match(/\(([^)]+)\)/);
-        if (!match)
-            return;
-
-        const screenName = root.normalizeConnectorName(match[1]);
+    function syncFocusedOutput() {
+        const screenName = root.normalizeConnectorName(Niri.currentOutput);
         if (screenName.length > 0)
             root.focusedScreenName = screenName;
     }
@@ -178,33 +177,16 @@ Singleton {
         id: fallbackSetProc
     }
 
-    Process {
-        id: focusedOutputProcess
-
-        command: ["niri", "msg", "focused-output"]
-
-        stdout: StdioCollector {
-            onStreamFinished: root.parseFocusedOutput(this.text)
-        }
-    }
-
     Timer {
         id: pollTimer
 
-        interval: 5000
+        interval: 15000
         running: true
         repeat: true
         onTriggered: {
             if (root.activeMonitor && !root.activeMonitor.isDdc)
                 root.activeMonitor.refresh();
         }
-    }
-
-    Timer {
-        interval: 1000
-        running: true
-        repeat: true
-        onTriggered: root.refreshFocusedOutput()
     }
 
     Component {

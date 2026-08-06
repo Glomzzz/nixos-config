@@ -22,3 +22,7 @@ target_link_libraries(ClavisNiri PRIVATE
     Qt6::Qml
     Qt6::Network
 )
+
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()

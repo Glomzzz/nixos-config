@@ -17,14 +17,17 @@ Item {
     property var player: null
     property var screen: null
     property int currentIndex: 0
+    property bool active: false
 
     Shortcut {
         sequence: "Tab"
+        enabled: root.active
         onActivated: root.currentIndex = (root.currentIndex + 1) % 4
     }
 
     Shortcut {
         sequence: "Shift+Tab"
+        enabled: root.active
         onActivated: root.currentIndex = (root.currentIndex + 3) % 4
     }
 
@@ -117,46 +120,81 @@ Item {
         anchors.bottom: parent.bottom
         anchors.topMargin: 10
 
-        DashboardContent {
+        RetainedPageLoader {
+            id: dashboardLoader
+
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
-            player: root.player
-            screen: root.screen
-            visible: root.currentIndex === 0
-            opacity: visible ? 1 : 0
-            Behavior on opacity { NumberAnimation { duration: 300 } }
-            onCloseRequested: root.closeRequested()
-            onAvatarEditRequested: root.avatarEditRequested()
+            presented: root.active && root.currentIndex === 0
+            sourceComponent: dashboardComponent
         }
 
-        Media {
-            player: root.player
+        RetainedPageLoader {
+            id: mediaLoader
+
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
-            visible: root.currentIndex === 1
-            opacity: visible ? 1 : 0
-            Behavior on opacity { NumberAnimation { duration: 300 } }
+            presented: root.active && root.currentIndex === 1
+            sourceComponent: mediaComponent
         }
 
-        WallpaperContent {
+        RetainedPageLoader {
+            id: wallpaperLoader
+
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width * 0.95
             height: 300
-            screen: root.screen
-            visible: root.currentIndex === 2
-            opacity: visible ? 1 : 0
-            Behavior on opacity { NumberAnimation { duration: 300 } }
-            onWallpaperChanged: root.closeRequested()
+            presented: root.active && root.currentIndex === 2
+            sourceComponent: wallpaperComponent
         }
 
-        WeatherContent {
+        RetainedPageLoader {
+            id: weatherLoader
+
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
-            active: root.currentIndex === 3 && root.visible
-            visible: root.currentIndex === 3
-            opacity: visible ? 1 : 0
-            Behavior on opacity { NumberAnimation { duration: 300 } }
+            presented: root.active && root.currentIndex === 3
+            sourceComponent: weatherComponent
+        }
+    }
+
+    Component {
+        id: dashboardComponent
+
+        DashboardContent {
+            player: root.player
+            screen: root.screen
+            active: dashboardLoader.presented
+            onCloseRequested: root.closeRequested()
+            onAvatarEditRequested: root.avatarEditRequested()
+        }
+    }
+
+    Component {
+        id: mediaComponent
+
+        Media {
+            player: root.player
+            active: mediaLoader.presented
+        }
+    }
+
+    Component {
+        id: wallpaperComponent
+
+        WallpaperContent {
+            anchors.fill: parent
+            screen: root.screen
+            onWallpaperChanged: root.closeRequested()
+        }
+    }
+
+    Component {
+        id: weatherComponent
+
+        WeatherContent {
+            active: weatherLoader.presented
         }
     }
 }

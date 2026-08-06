@@ -110,7 +110,29 @@ Item {
         const result = root.results[index];
         if (!result || !result.appObject)
             return false;
-        result.appObject.execute();
+
+        const app = result.appObject;
+        const appCommand = Array.from(app.command || []);
+        if (appCommand.length === 0 || app.runInTerminal) {
+            app.execute();
+            return true;
+        }
+
+        const command = [
+            "systemd-run",
+            "--user",
+            "--scope",
+            "--collect",
+            "--quiet",
+            "--slice=app-graphical.slice"
+        ];
+        const workingDirectory = String(app.workingDirectory || "");
+        if (workingDirectory !== "")
+            command.push("--working-directory=" + workingDirectory);
+        command.push("--");
+        for (let argument of appCommand)
+            command.push(String(argument));
+        Quickshell.execDetached(command);
         return true;
     }
 

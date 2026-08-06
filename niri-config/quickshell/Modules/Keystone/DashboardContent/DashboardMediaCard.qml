@@ -55,8 +55,7 @@ Item {
         duration: 23500
         easing.type: Easing.Linear
         loops: Animation.Infinite
-        running: true
-        paused: !root.active || !root.isPlaying
+        running: root.active && root.isPlaying
     }
 
     component MetadataText: Text {

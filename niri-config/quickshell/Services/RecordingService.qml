@@ -37,6 +37,8 @@ Singleton {
         ? Math.max(0, _nowMs - startedAtMs)
         : 0
 
+    Component.onCompleted: root.refresh()
+
     signal commandFinished(string command, bool ok)
     signal selectionCancelled()
     signal commandError(string code, string message)
@@ -225,10 +227,9 @@ Singleton {
     }
 
     Timer {
-        interval: root.isActive ? 500 : 2000
+        interval: 500
         repeat: true
-        running: true
-        triggeredOnStart: true
+        running: root.isActive
         onTriggered: root.refresh()
     }
 

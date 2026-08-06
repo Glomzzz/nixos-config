@@ -14,6 +14,7 @@ Item {
     height: 570
 
     property bool active: false
+    property bool componentReady: false
     property real latitude: 0
     property real longitude: 0
     property string locationName: qsTr("Weather")
@@ -229,14 +230,26 @@ Item {
         root.dailyData = nextDaily
     }
 
-    Component.onCompleted: {
+    function activateWeather() {
         root.syncWeatherData()
         if (!WeatherPlugin.hasValidData && !WeatherPlugin.loading)
             WeatherPlugin.refresh()
     }
 
+    Component.onCompleted: {
+        root.componentReady = true
+        if (root.active)
+            root.activateWeather()
+    }
+
+    onActiveChanged: {
+        if (root.active && root.componentReady)
+            root.activateWeather()
+    }
+
     Connections {
         target: WeatherPlugin
+        enabled: root.active
 
         function onDataChanged() {
             root.syncWeatherData()
@@ -282,13 +295,17 @@ Item {
 
                         WeatherCurrent {
                             Layout.fillWidth: true
+                            active: root.active
                             onRefreshRequested: root.fetchData()
                         }
 
                         WeatherFiveDayForecast { Layout.fillWidth: true }
 
                         WeatherAQIIndicator { Layout.fillWidth: true }
-                        WeatherSunriseSunset { Layout.fillWidth: true }
+                        WeatherSunriseSunset {
+                            Layout.fillWidth: true
+                            active: root.active
+                        }
                     }
                 }
 
@@ -302,7 +319,7 @@ Item {
                             Layout.alignment: Qt.AlignHCenter
                             Layout.preferredWidth: 42
                             Layout.preferredHeight: 42
-                            running: WeatherPlugin.loading
+                            running: root.active && WeatherPlugin.loading
                             visible: running
                             Material.accent: Appearance.colors.colPrimary
                         }

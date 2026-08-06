@@ -14,6 +14,8 @@ Item {
 
     signal refreshRequested()
 
+    property bool active: false
+    property bool componentReady: false
     property string locationName: qsTr("Weather")
     property string currentTemp: "--"
     property string currentIcon: "cloud"
@@ -50,12 +52,22 @@ Item {
 
     Connections {
         target: WeatherPlugin
+        enabled: root.active
         function onDataChanged() {
             syncData();
         }
     }
 
-    Component.onCompleted: syncData()
+    Component.onCompleted: {
+        root.componentReady = true
+        if (root.active)
+            root.syncData()
+    }
+
+    onActiveChanged: {
+        if (root.active && root.componentReady)
+            root.syncData()
+    }
 
     RowLayout {
         id: layout
@@ -108,7 +120,7 @@ Item {
             Layout.alignment: Qt.AlignVCenter
             width: 42
             height: 42
-            enabled: !WeatherPlugin.loading
+            enabled: root.active && !WeatherPlugin.loading
             hoverEnabled: true
 
             background: Item {}
@@ -127,11 +139,11 @@ Item {
                     to: 360
                     duration: 800
                     loops: Animation.Infinite
-                    running: WeatherPlugin.loading
+                    running: root.active && WeatherPlugin.loading
                 }
 
                 Behavior on rotation {
-                    enabled: !WeatherPlugin.loading
+                    enabled: root.active && !WeatherPlugin.loading
                     NumberAnimation {
                         duration: Appearance.animation.expressiveEffects.duration
                         easing.type: Appearance.animation.expressiveEffects.type

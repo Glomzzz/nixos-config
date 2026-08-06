@@ -43,8 +43,7 @@ Item {
         duration: root.phaseDuration
         easing.type: Easing.Linear
         loops: Animation.Infinite
-        running: true
-        paused: !root.active || !root.playing
+        running: root.active && root.playing
     }
 
     Canvas {

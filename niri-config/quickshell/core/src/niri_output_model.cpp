@@ -66,14 +66,67 @@ QHash<int, QByteArray> NiriOutputModel::roleNames() const
     };
 }
 
-void NiriOutputModel::setOutputs(const QList<NiriOutput> &outputs)
+bool NiriOutputModel::setOutputs(const QList<NiriOutput> &outputs)
 {
-    beginResetModel();
+    bool sameRows = m_outputs.count() == outputs.count();
+    if (sameRows) {
+        for (int i = 0; i < m_outputs.count(); ++i) {
+            if (m_outputs.at(i).name != outputs.at(i).name) {
+                sameRows = false;
+                break;
+            }
+        }
+    }
+
+    if (sameRows) {
+        bool changed = false;
+        for (int i = 0; i < outputs.count(); ++i) {
+            const NiriOutput &oldOutput = m_outputs.at(i);
+            const NiriOutput &newOutput = outputs.at(i);
+            QList<int> changedRoles;
+            if (oldOutput.name != newOutput.name)
+                changedRoles.append(NameRole);
+            if (oldOutput.make != newOutput.make)
+                changedRoles.append(MakeRole);
+            if (oldOutput.model != newOutput.model)
+                changedRoles.append(ModelRole);
+            if (oldOutput.serial != newOutput.serial)
+                changedRoles.append(SerialRole);
+            if (oldOutput.logicalX != newOutput.logicalX)
+                changedRoles.append(LogicalXRole);
+            if (oldOutput.logicalY != newOutput.logicalY)
+                changedRoles.append(LogicalYRole);
+            if (oldOutput.logicalWidth != newOutput.logicalWidth)
+                changedRoles.append(LogicalWidthRole);
+            if (oldOutput.logicalHeight != newOutput.logicalHeight)
+                changedRoles.append(LogicalHeightRole);
+            if (oldOutput.scale != newOutput.scale)
+                changedRoles.append(ScaleRole);
+            if (oldOutput.transform != newOutput.transform)
+                changedRoles.append(TransformRole);
+            if (oldOutput.currentMode != newOutput.currentMode)
+                changedRoles.append(CurrentModeRole);
+            if (oldOutput.vrrEnabled != newOutput.vrrEnabled)
+                changedRoles.append(VrrEnabledRole);
+
+            if (changedRoles.isEmpty())
+                continue;
+
+            m_outputs[i] = newOutput;
+            const QModelIndex modelIndex = index(i);
+            emit dataChanged(modelIndex, modelIndex, changedRoles);
+            changed = true;
+        }
+        return changed;
+    }
+
     const int oldCount = m_outputs.count();
+    beginResetModel();
     m_outputs = outputs;
     endResetModel();
     if (oldCount != m_outputs.count())
         emit countChanged();
+    return true;
 }
 
 const QList<NiriOutput> &NiriOutputModel::outputs() const

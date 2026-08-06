@@ -6,15 +6,37 @@ Item {
 
     property var screen: null
     property bool foreground: false
+    property var retainedViews: ({ "settings": true })
+
+    function retainView(view) {
+        if (root.retainedViews[view])
+            return;
+        const next = {};
+        for (const key in root.retainedViews)
+            next[key] = root.retainedViews[key];
+        next[view] = true;
+        root.retainedViews = next;
+    }
+
+    Component.onCompleted: root.retainView(WidgetState.qsView)
+
+    Connections {
+        target: WidgetState
+
+        function onQsViewChanged() {
+            root.retainView(WidgetState.qsView);
+        }
+    }
 
     PageTransitionLayer {
         anchors.fill: parent
         active: WidgetState.qsView === "network"
 
-        NetworkContent {
+        Loader {
             anchors.fill: parent
-            foreground: root.foreground
-                && WidgetState.qsView === "network"
+            active: !!root.retainedViews.network
+            asynchronous: true
+            sourceComponent: networkContentComponent
         }
     }
 
@@ -22,10 +44,11 @@ Item {
         anchors.fill: parent
         active: WidgetState.qsView === "bluetooth"
 
-        BluetoothContent {
+        Loader {
             anchors.fill: parent
-            foreground: root.foreground
-                && WidgetState.qsView === "bluetooth"
+            active: !!root.retainedViews.bluetooth
+            asynchronous: true
+            sourceComponent: bluetoothContentComponent
         }
     }
 
@@ -33,8 +56,11 @@ Item {
         anchors.fill: parent
         active: WidgetState.qsView === "idle"
 
-        IdleContent {
+        Loader {
             anchors.fill: parent
+            active: !!root.retainedViews.idle
+            asynchronous: true
+            sourceComponent: idleContentComponent
         }
     }
 
@@ -42,8 +68,11 @@ Item {
         anchors.fill: parent
         active: WidgetState.qsView === "audio"
 
-        AudioContent {
+        Loader {
             anchors.fill: parent
+            active: !!root.retainedViews.audio
+            asynchronous: true
+            sourceComponent: audioContentComponent
         }
     }
 
@@ -51,8 +80,11 @@ Item {
         anchors.fill: parent
         active: WidgetState.qsView === "microphone"
 
-        MicrophoneContent {
+        Loader {
             anchors.fill: parent
+            active: !!root.retainedViews.microphone
+            asynchronous: true
+            sourceComponent: microphoneContentComponent
         }
     }
 
@@ -65,5 +97,41 @@ Item {
             anchors.fill: parent
             screen: root.screen
         }
+    }
+
+    Component {
+        id: networkContentComponent
+
+        NetworkContent {
+            foreground: root.foreground
+                && WidgetState.qsView === "network"
+        }
+    }
+
+    Component {
+        id: bluetoothContentComponent
+
+        BluetoothContent {
+            foreground: root.foreground
+                && WidgetState.qsView === "bluetooth"
+        }
+    }
+
+    Component {
+        id: idleContentComponent
+
+        IdleContent {}
+    }
+
+    Component {
+        id: audioContentComponent
+
+        AudioContent {}
+    }
+
+    Component {
+        id: microphoneContentComponent
+
+        MicrophoneContent {}
     }
 }

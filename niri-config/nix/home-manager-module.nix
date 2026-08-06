@@ -7,6 +7,13 @@
   cfg = config.services.clavis-shell;
   defaultPackage = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
   niriConfig = ../config/niri/config.kdl;
+  sessionVariables =
+    {
+      _JAVA_AWT_WM_NONREPARENTING = "1";
+    }
+    // lib.optionalAttrs cfg.xwaylandSatellite.enable {
+      XWAYLAND_SATELLITE_BASE_SCALE = toString cfg.xwaylandSatellite.baseScale;
+    };
 in {
   options.services.clavis-shell = {
     enable = lib.mkEnableOption "Clavis Shell and its Niri configuration";
@@ -97,13 +104,10 @@ in {
       ++ cfg.extraPackages
       ++ lib.optional cfg.xwaylandSatellite.enable cfg.xwaylandSatellite.package;
 
-    home.sessionVariables =
-      {
-        _JAVA_AWT_WM_NONREPARENTING = "1";
-      }
-      // lib.optionalAttrs cfg.xwaylandSatellite.enable {
-        XWAYLAND_SATELLITE_BASE_SCALE = toString cfg.xwaylandSatellite.baseScale;
-      };
+    # SDDM starts Niri through the systemd user manager, which does not source
+    # hm-session-vars.sh. Keep both environments aligned for GUI and shell apps.
+    home.sessionVariables = sessionVariables;
+    systemd.user.sessionVariables = sessionVariables;
 
     xdg.configFile."niri/config.kdl" = {
       source = cfg.configFile;
