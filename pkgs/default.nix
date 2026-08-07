@@ -6,7 +6,6 @@ final: _prev: {
   nu_scripts = final.callPackage ./nu-scripts.nix {};
   oh-my-codex = final.callPackage ./oh-my-codex.nix {};
   ssh-proxy-mac-mini = final.callPackage ./ssh-proxy-mac-mini.nix {};
-  sub2api = final.callPackage ./sub2api.nix {};
   v2raya-assets = final.callPackage ./v2raya-assets.nix {};
   wechat = final.callPackage ./wechat {};
 }
