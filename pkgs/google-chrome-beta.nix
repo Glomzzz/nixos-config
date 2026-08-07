@@ -174,7 +174,7 @@
 
     src = fetchurl {
       url = "https://dl.google.com/linux/direct/google-chrome-beta_current_amd64.deb";
-      hash = "sha256-v7USP8tZpajt59wMyO6khGkvZqksx/FHTgZ9ArfpvTQ=";
+      hash = "sha256-v4behXUqR1PtKnZCAvTkLVOGaN52I0NrW9gpLHuK424=";
     };
 
     # With strictDeps on, some shebangs were not being patched correctly
@@ -301,7 +301,7 @@
 
     src = fetchurl {
       url = "https://dl.google.com/chrome/mac/universal/beta/googlechromebeta.dmg";
-      hash = "sha256-l65qmLZKEWHwFoWnZN8E7I2IDf6o29TuzdNBOKXmEd8=";
+      hash = "sha256-DKqqUM2uj9aNIlbuwEZdI80Yy9xlA/CP9AmWJA3oTYc=";
     };
 
     dontPatch = true;
