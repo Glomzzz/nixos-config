@@ -14,7 +14,6 @@ in {
     users.${username} = {
       imports = [
         (import (userRoot + "/home.nix"))
-        # inputs.emacs-config.homeManagerModules.default
       ];
     };
     extraSpecialArgs = inputs // specialArgs;
@@ -32,4 +31,8 @@ in {
       fi
     '';
   };
+
+  environment.extraInit = let
+    homeManagerSessionVars = "/etc/profiles/per-user/${username}/etc/profile.d/hm-session-vars.sh";
+  in "[[ -f ${homeManagerSessionVars} ]] && source ${homeManagerSessionVars}";
 }

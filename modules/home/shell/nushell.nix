@@ -38,9 +38,6 @@
       $env.SHELL = "${pkgs.nushell}/bin/nu";
       $env.config.show_banner = false
 
-      let carapace_completer = {|spans|
-      carapace $spans.0 nushell $spans | from json
-      }
       $env.config = {
         show_banner: false,
         completions: {
@@ -57,11 +54,6 @@
           ^ssh ...$args
         }
       }
-    '';
-
-    envFile.text = ''
-      mkdir ~/.cache/starship
-      starship init nu | sed "s/size -c/size/" | save ~/.cache/starship/init.nu -f
     '';
   };
 }

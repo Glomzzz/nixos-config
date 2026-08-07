@@ -1,6 +1,6 @@
 _: {
   imports = [
-    ./gaming.nix
-    ./gaming-wine.nix
+    ./games.nix
+    ./wine.nix
   ];
 }

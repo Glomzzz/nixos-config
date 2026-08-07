@@ -2,9 +2,6 @@
   description = "Glom's Flake configuration";
 
   inputs = {
-    # nixpkgs.url = "github:NixOS/nixpkgs/";
-    # nixpkgs-2505.url = "github:NixOS/nixpkgs/nixos-25.05/";
-    # nixpkgs-2411.url = "github:NixOS/nixpkgs/nixos-24.11/";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
       url = "github:nix-community/home-manager/master";
@@ -20,10 +17,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
-    # emacs-config = {
-    #   url = "path:/home/glom/emacs-config";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
   };
 
   outputs = inputs @ {

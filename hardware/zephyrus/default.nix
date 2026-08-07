@@ -16,6 +16,7 @@
     ./boot.nix
     ./asus.nix
     ./graphics-stack.nix
+    ./input.nix
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
 

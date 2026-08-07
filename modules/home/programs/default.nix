@@ -1,13 +1,11 @@
 _: {
   imports = [
-    ./dev
-    ./gaming
-    ./cli-tools.nix
-    ./communication.nix
     ./browser.nix
+    ./cli
+    ./communication.nix
+    ./dev
     ./documents.nix
-    ./xdg.nix
-    ./util.nix
-    ./media.nix
+    ./gaming
+    ./multimedia.nix
   ];
 }
