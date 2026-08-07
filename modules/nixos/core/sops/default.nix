@@ -8,6 +8,7 @@
     ./opencode.nix
     ./ai.nix
     ./tailscale.nix
+    ./github.nix
   ];
 
   sops = {
