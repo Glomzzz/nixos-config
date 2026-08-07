@@ -1,10 +1,21 @@
-_: {
+{pkgs, ...}: {
   programs = {
     tmux = {
       enable = true;
       clock24 = true;
       keyMode = "vi";
-      extraConfig = "mouse on";
+      mouse = true;
+      extraConfig = ''
+        set -g allow-passthrough on
+        set -ga update-environment TERM
+        set -ga update-environment TERM_PROGRAM
+      '';
+    };
+
+    yazi = {
+      enable = true;
+      enableNushellIntegration = true;
+      extraPackages = [pkgs.ueberzugpp];
     };
 
     bat = {
