@@ -1,18 +1,17 @@
 {pkgs, ...}: let
   # Use `steam-game-laptop %command%` as a game's Steam launch option when it
-  # needs Gamescope to enforce the laptop panel's native fullscreen geometry.
+  # needs an isolated native-resolution surface on the laptop panel.
   steamGameLaptop = pkgs.writeShellApplication {
     name = "steam-game-laptop";
     text = ''
-      # Niri presents eDP-1 as 1707x1067 logical pixels at scale 1.5. Keep
-      # Gamescope's outer SDL surface in that space while the nested game
-      # surface stays at the panel's native 2560x1600 pixels.
-      exec ${pkgs.gamemode}/bin/gamemoderun \
-        /run/wrappers/bin/gamescope \
-        --backend sdl \
+      # Let the Wayland backend convert Niri's 1707x1067 fullscreen configure
+      # through the output's 1.5 fractional scale. This produces a 2560x1600
+      # physical outer buffer and keeps absolute pointer coordinates aligned.
+      # Use the unwrapped binary because Steam's pressure-vessel sandbox cannot
+      # inherit the capabilities on NixOS's set-capability Gamescope wrapper.
+      exec ${pkgs.gamescope}/bin/gamescope \
+        --backend wayland \
         --fullscreen \
-        --output-width 1707 \
-        --output-height 1067 \
         --nested-width 2560 \
         --nested-height 1600 \
         --nested-refresh 240 \
@@ -42,9 +41,10 @@ in {
     steam = {
       enable = true;
       package = pkgs.steam.override {
-        # Xwayland already maps the client into Niri's scaled output space.
-        # Prevent Steam's persisted HiDPI fallback from enlarging the UI again.
-        extraEnv.STEAM_FORCE_DESKTOPUI_SCALING = "1";
+        # Steam's Xwayland helper measures this panel as a 1.6x desktop DPI
+        # factor. Use its reciprocal so one CEF CSS pixel maps to one physical
+        # pixel instead of enlarging the entire client UI.
+        extraEnv.STEAM_FORCE_DESKTOPUI_SCALING = "0.625";
       };
       fontPackages = with pkgs; [source-han-sans];
       extraPackages = with pkgs; [
