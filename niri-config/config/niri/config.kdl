@@ -131,6 +131,8 @@ window-rule {
 // aligned.
 window-rule {
     match app-id=r#"(?i)^(steam_app_[0-9]+|dota2|cs2|gamescope|\.gamescope-wrapped)$"#
+    // Gamescope 3.16 leaves the Just Go outer surface's app ID unset.
+    match title="^JustGo$"
     open-on-output "eDP-1"
     variable-refresh-rate true
     geometry-corner-radius 0

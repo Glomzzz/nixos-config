@@ -4,6 +4,16 @@
   steamGameLaptop = pkgs.writeShellApplication {
     name = "steam-game-laptop";
     text = ''
+      # Just Go only exposes 16:9 modes. Match the game's render surface to its
+      # highest supported mode so Gamescope, Unity, and absolute input use the
+      # same coordinates; Gamescope letterboxes it on the 16:10 panel.
+      if [[ "''${SteamAppId:-''${STEAM_COMPAT_APP_ID:-}}" == "1862520" ]]; then
+        set -- "$@" \
+          -screen-width 2560 \
+          -screen-height 1440 \
+          -screen-fullscreen 1
+      fi
+
       # Let the Wayland backend convert Niri's 1707x1067 fullscreen configure
       # through the output's 1.5 fractional scale. This produces a 2560x1600
       # physical outer buffer and keeps absolute pointer coordinates aligned.
@@ -41,9 +51,9 @@ in {
     steam = {
       enable = true;
       package = pkgs.steam.override {
-        # Steam's Xwayland helper measures this panel as a 1.6x desktop DPI
-        # factor. Use its reciprocal so one CEF CSS pixel maps to one physical
-        # pixel instead of enlarging the entire client UI.
+        # Steam multiplies this by the 1.6x DPI reported through Xwayland.
+        # Its CEF UI clamps at 1x, so the reciprocal is the smallest effective
+        # scale and avoids enlarging the client above native size.
         extraEnv.STEAM_FORCE_DESKTOPUI_SCALING = "0.625";
       };
       fontPackages = with pkgs; [source-han-sans];
