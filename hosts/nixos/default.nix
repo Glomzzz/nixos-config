@@ -13,7 +13,9 @@
   ];
 
   networking.hostName = hostname;
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  # Prefer the maintained LTS kernel for the NVIDIA-driven internal panel.
+  # linuxPackages_latest has intermittently exposed eDP-1 without any modes.
+  boot.kernelPackages = pkgs.linuxPackages;
 
   users.users.${username} = {
     isNormalUser = true;
