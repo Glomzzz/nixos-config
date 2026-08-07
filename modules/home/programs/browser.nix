@@ -1,14 +1,14 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
-    google-chrome
+    firefox
   ];
 
   home.sessionVariables = {
-    BROWSER = "google-chrome";
+    BROWSER = "firefox";
   };
   xdg.mimeApps.defaultApplications = {
-    "text/html" = ["com.google.Chrome.desktop"];
-    "x-scheme-handler/http" = ["com.google.Chrome.desktop"];
-    "x-scheme-handler/https" = ["com.google.Chrome.desktop"];
+    "text/html" = ["firefox.desktop"];
+    "x-scheme-handler/http" = ["firefox.desktop"];
+    "x-scheme-handler/https" = ["firefox.desktop"];
   };
 }
