@@ -1,14 +1,14 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
-    google-chrome-beta
+    google-chrome
   ];
 
   home.sessionVariables = {
-    BROWSER = "google-chrome-beta";
+    BROWSER = "google-chrome";
   };
   xdg.mimeApps.defaultApplications = {
-    "text/html" = ["com.google.Chrome.beta.desktop"];
-    "x-scheme-handler/http" = ["com.google.Chrome.beta.desktop"];
-    "x-scheme-handler/https" = ["com.google.Chrome.beta.desktop"];
+    "text/html" = ["com.google.Chrome.desktop"];
+    "x-scheme-handler/http" = ["com.google.Chrome.desktop"];
+    "x-scheme-handler/https" = ["com.google.Chrome.desktop"];
   };
 }
