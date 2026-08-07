@@ -15,5 +15,10 @@ in {
     ripgrep
     fd
     nix-alien
+    curl
+    sysstat
+    usbutils
+    wget
+    yq-go
   ];
 }

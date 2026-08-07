@@ -1,7 +1,9 @@
 _: {
   imports = [
-    ./steam.nix
     ./core
+    ./desktop
+    ./programs
+    ./security
     ../services/nixos
   ];
 }

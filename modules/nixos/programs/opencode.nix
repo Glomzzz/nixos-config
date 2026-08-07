@@ -132,22 +132,12 @@
       enabled = true;
     };
   };
-  # port = "6112";
 in {
   home-manager.users.${username} = {
     home.sessionVariables.OPENCODE_PASSWORD_FILE = opencodePasswordFile;
 
     programs.opencode = {
       enable = true;
-      # web = {
-      #   enable = true;
-      #   extraArgs = [
-      #     "--hostname"
-      #     "127.0.0.1"
-      #     "--port"
-      #     "${port}"
-      #   ];
-      # };
       settings = {
         "$schema" = "https://opencode.ai/config.json";
         plugin = ["oh-my-openagent"];
@@ -173,11 +163,4 @@ in {
 
     xdg.configFile."opencode/oh-my-openagent.json".text = ohMyOpenAgentConfig;
   };
-
-  # services.tailscale.serve.services.opencode = {
-  #   endpoints = {
-  #     "tcp:${port}" = "http://127.0.0.1:${port}";
-  #   };
-  #   advertised = true;
-  # };
 }

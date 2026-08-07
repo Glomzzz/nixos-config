@@ -1,23 +1,18 @@
-{lib, ...}: {
+{
+  lib,
+  username,
+  ...
+}: {
   nix.settings.trusted-users = lib.mkForce [
     "root"
-    "glom"
+    username
   ];
   imports = [
-    ./sops
-    ./cachix.nix
-    ./locale.nix
     ./fonts.nix
-    ./android.nix
-    ./ios.nix
-    ./networking.nix
-    ./plasma-auth.nix
-    ./howdy.nix
-    ./codex.nix
-    ./opencode.nix
-    ./nix-ld.nix
     ./home-manager.nix
     ./input.nix
-    ./keyboard.nix
+    ./locale.nix
+    ./networking.nix
+    ./nix.nix
   ];
 }

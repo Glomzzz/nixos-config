@@ -1,10 +1,10 @@
 _: {
   imports = [
-    ./lang
-    ./database
-    ./editor
     ./android.nix
+    ./database
     ./direnv.nix
+    ./editor
     ./git.nix
+    ./lang
   ];
 }

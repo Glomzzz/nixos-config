@@ -1,17 +1,11 @@
 {username, ...}: {
-  ##################################################################################################################
-  #
-  # NixOS Configuration
-  #
-  ##################################################################################################################
-  imports = [];
-  # To make sure that the home-manager session variables are loaded
-  #h ttps://github.com/nix-community/home-manager/issues/1011
-  environment.extraInit = let
-    homeManagerSessionVars = "/etc/profiles/per-user/${username}/etc/profile.d/hm-session-vars.sh";
-  in "[[ -f ${homeManagerSessionVars} ]] && source ${homeManagerSessionVars}";
-
-  nix.settings = {
-    download-buffer-size = 524288000; # 500 MiB
+  users.users.${username} = {
+    isNormalUser = true;
+    description = username;
+    extraGroups = [
+      "dialout"
+      "networkmanager"
+      "wheel"
+    ];
   };
 }

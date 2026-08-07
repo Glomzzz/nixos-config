@@ -1,5 +1,4 @@
 {pkgs, ...}: {
-  # auto mount usb drives
   services.udiskie = {
     enable = true;
     package = pkgs.udiskie.overridePythonAttrs (oldAttrs: {

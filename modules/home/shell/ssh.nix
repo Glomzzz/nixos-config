@@ -5,6 +5,7 @@
 }: {
   programs.ssh = {
     enable = true;
+    enableDefaultConfig = false;
     settings = {
       "macmini mac-mini" = {
         hostname = "mac-mini";

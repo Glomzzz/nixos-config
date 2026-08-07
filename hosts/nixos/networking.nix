@@ -1,10 +1,3 @@
-{
-  lib,
-  pkgs,
-  ...
-}: {
+{lib, ...}: {
   networking.useDHCP = lib.mkDefault true;
-  environment.systemPackages = with pkgs; [
-    easytier
-  ];
 }

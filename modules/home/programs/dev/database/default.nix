@@ -1,6 +1,6 @@
 _: {
   imports = [
-    ./postgre-sql.nix
-    ./sqlite.nix
+    ./dbeaver.nix
+    ./postgresql-client.nix
   ];
 }

@@ -1,4 +1,6 @@
 .vscode/
 .sisyphus/
+.direnv/
+.codegraph
 result
 result-*

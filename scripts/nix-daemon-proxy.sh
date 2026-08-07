@@ -1,3 +1,7 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
 sudo mkdir -p /run/systemd/system/nix-daemon.service.d/
 sudo tee /run/systemd/system/nix-daemon.service.d/override.conf << EOF
 [Service]

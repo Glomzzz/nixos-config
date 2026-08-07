@@ -11,4 +11,6 @@ _: {
       "8.8.8.8"
     ];
   };
+
+  services.resolved.enable = true;
 }
