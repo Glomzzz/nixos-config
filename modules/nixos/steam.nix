@@ -41,6 +41,11 @@ in {
 
     steam = {
       enable = true;
+      package = pkgs.steam.override {
+        # Xwayland already maps the client into Niri's scaled output space.
+        # Prevent Steam's persisted HiDPI fallback from enlarging the UI again.
+        extraEnv.STEAM_FORCE_DESKTOPUI_SCALING = "1";
+      };
       fontPackages = with pkgs; [source-han-sans];
       extraPackages = with pkgs; [
         corefonts
