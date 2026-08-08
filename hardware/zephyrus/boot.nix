@@ -4,7 +4,7 @@ _: {
       systemd-boot.enable = false;
       grub = {
         enable = true;
-        configurationLimit = 3;
+        configurationLimit = 20;
         device = "nodev";
         efiSupport = true;
         useOSProber = false;

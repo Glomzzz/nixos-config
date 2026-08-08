@@ -1,6 +1,6 @@
 _: {
   imports = [
-    ./greetd.nix
+    ./autologin.nix
     ./niri.nix
   ];
 }

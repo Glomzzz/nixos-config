@@ -1,6 +1,6 @@
 {pkgs, ...}: {
   # Caps Lock is a second Ctrl everywhere. This xkb block is the source for the
-  # virtual consoles and the greetd/tuigreet login prompt (via
+  # virtual consoles, including the tty1 autologin (via
   # console.useXkbConfig); the niri session sets the same option itself in
   # modules/home/desktop/niri/settings.nix because a Wayland compositor does
   # not read these.

@@ -10,7 +10,7 @@
   # niri-flake's NixOS module replaces the nixpkgs `programs.niri` module and
   # pulls in the pieces a bare compositor does not provide on its own:
   # xdg portals (screencast), polkit, gnome-keyring, dconf and the session
-  # entry used by greetd. It also injects `programs.niri.settings` into
+  # entry for the session. It also injects `programs.niri.settings` into
   # Home Manager automatically, so the user-level config lives under
   # modules/home/desktop/niri.
   # nixpkgs' own niri (26.04) is used rather than niri-flake's niri-stable:
