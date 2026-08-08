@@ -72,10 +72,8 @@ in {
       modules-left = ["custom/launcher" "niri/workspaces" "niri/window"];
       modules-center = ["clock"];
       modules-right = [
-        "tray"
-        "niri/language"
+        "group/tray-drawer"
         "pulseaudio"
-        "backlight"
         "battery"
         "cpu"
         "temperature"
@@ -277,7 +275,55 @@ in {
         on-click = "${pkgs.foot}/bin/foot -a impala ${pkgs.impala}/bin/impala";
       };
 
-      tray.spacing = 8;
+      # KDE's system tray (applet 36) split its members into a shown set
+      # (blueman, networkmanagement) and a hidden set behind the expand arrow,
+      # with scaleIconsToFit=true. Waybar's tray module CANNOT do that split:
+      # it has no per-item show/hide, no persistence of which item is hidden,
+      # and no arrow of its own. That per-item behaviour is dropped for good
+      # (recorded in the parity ledger, todo 18).
+      #
+      # The closest analogue is a group with a `drawer`: the FIRST module in
+      # `modules` is the group leader and is always visible, every later module
+      # is hidden until revealed. click-to-reveal = true is deliberate - KDE
+      # required a click on the arrow, and hover-reveal would make the bar
+      # twitch whenever the pointer crossed it.
+      #
+      # Leader is `tray` itself, so real SNI items stay permanently visible the
+      # way KDE's shown set was. The revealed children are the secondary
+      # indicators KDE also kept inside that tray: input method (niri/language
+      # = the kimpanel member) and brightness (backlight = the kscreen/
+      # brightness member). Todo 12 adds bluetooth/mpris/clipboard/privacy to
+      # this same `modules` list; nothing else needs to change to accept them.
+      "group/tray-drawer" = {
+        orientation = "inherit";
+        drawer = {
+          transition-duration = 500;
+          # Set explicitly. waybar-styles(5) documents the default as "hidden",
+          # but src/group.cpp:60 actually defaults it to "drawer-child" - the
+          # man page is wrong, so relying on either spelling is a silent CSS
+          # miss. The name below is what the style block targets.
+          children-class = "tray-drawer-child";
+          click-to-reveal = true;
+        };
+        modules = [
+          "tray"
+          "niri/language"
+          "backlight"
+        ];
+      };
+
+      tray = {
+        spacing = 8;
+        # The bar is 32px tall; 20 leaves 6px of breathing room top and bottom
+        # so icons do not touch the panel edges. This is the honest stand-in
+        # for KDE's scaleIconsToFit=true, which waybar has no equivalent for.
+        icon-size = 20;
+        # KDE showed passive members (its shown set included items sitting
+        # idle), and the default false would silently swallow any SNI item that
+        # reports Passive rather than Active - which reads as "my tray icon
+        # vanished". Explicit true keeps the tray's contents predictable.
+        show-passive-items = true;
+      };
     };
 
     # Catppuccin Mocha, matching foot and fuzzel.
@@ -371,6 +417,47 @@ in {
 
       #temperature.critical {
         color: #f38ba8;
+      }
+
+      /* The four selectors waybar-tray(5) documents. `#tray > .x` reaches the
+         individual SNI item widgets inside the tray box, so the three status
+         classes are per-icon, not per-module. Passive items are dimmed rather
+         than hidden, which is the point of show-passive-items = true: an idle
+         item is still there, just visually demoted. needs-attention is the
+         SNI equivalent of KDE's blinking/highlighted tray member. */
+      #tray > .passive {
+        -gtk-icon-effect: dim;
+      }
+
+      #tray > .active {
+        -gtk-icon-effect: none;
+      }
+
+      #tray > .needs-attention {
+        -gtk-icon-effect: highlight;
+        background: #f38ba8;
+        border-radius: 6px;
+      }
+
+      /* The drawer group. #tray-drawer is the group's own box (bar.cpp strips
+         the "group/" prefix to build the widget name), and .tray-drawer-child
+         is the children-class set explicitly in the drawer config above - it
+         lands on every module in the group EXCEPT the leader. Left padding
+         separates a revealed child from the always-visible tray, and the hover
+         tint on the group is the only affordance that it is clickable, since
+         click-to-reveal means nothing happens on mouse-over. */
+      #tray-drawer {
+        padding: 0 2px;
+        border-radius: 8px;
+      }
+
+      #tray-drawer:hover {
+        background: #45475a;
+      }
+
+      .tray-drawer-child {
+        padding: 0 6px;
+        color: #a6adc8;
       }
 
       /* Appended below the workspace rules on purpose - see the source-order
