@@ -127,10 +127,56 @@ in {
         tooltip = false;
       };
 
+      # KDE's digital clock ran use24hFormat=2, showSeconds=Always,
+      # dateFormat=isoDate and dateDisplayFormat=BesideTime, so the default
+      # format is the ISO date sitting beside a 24-hour clock with seconds.
+      # interval must be 1: at the default 60 the seconds field would sit
+      # frozen for a whole minute.
+      #
+      # showWeekNumbers=true maps to calendar.weeks-pos. `locale` is set
+      # because waybar-clock(5) states {calendar} takes its start-of-week from
+      # this option rather than the system locale; en_US.UTF-8 matches LC_TIME
+      # in modules/nixos/core/locale.nix, giving Sunday-start weeks and the
+      # default %U week numbering.
+      #
+      # Two honest gaps versus KDE. waybar renders the calendar INSIDE the
+      # tooltip, not as a separate popup window, so it is hover-only and
+      # cannot be pinned open. And KDE's three calendar plugins
+      # (alternatecalendar, astronomicalevents, holidaysevents) have no waybar
+      # equivalent at all - they are dropped, recorded in the parity ledger.
       clock = {
-        format = "{:%H:%M}";
-        format-alt = "{:%Y-%m-%d %H:%M:%S}";
+        interval = 1;
+        timezone = "Asia/Singapore";
+        locale = "en_US.UTF-8";
+        format = "{:%Y-%m-%d %H:%M:%S}";
+        format-alt = "{:%a %d %b %Y  %H:%M:%S}";
         tooltip-format = "<tt><small>{calendar}</small></tt>";
+        calendar = {
+          mode = "month";
+          mode-mon-col = 3;
+          # The direct equivalent of KDE's showWeekNumbers=true.
+          weeks-pos = "left";
+          on-scroll = 1;
+          # Catppuccin Mocha, same palette as the style block below. Pango
+          # markup, not CSS - the calendar is tooltip text, so #clock rules
+          # cannot reach it.
+          format = {
+            months = "<span color='#89b4fa'><b>{}</b></span>";
+            days = "<span color='#cdd6f4'>{}</span>";
+            weeks = "<span color='#6c7086'><b>W{}</b></span>";
+            weekdays = "<span color='#a6adc8'><b>{}</b></span>";
+            today = "<span color='#f38ba8'><b><u>{}</u></b></span>";
+          };
+        };
+        # Scroll shifts months and right-click cycles year/month, covering the
+        # navigation KDE's calendar popup had. Plain on-click is left alone so
+        # it keeps toggling format-alt. No tz_up/tz_down: those need
+        # `timezones`, which conflicts with the single `timezone` above.
+        actions = {
+          on-click-right = "mode";
+          on-scroll-up = "shift_up";
+          on-scroll-down = "shift_down";
+        };
       };
 
       pulseaudio = {
