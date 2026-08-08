@@ -278,13 +278,19 @@ in {
 
       # Picture-in-picture, the Bluetooth GUI and the TUI control panels are
       # launched as one-off windows (see waybar.nix, which starts wiremix and
-      # impala under these app-ids), so tiling them just displaces real work.
+      # nmtui under these app-ids), so tiling them just displaces real work.
+      #
+      # `nmtui` rather than `impala`: impala is an iwd frontend and this host
+      # runs NetworkManager with the wpa_supplicant backend (see
+      # modules/nixos/core/networking.nix), so impala had no iwd D-Bus service to
+      # talk to and crashed on launch. The app-id is the `foot -a` value in
+      # waybar.nix, not the binary name, so these two must stay in sync.
       {
         matches = [
           {title = "^Picture-in-Picture$";}
           {app-id = "^overskride$";}
           {app-id = "^wiremix$";}
-          {app-id = "^impala$";}
+          {app-id = "^nmtui$";}
         ];
         open-floating = true;
       }
