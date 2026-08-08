@@ -689,17 +689,60 @@ in {
 
     # Catppuccin Mocha, matching foot and fuzzel.
     style = ''
+      /* ===================================================================
+         Panel geometry and shared resets.
+
+         height = 32 in the config above matches KDE's `thickness=32`, so the
+         only job here is to stop GTK from adding its own chrome on top of it:
+         `min-height: 0` lets a widget shrink to the bar's height instead of
+         GTK's default minimum, and the border/radius resets clear the theme's
+         button decoration so every module starts from the same flat surface.
+
+         The transition is declared once, globally, so that every colour and
+         fill change in the bar animates at the same speed - the workspace
+         pills, the hover tints and the battery/temperature state colours all
+         inherit it rather than each cluster picking its own timing. GTK3
+         supports `transition` and `@keyframes`; it has no CSS backdrop
+         filtering at all, so no such property appears anywhere in this sheet -
+         translucency comes from the rgba() base below and nothing else.
+         =================================================================== */
       * {
         font-family: "JetBrainsMono Nerd Font";
         font-size: 13px;
         border: none;
         border-radius: 0;
         min-height: 0;
+        transition:
+          background-color 150ms ease-in-out,
+          color 150ms ease-in-out;
       }
 
+      /* KDE ran this panel at `panelOpacity=0` with the colorizer applet
+         painting a translucent Catppuccin surface over it, so an rgba() base is
+         the faithful equivalent rather than a stopgap. The alpha IS the final
+         appearance: todo 17 established that niri-flake's typed layer-rules
+         schema cannot express blur, so nothing will ever be composited behind
+         this. Keep the alpha below 1.0.
+
+         The hairline bottom border is what KDE's panel shadow did - it stops
+         the bar dissolving into a light wallpaper - and it is deliberately a
+         translucent surface1 rather than a solid line so it reads as an edge,
+         not as a frame. */
       window#waybar {
         background: rgba(30, 30, 46, 0.92);
         color: #cdd6f4;
+        border-bottom: 1px solid rgba(69, 71, 90, 0.6);
+      }
+
+      /* ===================================================================
+         Left cluster: launcher, workspace pills, window title.
+         =================================================================== */
+
+      /* The pill row is its own visual group, so the container carries no
+         decoration of its own - the buttons' margins do the spacing and the
+         group reads as a run of pills rather than a boxed widget. */
+      #workspaces {
+        padding: 0 4px;
       }
 
       /* Rule order below is load-bearing. GTK3 resolves equal-specificity
@@ -741,11 +784,23 @@ in {
         color: #f38ba8;
       }
 
+      /* The window title is the quietest thing in the bar - it changes on every
+         focus change, so it reads as secondary text (#a6adc8) rather than
+         competing with the pills next to it. */
       #window {
         color: #a6adc8;
         padding: 0 10px;
       }
 
+      /* ===================================================================
+         Shared module geometry.
+
+         One padding value for every text module in the centre and right
+         clusters, so the bar has a single horizontal rhythm instead of each
+         module carrying its own. The bar's `spacing = 6` sits on top of this,
+         which is what keeps neighbours inside a cluster distinguishable
+         without a separator between every one of them.
+         =================================================================== */
       #clock,
       #pulseaudio,
       #backlight,
@@ -759,12 +814,72 @@ in {
         color: #cdd6f4;
       }
 
+      /* ===================================================================
+         Cluster separators - CSS, not modules.
+
+         KDE broke this panel up with three third-party
+         `zayron.simple.separator` plasmoids (applets 58-61). Reproducing that
+         with waybar modules would mean adding fake custom modules that poll
+         nothing and exist only to draw a line, so the separator is a border on
+         the FIRST module of each cluster instead: indicators | volume+battery |
+         sensors | session.
+
+         `margin: 6px 0` is what makes it read as a separator rather than a
+         frame - it shortens the 32px border to 20px, the same trick as KDE's
+         `lengthSeparator=80`. The colour is the translucent surface1 used by
+         the bar's bottom edge, so every line in this sheet matches.
+         =================================================================== */
+      #pulseaudio,
+      #cpu,
+      #custom-notification {
+        border-left: 1px solid rgba(69, 71, 90, 0.6);
+        margin: 6px 0;
+      }
+
+      /* ===================================================================
+         Right cluster: volume, battery, sensors.
+         =================================================================== */
+
+      /* Muted is a state the user chose, so it recedes to the same overlay0
+         grey #bluetooth.off and the DND states use rather than warning. */
+      #pulseaudio.muted {
+        color: #6c7086;
+      }
+
       #battery.warning {
         color: #f9e2af;
       }
 
       #battery.critical {
         color: #f38ba8;
+      }
+
+      /* On mains, so the percentage stops being a warning at all - green wins
+         over the two rules above on source order, which is deliberate: a
+         charging battery at 12% should not read as an emergency. */
+      #battery.charging,
+      #battery.plugged {
+        color: #a6e3a1;
+      }
+
+      /* The one animation in the bar, and only for the state that genuinely
+         needs to interrupt: critical AND still discharging. GTK3 implements
+         @keyframes, so this is a real blink rather than a silent no-op. The
+         :not(.charging) guard stops it the moment the cable goes in. */
+      @keyframes battery-blink {
+        to {
+          color: #1e1e2e;
+          background: #f38ba8;
+        }
+      }
+
+      #battery.critical:not(.charging) {
+        animation-name: battery-blink;
+        animation-duration: 1.2s;
+        animation-timing-function: ease-in-out;
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
+        border-radius: 6px;
       }
 
       /* Same two-step escalation as #battery, and the same palette, so the
@@ -778,6 +893,36 @@ in {
 
       #temperature.critical {
         color: #f38ba8;
+      }
+
+      /* Disconnected is the module's own class. Dimmed rather than red: on a
+         laptop that is an ordinary state, and the glyph already changes to
+         󰖪. */
+      #network.disconnected {
+        color: #6c7086;
+      }
+
+      /* ===================================================================
+         Clickable affordance.
+
+         KDE's applets all highlighted under the pointer, and that is the only
+         cue a module does something when pointed at - waybar draws no button
+         chrome of its own. Every module listed here really is interactive:
+         #clock through its `actions` block, #pulseaudio/#network/#bluetooth
+         through `on-click`, and #pulseaudio/#backlight additionally through the
+         scroll handling those two modules implement natively.
+
+         #battery, #window, #cpu, #temperature and #custom-weather are
+         deliberately absent - none of them has an action, so highlighting them
+         would advertise a click that does nothing. The fill animates via the
+         global transition. */
+      #clock:hover,
+      #pulseaudio:hover,
+      #network:hover,
+      #bluetooth:hover,
+      #backlight:hover {
+        background: #45475a;
+        border-radius: 6px;
       }
 
       /* The four selectors waybar-tray(5) documents. `#tray > .x` reaches the
