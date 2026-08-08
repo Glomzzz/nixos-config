@@ -12,7 +12,11 @@
       fcitx5-rime
       fcitx5-gtk
       qt6Packages.fcitx5-configtool
-      kdePackages.fcitx5-qt
+      # Qt IM modules, needed so Qt apps get a working preedit. Spelled via
+      # qt6Packages/libsForQt5 rather than kdePackages: it is the identical
+      # derivation, but the kdePackages alias reads like a leftover KDE
+      # dependency now that Plasma is gone.
+      qt6Packages.fcitx5-qt
       libsForQt5.fcitx5-qt
     ];
   };

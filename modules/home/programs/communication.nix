@@ -6,7 +6,6 @@
     mumble
     discord
     anydesk
-    kdePackages.krdc
     cherry-studio-with-desktop
   ];
 }

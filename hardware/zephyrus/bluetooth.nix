@@ -9,5 +9,6 @@ _: {
       };
     };
   };
-  services.blueman.enable = true;
+  # No blueman: overskride (in the niri desktop module) is the Bluetooth GUI,
+  # and running two tray applets against the same adapter fights over pairing.
 }

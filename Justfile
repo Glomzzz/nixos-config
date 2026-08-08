@@ -9,8 +9,19 @@ build HOST="nixos":
 check:
   nix flake check --no-build
 
+# Format every .nix file in place with alejandra (the flake's formatter).
+format:
+  nix fmt -- .
+
 format-check:
   nix fmt -- --check .
+
+# Everything CI enforces: formatting, dead code, lints, and a full eval.
+lint:
+  nix build --no-link \
+    '.#checks.x86_64-linux.formatting' \
+    '.#checks.x86_64-linux.dead-code' \
+    '.#checks.x86_64-linux.lint'
 
 debug:
   sudo nixos-rebuild switch --flake . --show-trace --verbose

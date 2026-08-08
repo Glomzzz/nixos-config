@@ -3,7 +3,7 @@
   cache = config.xdg.cacheHome;
 in {
   imports = [
-    ./alacritty.nix
+    ./foot.nix
     ./nushell.nix
     ./ssh.nix
     ./starship.nix
@@ -13,7 +13,7 @@ in {
     sessionVariables = {
       LESSHISTFILE = cache + "/less/history";
       LESSKEY = c + "/less/lesskey";
-      TERMINAL = "alacritty";
+      TERMINAL = "foot";
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
     };
 
