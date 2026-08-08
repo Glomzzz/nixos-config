@@ -289,6 +289,16 @@ in {
         matches = [{namespace = "^launcher$";}];
         block-out-from = "screencast";
       }
+
+      # No blur rule for waybar (namespace "waybar") on purpose. The niri binary
+      # here is 26.04 and does support background-effect/blur, but niri-flake
+      # generates this typed schema against niri 25.08, so `layer-rules` accepts
+      # only baba-is-float, block-out-from, excludes, geometry-corner-radius,
+      # matches, opacity, place-within-backdrop and shadow. Any blur spelling
+      # fails at eval time and breaks the whole rebuild. The only escape hatch,
+      # `programs.niri.config`, would replace this entire generated document.
+      # The bar's translucency therefore comes from its own CSS rgba() alpha in
+      # waybar.nix, which is what KDE did too ("blurBehind":false).
     ];
 
     # Laptop lid: lock before sleeping rather than after waking.
