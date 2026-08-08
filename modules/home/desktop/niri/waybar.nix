@@ -1,4 +1,23 @@
-{pkgs, ...}: let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  # KDE's clipboard applet opened a history picker; the equivalent here is the
+  # cliphist+fuzzel script already declared in clipboard.nix and bound to
+  # Mod+Shift+C. Resolved out of home.packages by name rather than re-declaring
+  # the pipeline, so the picker keeps living in exactly one place and the bar
+  # button and the keybind can never drift apart.
+  clipboardHistory =
+    lib.getExe'
+    (lib.findSingle
+      (p: (lib.getName p) == "clipboard-history")
+      (throw "waybar: clipboard-history not found in home.packages (clipboard.nix)")
+      (throw "waybar: more than one clipboard-history in home.packages")
+      config.home.packages)
+    "clipboard-history";
+
   # Ported from KDE's kickoff applet, which carried
   # systemFavorites=suspend,hibernate,reboot,shutdown, plus lock and logout to
   # match the Mod+Escape and Mod+Shift+E binds in settings.nix.
@@ -309,6 +328,10 @@ in {
           "tray"
           "niri/language"
           "backlight"
+          "bluetooth"
+          "mpris"
+          "custom/clipboard"
+          "privacy"
         ];
       };
 
@@ -323,6 +346,112 @@ in {
         # reports Passive rather than Active - which reads as "my tray icon
         # vanished". Explicit true keeps the tray's contents predictable.
         show-passive-items = true;
+      };
+
+      # KDE kept blueman in its tray's SHOWN set. blueman itself was rejected
+      # for this host (hardware/zephyrus/bluetooth.nix:12-13), so the click
+      # target is overskride, which is already installed and already floated by
+      # a window rule in settings.nix - the same treatment wiremix and impala
+      # get, so every bar-launched GUI behaves alike.
+      #
+      # `controller` is deliberately absent. The man page recommends it only
+      # when more than one controller exists; this machine has exactly one, so
+      # naming it would just be a string that can go stale. (Note the module
+      # reads the alias, not the adapter path - so a wrong value silently
+      # selects nothing rather than erroring.)
+      #
+      # One format per documented state so the glyph alone says which state the
+      # adapter is in, before any CSS colour lands: 󰂲 U+F00B2 md-bluetooth_off
+      # for off/disabled, 󰂯 U+F00AF md-bluetooth for on-but-idle, 󰂱 U+F00B1
+      # md-bluetooth_connect plus a count for connected. format-disabled is set
+      # rather than left empty, because an empty format HIDES the module and a
+      # silently missing indicator is worse than a struck-through one.
+      bluetooth = {
+        format = "󰂯 {status}";
+        format-disabled = "󰂲";
+        format-off = "󰂲";
+        format-on = "󰂯";
+        format-connected = "󰂱 {num_connections}";
+        format-no-controller = "󰂲";
+        tooltip-format = "{controller_alias}\n{controller_address}";
+        tooltip-format-off = "Bluetooth off\n{controller_alias}";
+        tooltip-format-disabled = "Bluetooth disabled";
+        tooltip-format-on = "Bluetooth on, nothing connected\n{controller_alias}";
+        tooltip-format-connected = "{controller_alias}\n{num_connections} connected\n\n{device_enumerate}";
+        tooltip-format-enumerate-connected = "{device_alias}\t{device_address}";
+        tooltip-format-enumerate-connected-battery = "{device_alias}\t{device_battery_percentage}%";
+        on-click = "${pkgs.overskride}/bin/overskride";
+      };
+
+      # KDE's mediacontroller applet. `player = "playerctld"` is the documented
+      # default, but it is written out explicitly because it is load-bearing
+      # here: playerctld already runs as a user service
+      # (modules/services/home/playerctld.nix:2) and following the *active*
+      # player is the whole point - pinning a single player name would make the
+      # module go blank whenever anything else took over playback.
+      #
+      # The default format is "{player} ({status}) {dynamic}", which wastes bar
+      # width on the player's own name. {status_icon} + {dynamic} is the same
+      # information in one glyph. Glyphs: 󰐊 U+F040A md-play, 󰏤 U+F03E4 md-pause,
+      # 󰓛 U+F04DB md-stop, 󰝚 U+F075A md-music.
+      #
+      # Lengths are capped because the bar is shared with a 60-char window
+      # title: the module truncates its own text rather than pushing the rest
+      # of the bar around when a long track title arrives. album is dropped
+      # from dynamic-order (absence = force exclusion) since title + artist is
+      # what KDE's compact applet showed. enable-tooltip-len-limits is left at
+      # its default false so the tooltip carries the untruncated text.
+      mpris = {
+        player = "playerctld";
+        format = "{status_icon} {dynamic}";
+        format-stopped = "󰝚";
+        status-icons = {
+          playing = "󰐊";
+          paused = "󰏤";
+          stopped = "󰓛";
+        };
+        dynamic-order = ["title" "artist"];
+        title-len = 32;
+        artist-len = 20;
+        max-length = 48;
+        tooltip-format = "{status_icon} {title}\n{artist}\n{album}\n{player}";
+      };
+
+      # KDE's clipboard applet. Reuses the exact cliphist+fuzzel picker that
+      # Mod+Shift+C is bound to (see the clipboardHistory binding at the top of
+      # this file) rather than re-declaring the pipeline, so the button and the
+      # keybind cannot drift apart. 󰅍 U+F014D md-clipboard_text.
+      #
+      # A plain `custom` with no `exec` is a static button: waybar renders
+      # `format` verbatim and only runs the click handler. No return-type, no
+      # interval, no polling.
+      "custom/clipboard" = {
+        format = "󰅍";
+        tooltip = false;
+        on-click = "${clipboardHistory}";
+      };
+
+      # KDE's cameraindicator. `modules` is set EXPLICITLY to screenshare only.
+      # The documented default is [{"type":"screenshare"},{"type":"audio-in"}],
+      # so leaving it out would silently add a microphone indicator this panel
+      # never had in KDE - unrequested scope, and the kind of thing that only
+      # shows up the first time something opens the mic. audio-out is likewise
+      # omitted: pulseaudio above already covers output.
+      #
+      # This module is invisible until something actually captures the screen,
+      # which is the intended behaviour (KDE's indicator worked the same way) -
+      # an empty slot in the drawer is not a fault.
+      privacy = {
+        icon-size = 18;
+        icon-spacing = 4;
+        transition-duration = 250;
+        modules = [
+          {
+            type = "screenshare";
+            tooltip = true;
+            tooltip-icon-size = 24;
+          }
+        ];
       };
     };
 
@@ -458,6 +587,90 @@ in {
       .tray-drawer-child {
         padding: 0 6px;
         color: #a6adc8;
+      }
+
+      /* The todo-12 indicator cluster. These all live inside the drawer, so
+         .tray-drawer-child already gives them padding and the dimmed #a6adc8;
+         the rules below only add what is specific to each one. Every selector
+         here is one waybar-<module>(5) documents - #bluetooth with its state
+         classes, #mpris with its per-status class, #custom-clipboard from the
+         custom module's #custom-<name> contract, and #privacy/#privacy-item. */
+      #bluetooth,
+      #mpris,
+      #custom-clipboard,
+      #privacy {
+        padding: 0 6px;
+      }
+
+      /* Off and disabled are the resting states, so they stay muted rather
+         than shouting. Ordered off/disabled -> on -> connected so the brighter
+         states win on source order, the same convention as the workspace
+         pills above. */
+      #bluetooth.off,
+      #bluetooth.disabled {
+        color: #6c7086;
+      }
+
+      #bluetooth.on {
+        color: #a6adc8;
+      }
+
+      /* Connected is the state worth noticing, hence the accent blue - the
+         same #89b4fa the focused workspace and the launcher use. */
+      #bluetooth.connected {
+        color: #89b4fa;
+      }
+
+      /* Pairing and discovery are transient and end up in a dialog anyway, so
+         they get the yellow "in progress" colour shared with the warning
+         states rather than a colour of their own. */
+      #bluetooth.discoverable,
+      #bluetooth.discovering,
+      #bluetooth.pairable {
+        color: #f9e2af;
+      }
+
+      /* mpris carries a variable-width track title, so it gets the only
+         italic in the bar for paused and a green tint while playing: the
+         module's width changes on its own and colour is what makes the state
+         readable at a glance. */
+      #mpris.playing {
+        color: #a6e3a1;
+      }
+
+      #mpris.paused {
+        color: #a6adc8;
+        font-style: italic;
+      }
+
+      #mpris.stopped {
+        color: #6c7086;
+      }
+
+      #custom-clipboard {
+        color: #cdd6f4;
+      }
+
+      #custom-clipboard:hover {
+        background: #45475a;
+        border-radius: 6px;
+      }
+
+      /* #privacy is the container, #privacy-item each monitored type. Red,
+         because the whole point is that it is alarming: something is capturing
+         the screen. It renders nothing at all when idle, so this styling is
+         only ever visible during an actual capture. */
+      #privacy {
+        color: #f38ba8;
+      }
+
+      #privacy-item {
+        padding: 0 4px;
+        color: #f38ba8;
+      }
+
+      #privacy-item.screenshare {
+        color: #f38ba8;
       }
 
       /* Appended below the workspace rules on purpose - see the source-order
