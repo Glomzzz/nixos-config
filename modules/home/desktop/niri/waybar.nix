@@ -1,3 +1,113 @@
+# waybar replaces the KDE Plasma top panel this machine used to run. The panel's
+# full applet inventory lived in ~/.config/plasma-org.kde.plasma.desktop-appletsrc
+# (containment 26, AppletOrder at :421 = 33;58;55;60;69;57;59;31;34;61;54;32;53;
+# 52;27;36;63;35;66;56), and the ledger below records what happened to every one
+# of them, plus the system tray's own members. It is kept here rather than in a
+# separate document because the outcome of an applet is only meaningful next to
+# the module that replaced it. "DROPPED" means the function is genuinely gone,
+# not relocated - each such line says why, so nothing looks like an oversight.
+#
+# Panel applets, in KDE's own AppletOrder sequence:
+#
+#   33 kickoff          -> custom/launcher, a static nf-linux-nixos glyph opening
+#                          fuzzel; the power entries kickoff carried in
+#                          systemFavorites moved to custom/power's GtkMenu.
+#   58 separator        -> CSS. The four zayron.simple.separator plasmoids became
+#                          border-left + margin on the first module of each
+#                          cluster, so there is no separator module at all.
+#   55 userswitcher     -> DROPPED - single-user machine, and its config set
+#                          showFace=true/showName=false, so it only ever drew an
+#                          avatar; waybar's `user` module would add a face and no
+#                          switching, which is decoration rather than parity.
+#   60 separator        -> CSS, as 58.
+#   69 notes            -> DROPPED - a sticky-note editor with persisted body
+#                          text has no bar analogue in waybar, and reimplementing
+#                          one as a custom module is a new app, not a port.
+#   57 windowtitle      -> niri/window, which reads the focused window straight
+#                          from the compositor instead of the Fork applet's
+#                          KWin-specific scripting bridge.
+#   59 separator        -> CSS, as 58.
+#   31 panelspacer      -> layout, not a module: the modules-left/modules-center/
+#                          modules-right split reproduces the gap KDE opened with
+#                          an expanding spacer.
+#   34 digitalclock     -> clock, with the calendar in the tooltip. KDE's
+#                          alternatecalendar, astronomicalevents and
+#                          holidaysevents plugins are DROPPED - waybar's calendar
+#                          has no plugin surface to hang them on.
+#   61 separator        -> CSS, as 58.
+#   54 weather          -> custom/weather (keyless Open-Meteo, Kuala Lumpur),
+#                          de-duplicated: KDE ran the weather applet twice, once
+#                          on the panel and once inside the tray, and this ports
+#                          it once next to the clock where AppletOrder had it.
+#   32 panelspacer      -> layout, as 31.
+#   53 systemmonitor    -> cpu + temperature. KDE's CPU instance graphed
+#      (CPU)               cpu/all/averageTemperature; the pair here shows load
+#                          and that same temperature as text.
+#   52 systemmonitor    -> DROPPED by explicit decision - the GPU instance polled
+#      (GPU)               gpu/gpu0/temperature, and on this Optimus laptop any
+#                          periodic NVIDIA query wakes the discrete GPU, so the
+#                          reading would cost battery for its own sake.
+#   27 netspeedWidget   -> folded into network. KDE used speedLayout=rows with
+#                          swapDownUp=true, i.e. two stacked rows; one waybar
+#                          module renders one row, so throughput is inline,
+#                          download first, arrows as separators. Degraded, not
+#                          dropped: both figures are still on the bar.
+#   36 systemtray       -> tray plus a click-to-reveal group. Degraded: waybar
+#                          0.15.0 has no per-item show/hide and no memory of
+#                          which item was hidden, and its drawer arrow toggles
+#                          whole modules rather than individual SNI items, so
+#                          KDE's remembered shownItems/hiddenItems split cannot
+#                          be reproduced. Real tray icons stay visible; the
+#                          indicator modules sit behind the click.
+#   63 battery          -> battery, unchanged from its pre-existing form, which
+#                          already showed the percentage KDE's applet did.
+#   35 notifications    -> custom/notification driven by swaync-client -swb;
+#                          swaync replaced mako precisely so the unread count,
+#                          DND toggle and history panel KDE had could exist.
+#   66 showdesktop      -> DROPPED - niri has no show-desktop or peek action to
+#                          call, so the only route would be a new keybind, and
+#                          keybind changes are outside this work's scope.
+#   56 colorizer        -> CSS. The bar's translucent rgba background is the
+#                          equivalent of the colorizer's panel tinting. Panel
+#                          blur is DROPPED - it is not expressible in
+#                          niri-flake's typed layer-rules schema (the flake
+#                          generates types from niri 25.08 while the binary is
+#                          26.04), so CSS alpha is the actual final appearance.
+#                          No parity is lost: this panel had blurBehind=false.
+#
+# System tray members (containment 26, applet 36; extraItems at :211-216):
+#
+#   38 cameraindicator  -> privacy, scoped to screenshare only. The module's
+#                          default also indicates audio-in; that is deliberately
+#                          excluded because KDE never showed a microphone here.
+#   39 clipboard        -> custom/clipboard, clicking through to the same
+#                          cliphist+fuzzel picker Mod+Shift+C already opened.
+#   44 kscreen          -> DROPPED - waybar has no display-configuration module,
+#                          and output layout on niri is set declaratively in
+#                          settings.nix rather than from a tray popup.
+#   45 keyboardindicator-> niri/language, pre-existing and unchanged; it reports
+#                          the fcitx5 input method KDE's indicator (hidden as
+#                          "Fcitx" in hiddenItems) tracked.
+#   46 weather          -> see panel applet 54; this was the duplicate instance.
+#   47 volume           -> pulseaudio, pre-existing and unchanged.
+#   49 mediacontroller  -> mpris following playerctld, title and artist only.
+#   65 networkmanagement-> network, pre-existing, now also carrying the netspeed
+#                          throughput folded in from applet 27.
+#   66 printmanager     -> DROPPED - waybar has no print-queue module; CUPS keeps
+#                          its own web interface at localhost:631 for the rare
+#                          case a job needs attention.
+#   68 brightness       -> backlight, pre-existing and unchanged (KDE kept this
+#                          one in hiddenItems, so it was not visible there).
+#      blueman          -> bluetooth, one of KDE's two shownItems, clicking
+#                          through to overskride as the manager GUI.
+#      kded6, Xwayland  -> N/A, Plasma internals with no standalone function;
+#      Video Bridge        both were in hiddenItems and neither has a successor.
+#      udiskie          -> N/A, its own tray icon appears in the tray module when
+#                          the service runs; nothing waybar-side to port.
+#
+# Added, with no KDE counterpart: numbered workspace pills (niri/workspaces).
+# KDE's top panel had no workspace switcher - the taskbar lived on a second,
+# bottom panel (containment 2, icontasks) which is out of scope here.
 {
   config,
   lib,
