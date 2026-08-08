@@ -100,6 +100,10 @@
     overskride # Bluetooth
     wiremix # audio mixer
     impala # wifi
+    # gnome-keyring front end (replaces kwalletmanager). Needed to change the
+    # login keyring's own password, which is stored inside the keyring file and
+    # so cannot be set declaratively. See modules/nixos/desktop/autologin.nix.
+    seahorse
 
     # Hardware keys wired up in settings.nix.
     brightnessctl

@@ -12,8 +12,18 @@
   # instead of dropping to a prompt behind the dead compositor. The tty1 guard
   # keeps other VTs and SSH usable as plain shells, and the WAYLAND_DISPLAY
   # check stops a nested relaunch from a terminal inside niri.
+  #
+  # NIRI_SESSION_LAUNCHED is the re-entry guard and it MUST be exported.
+  # niri-session re-execs itself through a login shell whenever $SHELL is
+  # listed in /etc/shells (`exec -l "$SHELL" -c "$0 -l"`), which re-sources
+  # /etc/profile and reaches this snippet a second time. NixOS' own
+  # `__ETC_PROFILE_SOURCED` guard does not help: it is assigned without
+  # `export`, so it does not survive the exec. Without an exported marker the
+  # two conditions below are still true on that second pass and tty1 spins in
+  # an endless exec loop instead of starting the compositor.
   environment.loginShellInit = ''
-    if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
+    if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" = 1 ] && [ -z "$NIRI_SESSION_LAUNCHED" ]; then
+      export NIRI_SESSION_LAUNCHED=1
       exec ${pkgs.niri}/bin/niri-session
     fi
   '';
