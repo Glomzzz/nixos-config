@@ -10,7 +10,7 @@ hardware, system features, services, and user programs have clear ownership.
 hosts/nixos/             host composition and machine-wide overrides
 hardware/zephyrus/       Zephyrus-specific boot, disk, GPU, and peripherals
 modules/nixos/core/      baseline NixOS settings
-modules/nixos/desktop/   display manager and Plasma settings
+modules/nixos/desktop/   login manager and niri compositor settings
 modules/nixos/programs/  optional system integrations and tools
 modules/nixos/security/  authentication and sops-nix wiring
 modules/services/nixos/  system services
