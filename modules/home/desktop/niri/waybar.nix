@@ -248,11 +248,31 @@ in {
         tooltip-format = "CPU package: {temperatureC}°C ({temperatureF}°F)";
       };
 
+      # KDE's applet 27 was org.kde.netspeedWidget with speedLayout=rows and
+      # swapDownUp=true, i.e. two stacked rows with download on top. Waybar has
+      # no netspeed module and a single module renders ONE row, so the two rows
+      # collapse to one line with download first, separated by arrows:
+      # "↓ 1.2MB/s ↑ 34kB/s". That row/inline difference is the one honest gap
+      # versus KDE here and is recorded in the parity ledger (todo 18).
+      #
+      # interval = 2 because the documented default is 60 - at 60 the rate would
+      # be a stale minute-old average, where KDE polled continuously. 2 matches
+      # the cpu/temperature cadence above.
+      #
+      # Every token below is verbatim from the installed waybar-network(5):
+      # the Bytes pair reads as human units (kB/s, MB/s) rather than the Bits
+      # pair's raw bit counts, which is what KDE's widget displayed.
       network = {
-        format-wifi = "󰖩 {essid}";
-        format-ethernet = "󰈀";
+        interval = 2;
+        format-wifi = "󰖩 {essid}  ↓ {bandwidthDownBytes} ↑ {bandwidthUpBytes}";
+        format-ethernet = "󰈀  ↓ {bandwidthDownBytes} ↑ {bandwidthUpBytes}";
         format-disconnected = "󰖪";
-        tooltip-format = "{ifname}: {ipaddr}";
+        # {signalStrength} is wifi-only, so the wired tooltip uses gateway and
+        # netmask instead of carrying a permanently empty percentage.
+        tooltip-format = "{ifname}: {ipaddr}\nGateway: {gwaddr}\n↓ {bandwidthDownBytes}  ↑ {bandwidthUpBytes}";
+        tooltip-format-wifi = "{essid} ({signalStrength}%, {signaldBm} dBm)\n{ifname}: {ipaddr}\nGateway: {gwaddr}\n↓ {bandwidthDownBytes}  ↑ {bandwidthUpBytes}";
+        tooltip-format-ethernet = "{ifname}: {ipaddr}/{cidr}\nGateway: {gwaddr}\n↓ {bandwidthDownBytes}  ↑ {bandwidthUpBytes}";
+        tooltip-format-disconnected = "Disconnected";
         # impala is the wifi TUI replacing the plasma applet.
         on-click = "${pkgs.foot}/bin/foot -a impala ${pkgs.impala}/bin/impala";
       };
