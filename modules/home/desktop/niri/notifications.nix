@@ -9,7 +9,9 @@
   # swaync is still a native Wayland (wlr-layer-shell) daemon, still has a real
   # Home Manager module, and still registers org.freedesktop.Notifications - but
   # it adds the control centre, grouping, relative timestamps and DND that the
-  # waybar indicator (todo 14) drives via `swaync-client`.
+  # bar's custom/notification module drives via `swaync-client` (see the
+  # `custom/notification` block in waybar.nix, which reads `swaync-client -swb`
+  # for the unread count and toggles the panel and DND on click).
   #
   # Activation: the Home Manager module writes a `Type = "dbus"` user unit with
   # `BusName = org.freedesktop.Notifications`, bound to graphical-session.target.

@@ -241,17 +241,25 @@
     # -e makes jq exit non-zero on a null/false result, and the explicit type
     # checks reject a well-formed response that is missing the fields (an API
     # shape change would otherwise render as the string "null").
+    #
+    # `time` is checked the same way and in the same guard as the two numeric
+    # fields, not as a special case: it is interpolated into the tooltip's
+    # "Updated ..." line, so a null or empty value would render literally as
+    # "Updated null". Every field the output depends on shares one failure
+    # path, so there is exactly one way for this module to degrade.
     fields=$(printf '%s' "$raw" | ${pkgs.jq}/bin/jq -er '
       .current as $c
       | if ($c.temperature_2m | type) != "number"
            or ($c.weather_code | type) != "number"
-        then error("open-meteo: current fields missing or not numeric")
+           or ($c.time | type) != "string"
+           or ($c.time | length) == 0
+        then error("open-meteo: current fields missing or of the wrong type")
         else "\($c.temperature_2m | round)\t\($c.weather_code)\t\($c.time)"
         end
     ') || fallback
 
     IFS="$(printf '\t')" read -r temp code obstime <<< "$fields" || fallback
-    [ -n "$temp" ] && [ -n "$code" ] || fallback
+    [ -n "$temp" ] && [ -n "$code" ] && [ -n "$obstime" ] || fallback
 
     # WMO 4677 present-weather codes, as documented by Open-Meteo. Glyphs are
     # material-design-icons from JetBrainsMono Nerd Font, each confirmed by
@@ -343,24 +351,32 @@ in {
       height = 32;
       spacing = 6;
 
-      modules-left = ["custom/launcher" "niri/workspaces" "niri/window"];
+      # Workspaces are the leftmost thing on the bar: they are the only module
+      # a glance needs to land on reliably, so nothing is allowed to sit left
+      # of them. The launcher follows immediately (KDE's kickoff was leftmost,
+      # but it is a static button - its position carries no information), and
+      # the window title goes last because it is the widest and most volatile.
+      modules-left = ["niri/workspaces" "custom/launcher" "niri/window"];
       # Weather sits immediately after the clock, which is where KDE's
       # AppletOrder put it (digitalclock, then weather, then the second
       # spacer) - so modules-center is the position-faithful home for it
       # rather than modules-right.
       modules-center = ["clock" "custom/weather"];
+      # Order follows KDE's AppletOrder for the tail of the panel:
+      # systemmonitor-CPU(53), systemmonitor-GPU(52, dropped), netspeed(27),
+      # systemtray(36), battery(63), notifications(35), then the end-of-panel
+      # widgets peek(66)/colorizer(56) which are CSS or dropped. So the sensor
+      # readouts come BEFORE the tray, and the notification bell sits last
+      # before custom/power. pulseaudio and the drawer's other indicators were
+      # tray members (47 and friends), which is why they travel with the tray
+      # rather than with the sensors.
       modules-right = [
-        "group/tray-drawer"
-        "pulseaudio"
-        "battery"
         "cpu"
         "temperature"
         "network"
-        # KDE's AppletOrder ran tray(36), battery(63), notifications(35), then
-        # the end-of-panel widgets peek(66)/colorizer(56). The relative order
-        # battery -> notification -> session is what carries across, so the
-        # bell sits last before custom/power rather than splitting the
-        # battery/cpu/temperature/network sensor cluster in half.
+        "group/tray-drawer"
+        "pulseaudio"
+        "battery"
         "custom/notification"
         "custom/power"
       ];
@@ -572,8 +588,10 @@ in {
       #
       # Deliberately no GPU counterpart. KDE's applet 52 charted
       # gpu/gpu0/temperature; it is dropped on purpose, because every polling
-      # route to the NVIDIA card (nvidia-smi included) wakes the dGPU, and
-      # todo 2 confirmed no GPU hwmon node exists to read passively either.
+      # route to the NVIDIA card (nvidia-smi included) wakes the dGPU. There is
+      # no passive alternative either: a sweep of every /sys/class/hwmon*/name
+      # on this machine matched no nvidia, nouveau or amdgpu device at all, so
+      # the reading would cost battery purely for its own sake.
       cpu = {
         interval = 2;
         format = "󰻠 {usage}%";
@@ -612,7 +630,8 @@ in {
       # no netspeed module and a single module renders ONE row, so the two rows
       # collapse to one line with download first, separated by arrows:
       # "↓ 1.2MB/s ↑ 34kB/s". That row/inline difference is the one honest gap
-      # versus KDE here and is recorded in the parity ledger (todo 18).
+      # versus KDE here, and it is recorded as "degraded, not dropped" in the
+      # applet ledger at the top of this file.
       #
       # interval = 2 because the documented default is 60 - at 60 the rate would
       # be a stale minute-old average, where KDE polled continuously. 2 matches
@@ -641,7 +660,7 @@ in {
       # with scaleIconsToFit=true. Waybar's tray module CANNOT do that split:
       # it has no per-item show/hide, no persistence of which item is hidden,
       # and no arrow of its own. That per-item behaviour is dropped for good
-      # (recorded in the parity ledger, todo 18).
+      # (recorded against applet 36 in the ledger at the top of this file).
       #
       # The closest analogue is a group with a `drawer`: the FIRST module in
       # `modules` is the group leader and is always visible, every later module
@@ -653,8 +672,10 @@ in {
       # way KDE's shown set was. The revealed children are the secondary
       # indicators KDE also kept inside that tray: input method (niri/language
       # = the kimpanel member) and brightness (backlight = the kscreen/
-      # brightness member). Todo 12 adds bluetooth/mpris/clipboard/privacy to
-      # this same `modules` list; nothing else needs to change to accept them.
+      # brightness member), joined by the bluetooth/mpris/clipboard/privacy
+      # indicators that were also tray members. Adding another indicator means
+      # appending it to this `modules` list and giving it a CSS rule; nothing
+      # else about the group has to change.
       "group/tray-drawer" = {
         orientation = "inherit";
         drawer = {
@@ -830,9 +851,9 @@ in {
       /* KDE ran this panel at `panelOpacity=0` with the colorizer applet
          painting a translucent Catppuccin surface over it, so an rgba() base is
          the faithful equivalent rather than a stopgap. The alpha IS the final
-         appearance: todo 17 established that niri-flake's typed layer-rules
-         schema cannot express blur, so nothing will ever be composited behind
-         this. Keep the alpha below 1.0.
+         appearance: niri-flake's typed layer-rules schema has no blur or
+         background-effect attribute, so nothing will ever be composited behind
+         this surface. Keep the alpha below 1.0.
 
          The hairline bottom border is what KDE's panel shadow did - it stops
          the bar dissolving into a light wallpaper - and it is deliberately a
@@ -855,10 +876,27 @@ in {
         padding: 0 4px;
       }
 
-      /* Rule order below is load-bearing. GTK3 resolves equal-specificity
-         selectors by source order, and niri sets several of these classes on
-         the SAME button (the focused workspace is also .active, and may also
-         be .empty). So they escalate: base -> empty -> active -> focused. */
+      /* niri sets several of these classes on the SAME button - the focused
+         workspace is also its output's .active one, and an on-demand workspace
+         can be .empty while focused - so the four rules below genuinely
+         compete and the way each conflict is resolved differs. Two mechanisms
+         are at work, and neither is "later always wins":
+
+         - .empty vs .focused is a real source-order tie. Both are one id, one
+           type and one class, so specificity cannot separate them and GTK3
+           falls back to document order. .focused is written last for exactly
+           that reason; moving it above .empty would leave a focused-but-empty
+           pill drawn dim.
+         - .active:not(.focused) vs .focused is NOT decided by order. :not()
+           contributes its argument's specificity, so that selector counts two
+           classes and outranks .focused outright. It is also disjoint from it
+           by construction - a focused button cannot match :not(.focused) - so
+           the pair never actually collides. The guard, not the position, is
+           what stops the secondary blue text landing on the filled pill.
+
+         Net effect: keep .focused after .empty (order is load-bearing there),
+         and keep the :not(.focused) guard on .active (specificity and mutual
+         exclusion are load-bearing there). */
       #workspaces button {
         padding: 0 8px;
         margin: 4px 2px;
@@ -884,7 +922,8 @@ in {
       }
 
       /* .focused is globally unique: the one workspace holding keyboard focus.
-         Primary highlight, filled, and last so it wins over the rules above. */
+         Primary highlight, filled, and placed after .empty so it wins that
+         equal-specificity tie when the focused workspace is also empty. */
       #workspaces button.focused {
         color: #1e1e2e;
         background: #89b4fa;
@@ -1076,9 +1115,10 @@ in {
         color: #a6adc8;
       }
 
-      /* The todo-12 indicator cluster. These all live inside the drawer, so
-         .tray-drawer-child already gives them padding and the dimmed #a6adc8;
-         the rules below only add what is specific to each one. Every selector
+      /* The secondary indicator cluster - bluetooth, media, clipboard and the
+         privacy dot. These all live inside the drawer, so .tray-drawer-child
+         already gives them padding and the dimmed #a6adc8; the rules below
+         only add what is specific to each one. Every selector
          here is one waybar-<module>(5) documents - #bluetooth with its state
          classes, #mpris with its per-status class, #custom-clipboard from the
          custom module's #custom-<name> contract, and #privacy/#privacy-item. */
