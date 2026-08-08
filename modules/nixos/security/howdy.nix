@@ -14,10 +14,10 @@
   #        sudo -i
   #
   # Keyring unlock (previously KDE Wallet, now gnome-keyring):
-  #   niri has no wallet of its own, so secrets live in gnome-keyring, which is
-  #   unlocked by the password typed into tuigreet (see desktop/greetd.nix).
-  #   That only works if greetd actually asks for a password, so howdy is
-  #   disabled on the greetd PAM service below.
+  #   niri has no wallet of its own, so secrets live in gnome-keyring. There is
+  #   no greeter any more (see desktop/autologin.nix): tty1 autologins, so no
+  #   password reaches PAM and the login keyring must have an empty password.
+  #   Nothing here needs to preserve a password prompt for the keyring's sake.
   #
   #############################################################################
 
@@ -26,8 +26,7 @@
 
     # "sufficient": face alone is enough (skip password if face matches).
     # "required": 2FA mode (face + password both needed).
-    # Face auth stays "sufficient" for sudo/swaylock; the greetd exception
-    # below is what preserves the keyring unlock at login.
+    # Face auth is for sudo and swaylock; login itself is autologin.
     control = "sufficient";
 
     settings = {
@@ -42,13 +41,6 @@
       };
     };
   };
-
-  # === gnome-keyring Auto-Unlock ===
-  # howdy is enabled on every PAM service by default. On greetd that would let
-  # a face match skip the password prompt, and pam_gnome_keyring would then
-  # have no password to unlock the login keyring with. Disabling howdy here
-  # keeps the login password prompt, which is what unlocks the keyring.
-  security.pam.services.greetd.howdy.enable = false;
 
   # === polkit-127 Workaround ===
   # polkit >= 127 isolates helpers with PrivateDevices, which breaks howdy's
