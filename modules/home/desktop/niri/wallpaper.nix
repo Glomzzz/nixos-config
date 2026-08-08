@@ -1,5 +1,5 @@
 {pkgs, ...}: let
-  wallpaper = ../../../../assets/wallpaper_1.png;
+  wallpaper = ../../../../assets/e022.jpg;
 in {
   # `swww` was renamed to `awww` in nixpkgs (alias added 2026-03-22), and the
   # Home Manager module followed: services.swww is now services.awww. The old
