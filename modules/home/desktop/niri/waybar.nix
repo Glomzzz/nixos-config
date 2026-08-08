@@ -1,124 +1,9 @@
-# waybar replaces the KDE Plasma top panel this machine used to run. The panel's
-# full applet inventory lived in ~/.config/plasma-org.kde.plasma.desktop-appletsrc
-# (containment 26, AppletOrder at :421 = 33;58;55;60;69;57;59;31;34;61;54;32;53;
-# 52;27;36;63;35;66;56), and the ledger below records what happened to every one
-# of them, plus the system tray's own members. It is kept here rather than in a
-# separate document because the outcome of an applet is only meaningful next to
-# the module that replaced it. "DROPPED" means the function is genuinely gone,
-# not relocated - each such line says why, so nothing looks like an oversight.
-#
-# Panel applets, in KDE's own AppletOrder sequence:
-#
-#   33 kickoff          -> custom/launcher, a static nf-linux-nixos glyph opening
-#                          fuzzel; the power entries kickoff carried in
-#                          systemFavorites moved to custom/power's GtkMenu.
-#   58 separator        -> CSS. The four zayron.simple.separator plasmoids became
-#                          border-left + margin on the first module of each
-#                          cluster, so there is no separator module at all.
-#   55 userswitcher     -> DROPPED - single-user machine, and its config set
-#                          showFace=true/showName=false, so it only ever drew an
-#                          avatar; waybar's `user` module would add a face and no
-#                          switching, which is decoration rather than parity.
-#   60 separator        -> CSS, as 58.
-#   69 notes            -> DROPPED - a sticky-note editor with persisted body
-#                          text has no bar analogue in waybar, and reimplementing
-#                          one as a custom module is a new app, not a port.
-#   57 windowtitle      -> niri/window, which reads the focused window straight
-#                          from the compositor instead of the Fork applet's
-#                          KWin-specific scripting bridge.
-#   59 separator        -> CSS, as 58.
-#   31 panelspacer      -> layout, not a module: the modules-left/modules-center/
-#                          modules-right split reproduces the gap KDE opened with
-#                          an expanding spacer.
-#   34 digitalclock     -> clock, with the calendar in the tooltip. KDE's
-#                          alternatecalendar, astronomicalevents and
-#                          holidaysevents plugins are DROPPED - waybar's calendar
-#                          has no plugin surface to hang them on.
-#   61 separator        -> CSS, as 58.
-#   54 weather          -> custom/weather (keyless Open-Meteo, Kuala Lumpur),
-#                          de-duplicated: KDE ran the weather applet twice, once
-#                          on the panel and once inside the tray, and this ports
-#                          it once next to the clock where AppletOrder had it.
-#   32 panelspacer      -> layout, as 31.
-#   53 systemmonitor    -> cpu + temperature. KDE's CPU instance graphed
-#      (CPU)               cpu/all/averageTemperature; the pair here shows load
-#                          and that same temperature as text.
-#   52 systemmonitor    -> DROPPED by explicit decision - the GPU instance polled
-#      (GPU)               gpu/gpu0/temperature, and on this Optimus laptop any
-#                          periodic NVIDIA query wakes the discrete GPU, so the
-#                          reading would cost battery for its own sake.
-#   27 netspeedWidget   -> folded into network. KDE used speedLayout=rows with
-#                          swapDownUp=true, i.e. two stacked rows; one waybar
-#                          module renders one row, so throughput is inline,
-#                          download first, arrows as separators. Degraded, not
-#                          dropped: both figures are still on the bar.
-#   36 systemtray       -> tray plus a click-to-reveal group. Degraded: waybar
-#                          0.15.0 has no per-item show/hide and no memory of
-#                          which item was hidden, and its drawer arrow toggles
-#                          whole modules rather than individual SNI items, so
-#                          KDE's remembered shownItems/hiddenItems split cannot
-#                          be reproduced. Real tray icons stay visible; the
-#                          indicator modules sit behind the click.
-#   63 battery          -> battery, unchanged from its pre-existing form, which
-#                          already showed the percentage KDE's applet did.
-#   35 notifications    -> custom/notification driven by swaync-client -swb;
-#                          swaync replaced mako precisely so the unread count,
-#                          DND toggle and history panel KDE had could exist.
-#   66 showdesktop      -> DROPPED - niri has no show-desktop or peek action to
-#                          call, so the only route would be a new keybind, and
-#                          keybind changes are outside this work's scope.
-#   56 colorizer        -> CSS. The bar's translucent rgba background is the
-#                          equivalent of the colorizer's panel tinting. Panel
-#                          blur is DROPPED - it is not expressible in
-#                          niri-flake's typed layer-rules schema (the flake
-#                          generates types from niri 25.08 while the binary is
-#                          26.04), so CSS alpha is the actual final appearance.
-#                          No parity is lost: this panel had blurBehind=false.
-#
-# System tray members (containment 26, applet 36; extraItems at :211-216):
-#
-#   38 cameraindicator  -> privacy, scoped to screenshare only. The module's
-#                          default also indicates audio-in; that is deliberately
-#                          excluded because KDE never showed a microphone here.
-#   39 clipboard        -> custom/clipboard, clicking through to the same
-#                          cliphist+fuzzel picker Mod+Shift+C already opened.
-#   44 kscreen          -> DROPPED - waybar has no display-configuration module,
-#                          and output layout on niri is set declaratively in
-#                          settings.nix rather than from a tray popup.
-#   45 keyboardindicator-> niri/language, pre-existing and unchanged; it reports
-#                          the fcitx5 input method KDE's indicator (hidden as
-#                          "Fcitx" in hiddenItems) tracked.
-#   46 weather          -> see panel applet 54; this was the duplicate instance.
-#   47 volume           -> pulseaudio, pre-existing and unchanged.
-#   49 mediacontroller  -> mpris following playerctld, title and artist only.
-#   65 networkmanagement-> network, pre-existing, now also carrying the netspeed
-#                          throughput folded in from applet 27.
-#   66 printmanager     -> DROPPED - waybar has no print-queue module; CUPS keeps
-#                          its own web interface at localhost:631 for the rare
-#                          case a job needs attention.
-#   68 brightness       -> backlight, pre-existing and unchanged (KDE kept this
-#                          one in hiddenItems, so it was not visible there).
-#      blueman          -> bluetooth, one of KDE's two shownItems, clicking
-#                          through to overskride as the manager GUI.
-#      kded6, Xwayland  -> N/A, Plasma internals with no standalone function;
-#      Video Bridge        both were in hiddenItems and neither has a successor.
-#      udiskie          -> N/A, its own tray icon appears in the tray module when
-#                          the service runs; nothing waybar-side to port.
-#
-# Added, with no KDE counterpart: numbered workspace pills (niri/workspaces).
-# KDE's top panel had no workspace switcher - the taskbar lived on a second,
-# bottom panel (containment 2, icontasks) which is out of scope here.
 {
   config,
   lib,
   pkgs,
   ...
 }: let
-  # KDE's clipboard applet opened a history picker; the equivalent here is the
-  # cliphist+fuzzel script already declared in clipboard.nix and bound to
-  # Mod+Shift+C. Resolved out of home.packages by name rather than re-declaring
-  # the pipeline, so the picker keeps living in exactly one place and the bar
-  # button and the keybind can never drift apart.
   clipboardHistory =
     lib.getExe'
     (lib.findSingle
@@ -127,95 +12,181 @@
       (throw "waybar: more than one clipboard-history in home.packages")
       config.home.packages)
     "clipboard-history";
-
-  # Ported from KDE's kickoff applet, which carried
-  # systemFavorites=suspend,hibernate,reboot,shutdown, plus lock and logout to
-  # match the Mod+Escape and Mod+Shift+E binds in settings.nix.
+  # The battery popup. Waybar's menu support is a GtkBuilder file (see
+  # waybar-menu(5)) whose ids are matched against the `menu-actions` keys, so
+  # every id below MUST appear in that attrset or the item renders and silently
+  # does nothing.
   #
-  # waybar's `menu` mechanism wants a GtkBuilder document with a GtkMenu whose
-  # id is exactly `menu`; every other id here is the key that `menu-actions`
-  # binds a command to. Generated into the store so the path in `menu-file`
-  # cannot drift from the ids below, and so nothing depends on $HOME.
+  # Nesting uses `<child type="submenu">`, which is how GtkMenuItem's submenu
+  # property is set from a builder file. It is real GTK3 and waybar reaches the
+  # nested ids fine: ALabel walks the `menu-actions` keys and looks each one up
+  # with gtk_builder_get_object, which resolves any id in the file regardless of
+  # nesting depth, so the two submenus below are wired exactly like top-level
+  # items. Verified by parsing this file with a real GtkBuilder: every id
+  # resolves and profile/session each report an attached submenu.
+  #
+  # Every item here is a plain GtkMenuItem, and `prevent-lock` deliberately so
+  # rather than the GtkCheckMenuItem it used to be. A check mark in this menu
+  # cannot be kept truthful: ALabel builds the menu ONCE in its constructor and
+  # drops the GtkBuilder, and the only later uses of the menu object are
+  # show_all + popup_at_pointer, so there is no hook that could set an item's
+  # active state from live system state afterwards.
+  #
+  # GTK also flips a GtkCheckMenuItem's mark by itself on every click,
+  # independent of what the handler does, so the mark tracks CLICK PARITY, not
+  # the inhibitor. Verified in real GTK: the mark starts unchecked on every
+  # waybar start even while the inhibitor is held, and it stays checked after
+  # the unit is stopped from outside the menu - i.e. it can show the exact
+  # OPPOSITE of reality.
+  #
+  # The label therefore names the ACTION ("Toggle Prevent Lock") instead of
+  # implying a state. The script behind it is the honest state: it reads
+  # `systemctl --user is-active` and reports the resulting state through a
+  # notification. Live togglers need a popup we own rather than waybar's
+  # one-shot GtkBuilder menu.
   powerMenu = pkgs.writeText "waybar-power-menu.xml" ''
     <?xml version="1.0" encoding="UTF-8"?>
     <interface>
       <object class="GtkMenu" id="menu">
         <child>
-          <object class="GtkMenuItem" id="lock">
-            <property name="label">Lock</property>
+          <object class="GtkMenuItem" id="profile">
+            <property name="label">Power Profile</property>
+            <child type="submenu">
+              <object class="GtkMenu" id="profile-menu">
+                <child>
+                  <object class="GtkMenuItem" id="profile-quiet">
+                    <property name="label">Quiet</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkMenuItem" id="profile-balanced">
+                    <property name="label">Balanced</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkMenuItem" id="profile-performance">
+                    <property name="label">Performance</property>
+                  </object>
+                </child>
+              </object>
+            </child>
           </object>
         </child>
         <child>
-          <object class="GtkMenuItem" id="logout">
-            <property name="label">Log Out</property>
+          <object class="GtkMenuItem" id="prevent-lock">
+            <property name="label">Toggle Prevent Lock</property>
           </object>
         </child>
         <child>
           <object class="GtkSeparatorMenuItem" id="separator1"/>
         </child>
         <child>
-          <object class="GtkMenuItem" id="suspend">
-            <property name="label">Suspend</property>
-          </object>
-        </child>
-        <child>
-          <object class="GtkMenuItem" id="hibernate">
-            <property name="label">Hibernate</property>
-          </object>
-        </child>
-        <child>
-          <object class="GtkSeparatorMenuItem" id="separator2"/>
-        </child>
-        <child>
-          <object class="GtkMenuItem" id="reboot">
-            <property name="label">Restart</property>
-          </object>
-        </child>
-        <child>
-          <object class="GtkMenuItem" id="shutdown">
-            <property name="label">Shut Down</property>
+          <object class="GtkMenuItem" id="session">
+            <property name="label">Session</property>
+            <child type="submenu">
+              <object class="GtkMenu" id="session-menu">
+                <child>
+                  <object class="GtkMenuItem" id="lock">
+                    <property name="label">Lock</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkMenuItem" id="logout">
+                    <property name="label">Log Out</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkSeparatorMenuItem" id="separator2"/>
+                </child>
+                <child>
+                  <object class="GtkMenuItem" id="suspend">
+                    <property name="label">Suspend</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkMenuItem" id="hibernate">
+                    <property name="label">Hibernate</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkSeparatorMenuItem" id="separator3"/>
+                </child>
+                <child>
+                  <object class="GtkMenuItem" id="reboot">
+                    <property name="label">Restart</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkMenuItem" id="shutdown">
+                    <property name="label">Shut Down</property>
+                  </object>
+                </child>
+              </object>
+            </child>
           </object>
         </child>
       </object>
     </interface>
   '';
 
-  # swaync's client, resolved once here because the notification module needs it
-  # three times over (the watcher plus two click handlers). Bare `swaync-client`
-  # would depend on whatever PATH the waybar unit inherits, and the upstream
-  # snippet's `which swaync-client` guard is the same bet - the store path is
-  # the only spelling that cannot go missing between build and run.
-  #
-  # Read off `config.services.swaync.package` rather than `pkgs.swaynotification
-  # center` so the bar and the daemon can never point at two different builds:
-  # notifications.nix owns that choice, and this follows it.
   swayncClient = lib.getExe' config.services.swaync.package "swaync-client";
 
-  # KDE's weather applet (54) ran provider `bbcukmet` against
-  # `Kuala Lumpur, Malaysia, MY|1735161` with showTemperatureInCompactMode=true
-  # and temperatureUnit=6001 (Celsius). It appeared TWICE in KDE - once on the
-  # panel proper and once inside the system tray (appletsrc :166-172) - and is
-  # ported ONCE here, de-duplicated, because two copies of the same 15-minute
-  # poll is redundant rather than faithful.
+  # asusd is the only power-management daemon enabled on this host
+  # (hardware/zephyrus/asus.nix); there is no power-profiles-daemon and no tlp,
+  # so `powerprofilesctl` does not exist here and asusctl is the correct client.
+  # `asusctl profile set` takes the profile name as a positional argument and
+  # the three names below are exactly what `asusctl profile list` reports.
   #
-  # Kuala Lumpur is deliberate and predates the system timezone: locale.nix
-  # sets Asia/Singapore, which disagrees with the city. The KDE applet is the
-  # parity target, so the city wins and the timezone is only passed to the API
-  # so the observation timestamp reads in local time.
+  # -e on notify-send is not used: asusctl already applies the change
+  # synchronously, so the notification is purely confirmation, and reporting the
+  # profile asusd actually ended up on (rather than the one requested) is what
+  # makes a rejected change visible instead of silently claiming success.
+  setProfile = pkgs.writeShellApplication {
+    name = "waybar-set-profile";
+    runtimeInputs = [pkgs.asusctl pkgs.libnotify];
+    text = ''
+      profile="$1"
+      if ! asusctl profile set "$profile"; then
+        notify-send -a Waybar -u critical "Power profile" "Failed to set $profile"
+        exit 1
+      fi
+      notify-send -a Waybar -i battery "Power profile" "$(asusctl profile get | head -n1)"
+    '';
+  };
+
+  # "Prevent lock" toggle. swayidle is what locks this session
+  # (modules/home/desktop/niri/lock.nix), and swayidle 1.9 watches logind's
+  # BlockInhibited property over PropertiesChanged and skips its timeouts while
+  # an `idle` inhibitor is held - so taking a logind idle lock is what actually
+  # suppresses the dim/lock/blank chain, rather than killing the service and
+  # leaving the machine unlocked forever.
   #
-  # Waybar has no native weather module, so this is a `custom` module. Provider
-  # is Open-Meteo: keyless (no account, no token - the repo's no-plaintext-
-  # secrets rule means a key would have to go through sops-nix, and needing
-  # none is better), structured JSON so jq parsing is deterministic instead of
-  # scraping a text format, and it takes coordinates directly so there is no
-  # geocoding round-trip.
+  # `idle` only, deliberately: blocking `sleep` too would also override the lid
+  # switch, and a laptop that no longer suspends when closed is a different
+  # (and worse) behaviour than the one being asked for.
   #
-  # The JSON contract is non-negotiable: waybar's return-type=json parses this
-  # stdout on every tick, and ONE malformed line silently kills the module. So
-  # every failure path - DNS, timeout, HTTP error, absent fields, bad types -
-  # routes through `fallback`, and the success line is assembled BY jq (--arg,
-  # not string interpolation) so quoting and newline escaping cannot be got
-  # wrong by hand.
+  # The lock lives in a transient user unit rather than a background child of
+  # waybar, because a child would die with the bar and leak on every waybar
+  # restart. A named unit is also the state: `is-active` is the single source of
+  # truth for whether the inhibitor is held, so the toggle cannot drift out of
+  # sync with reality the way a stored flag file would.
+  idleInhibit = pkgs.writeShellApplication {
+    name = "waybar-idle-inhibit";
+    runtimeInputs = [pkgs.systemd pkgs.libnotify];
+    text = ''
+      unit="waybar-prevent-lock"
+      if systemctl --user --quiet is-active "$unit.service"; then
+        systemctl --user stop "$unit.service"
+        notify-send -a Waybar -i battery "Prevent lock" "Off - idle locking restored"
+      else
+        systemd-run --user --unit="$unit" --description="Waybar prevent lock" \
+          systemd-inhibit --what=idle --who=Waybar --why="Prevent lock" \
+          sleep infinity
+        notify-send -a Waybar -i battery "Prevent lock" "On - screen will not lock"
+      fi
+    '';
+  };
+
   weatherScript = pkgs.writeShellScript "waybar-weather" ''
     set -o pipefail
 
@@ -332,6 +303,269 @@
          class: "weather"
        }' || fallback
   '';
+  # nmtui in the bar's Catppuccin Mocha palette.
+  #
+  # nmtui is a newt (libnewt) application, and newt has exactly one theming
+  # mechanism: the NEWT_COLORS/NEWT_COLORS_FILE environment variables, parsed by
+  # parseColors() into `key=fg,bg` pairs. There is no config file and no runtime
+  # option, so an env var is not a workaround here - it IS the API.
+  #
+  # NEWT_COLORS_FILE rather than NEWT_COLORS because initColors() reads the
+  # inline variable with strncpy into a fixed 16KB buffer and checks the file
+  # only when NEWT_COLORS is unset; a file keeps the 23 pairs off the process
+  # environment and out of every `ps e` listing.
+  #
+  # The `#rrggbb` values are passed through newt untouched to SLtt_set_color,
+  # and S-Lang emits them as 24-bit SGR (ESC[38;2;r;g;bm). Verified in a real
+  # terminal: nmtui rendered with truecolor sequences carrying these exact
+  # Catppuccin channels, so the hex is honoured rather than being silently
+  # rounded to one of newt's eight legacy colour names.
+  #
+  # Every key parseColors() understands is set. A partial palette is what makes
+  # a "themed" newt app look broken: any key left out keeps its default from
+  # newtDefaultColorPalette, which is a light-on-blue scheme, so one unset key
+  # shows up as a bright panel in the middle of a dark dialog.
+  nmtuiColors = pkgs.writeText "nmtui-newt-colors" ''
+    root=#cdd6f4,#11111b
+    roottext=#a6adc8,#11111b
+    border=#cdd6f4,#1e1e2e
+    window=#cdd6f4,#1e1e2e
+    shadow=#11111b,#11111b
+    title=#89b4fa,#1e1e2e
+    button=#11111b,#89b4fa
+    actbutton=#11111b,#b4befe
+    compactbutton=#cdd6f4,#1e1e2e
+    checkbox=#cdd6f4,#313244
+    actcheckbox=#11111b,#89b4fa
+    entry=#cdd6f4,#313244
+    disentry=#6c7086,#313244
+    label=#bac2de,#1e1e2e
+    listbox=#cdd6f4,#1e1e2e
+    actlistbox=#11111b,#89b4fa
+    sellistbox=#cdd6f4,#45475a
+    actsellistbox=#11111b,#89b4fa
+    textbox=#cdd6f4,#1e1e2e
+    acttextbox=#11111b,#89b4fa
+    helpline=#a6adc8,#181825
+    emptyscale=white,#313244
+    fullscale=white,#89b4fa
+  '';
+
+  # A wrapper rather than a session variable, because the palette has to reach
+  # nmtui through waybar, and the bar runs as a systemd user service whose unit
+  # carries an empty Environment= - home.sessionVariables never lands in the
+  # process that spawns this command, so setting the variable session-wide would
+  # theme nmtui in a shell and leave the bar's copy at newt's light default.
+  #
+  # This wrapper therefore governs the bar's launch path only. `nmtui` typed in a
+  # shell resolves to the NetworkManager binary in the system profile and is
+  # deliberately left alone: theming every newt application on the machine is a
+  # system-wide decision that does not belong to the waybar module.
+  nmtui = pkgs.writeShellApplication {
+    name = "nmtui-themed";
+    runtimeInputs = [pkgs.networkmanager];
+    text = ''
+      export NEWT_COLORS_FILE="${nmtuiColors}"
+      exec nmtui "$@"
+    '';
+  };
+
+  netspeed = pkgs.writeShellApplication {
+    name = "waybar-netspeed";
+    runtimeInputs = [pkgs.coreutils pkgs.gawk pkgs.jq pkgs.networkmanager];
+    text = ''
+      INTERVAL="''${INTERVAL:-1}"
+      # Virtual interfaces are excluded from BOTH the byte counters and the
+      # link lookup below, using the same list, so the rate and the tooltip
+      # always describe the same set of interfaces. tailscale0 is in the list
+      # because its counters double-count traffic that already passed through
+      # the physical link.
+      EXCLUDE='^(lo|docker|veth|br-|virbr|vnet|tun|tap|wg|zt|tailscale)'
+
+      sample() {
+        awk -F'[: ]+' -v ex="$EXCLUDE" '
+          NR > 2 { if ($2 ~ ex) next; rx += $3; tx += $11 }
+          END    { printf "%d %d\n", rx, tx }
+        ' /proc/net/dev
+      }
+
+      # The rate is scaled once and returned as two fields - magnitude and unit
+      # - so the caller can render it twice with different padding. The label
+      # needs a constant width; the tooltip reads like prose. One pre-padded
+      # string cannot satisfy both.
+      #
+      # The magnitude is held to the 0.0 shape (at most two integer digits),
+      # which is what fixes the label width: 99.9 is the largest value shown in
+      # any unit, and anything above it escalates to the next unit instead of
+      # growing a third digit, so 123.1 B renders as 0.1 KB.
+      #
+      # The guard is 99.95 rather than 100 because the comparison has to be made
+      # against the value that will be PRINTED, not the value held. %.1f rounds
+      # 99.96 up to "100.0" - three integer digits, one column too wide - so the
+      # escalation has to happen just below the rounding boundary.
+      #
+      # Units run to EB so the loop's counter, not the end of the list, is what
+      # stops the scaling: a 64-bit counter cannot exceed 16 EB, so no rate can
+      # run off the end and print a bare magnitude with no unit.
+      #
+      # The trailing newline is load-bearing: writeShellApplication sets
+      # `errexit`, and `read` reports failure at EOF without a line delimiter,
+      # so omitting it kills the module before it prints its first line.
+      scale() {
+        awk -v b="$1" 'BEGIN {
+          split("B KB MB GB TB PB EB", u)
+          i = 1
+          while (b >= 99.95 && i < 7) { b /= 1024; i++ }
+          printf "%.1f\t%s\n", b, u[i]
+        }'
+      }
+
+      # Always exactly 7 columns: 4 for the magnitude, one real space, 2 for the
+      # unit. BOTH fields are right-aligned, so the label grows leftward from a
+      # fixed right edge and the decimal point, the digits and the unit each
+      # hold their own column:
+      #
+      # - %4s right-aligns the magnitude, so "9.0" pads to " 9.0" and lines its
+      #   decimal point up under the one in "99.9". Padding on the left is what
+      #   the arrow needs: the digits stay flush against the gap after it
+      #   instead of drifting away from it when the value is short.
+      # - %2s right-aligns the unit so it ENDS at the same column every time:
+      #   "B" becomes " B" and lines up under the "B" of "KB".
+      #
+      # The gap between the two is a literal space rather than padding, so it
+      # survives however wide either field renders.
+      #
+      # Verified across 0 B .. 16 EB: every label is 7 characters.
+      pad() { printf '%4s %2s' "$1" "$2"; }
+
+      # nmcli -t does NOT escape colons inside values, so it is only safe on
+      # fields that cannot contain one. DEVICE, TYPE and STATE cannot; a
+      # connection name or an SSID can, which is why those are fetched with -g
+      # (which escapes them as "\:") and unescaped explicitly below.
+      unescape() { printf '%s' "''${1//\\:/:}"; }
+
+      # First connected physical device wins. `device status` lists devices in
+      # NetworkManager's own priority order, so the first match is the link
+      # actually carrying traffic rather than whichever interface sorts first.
+      primary() {
+        nmcli -t -f DEVICE,TYPE,STATE device status 2>/dev/null | awk -F: -v ex="$EXCLUDE" '
+          $1 ~ ex           { next }
+          $2 == "wifi-p2p"  { next }
+          $3 != "connected" { next }
+          { printf "%s\t%s\n", $1, $2; exit }
+        '
+      }
+
+      devfield() {
+        unescape "$(nmcli -g "$1" device show "$2" 2>/dev/null | head -n1)"
+      }
+
+      # SSID is requested LAST so the fields before it - none of which can
+      # contain a colon - can be split off positionally and everything
+      # remaining rejoined as the SSID, whatever it contains.
+      wifi_ap() {
+        nmcli -g ACTIVE,SIGNAL,RATE,SSID device wifi list ifname "$1" --rescan no 2>/dev/null |
+          awk -F: '
+            $1 == "yes" {
+              ssid = $4
+              for (i = 5; i <= NF; i++) ssid = ssid ":" $i
+              printf "%s\t%s\t%s\n", $2, $3, ssid
+              exit
+            }
+          '
+      }
+
+      # Labels are padded to one width so every value starts in the same column.
+      row() { printf '%-10s %s\n' "$1:" "$2"; }
+
+      # The tooltip answers "what am I connected through" - the question the
+      # label cannot answer, since the label is already showing the rate. It
+      # deliberately does NOT repeat the two numbers.
+      conninfo() {
+        local dev type name addr gw signal rate ssid out
+        IFS=$'\t' read -r dev type < <(primary) || true
+
+        if [ -z "''${dev:-}" ]; then
+          printf 'Disconnected'
+          return
+        fi
+
+        name=$(devfield GENERAL.CONNECTION "$dev")
+        addr=$(devfield IP4.ADDRESS "$dev")
+        gw=$(devfield IP4.GATEWAY "$dev")
+
+        out=""
+        case "$type" in
+          ethernet)
+            out+="$(row Link 'Ethernet')"$'\n'
+            [ -n "$name" ] && out+="$(row Profile "$name")"$'\n'
+            ;;
+          wifi)
+            IFS=$'\t' read -r signal rate ssid < <(wifi_ap "$dev") || true
+            # The SSID arrives colon-escaped, because it is the one field here
+            # that can legitimately contain a colon and so had to be fetched
+            # with -g. Unescaping is what turns "Cafe\:Free" back into
+            # "Cafe:Free"; without it the backslash reaches the tooltip.
+            ssid=$(unescape "''${ssid:-}")
+            out+="$(row Link 'Wi-Fi')"$'\n'
+            out+="$(row Network "''${ssid:-''${name:-unknown}}")"$'\n'
+            [ -n "''${signal:-}" ] && out+="$(row Signal "$signal%")"$'\n'
+            [ -n "''${rate:-}" ] && out+="$(row Rate "$rate")"$'\n'
+            ;;
+          *)
+            out+="$(row Link "$type")"$'\n'
+            [ -n "$name" ] && out+="$(row Profile "$name")"$'\n'
+            ;;
+        esac
+
+        out+="$(row Interface "$dev")"$'\n'
+        [ -n "$addr" ] && out+="$(row IPv4 "$addr")"$'\n'
+        [ -n "$gw" ] && out+="$(row Gateway "$gw")"
+
+        printf '%s' "''${out%$'\n'}"
+      }
+
+      # The link does not change every second, and each refresh costs four
+      # nmcli round trips, so it is re-read on a slower cadence than the rate
+      # and reused in between. Primed before the loop so the very first line
+      # already carries a populated tooltip.
+      TOOLTIP_EVERY=5
+      tip=$(conninfo)
+      ticks=0
+
+      read -r prx ptx < <(sample)
+      while true; do
+        sleep "$INTERVAL"
+        read -r crx ctx < <(sample)
+        down=$(( (crx - prx) / INTERVAL ))
+        up=$((   (ctx - ptx) / INTERVAL ))
+        prx=$crx; ptx=$ctx
+
+        ticks=$(( ticks + 1 ))
+        if [ "$ticks" -ge "$TOOLTIP_EVERY" ]; then
+          tip=$(conninfo)
+          ticks=0
+        fi
+
+        IFS=$'\t' read -r dnum dunit < <(scale "$down")
+        IFS=$'\t' read -r unum uunit < <(scale "$up")
+
+        # jq builds the JSON so an SSID containing a quote, a backslash or a
+        # newline cannot break the contract with waybar. It also encodes the
+        # real newlines below, so the label and the tooltip are written here as
+        # ordinary multi-line text rather than as hand-escaped "\n".
+        jq -cn \
+          --arg down "$(pad "$dnum" "$dunit")" \
+          --arg up "$(pad "$unum" "$uunit")" \
+          --arg tip "$tip" \
+          '{
+             text: "↓ \($down)\n↑ \($up)",
+             tooltip: $tip,
+             class: "netspeed"
+           }'
+      done
+    '';
+  };
 in {
   # Waybar has had native niri modules since 0.11.0 (nixpkgs ships 0.15.0), so
   # workspace state comes from niri's own IPC rather than a helper script.
@@ -351,67 +585,27 @@ in {
       height = 32;
       spacing = 6;
 
-      # Workspaces are the leftmost thing on the bar: they are the only module
-      # a glance needs to land on reliably, so nothing is allowed to sit left
-      # of them. The launcher follows immediately (KDE's kickoff was leftmost,
-      # but it is a static button - its position carries no information), and
-      # the window title goes last because it is the widest and most volatile.
-      modules-left = ["niri/workspaces" "custom/launcher" "niri/window"];
-      # Weather sits immediately after the clock, which is where KDE's
-      # AppletOrder put it (digitalclock, then weather, then the second
-      # spacer) - so modules-center is the position-faithful home for it
-      # rather than modules-right.
+      modules-left = ["custom/launcher" "niri/workspaces" "niri/window"];
       modules-center = ["clock" "custom/weather"];
-      # Order follows KDE's AppletOrder for the tail of the panel:
-      # systemmonitor-CPU(53), systemmonitor-GPU(52, dropped), netspeed(27),
-      # systemtray(36), battery(63), notifications(35), then the end-of-panel
-      # widgets peek(66)/colorizer(56) which are CSS or dropped. So the sensor
-      # readouts come BEFORE the tray, and the notification bell sits last
-      # before custom/power. pulseaudio and the drawer's other indicators were
-      # tray members (47 and friends), which is why they travel with the tray
-      # rather than with the sensors.
+      # it in both places instantiates the module TWICE - two icons, two D-Bus
+      # watchers, and the shared #bluetooth CSS applying to both - so the drawer
+      # membership is the single home for it.
       modules-right = [
-        "cpu"
-        "temperature"
-        "network"
         "group/tray-drawer"
+        "group/sensors"
         "pulseaudio"
-        "battery"
+        "bluetooth"
         "custom/notification"
-        "custom/power"
+        "battery"
       ];
 
-      # KDE's kickoff sat at the far left with icon=nix-snowflake; U+F1105 is
-      # Nerd Fonts' nf-linux-nixos, the same mark. Static text, so no `exec`.
       "custom/launcher" = {
         format = "󱄅";
         tooltip = false;
         on-click = "${pkgs.fuzzel}/bin/fuzzel";
       };
 
-      # U+F0425 nf-md-power. `menu` names the event that opens the popup; the
-      # keys of `menu-actions` are the GtkMenuItem ids in powerMenu above.
-      "custom/power" = {
-        format = "󰐥";
-        tooltip = false;
-        menu = "on-click";
-        menu-file = "${powerMenu}";
-        menu-actions = {
-          lock = "${pkgs.swaylock-effects}/bin/swaylock -f";
-          # No --skip-confirmation: this matches the Mod+Shift+E bind
-          # (`quit = []` in settings.nix), and a stray menu click should not
-          # tear the session down without niri's own confirm prompt.
-          logout = "${pkgs.niri}/bin/niri msg action quit";
-          suspend = "${pkgs.systemd}/bin/systemctl suspend";
-          hibernate = "${pkgs.systemd}/bin/systemctl hibernate";
-          reboot = "${pkgs.systemd}/bin/systemctl reboot";
-          shutdown = "${pkgs.systemd}/bin/systemctl poweroff";
-        };
-      };
-
       "niri/workspaces" = {
-        # {value} renders the workspace name, falling back to its index, so the
-        # number is visible. KDE's pager was per-screen, hence all-outputs off.
         format = "{value}";
         all-outputs = false;
       };
@@ -427,23 +621,6 @@ in {
         tooltip = false;
       };
 
-      # KDE's digital clock ran use24hFormat=2, showSeconds=Always,
-      # dateFormat=isoDate and dateDisplayFormat=BesideTime, so the default
-      # format is the ISO date sitting beside a 24-hour clock with seconds.
-      # interval must be 1: at the default 60 the seconds field would sit
-      # frozen for a whole minute.
-      #
-      # showWeekNumbers=true maps to calendar.weeks-pos. `locale` is set
-      # because waybar-clock(5) states {calendar} takes its start-of-week from
-      # this option rather than the system locale; en_US.UTF-8 matches LC_TIME
-      # in modules/nixos/core/locale.nix, giving Sunday-start weeks and the
-      # default %U week numbering.
-      #
-      # Two honest gaps versus KDE. waybar renders the calendar INSIDE the
-      # tooltip, not as a separate popup window, so it is hover-only and
-      # cannot be pinned open. And KDE's three calendar plugins
-      # (alternatecalendar, astronomicalevents, holidaysevents) have no waybar
-      # equivalent at all - they are dropped, recorded in the parity ledger.
       clock = {
         interval = 1;
         timezone = "Asia/Singapore";
@@ -454,12 +631,8 @@ in {
         calendar = {
           mode = "month";
           mode-mon-col = 3;
-          # The direct equivalent of KDE's showWeekNumbers=true.
           weeks-pos = "left";
           on-scroll = 1;
-          # Catppuccin Mocha, same palette as the style block below. Pango
-          # markup, not CSS - the calendar is tooltip text, so #clock rules
-          # cannot reach it.
           format = {
             months = "<span color='#89b4fa'><b>{}</b></span>";
             days = "<span color='#cdd6f4'>{}</span>";
@@ -468,10 +641,6 @@ in {
             today = "<span color='#f38ba8'><b><u>{}</u></b></span>";
           };
         };
-        # Scroll shifts months and right-click cycles year/month, covering the
-        # navigation KDE's calendar popup had. Plain on-click is left alone so
-        # it keeps toggling format-alt. No tz_up/tz_down: those need
-        # `timezones`, which conflicts with the single `timezone` above.
         actions = {
           on-click-right = "mode";
           on-scroll-up = "shift_up";
@@ -479,62 +648,16 @@ in {
         };
       };
 
-      # The weather module proper; the script and the KDE provenance are
-      # documented at the weatherScript binding at the top of this file.
-      #
-      # interval = 900 matches the `interval: 900` Open-Meteo reports in its own
-      # `current` block - the upstream data does not refresh faster than that,
-      # so polling harder would only cost requests. Open-Meteo's free tier asks
-      # for non-commercial politeness rather than enforcing a rate limit, which
-      # makes restraint the whole contract.
-      #
-      # return-type = "json" is what makes waybar read text/tooltip/class out
-      # of the script's stdout instead of treating the line as literal text.
-      # tooltip is left ON (unlike the static buttons here) because the script
-      # supplies one.
       "custom/weather" = {
         return-type = "json";
         interval = 900;
         exec = "${weatherScript}";
-        # The script emits Pango-safe plain text, and its tooltip carries no
-        # markup, so waybar must not try to parse the description as markup.
         escape = true;
       };
 
-      # KDE's notification applet (35), which sat between the battery (63) and
-      # the session end of AppletOrder - hence the position in modules-right
-      # above. swaync replaced mako in notifications.nix precisely so this
-      # indicator could exist: unread count, DND toggle, and a history panel.
-      #
-      # This is swaync's OWN documented waybar snippet (swaync(1), "Waybar
-      # Example"), with the bare `swaync-client` substituted for the store path
-      # bound at the top of this file. `-swb` is the long-running watcher: it
-      # prints one JSON line per state change rather than exiting, so there is
-      # deliberately NO `interval` - waybar keeps the process alive and reads
-      # stdout as it arrives.
-      #
-      # The upstream snippet's `exec-if = "which swaync-client"` is dropped, not
-      # forgotten. It exists to stop the module when the binary is absent from
-      # PATH; a store path cannot be absent, and keeping it would spawn a `which`
-      # on every tick to answer a question already settled at build time.
-      #
-      # The eight format-icons keys are the complete set - the 2x2x2 product of
-      # {dnd,-} x {inhibited,-} x {notification,none}. There is no ninth, and
-      # the same eight strings are also the CSS classes the client emits, which
-      # is what the #custom-notification rules below key on.
-      #
-      # Glyphs, confirmed by NAME in the font's cmap rather than by codepoint:
-      # 󰂚 U+F009A md-bell (unread), 󰂜 U+F009C md-bell_outline (clear),
-      # 󰂛 U+F009B md-bell_off (DND), 󰂠 U+F00A0 md-bell_sleep (inhibited).
-      # Upstream wrapped its "unread" glyph in a red <span> superscript; that
-      # colour lives in the stylesheet here instead, so the palette stays in
-      # one place and `escape = true` can stay on.
       "custom/notification" = {
         return-type = "json";
         exec = "${swayncClient} -swb";
-        # Left click opens the control centre, right click toggles DND - the
-        # same two gestures KDE's applet had. `-sw` makes the client skip
-        # waiting for a reply, so a click cannot block the bar's event loop.
         on-click = "${swayncClient} -t -sw";
         on-click-right = "${swayncClient} -d -sw";
         format = "{icon}";
@@ -548,11 +671,7 @@ in {
           dnd-inhibited-notification = "󰂛";
           dnd-inhibited-none = "󰂛";
         };
-        # The client's JSON carries the unread count in `text`, which waybar
-        # would otherwise treat as Pango markup.
         escape = true;
-        # Off per upstream: the count is already the glyph's whole meaning, and
-        # the panel one click away carries the actual notification text.
         tooltip = false;
       };
 
@@ -560,7 +679,6 @@ in {
         format = "{icon} {volume}%";
         format-muted = "󰝟";
         format-icons.default = ["󰕿" "󰖀" "󰕾"];
-        # wiremix replaces pavucontrol as the mixer.
         on-click = "${pkgs.foot}/bin/foot -a wiremix ${pkgs.wiremix}/bin/wiremix";
       };
 
@@ -577,41 +695,52 @@ in {
         format = "{icon} {capacity}%";
         format-charging = "󰂄 {capacity}%";
         format-icons = ["󰁺" "󰁼" "󰁾" "󰂀" "󰂂"];
+
+        menu = "on-click";
+        menu-file = "${powerMenu}";
+        # One entry per id in powerMenu above. The two submenu PARENTS
+        # (`profile`, `session`) are deliberately absent: GTK opens a submenu on
+        # hover by itself, and giving a parent an action would run it when the
+        # user is only reaching for a child.
+        menu-actions = {
+          profile-quiet = "${setProfile}/bin/waybar-set-profile Quiet";
+          profile-balanced = "${setProfile}/bin/waybar-set-profile Balanced";
+          profile-performance = "${setProfile}/bin/waybar-set-profile Performance";
+          prevent-lock = "${idleInhibit}/bin/waybar-idle-inhibit";
+          lock = "${pkgs.swaylock-effects}/bin/swaylock -f";
+          logout = "${pkgs.niri}/bin/niri msg action quit";
+          suspend = "${pkgs.systemd}/bin/systemctl suspend";
+          hibernate = "${pkgs.systemd}/bin/systemctl hibernate";
+          reboot = "${pkgs.systemd}/bin/systemctl reboot";
+          shutdown = "${pkgs.systemd}/bin/systemctl poweroff";
+        };
       };
 
-      # KDE's applet 53 was a piechart whose total sensor was
-      # cpu/all/averageTemperature, with averageFrequency/system/usage/user/wait
-      # demoted to low-priority (tooltip-only) sensors. Split across waybar's
-      # two native modules: `cpu` carries the usage figure and the frequency
-      # detail, `temperature` carries the package reading the chart was keyed
-      # on. U+F0EE0 nf-md-cpu_64_bit.
+      # Network speed, CPU load and temperature are one reading of "what is this
+      # machine doing right now", so they live in a group and share a single
+      # separator instead of each carrying its own.
       #
-      # Deliberately no GPU counterpart. KDE's applet 52 charted
-      # gpu/gpu0/temperature; it is dropped on purpose, because every polling
-      # route to the NVIDIA card (nvidia-smi included) wakes the dGPU. There is
-      # no passive alternative either: a sweep of every /sys/class/hwmon*/name
-      # on this machine matched no nvidia, nouveau or amdgpu device at all, so
-      # the reading would cost battery purely for its own sake.
+      # `orientation = "inherit"` is required, not cosmetic: a group's default
+      # orientation is "orthogonal", which in this horizontal bar would stack the
+      # three modules vertically. Group boxes are also constructed with GTK
+      # spacing hardcoded to 0 (unlike the bar's own `spacing = 6`), so the
+      # members sit flush and their CSS padding is the only gap - which is what
+      # makes cpu and temperature read as one pair.
+      "group/sensors" = {
+        orientation = "inherit";
+        modules = [
+          "custom/network"
+          "cpu"
+          "temperature"
+        ];
+      };
+
       cpu = {
         interval = 2;
         format = "󰻠 {usage}%";
         tooltip = true;
       };
 
-      # thermal-zone is NOT used: thermal_zone0 here is acpitz, the real
-      # package sensor is thermal_zone7 (x86_pkg_temp), and that index is not
-      # stable across linuxPackages_latest bumps. The platform-device hwmon
-      # path is stable. The hwmon# leaf is intentionally absent from
-      # hwmon-path-abs - waybar-temperature(5) says the module appends
-      # hwmon*/<input-filename> itself. temp1_label reads "Package id 0", the
-      # die aggregate, which is the closest analogue to KDE's averageTemperature.
-      #
-      # Thresholds are tuned to THIS machine, not copied from dotfiles. Package
-      # readings observed 87-96C (91 idle, 96 under an 8-way busy loop), and
-      # temp1_crit/temp1_max both read 110000. A conventional 80C warning would
-      # therefore be lit permanently and mean nothing, so warning sits at 95
-      # (just above the idle band, so it fires on real sustained load) and
-      # critical at 105 (5C of headroom below the 110C hardware limit).
       temperature = {
         interval = 2;
         hwmon-path-abs = "/sys/devices/platform/coretemp.0/hwmon";
@@ -619,80 +748,44 @@ in {
         warning-threshold = 95;
         critical-threshold = 105;
         format = "󰔏 {temperatureC}°C";
-        # U+F0E01 nf-md-thermometer_alert, so the critical state reads
-        # differently even before the CSS colour lands.
         format-critical = "󰸁 {temperatureC}°C";
         tooltip-format = "CPU package: {temperatureC}°C ({temperatureF}°F)";
       };
 
-      # KDE's applet 27 was org.kde.netspeedWidget with speedLayout=rows and
-      # swapDownUp=true, i.e. two stacked rows with download on top. Waybar has
-      # no netspeed module and a single module renders ONE row, so the two rows
-      # collapse to one line with download first, separated by arrows:
-      # "↓ 1.2MB/s ↑ 34kB/s". That row/inline difference is the one honest gap
-      # versus KDE here, and it is recorded as "degraded, not dropped" in the
-      # applet ledger at the top of this file.
-      #
-      # interval = 2 because the documented default is 60 - at 60 the rate would
-      # be a stale minute-old average, where KDE polled continuously. 2 matches
-      # the cpu/temperature cadence above.
-      #
-      # Every token below is verbatim from the installed waybar-network(5):
-      # the Bytes pair reads as human units (kB/s, MB/s) rather than the Bits
-      # pair's raw bit counts, which is what KDE's widget displayed.
-      network = {
-        interval = 2;
-        format-wifi = "󰖩 {essid}  ↓ {bandwidthDownBytes} ↑ {bandwidthUpBytes}";
-        format-ethernet = "󰈀  ↓ {bandwidthDownBytes} ↑ {bandwidthUpBytes}";
-        format-disconnected = "󰖪";
-        # {signalStrength} is wifi-only, so the wired tooltip uses gateway and
-        # netmask instead of carrying a permanently empty percentage.
-        tooltip-format = "{ifname}: {ipaddr}\nGateway: {gwaddr}\n↓ {bandwidthDownBytes}  ↑ {bandwidthUpBytes}";
-        tooltip-format-wifi = "{essid} ({signalStrength}%, {signaldBm} dBm)\n{ifname}: {ipaddr}\nGateway: {gwaddr}\n↓ {bandwidthDownBytes}  ↑ {bandwidthUpBytes}";
-        tooltip-format-ethernet = "{ifname}: {ipaddr}/{cidr}\nGateway: {gwaddr}\n↓ {bandwidthDownBytes}  ↑ {bandwidthUpBytes}";
-        tooltip-format-disconnected = "Disconnected";
-        # impala is the wifi TUI replacing the plasma applet.
-        on-click = "${pkgs.foot}/bin/foot -a impala ${pkgs.impala}/bin/impala";
+      # nmtui, not impala: impala is an iwd frontend, and this host runs
+      # NetworkManager over wpa_supplicant (modules/nixos/core/networking.nix)
+      # with no iwd service and no net.connman.iwd on the bus at all, so impala
+      # panicked on startup ("reader source not set" / "No such device or
+      # address") every time it was clicked. nmtui talks to the daemon this
+      # machine actually runs.
+      "custom/network" = {
+        exec = "${netspeed}/bin/waybar-netspeed";
+        return-type = "json";
+        format = "{}";
+        restart-interval = 5;
+        tooltip = true;
+        # Waybar hands the tooltip to GTK as Pango MARKUP, not as plain text, so
+        # an SSID containing "&" or "<" would either vanish or blank the whole
+        # tooltip. The script builds its JSON with jq, which protects the JSON
+        # contract but says nothing about markup; `escape` is the layer that
+        # makes the value safe once it is inside that JSON. Same reason
+        # custom/weather sets it.
+        escape = true;
+        on-click = "${pkgs.foot}/bin/foot -a nmtui ${nmtui}/bin/nmtui-themed";
       };
 
-      # KDE's system tray (applet 36) split its members into a shown set
-      # (blueman, networkmanagement) and a hidden set behind the expand arrow,
-      # with scaleIconsToFit=true. Waybar's tray module CANNOT do that split:
-      # it has no per-item show/hide, no persistence of which item is hidden,
-      # and no arrow of its own. That per-item behaviour is dropped for good
-      # (recorded against applet 36 in the ledger at the top of this file).
-      #
-      # The closest analogue is a group with a `drawer`: the FIRST module in
-      # `modules` is the group leader and is always visible, every later module
-      # is hidden until revealed. click-to-reveal = true is deliberate - KDE
-      # required a click on the arrow, and hover-reveal would make the bar
-      # twitch whenever the pointer crossed it.
-      #
-      # Leader is `tray` itself, so real SNI items stay permanently visible the
-      # way KDE's shown set was. The revealed children are the secondary
-      # indicators KDE also kept inside that tray: input method (niri/language
-      # = the kimpanel member) and brightness (backlight = the kscreen/
-      # brightness member), joined by the bluetooth/mpris/clipboard/privacy
-      # indicators that were also tray members. Adding another indicator means
-      # appending it to this `modules` list and giving it a CSS rule; nothing
-      # else about the group has to change.
       "group/tray-drawer" = {
         orientation = "inherit";
         drawer = {
           transition-duration = 500;
-          # Set explicitly. waybar-styles(5) documents the default as "hidden",
-          # but src/group.cpp:60 actually defaults it to "drawer-child" - the
-          # man page is wrong, so relying on either spelling is a silent CSS
-          # miss. The name below is what the style block targets.
           children-class = "tray-drawer-child";
           click-to-reveal = true;
         };
         modules = [
           "tray"
-          "niri/language"
-          "backlight"
-          "bluetooth"
           "mpris"
+          "backlight"
+          "niri/language"
           "custom/clipboard"
           "privacy"
         ];
@@ -700,35 +793,10 @@ in {
 
       tray = {
         spacing = 8;
-        # The bar is 32px tall; 20 leaves 6px of breathing room top and bottom
-        # so icons do not touch the panel edges. This is the honest stand-in
-        # for KDE's scaleIconsToFit=true, which waybar has no equivalent for.
         icon-size = 20;
-        # KDE showed passive members (its shown set included items sitting
-        # idle), and the default false would silently swallow any SNI item that
-        # reports Passive rather than Active - which reads as "my tray icon
-        # vanished". Explicit true keeps the tray's contents predictable.
         show-passive-items = true;
       };
 
-      # KDE kept blueman in its tray's SHOWN set. blueman itself was rejected
-      # for this host (hardware/zephyrus/bluetooth.nix:12-13), so the click
-      # target is overskride, which is already installed and already floated by
-      # a window rule in settings.nix - the same treatment wiremix and impala
-      # get, so every bar-launched GUI behaves alike.
-      #
-      # `controller` is deliberately absent. The man page recommends it only
-      # when more than one controller exists; this machine has exactly one, so
-      # naming it would just be a string that can go stale. (Note the module
-      # reads the alias, not the adapter path - so a wrong value silently
-      # selects nothing rather than erroring.)
-      #
-      # One format per documented state so the glyph alone says which state the
-      # adapter is in, before any CSS colour lands: 󰂲 U+F00B2 md-bluetooth_off
-      # for off/disabled, 󰂯 U+F00AF md-bluetooth for on-but-idle, 󰂱 U+F00B1
-      # md-bluetooth_connect plus a count for connected. format-disabled is set
-      # rather than left empty, because an empty format HIDES the module and a
-      # silently missing indicator is worse than a struck-through one.
       bluetooth = {
         format = "󰂯 {status}";
         format-disabled = "󰂲";
@@ -740,30 +808,50 @@ in {
         tooltip-format-off = "Bluetooth off\n{controller_alias}";
         tooltip-format-disabled = "Bluetooth disabled";
         tooltip-format-on = "Bluetooth on, nothing connected\n{controller_alias}";
-        tooltip-format-connected = "{controller_alias}\n{num_connections} connected\n\n{device_enumerate}";
-        tooltip-format-enumerate-connected = "{device_alias}\t{device_address}";
-        tooltip-format-enumerate-connected-battery = "{device_alias}\t{device_battery_percentage}%";
+
+        # Every connected device is listed, one per line. waybar builds
+        # {device_enumerate} by running the two `-enumerate-` formats below once
+        # per entry in its connected-device list, so the list is complete by
+        # construction - there is no cap and no "focussed device" filtering.
+        #
+        # The device block is wrapped in <tt> because the columns are aligned
+        # with SPACES, and space is only a fixed advance in a monospaced font.
+        # In the tooltip's default proportional font the padding computed below
+        # renders as ragged gaps. Verified against Pango: the same padded string
+        # measures one width under a monospace family and drifts under the UI
+        # font. The header stays outside the <tt> so it keeps the tooltip's
+        # normal face.
+        #
+        # NOTE: waybar hands this to set_tooltip_markup WITHOUT escaping it, and
+        # the device alias comes from BlueZ. An alias containing & or < is
+        # therefore invalid markup and GTK drops the whole tooltip. That is an
+        # upstream limitation with no config-side fix - the alias never reaches
+        # anything here that could escape it - and it is pre-existing rather
+        # than introduced by this block. Renaming such a device in BlueZ is the
+        # only workaround.
+        tooltip-format-connected = "{controller_alias}\n{num_connections} connected\n\n<tt>{device_enumerate}</tt>";
+
+        # Both row formats put the address at the SAME column so the two kinds
+        # interleave as one table:
+        #
+        # - {:<16.16} pins the alias to 16 columns. The precision is what makes
+        #   it a hard field rather than a minimum: without `.16` a long alias
+        #   pushes everything after it rightward and only THAT row misaligns.
+        # - {:>3}% right-aligns the battery so 7%, 90% and 100% share a column.
+        # - The plain row pays for the whole missing battery field with eight
+        #   spaces: 2 separator + 3 digits + 1 "%" + 2 separator. Getting this
+        #   count wrong by one is exactly the bug this comment exists to
+        #   prevent, and it is invisible until a device without a battery sits
+        #   next to one that has it.
+        #
+        # Verified with real fmt against this host's aliases plus adversarial
+        # ones (overlong alias, 0%, 100%): the address starts at column 24 on
+        # every row, battery or not.
+        tooltip-format-enumerate-connected = "{device_alias:<16.16}        {device_address}";
+        tooltip-format-enumerate-connected-battery = "{device_alias:<16.16}  {device_battery_percentage:>3}%  {device_address}";
         on-click = "${pkgs.overskride}/bin/overskride";
       };
 
-      # KDE's mediacontroller applet. `player = "playerctld"` is the documented
-      # default, but it is written out explicitly because it is load-bearing
-      # here: playerctld already runs as a user service
-      # (modules/services/home/playerctld.nix:2) and following the *active*
-      # player is the whole point - pinning a single player name would make the
-      # module go blank whenever anything else took over playback.
-      #
-      # The default format is "{player} ({status}) {dynamic}", which wastes bar
-      # width on the player's own name. {status_icon} + {dynamic} is the same
-      # information in one glyph. Glyphs: 󰐊 U+F040A md-play, 󰏤 U+F03E4 md-pause,
-      # 󰓛 U+F04DB md-stop, 󰝚 U+F075A md-music.
-      #
-      # Lengths are capped because the bar is shared with a 60-char window
-      # title: the module truncates its own text rather than pushing the rest
-      # of the bar around when a long track title arrives. album is dropped
-      # from dynamic-order (absence = force exclusion) since title + artist is
-      # what KDE's compact applet showed. enable-tooltip-len-limits is left at
-      # its default false so the tooltip carries the untruncated text.
       mpris = {
         player = "playerctld";
         format = "{status_icon} {dynamic}";
@@ -794,16 +882,6 @@ in {
         on-click = "${clipboardHistory}";
       };
 
-      # KDE's cameraindicator. `modules` is set EXPLICITLY to screenshare only.
-      # The documented default is [{"type":"screenshare"},{"type":"audio-in"}],
-      # so leaving it out would silently add a microphone indicator this panel
-      # never had in KDE - unrequested scope, and the kind of thing that only
-      # shows up the first time something opens the mic. audio-out is likewise
-      # omitted: pulseaudio above already covers output.
-      #
-      # This module is invisible until something actually captures the screen,
-      # which is the intended behaviour (KDE's indicator worked the same way) -
-      # an empty slot in the drawer is not a fault.
       privacy = {
         icon-size = 18;
         icon-spacing = 4;
@@ -818,7 +896,6 @@ in {
       };
     };
 
-    # Catppuccin Mocha, matching foot and fuzzel.
     style = ''
       /* ===================================================================
          Panel geometry and shared resets.
@@ -954,12 +1031,46 @@ in {
       #pulseaudio,
       #backlight,
       #battery,
-      #cpu,
-      #temperature,
-      #network,
       #language,
       #tray {
         padding: 0 10px;
+        color: #cdd6f4;
+      }
+
+      /* The centre cluster is the bar's headline, so the clock and the weather
+         reading are the one place the 13px body size is overridden upward: 17px
+         is the largest size that still fits the 32px panel with room for the
+         font's descenders (~1.2x line height puts 17px at ~21px of ink), and it
+         leaves the right cluster's readouts as clearly secondary text.
+
+         Both selectors carry the SAME size on purpose - they sit next to each
+         other in modules-center and read as one unit, so a mismatch here would
+         look like a bug rather than a hierarchy. The clock also gets a mild
+         letter-spacing because it is monospaced digits that change every
+         second; the extra tracking stops the seconds column from looking
+         cramped at this size. */
+      #clock {
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+      }
+
+      #custom-weather {
+        font-size: 17px;
+      }
+
+      /* The sensors group is one cluster, so its members get a tighter 4px
+         inner padding than the 10px above - the group box has GTK spacing 0, so
+         this padding is the ONLY gap between them and 4px is what pulls cpu and
+         temperature together into a readable pair. #custom-network keeps a
+         little more room on its left so the trio does not touch the separator.
+
+         `#network` is deliberately NOT in this list: that id belongs to waybar's
+         built-in network module, which this bar does not use. The netspeed
+         readout is `custom/network`, so it is `#custom-network`. */
+      #cpu,
+      #temperature {
+        padding: 0 4px;
         color: #cdd6f4;
       }
 
@@ -973,16 +1084,42 @@ in {
          the FIRST module of each cluster instead: indicators | volume+battery |
          sensors | session.
 
-         `margin: 6px 0` is what makes it read as a separator rather than a
-         frame - it shortens the 32px border to 20px, the same trick as KDE's
-         `lengthSeparator=80`. The colour is the translucent surface1 used by
-         the bar's bottom edge, so every line in this sheet matches.
+         The line is a 1px-wide background gradient rather than a border plus
+         `margin: 6px 0`, and that is a layout fix, not a style preference. A
+         vertical margin is added to the widget's height request, and waybar
+         grows the bar to whatever its tallest module asks for (it logs
+         "Requested height: 32 is less than the minimum height: N"). With the
+         two-line netspeed label inside #sensors, a 6px margin pushed the bar
+         from 32px to 44px - measured, one variant per margin value. Painting
+         the line into the background instead requests no extra space at all, so
+         the shortened line survives and `height = 32` is actually honoured.
+
+         The stops reproduce exactly what the margin did visually: transparent
+         for the first 6px, surface1 from 6px to 26px, transparent again to the
+         bottom - a 20px line centred in a 32px bar, the same proportion as
+         KDE's `lengthSeparator=80`. `background-size: 1px 100%` keeps it
+         hairline-thin and full-height, and no-repeat stops GTK tiling it across
+         the whole module.
          =================================================================== */
+      /* #sensors, not #cpu: the sensors trio is a group now, so the line goes on
+         the group box and the three members inside it are separator-free. A
+         border on #cpu would draw a line BETWEEN the netspeed readout and the cpu
+         readout, splitting the very cluster this groups them into. */
       #pulseaudio,
-      #cpu,
+      #sensors,
       #custom-notification {
-        border-left: 1px solid rgba(69, 71, 90, 0.6);
-        margin: 6px 0;
+        background-image: linear-gradient(
+          to bottom,
+          transparent 0,
+          transparent 6px,
+          rgba(69, 71, 90, 0.6) 6px,
+          rgba(69, 71, 90, 0.6) 26px,
+          transparent 26px,
+          transparent 100%
+        );
+        background-size: 1px 100%;
+        background-position: left center;
+        background-repeat: no-repeat;
       }
 
       /* ===================================================================
@@ -1044,11 +1181,28 @@ in {
         color: #f38ba8;
       }
 
-      /* Disconnected is the module's own class. Dimmed rather than red: on a
-         laptop that is an ordinary state, and the glyph already changes to
-         󰖪. */
-      #network.disconnected {
-        color: #6c7086;
+      /* The netspeed readout, and the one module in the bar whose width must not
+         move: it re-renders every second, so a single character of drift would
+         shove the whole right cluster sideways once a second.
+
+         Two mechanisms hold it still, and BOTH are needed:
+         - The script pads every value to exactly 6 characters, unit included, so
+           "   0 B", " 1.0KB" and " 1.4MB" occupy the same number of glyphs. That
+           is what leaves room for B/KB/MB/GB without a reflow.
+         - `monospace` is what makes 6 equal characters mean 6 equal pixels. The
+           nerd font is monospaced, but the fallback must be too, or a glyph
+           served from a proportional fallback would undo the padding.
+
+         min-width is the floor for the two-line label; the padding above it is
+         symmetric so the text stays centred inside that floor. font-size is
+         11px rather than the bar's 13px because this is the only module drawing
+         TWO stacked lines inside the 32px bar. */
+      #custom-network {
+        font-family: "JetBrainsMono Nerd Font", monospace;
+        font-size: 11px;
+        min-width: 54px;
+        padding: 0 6px;
+        color: #cdd6f4;
       }
 
       /* ===================================================================
@@ -1057,20 +1211,33 @@ in {
          KDE's applets all highlighted under the pointer, and that is the only
          cue a module does something when pointed at - waybar draws no button
          chrome of its own. Every module listed here really is interactive:
-         #clock through its `actions` block, #pulseaudio/#network/#bluetooth
-         through `on-click`, and #pulseaudio/#backlight additionally through the
-         scroll handling those two modules implement natively.
+         #clock through its `actions` block,
+         #pulseaudio/#custom-network/#bluetooth through `on-click`, and
+         #pulseaudio/#backlight additionally through the scroll handling those two
+         modules implement natively. #battery is here too now: its `menu` opens
+         the power popup, so it IS clickable.
 
-         #battery, #window, #cpu, #temperature and #custom-weather are
-         deliberately absent - none of them has an action, so highlighting them
-         would advertise a click that does nothing. The fill animates via the
-         global transition. */
+         `#custom-network`, not `#network`: the old selector named waybar's
+         built-in network module, which this bar does not use, so the netspeed
+         readout never actually highlighted despite having an on-click.
+
+         #window, #cpu, #temperature and #custom-weather are deliberately absent -
+         none of them has an action, so highlighting them would advertise a click
+         that does nothing. The fill animates via the global transition.
+
+         `background-color`, NOT the `background` shorthand: #pulseaudio carries
+         its cluster separator as a background-image (see the separator block
+         above), and the shorthand resets every background property it does not
+         mention - so `background: #45475a` here would silently delete that
+         separator line for as long as the pointer rests on the module. Naming
+         the colour channel alone leaves the image untouched. */
       #clock:hover,
       #pulseaudio:hover,
-      #network:hover,
+      #custom-network:hover,
+      #battery:hover,
       #bluetooth:hover,
       #backlight:hover {
-        background: #45475a;
+        background-color: #45475a;
         border-radius: 6px;
       }
 
@@ -1203,10 +1370,24 @@ in {
       /* Appended below the workspace rules on purpose - see the source-order
          note above. These selectors do not overlap them, so position is only a
          convention here, but keeping additions at the end keeps it that way. */
+      /* The NixOS logo is the leftmost thing in the bar and it is a single
+         glyph, so it is sized to fill the 32px panel rather than to match the
+         13px body text next to it.
+
+         23px, not larger, and the ceiling was measured rather than estimated:
+         waybar asks the compositor for whichever height its widgets need, so an
+         oversized glyph does not clip - it silently grows the whole bar past
+         `height = 32`. Rendering this bar against a real compositor at 18..24px
+         put every size up to 23px at exactly 32px and 24px at 33px, so 23px is
+         the largest glyph that still fits the configured panel.
+
+         `padding: 0` on the vertical axis matters for the same reason - any
+         vertical padding is added to the glyph's ~28px ink box and would push
+         the bar over 32px again, so the padding below is horizontal-only. */
       #custom-launcher {
-        padding: 0 10px 0 12px;
+        padding: 0 12px 0 14px;
         color: #89b4fa;
-        font-size: 16px;
+        font-size: 23px;
       }
 
       #custom-launcher:hover,
@@ -1295,8 +1476,11 @@ in {
         color: #f38ba8;
       }
 
+      /* `background-color` for the same reason as the hover block above: this
+         module carries a separator background-image, and the shorthand would
+         drop it while hovered. */
       #custom-notification:hover {
-        background: #45475a;
+        background-color: #45475a;
       }
 
       /* The session popup is a real GtkMenu, not a waybar widget, so it is

@@ -99,7 +99,15 @@
     # GUI/TUI control panels that replace the Plasma applets.
     overskride # Bluetooth
     wiremix # audio mixer
-    impala # wifi
+    # nmtui, not impala, for wifi: impala is an iwd front end and talks to
+    # net.connman.iwd over D-Bus, but this host manages wifi with
+    # NetworkManager over wpa_supplicant (modules/nixos/core/networking.nix,
+    # wifi.backend=wpa_supplicant) and iwd is not installed at all. With no
+    # iwd on the bus impala panics on startup instead of reporting the
+    # missing backend, which is why clicking the netspeed module appeared to
+    # do nothing. nmtui ships in the same networkmanager package the daemon
+    # comes from, so the TUI and the daemon can never drift apart.
+    networkmanager # nmtui, wifi
     # gnome-keyring front end (replaces kwalletmanager). Needed to change the
     # login keyring's own password, which is stored inside the keyring file and
     # so cannot be set declaratively. See modules/nixos/desktop/autologin.nix.
