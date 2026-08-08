@@ -70,6 +70,17 @@
     </interface>
   '';
 
+  # swaync's client, resolved once here because the notification module needs it
+  # three times over (the watcher plus two click handlers). Bare `swaync-client`
+  # would depend on whatever PATH the waybar unit inherits, and the upstream
+  # snippet's `which swaync-client` guard is the same bet - the store path is
+  # the only spelling that cannot go missing between build and run.
+  #
+  # Read off `config.services.swaync.package` rather than `pkgs.swaynotification
+  # center` so the bar and the daemon can never point at two different builds:
+  # notifications.nix owns that choice, and this follows it.
+  swayncClient = lib.getExe' config.services.swaync.package "swaync-client";
+
   # KDE's weather applet (54) ran provider `bbcukmet` against
   # `Kuala Lumpur, Malaysia, MY|1735161` with showTemperatureInCompactMode=true
   # and temperatureUnit=6001 (Celsius). It appeared TWICE in KDE - once on the
@@ -235,6 +246,12 @@ in {
         "cpu"
         "temperature"
         "network"
+        # KDE's AppletOrder ran tray(36), battery(63), notifications(35), then
+        # the end-of-panel widgets peek(66)/colorizer(56). The relative order
+        # battery -> notification -> session is what carries across, so the
+        # bell sits last before custom/power rather than splitting the
+        # battery/cpu/temperature/network sensor cluster in half.
+        "custom/notification"
         "custom/power"
       ];
 
@@ -356,6 +373,61 @@ in {
         # The script emits Pango-safe plain text, and its tooltip carries no
         # markup, so waybar must not try to parse the description as markup.
         escape = true;
+      };
+
+      # KDE's notification applet (35), which sat between the battery (63) and
+      # the session end of AppletOrder - hence the position in modules-right
+      # above. swaync replaced mako in notifications.nix precisely so this
+      # indicator could exist: unread count, DND toggle, and a history panel.
+      #
+      # This is swaync's OWN documented waybar snippet (swaync(1), "Waybar
+      # Example"), with the bare `swaync-client` substituted for the store path
+      # bound at the top of this file. `-swb` is the long-running watcher: it
+      # prints one JSON line per state change rather than exiting, so there is
+      # deliberately NO `interval` - waybar keeps the process alive and reads
+      # stdout as it arrives.
+      #
+      # The upstream snippet's `exec-if = "which swaync-client"` is dropped, not
+      # forgotten. It exists to stop the module when the binary is absent from
+      # PATH; a store path cannot be absent, and keeping it would spawn a `which`
+      # on every tick to answer a question already settled at build time.
+      #
+      # The eight format-icons keys are the complete set - the 2x2x2 product of
+      # {dnd,-} x {inhibited,-} x {notification,none}. There is no ninth, and
+      # the same eight strings are also the CSS classes the client emits, which
+      # is what the #custom-notification rules below key on.
+      #
+      # Glyphs, confirmed by NAME in the font's cmap rather than by codepoint:
+      # 󰂚 U+F009A md-bell (unread), 󰂜 U+F009C md-bell_outline (clear),
+      # 󰂛 U+F009B md-bell_off (DND), 󰂠 U+F00A0 md-bell_sleep (inhibited).
+      # Upstream wrapped its "unread" glyph in a red <span> superscript; that
+      # colour lives in the stylesheet here instead, so the palette stays in
+      # one place and `escape = true` can stay on.
+      "custom/notification" = {
+        return-type = "json";
+        exec = "${swayncClient} -swb";
+        # Left click opens the control centre, right click toggles DND - the
+        # same two gestures KDE's applet had. `-sw` makes the client skip
+        # waiting for a reply, so a click cannot block the bar's event loop.
+        on-click = "${swayncClient} -t -sw";
+        on-click-right = "${swayncClient} -d -sw";
+        format = "{icon}";
+        format-icons = {
+          notification = "󰂚";
+          none = "󰂜";
+          dnd-notification = "󰂛";
+          dnd-none = "󰂛";
+          inhibited-notification = "󰂠";
+          inhibited-none = "󰂠";
+          dnd-inhibited-notification = "󰂛";
+          dnd-inhibited-none = "󰂛";
+        };
+        # The client's JSON carries the unread count in `text`, which waybar
+        # would otherwise treat as Pango markup.
+        escape = true;
+        # Off per upstream: the count is already the glyph's whole meaning, and
+        # the panel one click away carries the actual notification text.
+        tooltip = false;
       };
 
       pulseaudio = {
@@ -869,6 +941,67 @@ in {
          branch, so this only ever colours the tooltip-bearing gap. */
       #custom-weather.unavailable {
         color: #f9e2af;
+      }
+
+      /* The notification indicator. It sits in modules-right between the
+         battery and the power button, so it takes the same 0 10px padding the
+         shared #clock/#battery rule gives its neighbours and reads as part of
+         that cluster.
+
+         The eight class values below are exactly the eight format-icons keys -
+         swaync-client emits one of them per line and waybar sets it as a class
+         on this widget. They are mutually exclusive, so unlike the workspace
+         pills above no escalation is needed; the grouping is only for reading.
+         Ordered resting -> suppressed -> pending anyway, to keep this file's
+         one convention. */
+      #custom-notification {
+        padding: 0 10px;
+        color: #cdd6f4;
+      }
+
+      /* Nothing waiting: the resting state, so it recedes to the same dimmed
+         #a6adc8 the drawer children use rather than sitting at full text
+         brightness beside modules that actually have something to say. */
+      #custom-notification.none {
+        color: #a6adc8;
+      }
+
+      /* Do-not-disturb, with or without an inhibitor. Overlay0 - the same
+         "switched off" grey #bluetooth.off and the low-urgency swaync border
+         use - because DND is a state the user chose and should read as muted,
+         not as a fault. The two dnd-*-notification classes are deliberately
+         grouped here rather than with the red pending rules below: under DND a
+         waiting notification is being suppressed on purpose, and colouring it
+         red would defeat the whole point of the toggle. The glyph already
+         differs (md-bell_off), so the state is still distinguishable. */
+      #custom-notification.dnd-none,
+      #custom-notification.dnd-notification,
+      #custom-notification.dnd-inhibited-none,
+      #custom-notification.dnd-inhibited-notification {
+        color: #6c7086;
+      }
+
+      /* An inhibitor without DND: popups are held back by an application
+         (screen share, fullscreen) rather than by the user, and it lifts on its
+         own. Yellow, the transient "in progress" colour shared with
+         #battery.warning and #bluetooth.discovering. */
+      #custom-notification.inhibited-none,
+      #custom-notification.inhibited-notification {
+        color: #f9e2af;
+      }
+
+      /* Unread and nothing suppressing it - the one state that should pull the
+         eye. Red #f38ba8, the same accent as #privacy and the critical states,
+         which is also the colour upstream's snippet hard-coded into a Pango
+         <span>; keeping it here instead means the palette lives in one place
+         and the module can keep escape = true. Last, so it wins on source
+         order over the base rule. */
+      #custom-notification.notification {
+        color: #f38ba8;
+      }
+
+      #custom-notification:hover {
+        background: #45475a;
       }
 
       /* The session popup is a real GtkMenu, not a waybar widget, so it is
