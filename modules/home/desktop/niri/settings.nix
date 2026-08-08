@@ -18,7 +18,14 @@ in {
     hotkey-overlay.skip-at-startup = true;
 
     input = {
-      keyboard.xkb.layout = "us";
+      keyboard.xkb = {
+        layout = "us";
+        # Caps Lock acts as a second Ctrl, with no Caps Lock left on the board.
+        # niri reads xkb directly from libxkbcommon, so the NixOS-side
+        # services.xserver.xkb options do not reach this session; they only
+        # cover the consoles/greeter.
+        options = "ctrl:nocaps";
+      };
 
       touchpad = {
         tap = true;
