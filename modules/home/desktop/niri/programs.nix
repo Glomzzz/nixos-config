@@ -1,0 +1,108 @@
+{pkgs, ...}: {
+  # Viewers and daemons that KDE used to supply. Each entry here replaces a
+  # Plasma component rather than adding something new.
+  programs = {
+    # yazi is both the TUI file manager and the GUI-less replacement for nemo.
+    # Image previews come from foot's native sixel support, which yazi detects
+    # on its own - no ueberzugpp overlay, which never worked under niri anyway
+    # (yazi only whitelists Sway/Hyprland/Wayfire for its Wayland adapter).
+    yazi = {
+      enable = true;
+      enableNushellIntegration = true;
+
+      settings = {
+        mgr = {
+          show_hidden = false;
+          sort_by = "natural";
+          sort_dir_first = true;
+        };
+
+        preview = {
+          # Sixel is sized in pixels; these bounds keep previews sharp without
+          # pushing huge payloads through the pty on every cursor move.
+          max_width = 1200;
+          max_height = 1200;
+          image_quality = 90;
+        };
+      };
+    };
+
+    # PDF viewer. zathura's own config lives here rather than a dotfile.
+    zathura = {
+      enable = true;
+      options = {
+        selection-clipboard = "clipboard";
+        adjust-open = "width";
+        guioptions = "";
+
+        # Catppuccin Mocha, matching the rest of the session.
+        default-bg = "#1e1e2e";
+        default-fg = "#cdd6f4";
+        statusbar-bg = "#181825";
+        statusbar-fg = "#cdd6f4";
+        inputbar-bg = "#1e1e2e";
+        inputbar-fg = "#cdd6f4";
+        highlight-color = "#f9e2af";
+        highlight-active-color = "#89b4fa";
+        recolor-lightcolor = "#1e1e2e";
+        recolor-darkcolor = "#cdd6f4";
+      };
+    };
+
+    # Video player, replacing vlc.
+    mpv = {
+      enable = true;
+      config = {
+        hwdec = "auto-safe";
+        vo = "gpu-next";
+        gpu-api = "vulkan";
+        profile = "high-quality";
+        keep-open = true;
+      };
+    };
+  };
+
+  home.packages = with pkgs; [
+    # X11 shim so Steam/Discord/JetBrains keep working under niri.
+    xwayland-satellite
+
+    # Region select -> annotate -> save/clipboard. niri's own `screenshot`
+    # action saves straight to disk with no editing step, so satty needs its
+    # own path in. Bound to Mod+Shift+S in settings.nix.
+    # niri spawns commands with a minimal environment, so coreutils is
+    # referenced by store path rather than assumed to be on PATH.
+    (writeShellScriptBin "screenshot-annotate" ''
+      set -euo pipefail
+      out="$HOME/Pictures/Screenshots"
+      ${coreutils}/bin/mkdir -p "$out"
+      stamp=$(${coreutils}/bin/date '+%Y%m%dT%H%M%S')
+      ${grim}/bin/grim -g "$(${slurp}/bin/slurp -d)" -t ppm - \
+        | ${satty}/bin/satty \
+            --filename - \
+            --fullscreen \
+            --early-exit \
+            --copy-command ${wl-clipboard}/bin/wl-copy \
+            --output-filename "$out/satty-$stamp.png"
+    '')
+    satty
+    grim
+    slurp
+
+    # Screen recording.
+    wl-screenrec
+    # wl-copy / wl-paste. cliphist depends on this.
+    wl-clipboard
+
+    # Image viewer, replacing loupe.
+    oculante
+
+    # GUI/TUI control panels that replace the Plasma applets.
+    overskride # Bluetooth
+    wiremix # audio mixer
+    impala # wifi
+
+    # Hardware keys wired up in settings.nix.
+    brightnessctl
+    playerctl
+  ];
+}

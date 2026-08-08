@@ -64,12 +64,10 @@
     # Apparently, without this nouveau may attempt to be used instead
     # (despite it being blacklisted)
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-    # Hardware cursors are currently broken on nvidia
-    WLR_NO_HARDWARE_CURSORS = "1";
     # VA-API Backend as NVIDIA
     LIBVA_DRIVER_NAME = "nvidia";
 
-    # --- Wayland / Plasma Wayland ---
+    # --- Wayland ---
     # Prefer Wayland, but allow X11 fallback for SDK-bundled Qt apps such as
     # the Android emulator, which does not ship the Wayland platform plugin.
     QT_QPA_PLATFORM = "wayland;xcb";
@@ -80,4 +78,9 @@
     # Ozone platform for Chromium/Electron apps
     NIXOS_OZONE_WL = "1";
   };
+
+  # WLR_NO_HARDWARE_CURSORS is deliberately absent: it is a wlroots variable,
+  # and niri is built on Smithay, so it has no effect here. niri's equivalent
+  # knob is `debug.disable-cursor-plane` in programs.niri.settings, which is
+  # only needed if the cursor actually misbehaves on this GPU.
 }

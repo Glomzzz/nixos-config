@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+_: {
   programs = {
     tmux = {
       enable = true;
@@ -10,12 +10,6 @@
         set -ga update-environment TERM
         set -ga update-environment TERM_PROGRAM
       '';
-    };
-
-    yazi = {
-      enable = true;
-      enableNushellIntegration = true;
-      extraPackages = [pkgs.ueberzugpp];
     };
 
     bat = {

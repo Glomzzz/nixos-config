@@ -12,10 +12,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-alien-source.url = "github:thiagokokada/nix-alien";
-    plasma-manager = {
-      url = "github:nix-community/plasma-manager";
+    niri = {
+      url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
     };
   };
 

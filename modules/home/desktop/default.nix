@@ -1,8 +1,7 @@
 _: {
   imports = [
-    ./application-cache.nix
+    ./niri
     ./fcitx5.nix
-    ./plasma.nix
     ./xdg.nix
   ];
 }

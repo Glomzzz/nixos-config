@@ -2,25 +2,48 @@
   xdg = {
     enable = true;
     userDirs.enable = true;
+
+    # Without KDE there is no central "default applications" dialog, so the
+    # associations that Plasma used to own are declared here. Desktop file
+    # names were taken from each package's share/applications directory.
     mimeApps = {
       enable = true;
-      defaultApplications = {
-        "application/json" = ["emacs.desktop" "emacsclient.desktop"];
-        "application/x-shellscript" = ["emacs.desktop" "emacsclient.desktop"];
-        "text/plain" = ["emacs.desktop" "emacsclient.desktop"];
-        "text/x-c" = ["emacs.desktop" "emacsclient.desktop"];
-        "text/x-c++" = ["emacs.desktop" "emacsclient.desktop"];
-        "text/x-c++hdr" = ["emacs.desktop" "emacsclient.desktop"];
-        "text/x-c++src" = ["emacs.desktop" "emacsclient.desktop"];
-        "text/x-chdr" = ["emacs.desktop" "emacsclient.desktop"];
-        "text/x-csrc" = ["emacs.desktop" "emacsclient.desktop"];
-        "text/x-java" = ["emacs.desktop" "emacsclient.desktop"];
-        "text/x-makefile" = ["emacs.desktop" "emacsclient.desktop"];
-        "text/x-moc" = ["emacs.desktop" "emacsclient.desktop"];
-        "text/x-pascal" = ["emacs.desktop" "emacsclient.desktop"];
-        "text/x-tcl" = ["emacs.desktop" "emacsclient.desktop"];
-        "text/x-tex" = ["emacs.desktop" "emacsclient.desktop"];
-        "x-scheme-handler/org-protocol" = ["emacsclient.desktop"];
+
+      defaultApplications = let
+        pdf = ["org.pwmt.zathura.desktop"];
+        image = ["oculante.desktop"];
+        video = ["mpv.desktop"];
+        audio = ["mpv.desktop"];
+      in {
+        # Documents
+        "application/pdf" = pdf;
+        "application/epub+zip" = pdf;
+        "application/postscript" = pdf;
+
+        # Images
+        "image/png" = image;
+        "image/jpeg" = image;
+        "image/gif" = image;
+        "image/webp" = image;
+        "image/svg+xml" = image;
+        "image/bmp" = image;
+        "image/tiff" = image;
+
+        # Video
+        "video/mp4" = video;
+        "video/x-matroska" = video;
+        "video/webm" = video;
+        "video/quicktime" = video;
+        "video/x-msvideo" = video;
+
+        # Audio
+        "audio/mpeg" = audio;
+        "audio/flac" = audio;
+        "audio/ogg" = audio;
+        "audio/x-wav" = audio;
+
+        # Directories open in yazi, which replaces nemo entirely.
+        "inode/directory" = ["yazi.desktop"];
       };
     };
   };

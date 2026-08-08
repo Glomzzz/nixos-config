@@ -13,11 +13,11 @@
   #        sudo howdy test
   #        sudo -i
   #
-  # KDE Wallet auto-unlock:
-  #   - Wallet name must be "kdewallet" with Blowfish encryption
-  #   - Wallet password must match your login password
-  #   - howdy is DISABLED on the login PAM service so SDDM always prompts
-  #     for a password → kwallet-pam receives it → wallet auto-unlocks
+  # Keyring unlock (previously KDE Wallet, now gnome-keyring):
+  #   niri has no wallet of its own, so secrets live in gnome-keyring, which is
+  #   unlocked by the password typed into tuigreet (see desktop/greetd.nix).
+  #   That only works if greetd actually asks for a password, so howdy is
+  #   disabled on the greetd PAM service below.
   #
   #############################################################################
 
@@ -26,8 +26,8 @@
 
     # "sufficient": face alone is enough (skip password if face matches).
     # "required": 2FA mode (face + password both needed).
-    # Using "sufficient" because login.howdy is disabled below, so password
-    # is still required at SDDM login for kwallet auto-unlock.
+    # Face auth stays "sufficient" for sudo/swaylock; the greetd exception
+    # below is what preserves the keyring unlock at login.
     control = "sufficient";
 
     settings = {
@@ -43,11 +43,12 @@
     };
   };
 
-  # === KDE Wallet Auto-Unlock ===
-  # SDDM must prompt for password so that kwallet-pam receives it and can
-  # auto-unlock the wallet. Disabling howdy on the login PAM service ensures
-  # face auth doesn't bypass the password prompt at SDDM login.
-  security.pam.services.login.howdy.enable = false;
+  # === gnome-keyring Auto-Unlock ===
+  # howdy is enabled on every PAM service by default. On greetd that would let
+  # a face match skip the password prompt, and pam_gnome_keyring would then
+  # have no password to unlock the login keyring with. Disabling howdy here
+  # keeps the login password prompt, which is what unlocks the keyring.
+  security.pam.services.greetd.howdy.enable = false;
 
   # === polkit-127 Workaround ===
   # polkit >= 127 isolates helpers with PrivateDevices, which breaks howdy's
