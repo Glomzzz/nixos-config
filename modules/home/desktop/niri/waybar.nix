@@ -77,6 +77,8 @@ in {
         "pulseaudio"
         "backlight"
         "battery"
+        "cpu"
+        "temperature"
         "network"
         "custom/power"
       ];
@@ -202,6 +204,50 @@ in {
         format-icons = ["󰁺" "󰁼" "󰁾" "󰂀" "󰂂"];
       };
 
+      # KDE's applet 53 was a piechart whose total sensor was
+      # cpu/all/averageTemperature, with averageFrequency/system/usage/user/wait
+      # demoted to low-priority (tooltip-only) sensors. Split across waybar's
+      # two native modules: `cpu` carries the usage figure and the frequency
+      # detail, `temperature` carries the package reading the chart was keyed
+      # on. U+F0EE0 nf-md-cpu_64_bit.
+      #
+      # Deliberately no GPU counterpart. KDE's applet 52 charted
+      # gpu/gpu0/temperature; it is dropped on purpose, because every polling
+      # route to the NVIDIA card (nvidia-smi included) wakes the dGPU, and
+      # todo 2 confirmed no GPU hwmon node exists to read passively either.
+      cpu = {
+        interval = 2;
+        format = "󰻠 {usage}%";
+        tooltip = true;
+      };
+
+      # thermal-zone is NOT used: thermal_zone0 here is acpitz, the real
+      # package sensor is thermal_zone7 (x86_pkg_temp), and that index is not
+      # stable across linuxPackages_latest bumps. The platform-device hwmon
+      # path is stable. The hwmon# leaf is intentionally absent from
+      # hwmon-path-abs - waybar-temperature(5) says the module appends
+      # hwmon*/<input-filename> itself. temp1_label reads "Package id 0", the
+      # die aggregate, which is the closest analogue to KDE's averageTemperature.
+      #
+      # Thresholds are tuned to THIS machine, not copied from dotfiles. Package
+      # readings observed 87-96C (91 idle, 96 under an 8-way busy loop), and
+      # temp1_crit/temp1_max both read 110000. A conventional 80C warning would
+      # therefore be lit permanently and mean nothing, so warning sits at 95
+      # (just above the idle band, so it fires on real sustained load) and
+      # critical at 105 (5C of headroom below the 110C hardware limit).
+      temperature = {
+        interval = 2;
+        hwmon-path-abs = "/sys/devices/platform/coretemp.0/hwmon";
+        input-filename = "temp1_input";
+        warning-threshold = 95;
+        critical-threshold = 105;
+        format = "󰔏 {temperatureC}°C";
+        # U+F0E01 nf-md-thermometer_alert, so the critical state reads
+        # differently even before the CSS colour lands.
+        format-critical = "󰸁 {temperatureC}°C";
+        tooltip-format = "CPU package: {temperatureC}°C ({temperatureF}°F)";
+      };
+
       network = {
         format-wifi = "󰖩 {essid}";
         format-ethernet = "󰈀";
@@ -277,6 +323,8 @@ in {
       #pulseaudio,
       #backlight,
       #battery,
+      #cpu,
+      #temperature,
       #network,
       #language,
       #tray {
@@ -289,6 +337,19 @@ in {
       }
 
       #battery.critical {
+        color: #f38ba8;
+      }
+
+      /* Same two-step escalation as #battery, and the same palette, so the
+         temperature readout turns yellow then red the way KDE's piechart
+         recoloured its wedge. Placed after the shared padding rule above for
+         the same reason #battery's states are - id+class outranks a bare id,
+         but keeping the order consistent avoids relying on that. */
+      #temperature.warning {
+        color: #f9e2af;
+      }
+
+      #temperature.critical {
         color: #f38ba8;
       }
 
