@@ -1,4 +1,16 @@
 {pkgs, ...}: {
+  # Caps Lock is a second Ctrl everywhere. This xkb block is the source for the
+  # virtual consoles and the greetd/tuigreet login prompt (via
+  # console.useXkbConfig); the niri session sets the same option itself in
+  # modules/home/desktop/niri/settings.nix because a Wayland compositor does
+  # not read these.
+  services.xserver.xkb = {
+    layout = "us";
+    options = "ctrl:nocaps";
+  };
+
+  console.useXkbConfig = true;
+
   # Enable libinput for mouse/touchpad support
   services.libinput = {
     enable = true;
