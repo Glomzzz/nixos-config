@@ -29,11 +29,10 @@
       ];
 
       "niri/workspaces" = {
-        format = "{icon}";
-        format-icons = {
-          active = "";
-          default = "";
-        };
+        # {value} renders the workspace name, falling back to its index, so the
+        # number is visible. KDE's pager was per-screen, hence all-outputs off.
+        format = "{value}";
+        all-outputs = false;
       };
 
       "niri/window" = {
@@ -103,14 +102,39 @@
         color: #cdd6f4;
       }
 
+      /* Rule order below is load-bearing. GTK3 resolves equal-specificity
+         selectors by source order, and niri sets several of these classes on
+         the SAME button (the focused workspace is also .active, and may also
+         be .empty). So they escalate: base -> empty -> active -> focused. */
       #workspaces button {
         padding: 0 8px;
+        margin: 4px 2px;
+        border-radius: 8px;
+        color: #cdd6f4;
+        background: #45475a;
+      }
+
+      /* Occupied pills read brighter than niri's on-demand empty ones. */
+      #workspaces button.empty {
         color: #6c7086;
         background: transparent;
       }
 
-      #workspaces button.active {
+      /* .active is per-output: the workspace each monitor is displaying. The
+         weaker secondary highlight (no fill) so the bar on the monitor WITHOUT
+         keyboard focus still marks its visible workspace. :not(.focused) keeps
+         this text colour off the filled pill, which would be blue-on-blue. */
+      #workspaces button.active:not(.focused) {
         color: #89b4fa;
+        background: transparent;
+        border-bottom: 2px solid #89b4fa;
+      }
+
+      /* .focused is globally unique: the one workspace holding keyboard focus.
+         Primary highlight, filled, and last so it wins over the rules above. */
+      #workspaces button.focused {
+        color: #1e1e2e;
+        background: #89b4fa;
       }
 
       #workspaces button.urgent {
