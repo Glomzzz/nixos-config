@@ -17,7 +17,13 @@ in {
     Unit = {
       Description = "Set the desktop wallpaper with awww";
       ConditionEnvironment = "WAYLAND_DISPLAY";
-      After = ["awww.service"];
+      # `graphical-session.target` must be listed here even though awww.service
+      # already orders after it. A target is implicitly ordered *after* every
+      # unit it wants, unless that unit orders itself against the target - so
+      # omitting this makes the target wait on this unit while awww.service
+      # waits on the target, and systemd breaks the resulting cycle by dropping
+      # awww.service's start job.
+      After = ["graphical-session.target" "awww.service"];
       Requires = ["awww.service"];
       PartOf = ["graphical-session.target"];
     };
