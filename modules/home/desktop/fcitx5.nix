@@ -51,6 +51,64 @@
         '';
       };
 
+      # The candidate window is drawn by the classicui addon, and its default
+      # theme is the light "default" one - that is the whole reason the IME
+      # popup was the only light surface left in a dark session. Verified
+      # against the running daemon: `GetConfig fcitx://config/addon/classicui`
+      # reported Theme=default, UseDarkTheme=False.
+      #
+      # Theme is pinned to the Catppuccin Mocha theme written below rather than
+      # to the bundled "default-dark", because default-dark is pure #000000 with
+      # grey borders and would not match foot/waybar/swaync/zathura.
+      #
+      # UseDarkTheme is deliberately left False. When True, classicui swaps
+      # between Theme and DarkTheme based on the XDG portal's
+      # org.freedesktop.appearance color-scheme, and only the exact value 1
+      # (prefer-dark) counts as dark - a portal that answers 0/no-preference
+      # would silently put the light theme back. Since this session is
+      # unconditionally dark, naming the dark theme directly cannot regress.
+      # DarkTheme is still set to the same theme so that flipping UseDarkTheme
+      # on later stays correct.
+      "fcitx5/conf/classicui.conf" = {
+        force = true;
+        text = ''
+          # Vertical Candidate List
+          Vertical Candidate List=False
+          # Use mouse wheel to go to prev or next page
+          WheelForPaging=True
+          # Font
+          Font="Noto Sans CJK SC 11"
+          # Menu Font
+          MenuFont="Noto Sans CJK SC 11"
+          # Tray Font
+          TrayFont="Noto Sans CJK SC Bold 10"
+          # Tray Label Outline Color
+          TrayOutlineColor=#000000
+          # Tray Label Text Color
+          TrayTextColor=#ffffff
+          # Prefer Text Icon
+          PreferTextIcon=False
+          # Show Layout Name In Icon
+          ShowLayoutNameInIcon=True
+          # Use input method language to display text
+          UseInputMethodLanguageToDisplayText=True
+          # Theme
+          Theme=catppuccin-mocha
+          # Dark Theme
+          DarkTheme=catppuccin-mocha
+          # Follow system light/dark color scheme
+          UseDarkTheme=False
+          # Follow system accent color if it is supported by theme and desktop
+          UseAccentColor=False
+          # Use Per Screen DPI on X11
+          PerScreenDPI=False
+          # Force font DPI on Wayland
+          ForceWaylandDPI=0
+          # Enable fractional scale under Wayland
+          EnableFractionalScale=True
+        '';
+      };
+
       "fcitx5/config" = {
         force = true;
         text = ''
@@ -136,6 +194,142 @@
     };
 
     dataFile = {
+      # Catppuccin Mocha theme for the candidate window, selected by
+      # conf/classicui.conf above.
+      #
+      # This has to be a NEW theme name rather than a patch of the bundled
+      # "default-dark": classicui treats exactly the two names "default" and
+      # "default-dark" as system themes and reads those only from the package's
+      # own share/fcitx5/themes, ignoring ~/.local/share/fcitx5/themes entirely.
+      # Any other name is looked up in the user directory, which is what makes
+      # this file take effect.
+      #
+      # Colours are the same Mocha values used in waybar/swaync/foot: base
+      # #1e1e2e for backgrounds, text #cdd6f4, surface0 #45475a for the selected
+      # candidate, blue #89b4fa for the border, matching niri's focus ring.
+      "fcitx5/themes/catppuccin-mocha/theme.conf" = {
+        force = true;
+        text = ''
+          [Metadata]
+          Name=Catppuccin Mocha
+          Version=1
+          Author=local
+          Description=Catppuccin Mocha, matching foot/waybar/swaync
+          ScaleWithDPI=True
+
+          [InputPanel]
+          NormalColor=#cdd6f4
+          HighlightCandidateColor=#1e1e2e
+          HighlightColor=#1e1e2e
+          HighlightBackgroundColor=#89b4fa
+          PageButtonAlignment=Last Candidate
+
+          [InputPanel/TextMargin]
+          Left=6
+          Right=6
+          Top=5
+          Bottom=5
+
+          [InputPanel/ContentMargin]
+          Left=3
+          Right=3
+          Top=3
+          Bottom=3
+
+          [InputPanel/Background]
+          Color=#1e1e2e
+          BorderColor=#89b4fa
+          BorderWidth=2
+
+          [InputPanel/Background/Margin]
+          Left=2
+          Right=2
+          Top=2
+          Bottom=2
+
+          [InputPanel/Highlight]
+          Color=#89b4fa
+
+          [InputPanel/Highlight/Margin]
+          Left=5
+          Right=5
+          Top=5
+          Bottom=5
+
+          [InputPanel/PrevPage]
+          Image=prev.png
+
+          [InputPanel/PrevPage/ClickMargin]
+          Left=5
+          Right=5
+          Top=4
+          Bottom=4
+
+          [InputPanel/NextPage]
+          Image=next.png
+
+          [InputPanel/NextPage/ClickMargin]
+          Left=5
+          Right=5
+          Top=4
+          Bottom=4
+
+          [Menu]
+          NormalColor=#cdd6f4
+          HighlightCandidateColor=#1e1e2e
+
+          [Menu/Background]
+          Color=#1e1e2e
+          BorderColor=#45475a
+          BorderWidth=2
+
+          [Menu/Background/Margin]
+          Left=2
+          Right=2
+          Top=2
+          Bottom=2
+
+          [Menu/ContentMargin]
+          Left=3
+          Right=3
+          Top=3
+          Bottom=3
+
+          [Menu/CheckBox]
+          Image=radio.png
+
+          [Menu/SubMenu]
+          Image=arrow.png
+
+          [Menu/Highlight]
+          Color=#89b4fa
+
+          [Menu/Highlight/Margin]
+          Left=5
+          Right=5
+          Top=5
+          Bottom=5
+
+          [Menu/Separator]
+          Color=#45475a
+
+          [Menu/TextMargin]
+          Left=6
+          Right=6
+          Top=5
+          Bottom=5
+        '';
+      };
+
+      # theme.conf resolves Image= relative to its own directory, so the four
+      # sprites it names have to exist alongside it. They are reused verbatim
+      # from the bundled dark theme (grey glyphs on transparency, so they suit
+      # any dark palette) rather than redrawn.
+      "fcitx5/themes/catppuccin-mocha/prev.png".source = "${pkgs.fcitx5}/share/fcitx5/themes/default-dark/prev.png";
+      "fcitx5/themes/catppuccin-mocha/next.png".source = "${pkgs.fcitx5}/share/fcitx5/themes/default-dark/next.png";
+      "fcitx5/themes/catppuccin-mocha/radio.png".source = "${pkgs.fcitx5}/share/fcitx5/themes/default-dark/radio.png";
+      "fcitx5/themes/catppuccin-mocha/arrow.png".source = "${pkgs.fcitx5}/share/fcitx5/themes/default-dark/arrow.png";
+
       "fcitx5/rime/default.custom.yaml" = {
         force = true;
         text = ''
