@@ -16,6 +16,23 @@
       url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Pinned to PR #452, which adds compositor-side scaling for X11 clients.
+    # Release 0.8.2 in nixpkgs derives one X-wide scale as the *minimum* of all
+    # output scales and then positions each XRandR output at niri's logical
+    # coordinate while sizing it in native pixels. Those two coordinate spaces
+    # disagree whenever the scales differ, so the X rectangles overlap and no
+    # X11 client can tell which monitor its window is on. This revision makes
+    # the X screen a uniform multiple of niri's logical space instead, which is
+    # what allows per-monitor scaling to work at all; see
+    # hardware/zephyrus/gpu for the scale that goes with it.
+    #
+    # Pinned by revision rather than tracking a branch: this is an unmerged PR,
+    # so its head can be rebased or force-pushed out from under us.
+    xwayland-satellite = {
+      url = "github:Supreeeme/xwayland-satellite/0a95f18d9fd254e3f42e0b4e4132a59084b18b98";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.rust-overlay.follows = "";
+    };
   };
 
   outputs = inputs @ {

@@ -1,8 +1,14 @@
 {
   config,
   pkgs,
+  xwayland-satellite,
   ...
 }: let
+  # PR #452's satellite, pinned in flake.nix. Release 0.8.2 in nixpkgs cannot
+  # scale X11 clients per monitor at all; see the input's comment there and the
+  # base scale in hardware/zephyrus/gpu.
+  xwaylandSatellite =
+    xwayland-satellite.packages.${pkgs.stdenv.hostPlatform.system}.xwayland-satellite;
   terminal = "${pkgs.foot}/bin/foot";
   launcher = "${pkgs.fuzzel}/bin/fuzzel";
   filemanager = "${terminal} -e ${pkgs.yazi}/bin/yazi";
@@ -158,12 +164,27 @@ in {
       DISPLAY = ":0";
     };
 
+    # niri 26.04 starts the satellite itself, on demand, the first time a client
+    # connects to the X11 socket it owns. Naming the binary here rather than
+    # adding it to spawn-at-startup is what makes that integration use this
+    # build; a spawn-at-startup entry would start a *second*, unmanaged
+    # satellite alongside niri's own (both were running before this change,
+    # each with its own Xwayland).
+    #
+    # The base scale that goes with this build is XWAYLAND_SATELLITE_BASE_SCALE
+    # in hardware/zephyrus/gpu. It cannot be set in the environment block below:
+    # niri builds the satellite's command itself and never applies that block to
+    # it, so the variable has to be in niri's own environment.
+    xwayland-satellite = {
+      enable = true;
+      path = "${xwaylandSatellite}/bin/xwayland-satellite";
+    };
+
     # niri has no XDG-autostart handling of its own, so anything that must be
     # running for the session to feel complete is spawned explicitly.
     # Wallpaper, clipboard, notifications and idle locking are systemd user
     # services instead (see the sibling modules).
     spawn-at-startup = [
-      {argv = ["${pkgs.xwayland-satellite}/bin/xwayland-satellite"];}
       # fcitx5 previously came up via KDE's autostart; niri has no XDG-autostart
       # handling, so without this Chinese input silently stops working.
       # Deliberately unqualified: the i18n.inputMethod module builds its own
