@@ -1,4 +1,8 @@
-{pkgs, ...}: let
+{
+  config,
+  pkgs,
+  ...
+}: let
   terminal = "${pkgs.foot}/bin/foot";
   launcher = "${pkgs.fuzzel}/bin/fuzzel";
   filemanager = "${terminal} -e ${pkgs.yazi}/bin/yazi";
@@ -122,9 +126,11 @@ in {
       };
     };
 
+    # Read back from home.pointerCursor (desktop/cursor.nix) so the compositor
+    # cursor and the XCURSOR_* variables every client sees stay in step.
     cursor = {
-      theme = "Adwaita";
-      size = 24;
+      theme = config.home.pointerCursor.name;
+      size = config.home.pointerCursor.size;
       hide-when-typing = true;
     };
 
