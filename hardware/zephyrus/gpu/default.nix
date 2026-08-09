@@ -77,33 +77,44 @@
     NIXOS_OZONE_WL = "1";
 
     # Pins the X11 render grid of the PR #452 xwayland-satellite (pinned in
-    # flake.nix) to niri's *logical* coordinate space, so one X pixel is one
-    # logical pixel on every output regardless of that output's scale.
+    # flake.nix) to a fixed multiple of niri's logical coordinate space, the
+    # same multiple on every output regardless of that output's own scale.
     #
-    # This is what makes X11 apps scale per monitor. Without it satellite
-    # publishes a single X-wide scale taken as the minimum across outputs, and
-    # positions each XRandR output at its logical coordinate while sizing it in
-    # native pixels. With eDP-1 (2560px, scale 1.5) beside HDMI-A-1 (1920px,
-    # scale 1.0) those rectangles become 0..2560 and 1707..3627, overlapping by
-    # 853px, and Qt resolves a window's screen by dividing its X position by its
-    # own scale factor and testing the result against each rectangle - 1707/1.5
-    # is 1138, still inside eDP-1, so a window moved to the external monitor was
-    # never seen to leave the laptop and kept the laptop's scale.
+    # That uniformity is what makes X11 apps scale per monitor. Without this
+    # build satellite publishes a single X-wide scale taken as the minimum
+    # across outputs, and positions each XRandR output at its logical
+    # coordinate while sizing it in native pixels. With eDP-1 (2560px, scale
+    # 1.5) beside HDMI-A-1 (1920px, scale 1.0) those rectangles become 0..2560
+    # and 1707..3627, overlapping by 853px, and a toolkit resolves a window's
+    # screen by dividing its X position by the window's own scale factor and
+    # testing the result against each rectangle - 1707/1.5 is 1138, still
+    # inside eDP-1, so a window moved to the external monitor was never seen to
+    # leave the laptop and kept the laptop's scale.
     #
-    # 1.0 rather than leaving it unset: unset, this build renders at
-    # max(output scales) - here 2 - and advertises 192 DPI over XSETTINGS, which
-    # is sharper on the panel because niri downsamples, but only apps that read
-    # that DPI come out the right size. Anything DPI-blind, which includes
-    # WeChat's statically linked Qt 5 and Steam's CEF client, then renders at
-    # half size. At 1.0 every X11 app is correctly sized on both monitors with
-    # no per-app variable at all; the cost is that niri upscales the 1x buffer
-    # on the 1.5x panel, so X11 text is slightly softer than native.
+    # 1.5, matching the panel scale, so that one X pixel is one *physical*
+    # pixel on eDP-1: a 1.5x-scaled window is then composited 1:1 instead of
+    # being stretched. At 1.0 the X buffer only ever holds logical pixels, so
+    # niri had to upscale every X11 surface by 1.5 on the panel, which was
+    # visibly soft - measured on a screenshot of the same Qt app rendered
+    # through both, Laplacian edge energy was 405 at 1.0 against 2437 at 1.5
+    # for the same apparent text size (~22px glyph rows in both).
+    #
+    # Leaving it unset is not the same thing: the build then tracks
+    # max(output scales), which changes as monitors come and go, so the X
+    # coordinate space silently rescales mid-session.
+    #
+    # Apps that read the DPI satellite advertises (144 here) need nothing
+    # further. An app that ignores it lays out in raw X pixels and so comes out
+    # 1/1.5 of the intended size; because the multiple is uniform, one flat
+    # scale factor - QT_SCALE_FACTOR for Qt, GDK_SCALE for GTK - fixes such an
+    # app on both monitors at once, which is why no such variable is set
+    # anywhere here yet: none of the X11 clients in this config has needed one.
     #
     # It has to live here, in the *system* environment, rather than in niri's
     # `environment` block: niri constructs the satellite's command itself and
     # never applies that block to it, but does pass on its own environment, and
     # niri-session re-execs as a login shell so /etc/profile reaches it.
-    XWAYLAND_SATELLITE_BASE_SCALE = "1.0";
+    XWAYLAND_SATELLITE_BASE_SCALE = "1.5";
   };
 
   # SDL_VIDEODRIVER is deliberately absent. Setting it globally to "wayland"
