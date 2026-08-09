@@ -62,21 +62,26 @@ in {
     # sorts by name, which puts HDMI-A-1 at the origin and hands it the initial
     # focus whenever the dock is attached.
     outputs = {
-      # 2560x1600 at the auto-picked scale 1.5 is 1706.67 logical pixels wide,
-      # so the external monitor starts at x=1707 to sit flush to its right.
-      # x=1706 would overlap the panel by a fraction of a pixel, and niri
-      # responds to any overlap by discarding both explicit positions and
+      # Scales are pinned rather than left to niri's DPI heuristic so the
+      # positions below stay valid. 2560x1600 at scale 1.5 is 1706.67 logical
+      # pixels wide, so the external monitor starts at x=1707 to sit flush to
+      # its right. x=1706 would overlap the panel by a fraction of a pixel, and
+      # niri responds to any overlap by discarding both explicit positions and
       # auto-placing instead. Keep this in step if the panel scale changes.
       "eDP-1" = {
         focus-at-startup = true;
+        scale = 1.5;
         position = {
           x = 0;
           y = 0;
         };
       };
-      "HDMI-A-1".position = {
-        x = 1707;
-        y = 0;
+      "HDMI-A-1" = {
+        scale = 1.0;
+        position = {
+          x = 1707;
+          y = 0;
+        };
       };
     };
 
