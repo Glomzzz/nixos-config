@@ -189,7 +189,8 @@
         "niri": "niri",
         "nix-alien-source": "nix-alien-source",
         "nixpkgs": "nixpkgs_2",
-        "sops-nix": "sops-nix"
+        "sops-nix": "sops-nix",
+        "xwayland-satellite": "xwayland-satellite"
       }
     },
     "sops-nix": {
@@ -209,6 +210,28 @@
       "original": {
         "owner": "Mic92",
         "repo": "sops-nix",
+        "type": "github"
+      }
+    },
+    "xwayland-satellite": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "rust-overlay": []
+      },
+      "locked": {
+        "lastModified": 1785714084,
+        "narHash": "sha256-xG3y0hvLjrkFxtxlWKcwXd8FwMKKuUsGsHycwx4wrU4=",
+        "owner": "Supreeeme",
+        "repo": "xwayland-satellite",
+        "rev": "0a95f18d9fd254e3f42e0b4e4132a59084b18b98",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Supreeeme",
+        "repo": "xwayland-satellite",
+        "rev": "0a95f18d9fd254e3f42e0b4e4132a59084b18b98",
         "type": "github"
       }
     },
