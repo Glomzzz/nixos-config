@@ -140,7 +140,7 @@ in {
     };
 
     # Only session-specific variables belong here. The Wayland toolkit hints
-    # (NIXOS_OZONE_WL, QT_QPA_PLATFORM, MOZ_ENABLE_WAYLAND, SDL_VIDEODRIVER)
+    # (NIXOS_OZONE_WL, QT_QPA_PLATFORM, MOZ_ENABLE_WAYLAND)
     # are set system-wide in hardware/zephyrus/gpu, and niri-session re-execs
     # as a login shell, so /etc/profile already exports them to everything niri
     # spawns. Repeating them here would just be two places to keep in sync.
