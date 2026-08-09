@@ -334,6 +334,38 @@ in {
         ];
         open-floating = true;
       }
+
+      # Steam draws its own toasts ("friend is now playing X", chat pings) as
+      # separate X11 windows instead of going through the notification daemon,
+      # so swaync never sees them and cannot place them. They arrive through
+      # xwayland-satellite as ordinary xdg-toplevels whose app-id is the
+      # WM_CLASS class ("steam") and whose title is notificationtoasts_N_desktop.
+      #
+      # niri centres them because it has no idea where Steam wanted them: the
+      # xdg-toplevel protocol has no position request, so the X11 coordinates
+      # Steam picked never reach the compositor, and niri's default position for
+      # a new floating window is the centre of the screen. The toast lands in
+      # the floating layout in the first place because niri auto-floats
+      # fixed-height windows. Naming a position is therefore the only fix; there
+      # is no "leave it where the client asked" mode.
+      #
+      # open-focused = false additionally stops a toast from stealing focus
+      # mid-keystroke, which centring made especially disruptive.
+      {
+        matches = [
+          {
+            app-id = "^steam$";
+            title = "^notificationtoasts_[0-9]+_desktop$";
+          }
+        ];
+        open-floating = true;
+        open-focused = false;
+        default-floating-position = {
+          x = 16;
+          y = 16;
+          relative-to = "bottom-right";
+        };
+      }
     ];
 
     layer-rules = [
