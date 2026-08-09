@@ -71,13 +71,22 @@
     # Prefer Wayland, but allow X11 fallback for SDK-bundled Qt apps such as
     # the Android emulator, which does not ship the Wayland platform plugin.
     QT_QPA_PLATFORM = "wayland;xcb";
-    # Ensure SDL2 applications use Wayland
-    SDL_VIDEODRIVER = "wayland";
     # Force Firefox to use Wayland
     MOZ_ENABLE_WAYLAND = "1";
     # Ozone platform for Chromium/Electron apps
     NIXOS_OZONE_WL = "1";
   };
+
+  # SDL_VIDEODRIVER is deliberately absent. Setting it globally to "wayland"
+  # breaks native Linux games that bundle an old SDL2: steam.sh rewrites that
+  # exact value to the list form "wayland,x11", and SDL2 only learned to parse a
+  # comma-separated driver list in 2.24. Older bundled copies treat the whole
+  # string as one driver name, match nothing, and initialize no video backend,
+  # so the game logs "Desktop is 0 x 0 @ 0 Hz" and never maps a window (seen
+  # with Overcooked! 2, Unity 2017.4).
+  # Modern SDL2/SDL3 already prefer Wayland on their own when a compositor is
+  # present, so nothing needs this variable to get Wayland. Per-app overrides
+  # belong in that app's launch options, not in the global environment.
 
   # WLR_NO_HARDWARE_CURSORS is deliberately absent: it is a wlroots variable,
   # and niri is built on Smithay, so it has no effect here. niri's equivalent
