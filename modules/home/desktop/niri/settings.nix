@@ -96,6 +96,15 @@ in {
       ];
       default-column-width.proportion = 1.0 / 2.0;
 
+      # Backs the Mod+Shift+R cycle. Without this list niri has no heights to
+      # switch between and switch-preset-window-height does nothing, so the two
+      # must be added together.
+      preset-window-heights = [
+        {proportion = 1.0 / 3.0;}
+        {proportion = 1.0 / 2.0;}
+        {proportion = 2.0 / 3.0;}
+      ];
+
       focus-ring = {
         enable = true;
         width = 2;
@@ -182,6 +191,12 @@ in {
       "Mod+C".action.center-column = [];
 
       # --- focus -----------------------------------------------------------
+      # Modifier scheme, applied consistently below:
+      #   Mod              - move focus inside the current workspace
+      #   Mod+Shift        - move the window/column inside the current workspace
+      #   Mod+Ctrl         - cross workspaces (up/down) and monitors (left/right)
+      #   Mod+Shift+Ctrl   - carry the column across workspaces/monitors
+      # Every directional bind exists in both an arrow and an hjkl spelling.
       "Mod+Left".action.focus-column-left = [];
       "Mod+Right".action.focus-column-right = [];
       "Mod+Up".action.focus-window-up = [];
@@ -191,19 +206,56 @@ in {
       "Mod+K".action.focus-window-up = [];
       "Mod+J".action.focus-window-down = [];
 
+      # Jump to the ends of the scrolling row.
+      "Mod+Home".action.focus-column-first = [];
+      "Mod+End".action.focus-column-last = [];
+
+      # Alt-tab equivalents: last window, last workspace.
+      "Mod+Grave".action.focus-window-previous = [];
+      "Mod+Shift+Grave".action.focus-workspace-previous = [];
+
+      # Floating and tiling are separate focus planes in niri; without this
+      # bind a floating window can only be reached with the pointer.
+      "Mod+Shift+V".action.switch-focus-between-floating-and-tiling = [];
+
       # --- moving ----------------------------------------------------------
       "Mod+Shift+Left".action.move-column-left = [];
       "Mod+Shift+Right".action.move-column-right = [];
       "Mod+Shift+Up".action.move-window-up = [];
       "Mod+Shift+Down".action.move-window-down = [];
+      "Mod+Shift+H".action.move-column-left = [];
+      "Mod+Shift+L".action.move-column-right = [];
+      "Mod+Shift+K".action.move-window-up = [];
+      "Mod+Shift+J".action.move-window-down = [];
+
+      "Mod+Shift+Home".action.move-column-to-first = [];
+      "Mod+Shift+End".action.move-column-to-last = [];
+
+      # Swap with the neighbouring window rather than reordering columns.
+      # Mod+Alt+* is the workspace/monitor-level modifier below, so swap uses
+      # Mod+Shift+Alt to stay out of its way.
+      "Mod+Shift+Alt+H".action.swap-window-left = [];
+      "Mod+Shift+Alt+L".action.swap-window-right = [];
+
+      # Column composition: pull the neighbour into this column, or push the
+      # bottom window back out into its own column.
+      "Mod+Comma".action.consume-window-into-column = [];
+      "Mod+Period".action.expel-window-from-column = [];
+      "Mod+BracketLeft".action.consume-or-expel-window-left = [];
+      "Mod+BracketRight".action.consume-or-expel-window-right = [];
 
       # --- sizing ----------------------------------------------------------
       "Mod+R".action.switch-preset-column-width = [];
-      "Mod+Shift+R".action.reset-window-height = [];
+      # Cycles layout.preset-window-heights, the vertical counterpart of Mod+R.
+      # Resetting to automatic height moved to Mod+Ctrl+R.
+      "Mod+Shift+R".action.switch-preset-window-height = [];
+      "Mod+Ctrl+R".action.reset-window-height = [];
       "Mod+Minus".action.set-column-width = "-10%";
       "Mod+Equal".action.set-column-width = "+10%";
       "Mod+Shift+Minus".action.set-window-height = "-10%";
       "Mod+Shift+Equal".action.set-window-height = "+10%";
+      # Grow the column into whatever space the other visible columns leave.
+      "Mod+Ctrl+F".action.expand-column-to-available-width = [];
 
       # --- workspaces ------------------------------------------------------
       "Mod+1".action.focus-workspace = 1;
@@ -226,15 +278,70 @@ in {
       "Mod+Shift+8".action.move-column-to-workspace = 8;
       "Mod+Shift+9".action.move-column-to-workspace = 9;
 
+      # Move the view up/down the workspace stack. Mod+Ctrl+J/K mirrors the
+      # arrow spellings so the vertical axis is reachable without leaving the
+      # home row; Page_Up/Down stay for muscle memory.
       "Mod+Page_Down".action.focus-workspace-down = [];
       "Mod+Page_Up".action.focus-workspace-up = [];
+      "Mod+Ctrl+J".action.focus-workspace-down = [];
+      "Mod+Ctrl+K".action.focus-workspace-up = [];
+      "Mod+Ctrl+Down".action.focus-workspace-down = [];
+      "Mod+Ctrl+Up".action.focus-workspace-up = [];
+
+      # Carry the focused column with you across workspaces. This is the
+      # vertical counterpart of Mod+Shift+Ctrl+Left/Right for monitors.
+      "Mod+Shift+Page_Down".action.move-column-to-workspace-down = [];
+      "Mod+Shift+Page_Up".action.move-column-to-workspace-up = [];
+      "Mod+Shift+Ctrl+J".action.move-column-to-workspace-down = [];
+      "Mod+Shift+Ctrl+K".action.move-column-to-workspace-up = [];
+      "Mod+Shift+Ctrl+Down".action.move-column-to-workspace-down = [];
+      "Mod+Shift+Ctrl+Up".action.move-column-to-workspace-up = [];
+
+      # Reorder the workspaces themselves rather than moving windows between
+      # them. Alt is the "operate on the workspace" modifier.
+      "Mod+Alt+Page_Down".action.move-workspace-down = [];
+      "Mod+Alt+Page_Up".action.move-workspace-up = [];
+      "Mod+Alt+J".action.move-workspace-down = [];
+      "Mod+Alt+K".action.move-workspace-up = [];
+
       "Mod+Tab".action.toggle-overview = [];
 
+      # Mouse wheel over the workspace stack. cooldown-ms rate-limits the
+      # continuous scroll stream so one flick does not fly through ten
+      # workspaces; the niri wiki recommends this for scroll binds.
+      "Mod+WheelScrollDown" = {
+        action.focus-workspace-down = [];
+        cooldown-ms = 150;
+      };
+      "Mod+WheelScrollUp" = {
+        action.focus-workspace-up = [];
+        cooldown-ms = 150;
+      };
+      "Mod+WheelScrollRight".action.focus-column-right = [];
+      "Mod+WheelScrollLeft".action.focus-column-left = [];
+
       # --- monitors --------------------------------------------------------
+      # Left/right only covers this desk's layout (eDP-1 at x=0, HDMI-A-1 to
+      # its right), but up/down and previous/next are bound too so a rearranged
+      # or stacked output setup does not need a config change to be reachable.
       "Mod+Ctrl+Left".action.focus-monitor-left = [];
       "Mod+Ctrl+Right".action.focus-monitor-right = [];
+      "Mod+Ctrl+H".action.focus-monitor-left = [];
+      "Mod+Ctrl+L".action.focus-monitor-right = [];
+      "Mod+Ctrl+Tab".action.focus-monitor-next = [];
+      "Mod+Ctrl+Shift+Tab".action.focus-monitor-previous = [];
+
       "Mod+Shift+Ctrl+Left".action.move-column-to-monitor-left = [];
       "Mod+Shift+Ctrl+Right".action.move-column-to-monitor-right = [];
+      "Mod+Shift+Ctrl+H".action.move-column-to-monitor-left = [];
+      "Mod+Shift+Ctrl+L".action.move-column-to-monitor-right = [];
+
+      # Send the whole workspace to the other screen, which is what you
+      # actually want when docking or undocking mid-task.
+      "Mod+Alt+Left".action.move-workspace-to-monitor-left = [];
+      "Mod+Alt+Right".action.move-workspace-to-monitor-right = [];
+      "Mod+Alt+H".action.move-workspace-to-monitor-left = [];
+      "Mod+Alt+L".action.move-workspace-to-monitor-right = [];
 
       # --- screenshots -----------------------------------------------------
       # `screenshot` opens niri's interactive UI; satty is wired in for
