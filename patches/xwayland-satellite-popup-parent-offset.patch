@@ -1,0 +1,109 @@
+Use a popup's inferred parent, not WM_TRANSIENT_FOR, when repositioning it.
+
+xwayland-satellite gives an X11 popup an xdg_popup parent at map time by
+inferring it (last hovered or last focused toplevel, see create_popup), because
+override-redirect windows are not required to set WM_TRANSIENT_FOR - and
+fcitx5's candidate window does not set it. That inferred parent is stored in
+PopupData.parent.
+
+reconfigure_window, however, looked the parent up again from
+win.attrs.transient_for. For a popup without that property the lookup found
+nothing, parent_dims stayed at its (0, 0) default, and the offset handed to
+xdg_positioner::set_offset was computed against the origin of the whole X
+screen rather than against the parent window. Wayland treats that offset as
+relative to the parent's anchor rect, so the candidate window was displaced by
+the parent's own position - visible as an input-method popup appearing far from
+the text caret in X11 apps such as WeChat, and worse the further right the
+window sat.
+
+Read the parent back from PopupData.parent so the reposition path agrees with
+the map path. The added test covers exactly this case: it puts the toplevel on
+an output at x=500 and reconfigures a popup to absolute x=540, expecting the
+relative offset 40. Without this change it observes 540.
+
+Submitted upstream state: not submitted; carried locally against PR #452
+(0a95f18) as pinned in flake.nix.
+diff --git a/src/server/mod.rs b/src/server/mod.rs
+index cd03fac..c81ac07 100644
+--- a/src/server/mod.rs
++++ b/src/server/mod.rs
+@@ -1367,7 +1367,6 @@ impl<S: X11Selection + 'static> InnerServerState<S> {
+             return;
+         }
+ 
+-        let transient_for = win.attrs.transient_for;
+         drop(win);
+ 
+         if self.xdg_wm_base.version() < 3 {
+@@ -1383,20 +1382,19 @@ impl<S: X11Selection + 'static> InnerServerState<S> {
+             SurfaceRole::Popup(Some(popup)) => {
+                 let mut parent_dims = WindowDims::default();
+                 let mut decorations_height = 0;
+-                if let Some(parent) = transient_for {
+-                    if let Some(&parent_entity) = self.windows.get(&parent) {
+-                        if let Ok(parent_data) = self.world.get::<&WindowData>(parent_entity) {
+-                            parent_dims = parent_data.attrs.dims;
+-                            if let Ok(parent_role) = self.world.get::<&SurfaceRole>(parent_entity) {
+-                                if let SurfaceRole::Toplevel(Some(toplevel)) = &*parent_role {
+-                                    if let Some(ref sat) = toplevel.decoration.satellite {
+-                                        decorations_height = sat.titlebar_height();
+-                                    }
++                if let Some(&parent_entity) = self.windows.get(&popup.parent) {
++                    if let Ok(parent_data) = self.world.get::<&WindowData>(parent_entity) {
++                        parent_dims = parent_data.attrs.dims;
++                        if let Ok(parent_role) = self.world.get::<&SurfaceRole>(parent_entity) {
++                            if let SurfaceRole::Toplevel(Some(toplevel)) = &*parent_role {
++                                if let Some(ref sat) = toplevel.decoration.satellite {
++                                    decorations_height = sat.titlebar_height();
+                                 }
+                             }
+                         }
+                     }
+                 }
++
+                 let rx = event.x() as i32 - parent_dims.x as i32;
+                 let ry = event.y() as i32 - parent_dims.y as i32;
+                 let ry_scaled =
+diff --git a/src/server/tests.rs b/src/server/tests.rs
+index f12ad7e..033120a 100644
+--- a/src/server/tests.rs
++++ b/src/server/tests.rs
+@@ -2104,6 +2104,38 @@ fn reconfigure_popup() {
+     f.assert_window_dimensions(popup, p_id, new_dims);
+ }
+ 
++#[test]
++fn reconfigure_popup_uses_inferred_parent() {
++    let (mut f, comp) = TestFixture::new_with_compositor();
++    f.new_output(0, 0);
++    let (_, output) = f.new_output(500, 0);
++    f.run();
++
++    let toplevel = Window::new(1);
++    let (_, t_id) = f.create_toplevel(&comp, toplevel);
++    f.testwl.move_surface_to_output(t_id, &output);
++    f.run();
++
++    let popup = Window::new(2);
++    let (_, p_id) = f.create_popup(&comp, PopupBuilder::new(popup, toplevel, t_id).x(520).y(40));
++
++    let new_dims = WindowDims {
++        x: 540,
++        y: 60,
++        width: 80,
++        height: 100,
++    };
++    f.reconfigure_window(popup, new_dims, true);
++    f.run();
++    f.run();
++
++    let data = f.testwl.get_surface_data(p_id).unwrap();
++    assert_eq!(
++        data.popup().positioner_state.offset,
++        testwl::Vec2 { x: 40, y: 60 }
++    );
++}
++
+ #[test]
+ fn reconfigure_popup_after_map() {
+     let (mut f, comp) = TestFixture::new_with_compositor();
