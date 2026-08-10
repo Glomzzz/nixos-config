@@ -1,6 +1,13 @@
-{config, ...}: let
+{
+  config,
+  username,
+  ...
+}: let
   credentials = config.sops.templates."smb-mac-mini-credentials".path;
-  uid = toString config.users.users.glom.uid;
+  # users.users.<name>.uid is null unless pinned, and an empty `uid=` in fstab
+  # is silently accepted by mount.cifs and then ignored, so the share comes back
+  # owned by whatever the server claims. users/glom/default.nix pins it.
+  uid = toString config.users.users.${username}.uid;
   gid = toString config.users.groups.users.gid;
 in {
   # yazi has no VFS of its own - it browses paths - so reaching the mac-mini
@@ -42,8 +49,12 @@ in {
       "file_mode=0600"
       "dir_mode=0700"
 
-      # SMB 3.1.1 with encryption in transit - what macOS 26 speaks natively.
-      "vers=3.1.1"
+      # macOS's SMB server rejects a 3.1.1 negotiation outright - the kernel
+      # reports "Dialect not supported by server" and the mount fails with
+      # -EOPNOTSUPP (95), which surfaces in yazi as the far less obvious
+      # "No such device (os error 19)". 3.0 is the newest dialect it accepts,
+      # and it still supports `seal`, so the traffic stays encrypted.
+      "vers=3.0"
       "seal"
 
       # macOS filenames are UTF-8 NFD; without this, names with CJK or accented
