@@ -2,7 +2,11 @@
   programs.emacs = {
     enable = true;
     package = pkgs.emacs-pgtk;
-    extraPackages = epkgs: [epkgs.pdf-tools];
+    extraPackages = epkgs: [
+      (epkgs.pdf-tools.overrideAttrs (old: {
+        patches = (old.patches or []) ++ [../../../../../patches/pdf-tools-native-comp-declarations.patch];
+      }))
+    ];
   };
 
   home.packages = with pkgs; [
