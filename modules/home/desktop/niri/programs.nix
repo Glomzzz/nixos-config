@@ -83,6 +83,15 @@
           run = "open --hovered";
           desc = "Open the hovered file or directory in emacs";
         }
+        # The mac-mini's home directory over SMB. The mount is an idle-timeout
+        # automount (modules/services/nixos/smb.nix), so the first `gm` after a
+        # while pauses briefly while the kernel dials out, and the share
+        # unmounts itself once yazi leaves it alone for ten minutes.
+        {
+          on = ["g" "m"];
+          run = "cd /mnt/mac-mini";
+          desc = "Go to mac-mini (SMB)";
+        }
       ];
     };
 
