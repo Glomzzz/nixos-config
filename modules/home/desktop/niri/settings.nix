@@ -23,9 +23,10 @@
   terminal = "${pkgs.foot}/bin/foot";
   launcher = "${pkgs.fuzzel}/bin/fuzzel";
   filemanager = "${terminal} -e ${pkgs.yazi}/bin/yazi";
+  emacs = config.programs.emacs.finalPackage;
   # No emacs daemon runs in this session (see programs/dev/editor/emacs.nix),
   # so this launches a standalone frame rather than emacsclient.
-  editor = "${pkgs.emacs-pgtk}/bin/emacs";
+  editor = "${emacs}/bin/emacs";
   locker = "${pkgs.swaylock}/bin/swaylock";
   brightness = "${pkgs.brightnessctl}/bin/brightnessctl";
   playerctl = "${pkgs.playerctl}/bin/playerctl";
