@@ -9,6 +9,7 @@
     ./ai.nix
     ./tailscale.nix
     ./github.nix
+    ./smb.nix
   ];
 
   sops = {
