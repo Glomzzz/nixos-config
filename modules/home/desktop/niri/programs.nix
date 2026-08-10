@@ -24,7 +24,66 @@
           max_height = 1200;
           image_quality = 90;
         };
+
+        # yazi's preset `edit` opener is `${EDITOR:-vi} %s` with block = true,
+        # which assumes a terminal editor that owns the pty until it exits.
+        # emacs-pgtk is a GUI client, so blocking would freeze yazi behind a
+        # window it does not draw. orphan = true detaches the child into its own
+        # session instead, leaving yazi interactive.
+        #
+        # The store path is spelled out rather than relying on $EDITOR (set in
+        # programs/dev/editor/emacs.nix): openers run through `sh -c` from
+        # whatever environment launched yazi, which for the niri keybind in
+        # settings.nix is not a login shell and so has no EDITOR at all.
+        #
+        # -c makes a new frame, and -a emacs falls back to a standalone emacs
+        # when no daemon is listening - this session runs none.
+        opener.edit = [
+          {
+            run = "${pkgs.emacs-pgtk}/bin/emacsclient -c -a ${pkgs.emacs-pgtk}/bin/emacs %s";
+            desc = "emacs";
+            block = false;
+            orphan = true;
+            "for" = "unix";
+          }
+        ];
       };
+
+      # <Enter> on a directory descends into it instead of handing it to the
+      # editor, and <S-Enter> is what opens a directory in emacs (dired).
+      #
+      # This cannot be expressed as a plain action list: yazi runs a chord's
+      # `run` array as an unconditional sequence, so [ "enter", "open" ] would
+      # descend into the directory and then immediately open whichever file the
+      # cursor landed on inside it. The branch has to happen before either
+      # action is emitted, which means a sync plugin that can read the hovered
+      # file's Cha.
+      plugins.smart-enter = pkgs.writeTextDir "main.lua" ''
+        --- @sync entry
+        return {
+        	entry = function()
+        		local h = cx.active.current.hovered
+        		if h and h.cha.is_dir then
+        			ya.emit("enter", {})
+        		else
+        			ya.emit("open", { hovered = true })
+        		end
+        	end,
+        }
+      '';
+
+      keymap.mgr.prepend_keymap = [
+        {
+          on = "<Enter>";
+          run = "plugin smart-enter";
+          desc = "Enter the directory, or open the file";
+        }
+        {
+          on = "<S-Enter>";
+          run = "open --hovered";
+          desc = "Open the hovered file or directory in emacs";
+        }
+      ];
     };
 
     # PDF viewer. zathura's own config lives here rather than a dotfile.
