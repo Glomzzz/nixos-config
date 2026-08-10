@@ -1,6 +1,12 @@
 {pkgs, ...}: {
+  programs.emacs = {
+    enable = true;
+    package = pkgs.emacs-pgtk;
+    extraPackages = epkgs: [epkgs.pdf-tools];
+  };
+
   home.packages = with pkgs; [
-    emacs-pgtk
+    imagemagick
     libtool
   ];
   xdg.mimeApps.defaultApplications = {

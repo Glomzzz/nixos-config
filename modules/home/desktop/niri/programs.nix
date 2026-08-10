@@ -1,4 +1,10 @@
-{pkgs, ...}: {
+{
+  config,
+  pkgs,
+  ...
+}: let
+  emacs = config.programs.emacs.finalPackage;
+in {
   # Viewers and daemons that KDE used to supply. Each entry here replaces a
   # Plasma component rather than adding something new.
   programs = {
@@ -27,7 +33,7 @@
 
         # yazi's preset `edit` opener is `${EDITOR:-vi} %s` with block = true,
         # which assumes a terminal editor that owns the pty until it exits.
-        # emacs-pgtk is a GUI client, so blocking would freeze yazi behind a
+        # The PGTK Emacs is a GUI client, so blocking would freeze yazi behind a
         # window it does not draw. orphan = true detaches the child into its own
         # session instead, leaving yazi interactive.
         #
@@ -40,7 +46,7 @@
         # when no daemon is listening - this session runs none.
         opener.edit = [
           {
-            run = "${pkgs.emacs-pgtk}/bin/emacsclient -c -a ${pkgs.emacs-pgtk}/bin/emacs %s";
+            run = "${emacs}/bin/emacsclient -c -a ${emacs}/bin/emacs %s";
             desc = "emacs";
             block = false;
             orphan = true;
