@@ -92,6 +92,30 @@
           run = "cd /mnt/mac-mini";
           desc = "Go to mac-mini (SMB)";
         }
+        # Drag the selection out to GUI apps (Firefox upload targets, chat
+        # windows). A TUI cannot be a Wayland drag source at all - the drag has
+        # to originate from a real wl_data_device - so ripdrag stands in as a
+        # small GTK4 window holding the files, and the drag starts from there.
+        #
+        # yazi 26.5.6 does have native drag-and-drop, but it rides the terminal
+        # DnD escape protocol that only kitty implements; foot does not, so that
+        # path is unavailable here and ripdrag is the working option.
+        #
+        # %s is yazi's own shell formatting and expands to the selection, or to
+        # the hovered file when nothing is selected (Mgr::selected is backed by
+        # selected_or_hovered), with each path escaped by yazi. The older `"$@"`
+        # spelling seen in most recipes online is deprecated and already gone
+        # from yazi's git main, so it is deliberately avoided.
+        #
+        # -x closes the window after one successful drag, so the window is not
+        # left behind. orphan detaches it from yazi's task lifetime the way the
+        # editor opener above does; without block yazi stays interactive while
+        # the drag is in progress.
+        {
+          on = "<C-n>";
+          run = "shell --orphan -- ${pkgs.ripdrag}/bin/ripdrag -x %s";
+          desc = "Drag the selection out (ripdrag)";
+        }
       ];
     };
 
@@ -163,6 +187,10 @@
 
     # Image viewer, replacing loupe.
     oculante
+
+    # Wayland drag source for yazi's <C-n> bind above. Also useful on its own:
+    # `ripdrag -t` accepts drops from GUI apps and prints the paths.
+    ripdrag
 
     # GUI/TUI control panels that replace the Plasma applets.
     overskride # Bluetooth
