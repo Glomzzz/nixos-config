@@ -7,8 +7,19 @@
   # PR #452's satellite, pinned in flake.nix. Release 0.8.2 in nixpkgs cannot
   # scale X11 clients per monitor at all; see the input's comment there and the
   # base scale in hardware/zephyrus/gpu.
+  #
+  # The patch fixes the input-method candidate window appearing offset from the
+  # caret in X11 apps: satellite repositioned popups relative to the whole X
+  # screen instead of relative to the parent window, because it re-derived the
+  # parent from WM_TRANSIENT_FOR, which fcitx5's override-redirect popup does
+  # not set. The patch file's header explains it in full.
   xwaylandSatellite =
-    xwayland-satellite.packages.${pkgs.stdenv.hostPlatform.system}.xwayland-satellite;
+    xwayland-satellite.packages.${pkgs.stdenv.hostPlatform.system}.xwayland-satellite.overrideAttrs
+    (old: {
+      patches =
+        (old.patches or [])
+        ++ [../../../../patches/xwayland-satellite-popup-parent-offset.patch];
+    });
   terminal = "${pkgs.foot}/bin/foot";
   launcher = "${pkgs.fuzzel}/bin/fuzzel";
   filemanager = "${terminal} -e ${pkgs.yazi}/bin/yazi";
