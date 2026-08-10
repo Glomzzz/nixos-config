@@ -1,0 +1,89 @@
+--- a/lisp/pdf-roll.el
++++ b/lisp/pdf-roll.el
+@@ -56,15 +56,17 @@
+   "Get the buffer position displaing PAGE."
+   (- (* 4 page) 3))
+ 
+-(defun pdf-roll--pos-overlay (pos window)
+-  "Return an overlay for WINDOW at POS."
+-  (cl-find window (overlays-at pos) :key (lambda (ov) (overlay-get ov 'window))))
++(defun pdf-roll--pos-overlay (pos window category)
++  "Return an overlay for WINDOW with CATEGORY at POS."
++  (cl-find-if (lambda (ov) (and (eq (overlay-get ov 'window) window)
++                                (eq (overlay-get ov 'category) category)))
++              (overlays-at pos)))
+ 
+ (defun pdf-roll-page-overlay (&optional page window)
+   "Return overlay displaying PAGE in WINDOW."
+   (pdf-roll--pos-overlay
+    (pdf-roll-page-to-pos (or page (pdf-roll-page-at-current-pos)))
+-   (or window (selected-window))))
++   (or window (selected-window)) 'pdf-roll))
+ 
+ (defun pdf-roll-page-at-current-pos ()
+   "Page at point."
+@@ -96,7 +98,7 @@
+          (size (image-display-size image t))
+          (overlay (pdf-roll-page-overlay page window))
+          (margin-pos (+ (pdf-roll-page-to-pos page) 2))
+-         (margin-overlay (pdf-roll--pos-overlay margin-pos window))
++         (margin-overlay (pdf-roll--pos-overlay margin-pos window 'pdf-roll-margin))
+          (offset (when (> (window-width window t) (car size))
+                    `(space :width (,(/ (- (window-width window t) (car size)) 2))))))
+     (overlay-put overlay 'display image)
+@@ -158,28 +160,15 @@
+ minor mode commands, after erasing the buffer to create the
+ overlays."
+   (setq win (or (and (windowp win) win) (selected-window)))
+-  (if (not (overlays-at 1))
+-      (let ((pages (pdf-cache-number-of-pages))
+-            (inhibit-read-only t))
+-        (erase-buffer)
+-        (setq pdf-roll--state (list t))
+-        (dotimes (i (* 2 pages))
+-          (insert " ")
+-          (let ((o (make-overlay (1- (point)) (point))))
+-            (overlay-put o 'category (if (eq 0 (mod i 2)) 'pdf-roll 'pdf-roll-margin))
+-            (overlay-put o 'window win))
+-          (insert "\n"))
+-        (delete-char -1)
+-        (set-buffer-modified-p nil))
+-    (unless (pdf-roll-page-overlay 1 win)
+-      (dotimes (i (/ (point-max) 2))
+-        (overlay-put (copy-overlay (car (overlays-at (1+ (* 2 i)))))
+-                     'window win))
+-      (dolist (win-st pdf-roll--state)
+-        (when-let ((win-old (car-safe win-st))
+-                   ((not (window-live-p win-old))))
+-          (remove-overlays (point-min) (point-max) 'window win-old)))
+-      (cl-callf2 cl-delete-if-not #'window-live-p pdf-roll--state :key #'car-safe)))
++  (unless (pdf-roll-page-overlay 1 win)
++    (dotimes (i (* 2 (+ (pdf-cache-number-of-pages) 1)))
++      (let ((o (make-overlay (+ 1 (* 2 i)) (+ 2 (* 2 i)))))
++        (overlay-put o 'category (if (eq 0 (mod i 2)) 'pdf-roll 'pdf-roll-margin))
++        (overlay-put o 'window win)))
++    (dolist (win-st pdf-roll--state)
++      (when-let ((win-old (car-safe win-st))
++                 ((not (window-live-p win-old))))
++        (remove-overlays (point-min) (point-max) 'window win-old))))
+   ;; initial `pdf-roll-redisplay' needs to know which page(s) to display
+   (cl-callf or (pdf-view-current-page win) 1)
+   (cl-callf or (image-mode-window-get 'vscroll win) 0))
+@@ -339,9 +328,16 @@
+   "Fun to initialize `pdf-view-roll-minor-mode'.
+ It is also added to `revert-buffer-function'."
+   (let ((inhibit-read-only t))
+-    (erase-buffer)
+     (remove-overlays))
+   (image-mode-window-put 'displayed-pages nil)
++  (let ((pages (pdf-cache-number-of-pages))
++        (inhibit-read-only t))
++    (erase-buffer)
++    (setq pdf-roll--state (list t))
++    (dotimes (_i (* 2 (+ pages 1)))
++      (insert " \n"))
++    (delete-char -1)
++    (set-buffer-modified-p nil))
+   (pdf-roll-new-window-function))
+ 
+ ;;;###autoload

@@ -1,10 +1,17 @@
 {pkgs, ...}: {
   programs.emacs = {
     enable = true;
-    package = pkgs.emacs-pgtk;
+    package = pkgs.emacs-pgtk.overrideAttrs (old: {
+      patches = (old.patches or []) ++ [../../../../../patches/emacs-cairo-interactive-image-filter.patch];
+    });
     extraPackages = epkgs: [
       (epkgs.pdf-tools.overrideAttrs (old: {
-        patches = (old.patches or []) ++ [../../../../../patches/pdf-tools-native-comp-declarations.patch];
+        patches =
+          (old.patches or [])
+          ++ [
+            ../../../../../patches/pdf-tools-native-comp-declarations.patch
+            ../../../../../patches/pdf-tools-roll-overlay-safety.patch
+          ];
       }))
     ];
   };

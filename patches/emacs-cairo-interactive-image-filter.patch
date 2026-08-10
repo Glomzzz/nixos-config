@@ -1,0 +1,30 @@
+From 553b9b49c855471e1076d65311d1eef6d45f1dbf Mon Sep 17 00:00:00 2001
+From: Steven Allen <steven@stebalien.com>
+Date: Mon, 21 Jul 2025 13:00:03 -0700
+Subject: [PATCH] Use the good filter when downscaling with Cairo
+
+CAIRO_FILTER_BEST is prohibitively slow when a large, downscaled image is
+clipped during interactive scrolling. Cairo documents CAIRO_FILTER_GOOD as
+the appropriate filter for interactive use, with no perceptible quality loss.
+
+Upstream discussion:
+https://mail.gnu.org/archive/html/emacs-devel/2025-07/msg00475.html
+---
+ src/image.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/image.c b/src/image.c
+index c5caaf739e7..7622f969398 100644
+--- a/src/image.c
++++ b/src/image.c
+@@ -3354,7 +3354,7 @@ image_set_transform (struct frame *f, struct image *img)
+   cairo_pattern_t *pattern = cairo_pattern_create_rgb (0, 0, 0);
+   cairo_pattern_set_matrix (pattern, &cr_matrix);
+   cairo_pattern_set_filter (pattern, smoothing
+-                            ? CAIRO_FILTER_BEST : CAIRO_FILTER_NEAREST);
++                            ? CAIRO_FILTER_GOOD : CAIRO_FILTER_NEAREST);
+   /* Dummy solid color pattern just to record pattern matrix.  */
+   img->cr_data = pattern;
+ # elif defined (HAVE_XRENDER)
+-- 
+2.50.1
