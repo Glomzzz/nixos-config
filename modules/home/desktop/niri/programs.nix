@@ -292,6 +292,10 @@ in {
     # Image viewer, replacing loupe.
     oculante
 
+    # Archive manager, replacing Ark and preventing PrismLauncher from becoming
+    # the incidental default for ZIP files.
+    file-roller
+
     # Wayland drag source for yazi's <C-n> bind above. Also useful on its own:
     # `ripdrag -t` accepts drops from GUI apps and prints the paths.
     ripdrag

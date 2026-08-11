@@ -93,6 +93,7 @@ in {
       enable = true;
 
       defaultApplications = let
+        archive = ["org.gnome.FileRoller.desktop"];
         pdf = ["org.pwmt.zathura.desktop"];
         image = ["oculante.desktop"];
         video = ["mpv.desktop"];
@@ -102,6 +103,11 @@ in {
         "application/pdf" = pdf;
         "application/epub+zip" = pdf;
         "application/postscript" = pdf;
+
+        # Archives
+        "application/zip" = archive;
+        "application/x-zip" = archive;
+        "application/x-zip-compressed" = archive;
 
         # Images
         "image/png" = image;
