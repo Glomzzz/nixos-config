@@ -1,4 +1,87 @@
-{pkgs, ...}: {
+{pkgs, ...}: let
+  python = pkgs.python3.withPackages (pythonPackages: [pythonPackages.dbus-next]);
+  yaziFileManager1 = pkgs.writeTextFile {
+    name = "yazi-file-manager1";
+    destination = "/bin/yazi-file-manager1";
+    executable = true;
+    text = ''
+      #!${python}/bin/python3
+
+      import asyncio
+      import os
+      import sys
+      from urllib.parse import unquote_to_bytes, urlsplit
+
+      from dbus_next.aio import MessageBus
+      from dbus_next.service import ServiceInterface, method
+
+
+      TERMINAL = "${pkgs.xdg-terminal-exec}/bin/xdg-terminal-exec"
+      YAZI = "${pkgs.yazi}/bin/yazi"
+      tasks = set()
+
+
+      def local_path(uri):
+          parsed = urlsplit(uri)
+          if parsed.scheme != "file" or parsed.netloc not in ("", "localhost"):
+              return None
+          return os.fsdecode(unquote_to_bytes(parsed.path))
+
+
+      async def launch_yazi(paths):
+          try:
+              process = await asyncio.create_subprocess_exec(
+                  TERMINAL,
+                  "--app-id=yazi",
+                  "--title=Yazi",
+                  "--",
+                  YAZI,
+                  *paths,
+                  start_new_session=True,
+              )
+              await process.wait()
+          except OSError as error:
+              print(f"yazi-file-manager1: {error}", file=sys.stderr)
+
+
+      class FileManager1(ServiceInterface):
+          def __init__(self):
+              super().__init__("org.freedesktop.FileManager1")
+
+          def open(self, uris):
+              paths = [path for uri in uris if (path := local_path(uri)) is not None]
+              if not paths:
+                  return
+
+              task = asyncio.create_task(launch_yazi(paths))
+              tasks.add(task)
+              task.add_done_callback(tasks.discard)
+
+          @method()
+          def ShowFolders(self, uris: "as", startup_id: "s"):
+              self.open(uris)
+
+          @method()
+          def ShowItems(self, uris: "as", startup_id: "s"):
+              self.open(uris)
+
+          @method()
+          def ShowItemProperties(self, uris: "as", startup_id: "s"):
+              self.open(uris)
+
+
+      async def main():
+          bus = await MessageBus().connect()
+          bus.export("/org/freedesktop/FileManager1", FileManager1())
+          await bus.request_name("org.freedesktop.FileManager1")
+          await bus.wait_for_disconnect()
+
+
+      if __name__ == "__main__":
+          asyncio.run(main())
+    '';
+  };
+in {
   xdg = {
     enable = true;
     userDirs.enable = true;
@@ -47,27 +130,23 @@
       };
     };
 
-    # yazi.desktop carries Terminal=true, and glib has to find a terminal
-    # itself before it can honour the inode/directory association above.
-    # gdesktopappinfo.c looks for `xdg-terminal-exec` first and only then falls
-    # back to a hardcoded list (gnome-terminal, konsole, xterm, ...), none of
-    # which is installed here - so every directory launch died with
-    # "Unable to find terminal required for application" and nothing appeared.
-    #
-    # That is the failure behind Firefox's "Open Containing Folder" doing
-    # nothing: Firefox first calls org.freedesktop.FileManager1.ShowItems, and
-    # when that name is not activatable (no GUI file manager on this host) it
-    # falls back to launching the parent directory through
-    # g_app_info_launch_default_for_uri, which is exactly the path that needs a
-    # terminal. The fallback only logs a g_warning on failure, so the click
-    # looked like a no-op.
-    #
-    # foot.desktop, not footclient.desktop: no foot server runs in this session,
-    # and xdg-terminal-exec's own low-priority list already excludes the client.
+    # yazi.desktop carries Terminal=true, so glib needs a terminal provider for
+    # ordinary directory launches. foot.desktop is used rather than the client
+    # because no foot server runs in this session.
     terminal-exec = {
       enable = true;
       settings.default = ["foot.desktop"];
     };
+
+    # Firefox reveals downloads through FileManager1.ShowItems. Its fallback
+    # opens only the parent directory, which discards the item URI and leaves
+    # yazi unable to hover the requested file. This activatable bridge preserves
+    # that URI and passes the file itself to yazi as its current entry.
+    dataFile."dbus-1/services/org.freedesktop.FileManager1.service".text = ''
+      [D-BUS Service]
+      Name=org.freedesktop.FileManager1
+      Exec=${yaziFileManager1}/bin/yazi-file-manager1
+    '';
   };
 
   home.packages = with pkgs; [
