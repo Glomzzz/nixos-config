@@ -1,9 +1,83 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }: let
   emacs = config.programs.emacs.finalPackage;
+  androidMountPoint = "${config.home.homeDirectory}/mnt/android";
+  androidPhone = pkgs.writeShellApplication {
+    name = "android-phone";
+    runtimeInputs = with pkgs; [
+      android-file-transfer
+      coreutils
+      findutils
+      libnotify
+      util-linux
+    ];
+    text = ''
+      mount_point=${lib.escapeShellArg androidMountPoint}
+
+      report_error() {
+        printf 'android-phone: %s\n' "$1" >&2
+        notify-send --urgency=critical "Android phone" "$1" >/dev/null 2>&1 || true
+      }
+
+      case "''${1:-mount}" in
+        mount)
+          mkdir -p "$mount_point"
+
+          if mountpoint -q -- "$mount_point"; then
+            exit 0
+          fi
+
+          if [ -n "$(find "$mount_point" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
+            report_error "The mount directory is not empty: $mount_point"
+            exit 1
+          fi
+
+          if ! mount_output=$(aft-mtp-mount "$mount_point" 2>&1); then
+            report_error "Could not mount the phone. Unlock it and select File transfer (MTP)."
+            if [ -n "$mount_output" ]; then
+              printf '%s\n' "$mount_output" >&2
+            fi
+            rmdir "$mount_point" 2>/dev/null || true
+            exit 1
+          fi
+
+          if ! mountpoint -q -- "$mount_point"; then
+            report_error "The MTP mount exited without mounting the phone."
+            rmdir "$mount_point" 2>/dev/null || true
+            exit 1
+          fi
+          ;;
+        unmount)
+          if ! mountpoint -q -- "$mount_point"; then
+            rmdir "$mount_point" 2>/dev/null || true
+            exit 0
+          fi
+
+          mount_type=$(findmnt -rn -o FSTYPE --target "$mount_point")
+          if [ "$mount_type" != "fuse.aft-mtp-mount" ]; then
+            report_error "Refusing to unmount unexpected filesystem: $mount_type"
+            exit 1
+          fi
+
+          if ! /run/wrappers/bin/fusermount3 -u "$mount_point"; then
+            report_error "The phone is busy. Close other programs using it and try again."
+            exit 1
+          fi
+
+          rmdir "$mount_point" 2>/dev/null || true
+          notify-send "Android phone" "Unmounted; it is safe to disconnect." >/dev/null 2>&1 || true
+          ;;
+        *)
+          printf 'Usage: android-phone [mount|unmount]\n' >&2
+          exit 2
+          ;;
+      esac
+    '';
+  };
 in {
   # Viewers and daemons that KDE used to supply. Each entry here replaces a
   # Plasma component rather than adding something new.
@@ -18,7 +92,7 @@ in {
 
       settings = {
         mgr = {
-          show_hidden = false;
+          show_hidden = true;
           sort_by = "natural";
           sort_dir_first = true;
         };
@@ -98,6 +172,26 @@ in {
           run = "cd /mnt/mac-mini";
           desc = "Go to mac-mini (SMB)";
         }
+        # MTP is not a filesystem on its own. Mount the first connected phone
+        # through FUSE, then enter the stable path exposed by the helper.
+        {
+          on = ["g" "a"];
+          run = [
+            "shell --block -- ${androidPhone}/bin/android-phone mount"
+            "cd ${androidMountPoint}"
+          ];
+          desc = "Mount and go to Android phone";
+        }
+        # Leave the FUSE tree before unmounting so yazi's own working directory
+        # cannot keep the phone busy.
+        {
+          on = ["g" "A"];
+          run = [
+            "cd ~"
+            "shell --block -- ${androidPhone}/bin/android-phone unmount"
+          ];
+          desc = "Unmount Android phone";
+        }
         # Drag the selection out to GUI apps (Firefox upload targets, chat
         # windows). A TUI cannot be a Wayland drag source at all - the drag has
         # to originate from a real wl_data_device - so ripdrag stands in as a
@@ -161,6 +255,10 @@ in {
   };
 
   home.packages = with pkgs; [
+    # FUSE-backed MTP mount used by yazi's ga/gA bindings. It is also available
+    # as `android-phone mount|unmount` outside yazi.
+    androidPhone
+
     # X11 shim so Steam/Discord/JetBrains keep working under niri.
     xwayland-satellite
 
