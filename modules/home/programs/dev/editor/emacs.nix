@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   programs.emacs = {
     enable = true;
-    package = pkgs.emacs-pgtk.overrideAttrs (old: {
+    package = pkgs.emacs31-pgtk.overrideAttrs (old: {
       patches = (old.patches or []) ++ [../../../../../patches/emacs-cairo-interactive-image-filter.patch];
     });
     extraPackages = epkgs: [
