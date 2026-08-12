@@ -9,6 +9,6 @@
         error_symbol = "[›](bold red)";
       };
     };
-    enableNushellIntegration = true;
+    enableFishIntegration = true;
   };
 }
