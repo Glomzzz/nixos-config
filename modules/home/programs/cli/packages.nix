@@ -14,6 +14,7 @@ in {
     p7zip
     ripgrep
     fd
+    mandible
     nix-alien
     curl
     sysstat
