@@ -18,8 +18,4 @@
       };
     };
   };
-
-  programs.lazygit = {
-    enable = true;
-  };
 }
