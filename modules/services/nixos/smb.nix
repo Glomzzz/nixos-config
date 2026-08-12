@@ -79,6 +79,9 @@ in {
     {
       where = "/mnt/mac-mini";
       wantedBy = ["multi-user.target"];
+      # This explicit unit overrides systemd-fstab-generator's automount unit,
+      # so mirror the idle timeout from the x-systemd option above.
+      automountConfig.TimeoutIdleSec = "10min";
     }
   ];
 }
