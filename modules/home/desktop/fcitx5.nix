@@ -59,7 +59,7 @@
       #
       # Theme is pinned to the Catppuccin Mocha theme written below rather than
       # to the bundled "default-dark", because default-dark is pure #000000 with
-      # grey borders and would not match foot/waybar/swaync/zathura.
+      # grey borders and would not match foot/waybar/swaync/Thunar.
       #
       # UseDarkTheme is deliberately left False. When True, classicui swaps
       # between Theme and DarkTheme based on the XDG portal's

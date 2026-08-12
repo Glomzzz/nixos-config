@@ -2,7 +2,7 @@
   # Session-wide dark preference. With KDE gone nothing was telling GTK, Qt or
   # the XDG portal that this is a dark desktop, so every toolkit fell back to
   # its light default while the hand-styled surfaces (foot, waybar, swaync,
-  # zathura, fuzzel) stayed dark. Each block below covers one toolkit; there is
+  # Thunar and fuzzel) stayed dark. Each block below covers one toolkit; there is
   # no single switch that reaches all of them.
 
   gtk = {

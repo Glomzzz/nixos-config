@@ -1,10 +1,7 @@
 {pkgs, ...}: let
   font = "JetBrainsMono Nerd Font";
 in {
-  # foot replaces alacritty because alacritty implements no image protocol at
-  # all - no sixel, no kitty graphics, no iTerm2 - so yazi can only ever render
-  # ASCII block art there. foot has native sixel support that yazi detects and
-  # drives directly, with no ueberzugpp overlay process involved.
+  # foot is the Wayland-native terminal for this session.
   programs.foot = {
     enable = true;
 
@@ -14,8 +11,6 @@ in {
         # here rather than in a SHELL environment variable.
         shell = "${pkgs.nushell}/bin/nu --login --interactive";
         font = "${font}:size=14";
-        # Sixel previews are sized from cell geometry, so tight padding gives
-        # yazi more pixels to draw into.
         pad = "4x4";
       };
 

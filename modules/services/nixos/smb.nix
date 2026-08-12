@@ -10,9 +10,9 @@
   uid = toString config.users.users.${username}.uid;
   gid = toString config.users.groups.users.gid;
 in {
-  # yazi has no VFS of its own - it browses paths - so reaching the mac-mini
-  # over SMB means giving the kernel a real mount rather than teaching yazi a
-  # protocol. gvfs would also work through `gio mount`, but its shares live
+  # Dirvish browses filesystem paths, so reaching the mac-mini over SMB uses a
+  # stable kernel mount. GVfs would also work through `gio mount`, but its
+  # shares live
   # under a per-session /run/user/$UID/gvfs path that only exists once a GUI
   # session has authenticated, which is exactly the fragility this avoids.
   boot.supportedFilesystems = ["cifs"]; # pulls in cifs-utils for mount.cifs
@@ -51,8 +51,7 @@ in {
 
       # macOS's SMB server rejects a 3.1.1 negotiation outright - the kernel
       # reports "Dialect not supported by server" and the mount fails with
-      # -EOPNOTSUPP (95), which surfaces in yazi as the far less obvious
-      # "No such device (os error 19)". 3.0 is the newest dialect it accepts,
+      # -EOPNOTSUPP (95). 3.0 is the newest dialect it accepts,
       # and it still supports `seal`, so the traffic stays encrypted.
       "vers=3.0"
       "seal"
@@ -62,8 +61,8 @@ in {
       "iocharset=utf8"
 
       # Drop the connection instead of blocking forever in D state when the
-      # mac-mini disappears mid-transfer. yazi (and any shell sitting in the
-      # directory) gets an EIO it can recover from.
+      # mac-mini disappears mid-transfer. Applications in the directory get an
+      # EIO they can recover from.
       "soft"
       "echo_interval=10"
       "actimeo=30"
