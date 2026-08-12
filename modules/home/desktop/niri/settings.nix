@@ -22,11 +22,11 @@
     });
   terminal = "${pkgs.foot}/bin/foot";
   launcher = "${pkgs.fuzzel}/bin/fuzzel";
-  filemanager = "${terminal} -e ${pkgs.yazi}/bin/yazi";
   emacs = config.programs.emacs.finalPackage;
   # No emacs daemon runs in this session (see programs/dev/editor/emacs.nix),
   # so this launches a standalone frame rather than emacsclient.
   editor = "${emacs}/bin/emacs";
+  filemanager = [editor "--dirvish"];
   locker = "${pkgs.swaylock}/bin/swaylock";
   brightness = "${pkgs.brightnessctl}/bin/brightnessctl";
   playerctl = "${pkgs.playerctl}/bin/playerctl";
@@ -210,7 +210,7 @@ in {
       "Mod+Slash".action.spawn = terminal;
       "Mod+Return".action.spawn = editor;
       "Mod+D".action.spawn = launcher;
-      "Mod+E".action.spawn = ["sh" "-c" filemanager];
+      "Mod+E".action.spawn = filemanager;
       "Mod+Escape".action.spawn = locker;
       # Picker script defined in clipboard.nix.
       "Mod+Shift+C".action.spawn = "clipboard-history";
