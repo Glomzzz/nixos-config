@@ -46,6 +46,7 @@ in {
   };
   xdg.mimeApps.defaultApplications = {
     "application/epub+zip" = ["emacs.desktop"];
+    "application/x-fishscript" = ["emacs.desktop" "emacsclient.desktop"];
     "application/json" = ["emacs.desktop" "emacsclient.desktop"];
     "application/pdf" = ["emacs.desktop"];
     "application/postscript" = ["emacs.desktop"];

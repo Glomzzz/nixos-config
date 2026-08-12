@@ -9,7 +9,7 @@ in {
       main = {
         # foot tokenizes `shell` into argv, so login/interactive flags belong
         # here rather than in a SHELL environment variable.
-        shell = "${pkgs.nushell}/bin/nu --login --interactive";
+        shell = "${pkgs.fish}/bin/fish --login --interactive";
         font = "${font}:size=14";
         pad = "4x4";
       };

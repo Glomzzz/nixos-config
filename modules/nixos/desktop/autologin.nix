@@ -14,18 +14,19 @@
   # check stops a nested relaunch from a terminal inside niri.
   #
   # NIRI_SESSION_LAUNCHED is the re-entry guard and it MUST be exported.
-  # niri-session re-execs itself through a login shell whenever $SHELL is
-  # listed in /etc/shells (`exec -l "$SHELL" -c "$0 -l"`), which re-sources
-  # /etc/profile and reaches this snippet a second time. NixOS' own
-  # `__ETC_PROFILE_SOURCED` guard does not help: it is assigned without
-  # `export`, so it does not survive the exec. Without an exported marker the
-  # two conditions below are still true on that second pass and tty1 spins in
+  # niri-session re-execs itself through Fish because $SHELL is listed in
+  # /etc/shells (`exec -l "$SHELL" -c "$0 -l"`), which reaches this login
+  # initialization a second time. Without the exported marker, tty1 spins in
   # an endless exec loop instead of starting the compositor.
-  environment.loginShellInit = ''
-    if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" = 1 ] && [ -z "$NIRI_SESSION_LAUNCHED" ]; then
-      export NIRI_SESSION_LAUNCHED=1
+  #
+  # This must be native Fish code. NixOS evaluates environment.loginShellInit
+  # through a POSIX compatibility subprocess, where `exec` would replace only
+  # that subprocess and leave the original tty shell behind after niri exits.
+  programs.fish.loginShellInit = ''
+    if not set --query WAYLAND_DISPLAY; and test "$XDG_VTNR" = 1; and not set --query NIRI_SESSION_LAUNCHED
+      set --global --export NIRI_SESSION_LAUNCHED 1
       exec ${pkgs.niri}/bin/niri-session
-    fi
+    end
   '';
 
   # Autologin means PAM never sees a password, so pam_gnome_keyring cannot

@@ -4,7 +4,7 @@
 in {
   imports = [
     ./foot.nix
-    ./nushell.nix
+    ./fish.nix
     ./ssh.nix
     ./starship.nix
   ];

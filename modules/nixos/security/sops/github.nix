@@ -9,9 +9,9 @@ in {
     owner = username;
   };
 
-  home-manager.users.${username}.programs.nushell.extraEnv = ''
-    if ("${githubPatFile}" | path exists) {
-      $env.GITHUB_PAT_TOKEN = (open --raw "${githubPatFile}" | str trim)
-    }
+  home-manager.users.${username}.programs.fish.shellInit = ''
+    if test -r "${githubPatFile}"
+      set --global --export GITHUB_PAT_TOKEN (string trim < "${githubPatFile}")
+    end
   '';
 }
