@@ -1,5 +1,10 @@
-{pkgs, ...}: {
+{
+  lib,
+  pkgs,
+  ...
+}: {
   home.packages = with pkgs; [
+    (lib.hiPrio rust-analyzer)
     rustup
     trunk
     cargo-generate
