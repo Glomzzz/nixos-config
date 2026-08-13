@@ -3,5 +3,7 @@
     nodejs
     pnpm
     bun
+    typescript-language-server
+    vscode-langservers-extracted
   ];
 }

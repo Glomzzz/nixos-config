@@ -8,8 +8,10 @@ _: {
     ./kotlin.nix
     ./nix.nix
     ./ocaml.nix
+    ./python.nix
     ./rust.nix
     ./scala.nix
     ./scheme.nix
+    ./typst.nix
   ];
 }
