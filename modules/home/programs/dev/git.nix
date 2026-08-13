@@ -14,7 +14,7 @@
         inherit email;
       };
       core = {
-        editor = "emacsclient -c -a emacs";
+        editor = "emacsclient -c --alternate-editor=";
       };
     };
   };

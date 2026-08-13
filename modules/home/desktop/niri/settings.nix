@@ -23,10 +23,8 @@
   terminal = "${pkgs.foot}/bin/foot";
   launcher = "${pkgs.fuzzel}/bin/fuzzel";
   emacs = config.programs.emacs.finalPackage;
-  # No emacs daemon runs in this session (see programs/dev/editor/emacs.nix),
-  # so this launches a standalone frame rather than emacsclient.
-  editor = "${emacs}/bin/emacs";
-  filemanager = [editor "--dirvish"];
+  editor = ["${emacs}/bin/emacsclient" "-c" "-n" "-a" ""];
+  filemanager = ["${emacs}/bin/emacsclient" "-c" "-n" "-a" "" config.home.homeDirectory];
   locker = "${pkgs.swaylock}/bin/swaylock";
   brightness = "${pkgs.brightnessctl}/bin/brightnessctl";
   playerctl = "${pkgs.playerctl}/bin/playerctl";
