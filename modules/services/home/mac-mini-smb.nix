@@ -11,6 +11,8 @@
     name = "mac-mini-smb-mount";
     runtimeInputs = with pkgs; [
       coreutils
+      iproute2
+      libressl.nc
       gnused
       rclone
       util-linux
@@ -45,7 +47,19 @@
         exit 1
       fi
 
-      export RCLONE_SMB_HOST=mac-mini
+      lan_ip=192.168.50.198
+      smb_host=mac-mini
+      lan_route=$(ip -4 route get "$lan_ip" 2>/dev/null || true)
+      if [ -n "$lan_route" ] && \
+        [[ "$lan_route" != *" via "* ]] && \
+        [[ "$lan_route" != *" dev tailscale0 "* ]] && \
+        nc -n -z -w 3 "$lan_ip" 445 >/dev/null 2>&1
+      then
+        smb_host=$lan_ip
+      fi
+
+      printf 'mac-mini-smb-mount: using SMB host %s\n' "$smb_host"
+      export RCLONE_SMB_HOST="$smb_host"
       export RCLONE_SMB_USER="$username"
       export RCLONE_SMB_PASS
       RCLONE_SMB_PASS=$(printf '%s\n' "$password" | rclone obscure -)
@@ -57,16 +71,16 @@
       exec rclone mount :smb:glom "$mount_point" \
         --config /dev/null \
         --attr-timeout 1s \
-        --contimeout 3s \
-        --daemon-timeout 3s \
+        --contimeout 10s \
+        --daemon-timeout 10s \
         --dir-cache-time 30s \
         --log-level NOTICE \
         --log-systemd \
         --low-level-retries 2 \
         --poll-interval 0 \
         --retries 2 \
-        --smb-idle-timeout 1m \
-        --timeout 3s \
+        --smb-idle-timeout 5s \
+        --timeout 30s \
         --vfs-cache-mode full \
         --cache-dir "$cache_root" \
         --vfs-cache-max-age 24h \
@@ -112,7 +126,7 @@
 
         mount_type=$(findmnt -rn -o FSTYPE --target "$mount_point" 2>/dev/null || true)
         if [ "$mount_type" = "fuse.rclone" ] && \
-          timeout --kill-after=1s 5s ls -la -- "$mount_point" >/dev/null 2>&1
+          timeout --kill-after=2s 15s df -P -- "$mount_point" >/dev/null 2>&1
         then
           printf '%s\n' "$mount_point"
           exit 0
