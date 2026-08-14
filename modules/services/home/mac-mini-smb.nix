@@ -59,16 +59,35 @@
       fi
 
       printf 'mac-mini-smb-mount: using SMB host %s\n' "$smb_host"
-      export RCLONE_SMB_HOST="$smb_host"
-      export RCLONE_SMB_USER="$username"
-      export RCLONE_SMB_PASS
-      RCLONE_SMB_PASS=$(printf '%s\n' "$password" | rclone obscure -)
-      unset password
 
       cache_root="''${XDG_CACHE_HOME:-$HOME/.cache}/rclone/mac-mini"
+      credentials_cache="$cache_root/smb-credentials"
       mkdir -p "$cache_root"
 
-      exec rclone mount :smb:glom "$mount_point" \
+      password_fingerprint=$(printf '%s' "$password" | sha256sum | sed 's/ .*//')
+      cached_fingerprint=$(sed -n '1p' "$credentials_cache" 2>/dev/null || true)
+      obscured_password=$(sed -n '2p' "$credentials_cache" 2>/dev/null || true)
+      if [ "$password_fingerprint" != "$cached_fingerprint" ] || \
+        [ -z "$obscured_password" ]
+      then
+        obscured_password=$(printf '%s\n' "$password" | rclone obscure -)
+        credentials_cache_tmp=$(mktemp "$cache_root/.smb-credentials.XXXXXX")
+        trap 'rm -f "$credentials_cache_tmp"' EXIT
+        chmod 600 "$credentials_cache_tmp"
+        printf '%s\n%s\n' "$password_fingerprint" "$obscured_password" \
+          >"$credentials_cache_tmp"
+        mv -f "$credentials_cache_tmp" "$credentials_cache"
+        trap - EXIT
+      fi
+
+      # Stable config values keep dirty VFS entries resumable after restarts.
+      export RCLONE_CONFIG_MACMINI_TYPE=smb
+      export RCLONE_CONFIG_MACMINI_HOST="$smb_host"
+      export RCLONE_CONFIG_MACMINI_USER="$username"
+      export RCLONE_CONFIG_MACMINI_PASS="$obscured_password"
+      unset password obscured_password password_fingerprint
+
+      exec rclone mount macmini:glom "$mount_point" \
         --config /dev/null \
         --attr-timeout 1s \
         --contimeout 30s \
