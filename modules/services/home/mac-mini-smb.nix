@@ -71,16 +71,18 @@
       exec rclone mount :smb:glom "$mount_point" \
         --config /dev/null \
         --attr-timeout 1s \
-        --contimeout 10s \
+        --contimeout 30s \
         --daemon-timeout 10s \
         --dir-cache-time 30s \
         --log-level NOTICE \
         --log-systemd \
-        --low-level-retries 2 \
+        --low-level-retries 10 \
+        --multi-thread-streams 0 \
         --poll-interval 0 \
-        --retries 2 \
-        --smb-idle-timeout 5s \
-        --timeout 30s \
+        --retries 5 \
+        --smb-idle-timeout 5m \
+        --timeout 10m \
+        --transfers 1 \
         --vfs-cache-mode full \
         --cache-dir "$cache_root" \
         --vfs-cache-max-age 24h \
