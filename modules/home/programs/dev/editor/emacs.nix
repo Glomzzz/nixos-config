@@ -30,6 +30,13 @@ in {
     startWithUserSession = "graphical";
   };
 
+  programs.fish.functions.magit = {
+    description = "Open Magit for the current directory";
+    body = ''
+      ${emacs}/bin/emacsclient --create-frame --no-wait --suppress-output --alternate-editor= --eval '(magit-status default-directory)'
+    '';
+  };
+
   home.packages = with pkgs; [
     # Runtime helpers for Dirvish previews.
     epub-thumbnailer
