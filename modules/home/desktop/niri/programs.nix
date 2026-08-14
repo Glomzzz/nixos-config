@@ -22,12 +22,29 @@
         notify-send --urgency=critical "Android phone" "$1" >/dev/null 2>&1 || true
       }
 
+      get_mount_type() {
+        findmnt -rn --mountpoint "$mount_point" -o FSTYPE 2>/dev/null || true
+      }
+
       case "''${1:-mount}" in
         mount)
           mkdir -p "$mount_point"
 
-          if mountpoint -q -- "$mount_point"; then
-            exit 0
+          mount_type=$(get_mount_type)
+          if [ -n "$mount_type" ]; then
+            if [ "$mount_type" != "fuse.aft-mtp-mount" ]; then
+              report_error "Refusing to replace unexpected filesystem: $mount_type"
+              exit 1
+            fi
+
+            if mountpoint -q -- "$mount_point" 2>/dev/null; then
+              exit 0
+            fi
+
+            if ! /run/wrappers/bin/fusermount3 -u -z "$mount_point"; then
+              report_error "Could not detach the disconnected phone mount."
+              exit 1
+            fi
           fi
 
           if [ -n "$(find "$mount_point" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
@@ -51,20 +68,27 @@
           fi
           ;;
         unmount)
-          if ! mountpoint -q -- "$mount_point"; then
+          mount_type=$(get_mount_type)
+          if [ -z "$mount_type" ]; then
             rmdir "$mount_point" 2>/dev/null || true
             exit 0
           fi
 
-          mount_type=$(findmnt -rn -o FSTYPE --target "$mount_point")
           if [ "$mount_type" != "fuse.aft-mtp-mount" ]; then
             report_error "Refusing to unmount unexpected filesystem: $mount_type"
             exit 1
           fi
 
           if ! /run/wrappers/bin/fusermount3 -u "$mount_point"; then
-            report_error "The phone is busy. Close other programs using it and try again."
-            exit 1
+            if mountpoint -q -- "$mount_point" 2>/dev/null; then
+              report_error "The phone is busy. Close other programs using it and try again."
+              exit 1
+            fi
+
+            if ! /run/wrappers/bin/fusermount3 -u -z "$mount_point"; then
+              report_error "Could not detach the disconnected phone mount."
+              exit 1
+            fi
           fi
 
           rmdir "$mount_point" 2>/dev/null || true
