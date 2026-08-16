@@ -19,6 +19,11 @@ in {
             ../../../../../patches/pdf-tools-native-comp-declarations.patch
             ../../../../../patches/pdf-tools-roll-overlay-safety.patch
           ];
+        # The epdfinfo server is built locally by the package's preBuild
+        # (`make server/epdfinfo`); give its C++ the same native flags the
+        # rest of the system gets.  The heavy lifting happens inside poppler
+        # and cairo, but the server's own PNG encode path benefits too.
+        NIX_CFLAGS_COMPILE = "-O3 -march=native";
       }))
     ];
   };
