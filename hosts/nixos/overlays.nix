@@ -1,6 +1,11 @@
-_: {
+{inputs, ...}: {
   nixpkgs.overlays = [
     (import ../../pkgs)
+    (final: prev: {
+      # Ryzenbit compiler + `rz lsp` language server, built from the local
+      # checkout at ~/git/ryzenbit (flake input `ryzenbit`).
+      ryzenbit = inputs.ryzenbit.packages.${prev.system}.ryzenbit;
+    })
     (final: prev: {
       python3 = prev.python3.override {
         packageOverrides = _: pySuper: {
