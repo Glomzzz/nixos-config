@@ -23,9 +23,33 @@ in {
   services.emacs = {
     enable = true;
     client.enable = true;
-    socketActivation.enable = true;
+    # Socket activation is disabled on purpose: the generated
+    # emacs.socket unit listens on %t/emacs/server while the daemon
+    # also binds that exact path, and after every service restart
+    # systemd's listener wins the path.  Client handshakes then fail,
+    # and emacsclient's alternate-editor fallback spawns orphan
+    # `emacs --daemon=<socket>` processes that shadow the real daemon
+    # forever.  The service is already started by
+    # graphical-session.target, and Emacs binds %t/emacs/server itself
+    # (its default socket dir under XDG_RUNTIME_DIR), so the socket
+    # unit's listener is redundant as well as harmful.
+    socketActivation.enable = false;
     startWithUserSession = "graphical";
   };
+
+  # Reap orphaned Emacs daemons before (re)starting the service:
+  # emacsclient's alternate-editor fallback can still spawn a bare
+  # `emacs --daemon=<socket>` during the brief window while the
+  # service is restarting, and such processes keep a shadowed copy of
+  # the server socket forever.  The pattern is anchored to the Emacs
+  # binary invocation, so it never matches the service's own
+  # `--fg-daemon` command line, and the leading '-' makes the pkill
+  # ignore "no process matched".  The sleep gives a signaled orphan
+  # time to release the socket path before the new daemon binds it.
+  systemd.user.services.emacs.serviceConfig.ExecStartPre = [
+    "-${pkgs.procps}/bin/pkill -f '^(/nix/store/[^ ]*/bin/)?emacs --daemon'"
+    "${pkgs.coreutils}/bin/sleep 1"
+  ];
 
   programs.fish.functions.magit = {
     description = "Open Magit for the current directory in an Emacs window";
