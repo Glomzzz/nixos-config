@@ -7,29 +7,16 @@
 in {
   programs.emacs = {
     enable = true;
+    # Keep Emacs on the newest pretest (31.x): nixpkgs' emacs31-pgtk tracks
+    # upstream pretest releases on each flake update.
     package = pkgs.emacs31-pgtk.overrideAttrs (old: {
       patches = (old.patches or []) ++ [../../../../../patches/emacs-cairo-interactive-image-filter.patch];
       # Emacs's C-level redisplay, image scaling, and GTK glue dominate
-      # PDF-viewer responsiveness; give them native codegen like the
-      # epdfinfo server below.
+      # responsiveness; give them native codegen.
       NIX_CFLAGS_COMPILE = "-O2 -march=native";
     });
-    extraPackages = epkgs: [
-      epkgs.async
-      (epkgs.pdf-tools.overrideAttrs (old: {
-        patches =
-          (old.patches or [])
-          ++ [
-            ../../../../../patches/pdf-tools-native-comp-declarations.patch
-            ../../../../../patches/pdf-tools-roll-overlay-safety.patch
-          ];
-        # The epdfinfo server is built locally by the package's preBuild
-        # (`make server/epdfinfo`); give its C++ the same native flags the
-        # rest of the system gets.  The heavy lifting happens inside poppler
-        # and cairo, but the server's own PNG encode path benefits too.
-        NIX_CFLAGS_COMPILE = "-O3 -march=native";
-      }))
-    ];
+    # No extraPackages: every Lisp package comes from package.el
+    # (~/.config/emacs/modules/bootstrap.el), not from Nix.
   };
 
   services.emacs = {
@@ -40,9 +27,17 @@ in {
   };
 
   programs.fish.functions.magit = {
-    description = "Open Magit for the current directory";
+    description = "Open Magit for the current directory in an Emacs window";
     body = ''
-      ${emacs}/bin/emacsclient --create-frame --no-wait --suppress-output --alternate-editor= --eval '(magit-status default-directory)'
+      # A frame-less daemon cannot display a buffer: its display-less
+      # initial frame wedges the PGTK daemon if Magit tries to use it.
+      # Fall back to the client's --create-frame path in that case.
+      if test (${emacs}/bin/emacsclient --alternate-editor= --eval '(if (my/gui-frames) (quote yes) (quote no))') = no
+        ${emacs}/bin/emacsclient --create-frame --no-wait --suppress-output --alternate-editor= --eval '(my/magit-status-window default-directory)'
+      else
+        ${emacs}/bin/emacsclient --no-wait --suppress-output --alternate-editor= --eval '(my/magit-status-window default-directory)'
+      end
+      and echo "Magit opened in an Emacs window"
     '';
   };
 
