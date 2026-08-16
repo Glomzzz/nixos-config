@@ -12,6 +12,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-alien-source.url = "github:thiagokokada/nix-alien";
+    # Local Ryzenbit compiler checkout (the repository at
+    # ~/git/ryzenbit); its flake exposes packages.ryzenbit.
+    ryzenbit.url = "path:/home/glom/git/ryzenbit";
     niri = {
       url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
