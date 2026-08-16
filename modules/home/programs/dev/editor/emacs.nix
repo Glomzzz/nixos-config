@@ -9,6 +9,10 @@ in {
     enable = true;
     package = pkgs.emacs31-pgtk.overrideAttrs (old: {
       patches = (old.patches or []) ++ [../../../../../patches/emacs-cairo-interactive-image-filter.patch];
+      # Emacs's C-level redisplay, image scaling, and GTK glue dominate
+      # PDF-viewer responsiveness; give them native codegen like the
+      # epdfinfo server below.
+      NIX_CFLAGS_COMPILE = "-O2 -march=native";
     });
     extraPackages = epkgs: [
       epkgs.async
