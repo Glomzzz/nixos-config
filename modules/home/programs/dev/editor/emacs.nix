@@ -22,7 +22,14 @@ in {
 
   services.emacs = {
     enable = true;
-    client.enable = true;
+    client = {
+      enable = true;
+      # Keep the same no-spawn guarantee for the desktop entry: an
+      # empty alternate editor makes emacsclient fail loudly instead
+      # of manufacturing a bare `emacs --daemon` orphan when the
+      # daemon is briefly unreachable.
+      arguments = ["-c" "--alternate-editor="];
+    };
     # Socket activation is disabled on purpose: the generated
     # emacs.socket unit listens on %t/emacs/server while the daemon
     # also binds that exact path, and after every service restart
@@ -79,10 +86,26 @@ in {
     executable = true;
     text = ''
       #!/bin/sh
-      if [ "$(${emacs}/bin/emacsclient --alternate-editor= --eval '(if (and (fboundp (quote my/gui-frames)) (fboundp (quote my/config-stale-p))) (if (and (null (my/gui-frames)) (my/config-stale-p)) (quote stale) (quote ok)) (quote stale))' 2>/dev/null)" = stale ]; then
-        ${pkgs.systemd}/bin/systemctl --user restart emacs
+      # Resolve the client at runtime instead of relying on a bare
+      # store path: prefer an explicit EMACSCLIENT, then the binary of
+      # the generation this wrapper was built from, and fall back to
+      # PATH.  A rolled-back or garbage-collected Emacs store path can
+      # therefore never leave the wrapper broken.
+      if [ -n "$EMACSCLIENT" ] && [ -x "$EMACSCLIENT" ]; then
+        emacsclient=$EMACSCLIENT
+      elif [ -x "${emacs}/bin/emacsclient" ]; then
+        emacsclient=${emacs}/bin/emacsclient
+      else
+        emacsclient=$(command -v emacsclient || true)
       fi
-      exec ${emacs}/bin/emacsclient "$@"
+      [ -n "$emacsclient" ] || { echo "emc: emacsclient not found" >&2; exit 1; }
+
+      # systemctl lives at the stable system path (/run/current-system
+      # is a boot-level GC root), unlike a per-generation store path.
+      if [ "$("$emacsclient" --alternate-editor= --eval '(if (and (fboundp (quote my/gui-frames)) (fboundp (quote my/config-stale-p))) (if (and (null (my/gui-frames)) (my/config-stale-p)) (quote stale) (quote ok)) (quote stale))' 2>/dev/null)" = stale ]; then
+        /run/current-system/sw/bin/systemctl --user restart emacs
+      fi
+      exec "$emacsclient" "$@"
     '';
   };
 
@@ -133,6 +156,12 @@ in {
     "text/x-tex" = ["emacsclient.desktop"];
     "x-scheme-handler/org-protocol" = ["emacsclient.desktop"];
   };
+  # EDITOR/VISUAL must keep an EMPTY alternate editor: while the daemon
+  # is unreachable for a moment (e.g. mid-restart), a non-empty
+  # alternate editor makes emacsclient spawn a bare `emacs --daemon`
+  # process that shadows the service daemon's socket forever.  An
+  # empty --alternate-editor= makes emacsclient fail loudly instead,
+  # and the fish shell inherits these through home.sessionVariables.
   home.sessionVariables = {
     EDITOR = "emacsclient -c --alternate-editor=";
     VISUAL = "emacsclient -c --alternate-editor=";
