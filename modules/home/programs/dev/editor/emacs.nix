@@ -4,6 +4,7 @@
   ...
 }: let
   emacs = config.programs.emacs.finalPackage;
+  emc = "${config.home.homeDirectory}/.local/bin/emc";
 in {
   programs.emacs = {
     enable = true;
@@ -32,12 +33,32 @@ in {
       # A frame-less daemon cannot display a buffer: its display-less
       # initial frame wedges the PGTK daemon if Magit tries to use it.
       # Fall back to the client's --create-frame path in that case.
-      if test (${emacs}/bin/emacsclient --alternate-editor= --eval '(if (my/gui-frames) (quote yes) (quote no))') = no
-        ${emacs}/bin/emacsclient --create-frame --no-wait --suppress-output --alternate-editor= --eval '(my/magit-status-window default-directory)'
+      if test (${emc} --alternate-editor= --eval '(if (my/gui-frames) (quote yes) (quote no))') = no
+        ${emc} --create-frame --no-wait --suppress-output --alternate-editor= --eval '(my/magit-status-window default-directory)'
       else
-        ${emacs}/bin/emacsclient --no-wait --suppress-output --alternate-editor= --eval '(my/magit-status-window default-directory)'
+        ${emc} --no-wait --suppress-output --alternate-editor= --eval '(my/magit-status-window default-directory)'
       end
       and echo "Magit opened in an Emacs window"
+    '';
+  };
+
+  # emacsclient wrapper used by the niri binds and the `magit' fish
+  # function: when the hand-written config is newer than the running
+  # daemon and no frame is open (the launching client is the only
+  # one), restart the daemon first so the edited config is loaded.
+  #
+  # The probe only asks for functions the daemon defines in core.el;
+  # a daemon that cannot answer it is running some other config and
+  # counts as stale, so the restart that loads the current config
+  # always happens instead of serving void-function errors.
+  home.file.".local/bin/emc" = {
+    executable = true;
+    text = ''
+      #!/bin/sh
+      if [ "$(${emacs}/bin/emacsclient --alternate-editor= --eval '(if (and (fboundp (quote my/gui-frames)) (fboundp (quote my/config-stale-p))) (if (and (null (my/gui-frames)) (my/config-stale-p)) (quote stale) (quote ok)) (quote stale))' 2>/dev/null)" = stale ]; then
+        ${pkgs.systemd}/bin/systemctl --user restart emacs
+      fi
+      exec ${emacs}/bin/emacsclient "$@"
     '';
   };
 

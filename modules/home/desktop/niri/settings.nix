@@ -22,9 +22,9 @@
     });
   terminal = "${pkgs.foot}/bin/foot";
   launcher = "${pkgs.fuzzel}/bin/fuzzel";
-  emacs = config.programs.emacs.finalPackage;
-  editor = ["${emacs}/bin/emacsclient" "-c" "-n" "-a" ""];
-  filemanager = ["${emacs}/bin/emacsclient" "-c" "-n" "-a" "" config.home.homeDirectory];
+  emc = "${config.home.homeDirectory}/.local/bin/emc";
+  editor = ["${emc}" "-c" "-n" "-a" ""];
+  filemanager = ["${emc}" "-c" "-n" "-a" "" config.home.homeDirectory];
   locker = "${pkgs.swaylock}/bin/swaylock";
   brightness = "${pkgs.brightnessctl}/bin/brightnessctl";
   playerctl = "${pkgs.playerctl}/bin/playerctl";
