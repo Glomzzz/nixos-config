@@ -5,6 +5,7 @@
 }: let
   emacs = config.programs.emacs.finalPackage;
   emc = "${config.home.homeDirectory}/.local/bin/emc";
+  noSpawnEditor = "${pkgs.coreutils}/bin/false";
 in {
   programs.emacs = {
     enable = true;
@@ -16,19 +17,16 @@ in {
       # responsiveness; give them native codegen.
       NIX_CFLAGS_COMPILE = "-O2 -march=native";
     });
-    # No extraPackages: every Lisp package comes from package.el
-    # (~/.config/emacs/modules/bootstrap.el), not from Nix.
+    # Lisp packages are managed by Emacs config.
   };
 
   services.emacs = {
     enable = true;
     client = {
       enable = true;
-      # Keep the same no-spawn guarantee for the desktop entry: an
-      # empty alternate editor makes emacsclient fail loudly instead
-      # of manufacturing a bare `emacs --daemon` orphan when the
-      # daemon is briefly unreachable.
-      arguments = ["-c" "--alternate-editor="];
+      # A non-empty command that always fails makes emacsclient report
+      # an unavailable server without spawning an unmanaged daemon.
+      arguments = ["-c" "--alternate-editor=${noSpawnEditor}"];
     };
     # Socket activation is disabled on purpose: the generated
     # emacs.socket unit listens on %t/emacs/server while the daemon
@@ -44,16 +42,13 @@ in {
     startWithUserSession = "graphical";
   };
 
-  # Reap orphaned Emacs daemons before (re)starting the service:
-  # emacsclient's alternate-editor fallback can still spawn a bare
-  # `emacs --daemon=<socket>` during the brief window while the
-  # service is restarting, and such processes keep a shadowed copy of
-  # the server socket forever.  The pattern is anchored to the Emacs
-  # binary invocation, so it never matches the service's own
-  # `--fg-daemon` command line, and the leading '-' makes the pkill
-  # ignore "no process matched".  The sleep gives a signaled orphan
+  # Reap legacy orphaned Emacs daemons before (re)starting the service.
+  # An orphan can keep a shadowed copy of the server socket forever.
+  # The pattern is anchored to the Emacs binary invocation, so it never
+  # matches the service's own `--fg-daemon` command line.  The leading '-'
+  # makes "no process matched" harmless.  The sleep gives a signaled orphan
   # time to release the socket path before the new daemon binds it.
-  systemd.user.services.emacs.serviceConfig.ExecStartPre = [
+  systemd.user.services.emacs.Service.ExecStartPre = [
     "-${pkgs.procps}/bin/pkill -f '^(/nix/store/[^ ]*/bin/)?emacs --daemon'"
     "${pkgs.coreutils}/bin/sleep 1"
   ];
@@ -64,10 +59,10 @@ in {
       # A frame-less daemon cannot display a buffer: its display-less
       # initial frame wedges the PGTK daemon if Magit tries to use it.
       # Fall back to the client's --create-frame path in that case.
-      if test (${emc} --alternate-editor= --eval '(if (my/gui-frames) (quote yes) (quote no))') = no
-        ${emc} --create-frame --no-wait --suppress-output --alternate-editor= --eval '(my/magit-status-window default-directory)'
+      if test (${emc} --alternate-editor=${noSpawnEditor} --eval '(if (my/gui-frames) (quote yes) (quote no))') = no
+        ${emc} --create-frame --no-wait --suppress-output --alternate-editor=${noSpawnEditor} --eval '(my/magit-status-window default-directory)'
       else
-        ${emc} --no-wait --suppress-output --alternate-editor= --eval '(my/magit-status-window default-directory)'
+        ${emc} --no-wait --suppress-output --alternate-editor=${noSpawnEditor} --eval '(my/magit-status-window default-directory)'
       end
       and echo "Magit opened in an Emacs window"
     '';
@@ -78,7 +73,7 @@ in {
   # daemon and no frame is open (the launching client is the only
   # one), restart the daemon first so the edited config is loaded.
   #
-  # The probe only asks for functions the daemon defines in core.el;
+  # The probe only asks for functions defined by modules/emc.el.
   # a daemon that cannot answer it is running some other config and
   # counts as stale, so the restart that loads the current config
   # always happens instead of serving void-function errors.
@@ -100,12 +95,20 @@ in {
       fi
       [ -n "$emacsclient" ] || { echo "emc: emacsclient not found" >&2; exit 1; }
 
+      no_spawn_editor=${noSpawnEditor}
+      probe=$("$emacsclient" --alternate-editor="$no_spawn_editor" --eval '(if (and (fboundp (quote my/gui-frames)) (fboundp (quote my/config-stale-p))) (if (and (null (my/gui-frames)) (my/config-stale-p)) (quote stale) (quote ok)) (quote stale))' 2>/dev/null || true)
+
       # systemctl lives at the stable system path (/run/current-system
       # is a boot-level GC root), unlike a per-generation store path.
-      if [ "$("$emacsclient" --alternate-editor= --eval '(if (and (fboundp (quote my/gui-frames)) (fboundp (quote my/config-stale-p))) (if (and (null (my/gui-frames)) (my/config-stale-p)) (quote stale) (quote ok)) (quote stale))' 2>/dev/null)" = stale ]; then
-        /run/current-system/sw/bin/systemctl --user restart emacs
+      systemctl=/run/current-system/sw/bin/systemctl
+      if [ "$probe" != ok ]; then
+        "$systemctl" --user reset-failed emacs.service >/dev/null 2>&1 || true
+        if ! "$systemctl" --user restart emacs.service; then
+          echo "emc: failed to restart emacs.service" >&2
+          exit 1
+        fi
       fi
-      exec "$emacsclient" "$@"
+      exec "$emacsclient" --alternate-editor="$no_spawn_editor" "$@"
     '';
   };
 
@@ -124,7 +127,7 @@ in {
     name = "Emacs Dirvish";
     genericName = "File Manager";
     comment = "Manage files with Dirvish in Emacs";
-    exec = "${emacs}/bin/emacsclient --create-frame --no-wait --alternate-editor= %f";
+    exec = "${emc} --create-frame --no-wait --alternate-editor=${noSpawnEditor} %f";
     icon = "emacs";
     terminal = false;
     categories = ["System" "FileTools" "FileManager"];
@@ -156,16 +159,13 @@ in {
     "text/x-tex" = ["emacsclient.desktop"];
     "x-scheme-handler/org-protocol" = ["emacsclient.desktop"];
   };
-  # EDITOR/VISUAL must keep an EMPTY alternate editor: while the daemon
-  # is unreachable for a moment (e.g. mid-restart), a non-empty
-  # alternate editor makes emacsclient spawn a bare `emacs --daemon`
-  # process that shadows the service daemon's socket forever.  An
-  # empty --alternate-editor= makes emacsclient fail loudly instead,
-  # and the fish shell inherits these through home.sessionVariables.
+  # An empty alternate editor tells emacsclient to launch `emacs --daemon`.
+  # Use `false` instead so every editor entry fails cleanly while the managed
+  # service is unavailable and can never shadow its socket with an orphan.
   home.sessionVariables = {
-    EDITOR = "emacsclient -c --alternate-editor=";
-    VISUAL = "emacsclient -c --alternate-editor=";
-    SUDO_EDITOR = "emacsclient -c --alternate-editor=";
-    ALTERNATE_EDITOR = "";
+    EDITOR = "emacsclient -c --alternate-editor=${noSpawnEditor}";
+    VISUAL = "emacsclient -c --alternate-editor=${noSpawnEditor}";
+    SUDO_EDITOR = "emacsclient -c --alternate-editor=${noSpawnEditor}";
+    ALTERNATE_EDITOR = noSpawnEditor;
   };
 }
