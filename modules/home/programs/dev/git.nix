@@ -14,7 +14,7 @@
         inherit email;
       };
       core = {
-        editor = "emacsclient -c --alternate-editor=";
+        editor = "emacsclient -c --alternate-editor=${pkgs.coreutils}/bin/false";
       };
     };
   };
