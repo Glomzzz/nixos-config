@@ -446,6 +446,37 @@ in {
         clip-to-geometry = true;
       }
 
+      # Keep Steam and its game surfaces on the high-refresh laptop panel.
+      {
+        matches = [
+          {app-id = "(?i)^(steam|steamwebhelper)$";}
+        ];
+        open-on-output = "eDP-1";
+      }
+
+      # Gamescope 3.16 leaves Just Go's outer surface app-id unset and only
+      # supplies the title, so match both the usual Steam game IDs and title.
+      # The game launcher supplies the fullscreen geometry; Niri only routes
+      # the surface and leaves the game's configure request intact.
+      {
+        matches = [
+          {
+            app-id = "(?i)^(steam_app_[0-9]+|dota2|cs2|gamescope|\\.gamescope-wrapped)$";
+          }
+          {title = "^JustGo$";}
+        ];
+        open-on-output = "eDP-1";
+        variable-refresh-rate = true;
+        geometry-corner-radius = {
+          top-left = 0.0;
+          top-right = 0.0;
+          bottom-left = 0.0;
+          bottom-right = 0.0;
+        };
+        clip-to-geometry = false;
+        shadow.enable = false;
+      }
+
       # Password/secret surfaces must never land in a screen recording.
       {
         matches = [
