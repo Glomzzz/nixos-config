@@ -49,14 +49,19 @@ in {
   # matches the service's own `--fg-daemon` command line.  The leading '-'
   # makes "no process matched" harmless.  The sleep gives a signaled orphan
   # time to release the socket path before the new daemon binds it.
-  systemd.user.services.emacs.Service.ExecStartPre = [
-    "-${pkgs.procps}/bin/pkill -f '^(/nix/store/[^ ]*/bin/)?emacs --daemon'"
-    "${pkgs.coreutils}/bin/sleep 1"
-    # Install declarations before the real daemon loads the configuration.
-    # `--eval` must precede `-l init.el`; Emacs loads init files before
-    # processing ordinary command-line arguments.
-    "${emacs}/bin/emacs -Q --batch --eval '(setq user-emacs-directory (expand-file-name \"~/.config/emacs/\") packages/bootstrap-mode t)' -l ${emacsInit}"
-  ];
+  systemd.user.services.emacs.Service = {
+    # A first launch may need to download and compile the entire package set.
+    # Home Manager's default 90-second deadline is too short for that work.
+    TimeoutStartSec = "5min";
+    ExecStartPre = [
+      "-${pkgs.procps}/bin/pkill -f '^(/nix/store/[^ ]*/bin/)?emacs --daemon'"
+      "${pkgs.coreutils}/bin/sleep 1"
+      # Install declarations before the real daemon loads the configuration.
+      # `--eval` must precede `-l init.el`; Emacs loads init files before
+      # processing ordinary command-line arguments.
+      "${emacs}/bin/emacs -Q --batch --eval '(setq user-emacs-directory (expand-file-name \"~/.config/emacs/\") user-init-file ${builtins.toJSON emacsInit} packages/bootstrap-mode t)' -l ${emacsInit}"
+    ];
+  };
 
   programs.fish.functions.magit = {
     description = "Open Magit in a new Emacs window for the current directory";
@@ -69,7 +74,7 @@ in {
       # Always ask emacsclient for a fresh graphical frame.  The Elisp
       # entry point uses that request's selected frame, so existing Magit
       # windows are left untouched.
-      ${emc} --create-frame --no-wait --suppress-output --alternate-editor=${noSpawnEditor} --eval '(my/magit-status-window default-directory)'
+      ${emc} --create-frame --no-wait --suppress-output --alternate-editor=${noSpawnEditor} --eval '(git/status-window default-directory)'
       and echo "Magit opened in a new Emacs window"
     '';
   };
@@ -106,7 +111,7 @@ in {
         # A daemon blocked by an earlier asynchronous request must not make
         # every later launcher wait forever.  A failed health probe triggers
         # the managed service restart below.
-        probe=$("$emacsclient" --timeout=5 --alternate-editor="$no_spawn_editor" --eval '(if (and (fboundp (quote my/gui-frames)) (fboundp (quote my/config-stale-p))) (if (and (null (my/gui-frames)) (my/config-stale-p)) (quote stale) (quote ok)) (quote stale))' 2>/dev/null || true)
+        probe=$("$emacsclient" --timeout=5 --alternate-editor="$no_spawn_editor" --eval '(if (and (fboundp (quote emc/gui-frames)) (fboundp (quote emc/config-stale-p))) (if (and (null (emc/gui-frames)) (emc/config-stale-p)) (quote stale) (quote ok)) (quote stale))' 2>/dev/null || true)
 
         # systemctl lives at the stable system path (/run/current-system
         # is a boot-level GC root), unlike a per-generation store path.
