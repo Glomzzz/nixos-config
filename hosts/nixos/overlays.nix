@@ -1,7 +1,7 @@
 {inputs, ...}: {
   nixpkgs.overlays = [
     (import ../../pkgs)
-    (final: prev: {
+    (_final: prev: {
       # Ryzenbit compiler + `rz lsp` language server, built from the local
       # checkout at ~/git/ryzenbit (flake input `ryzenbit`).
       ryzenbit = inputs.ryzenbit.packages.${prev.system}.ryzenbit;
@@ -11,6 +11,17 @@
         packageOverrides = _: pySuper: {
           cli-helpers = pySuper.cli-helpers.overridePythonAttrs (_: {
             doCheck = false;
+          });
+          # dlib 20.0.1 moved this function, so nixpkgs' build-cores.patch no
+          # longer applies. Preserve the patch's intent until nixpkgs fixes it.
+          dlib = pySuper.dlib.overridePythonAttrs (oldAttrs: {
+            patches = [];
+            preConfigure = "";
+            preBuild =
+              (oldAttrs.preBuild or "")
+              + ''
+                export CMAKE_BUILD_PARALLEL_LEVEL="$NIX_BUILD_CORES"
+              '';
           });
           face-recognition = pySuper.face-recognition.overrideAttrs (_: {
             doInstallCheck = false;
