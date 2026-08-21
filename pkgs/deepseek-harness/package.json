@@ -1,0 +1,20 @@
+{
+  "name": "deepseek-harness-nix",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "bootstrap.mjs",
+    "openviking-dsh-nix"
+  ],
+  "bin": {
+    "dsh": "node_modules/@deepseek-ai/dsh/lib/bin.js"
+  },
+  "dependencies": {
+    "@deepseek-ai/dsh": "0.1.0-rc.8",
+    "@liustack/modlens": "3.22.1",
+    "@liustack/modsearch": "5.8.0",
+    "dsh-routing-suite": "0.1.2",
+    "openviking-dsh-nix": "file:./openviking-dsh-nix"
+  }
+}
