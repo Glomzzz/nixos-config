@@ -14,8 +14,10 @@ in {
     p7zip
     ripgrep
     fd
+    deepseek-harness
     mandible
     nix-alien
+    openviking-agent-plugins
     curl
     sysstat
     usbutils
