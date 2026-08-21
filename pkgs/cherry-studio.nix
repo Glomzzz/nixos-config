@@ -6,13 +6,13 @@
   runCommand,
 }: let
   pname = "cherry-studio";
-  version = "2.0.2";
+  version = "2.0.8";
   src = fetchurl {
     url = "https://github.com/CherryHQ/cherry-studio/releases/download/v${version}/Cherry-Studio-${version}-x86_64.AppImage";
-    hash = "sha256-V1e+mKNyk0T6+pq/dtxBAV0Xw9ZOW3o5B4JMsUyZw1E=";
+    hash = "sha256-JNUfsfcHY3lxpPlOyaR2nqs7gfpD9vY3dQ2FafZpsds=";
   };
 
-  appimageContents = appimageTools.extractType2 {
+  appimageContents = appimageTools.extract {
     inherit pname version src;
   };
 
