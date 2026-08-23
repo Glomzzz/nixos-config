@@ -1,0 +1,11 @@
+--- a/node_modules/@deepseek-harness-tui/dsh-tui/lib/types/ink/log-update.js
++++ b/node_modules/@deepseek-harness-tui/dsh-tui/lib/types/ink/log-update.js
+@@ -528,7 +528,7 @@
+         // unaffected: its per-frame CSI H anchor + BSU/ESU atomic frames already
+         // keep the block renderer consistent.
+         if (!altScreen &&
+-            isJetBrainsIdeTerminal() &&
++            (isJetBrainsIdeTerminal() || process.env.DSH_TUI_INLINE_REPAINT === '1') &&
+             prev.viewport.height > 1 &&
+             !result.some(patch => patch.type === 'clearTerminal')) {
+             logForDebugging(`JetBrains inline frame: append viewport repaint (height=${next.screen.height}, viewport=${prev.viewport.height})`);

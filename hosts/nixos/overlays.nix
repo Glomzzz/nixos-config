@@ -4,7 +4,7 @@
     (_final: prev: {
       # Ryzenbit compiler + `rz lsp` language server, built from the local
       # checkout at ~/git/ryzenbit (flake input `ryzenbit`).
-      ryzenbit = inputs.ryzenbit.packages.${prev.system}.ryzenbit;
+      ryzenbit = inputs.ryzenbit.packages.${prev.stdenv.hostPlatform.system}.ryzenbit;
     })
     (final: prev: {
       python3 = prev.python3.override {
