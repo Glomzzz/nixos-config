@@ -7,5 +7,6 @@ _: {
     ./tailscale.nix
     ./udisks2.nix
     ./v2raya.nix
+    ./wivrn.nix
   ];
 }

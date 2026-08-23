@@ -64,13 +64,17 @@
     # Apparently, without this nouveau may attempt to be used instead
     # (despite it being blacklisted)
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+    # Keep VR and Steam games on the discrete NVIDIA GPU on this hybrid laptop.
+    __NV_PRIME_RENDER_OFFLOAD = "1";
+    __VK_LAYER_NV_optimus = "NVIDIA_only";
     # VA-API Backend as NVIDIA
     LIBVA_DRIVER_NAME = "nvidia";
 
     # --- Wayland ---
-    # Prefer Wayland, but allow X11 fallback for SDK-bundled Qt apps such as
-    # the Android emulator, which does not ship the Wayland platform plugin.
-    QT_QPA_PLATFORM = "wayland;xcb";
+    # Do not set QT_QPA_PLATFORM globally. Qt interprets the complete value as
+    # one plugin name, so a value such as "wayland;xcb" breaks bundled Qt5
+    # applications (notably SteamVR). Per-application overrides belong in the
+    # Steam package.
     # Force Firefox to use Wayland
     MOZ_ENABLE_WAYLAND = "1";
     # Ozone platform for Chromium/Electron apps

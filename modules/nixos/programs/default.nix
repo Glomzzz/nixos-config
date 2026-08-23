@@ -8,5 +8,6 @@ _: {
     ./nix-ld.nix
     ./opencode.nix
     ./steam.nix
+    ./vr.nix
   ];
 }
