@@ -18,6 +18,8 @@
       "dialout"
       "networkmanager"
       "wheel"
+      "render"
+      "video"
     ];
   };
 }

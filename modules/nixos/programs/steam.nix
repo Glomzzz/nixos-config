@@ -41,29 +41,52 @@ in {
   environment.systemPackages = with pkgs; [
     wayvr
     openxr-loader
-    alvr
     gamescope
     steamGameLaptop
   ];
 
   programs.steam = {
     enable = true;
+    # Steam Link on Quest 3 uses Steam Remote Play for the local VR stream.
+    remotePlay.openFirewall = true;
     package = pkgs.steam.override {
+      # Do not pass -pipewire: it routes Steam's desktop/Remote Play capture
+      # into the PipeWire+EGL pipeline that cannot initialize on NVIDIA
+      # Wayland hosts (Steam logs "CDesktopCapturePipeWire: Couldn't initialize
+      # EGL: 0x3001"; upstream valve-software/steam-for-linux#10315/#11913),
+      # and the ALVR use case it was added for is gone.
+      extraArgs = "";
       # Steam multiplies this by the 1.6x DPI reported through Xwayland.
       # Its CEF UI clamps at 1x, so the reciprocal prevents another HiDPI
       # enlargement on Niri's 1.5x laptop output.
-      extraEnv.STEAM_FORCE_DESKTOPUI_SCALING = "0.625";
+      # SteamVR and every game launched by Steam must select the NVIDIA GPU.
+      extraEnv = {
+        STEAM_FORCE_DESKTOPUI_SCALING = "0.625";
+        # SteamVR bundles Qt5 with only the XCB platform plugin. The global
+        # Wayland fallback value is interpreted literally by that runtime.
+        QT_QPA_PLATFORM = "xcb";
+        __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+        __NV_PRIME_RENDER_OFFLOAD = "1";
+        __VK_LAYER_NV_optimus = "NVIDIA_only";
+      };
     };
     fontPackages = with pkgs; [source-han-sans];
     extraPackages = with pkgs; [
       corefonts
       noto-fonts-cjk-sans
       source-han-sans
-      # SteamVR's native vrmonitor is a Qt5 application, but the stock Steam
-      # runtime does not provide the Qt5 libraries it links against.
+      # SteamVR's native monitor is a Qt5 application, and its vrserver also
+      # needs host PipeWire/GBM/XKB libraries that the stock runtime lacks.
       qt5.qtbase
       qt5.qtmultimedia
       qt5.qtwayland
+      libdrm
+      libgbm
+      pulseaudio
+      pipewire
+      libcap
+      procps
+      xkeyboard-config
     ];
     extraCompatPackages = with pkgs; [
       gamemode
