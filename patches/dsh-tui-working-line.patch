@@ -1,0 +1,26 @@
+--- a/node_modules/@deepseek-harness-tui/dsh-tui/lib/types/screens/Chat.js
++++ b/node_modules/@deepseek-harness-tui/dsh-tui/lib/types/screens/Chat.js
+@@ -2457,7 +2457,7 @@
+                             return _jsx(ScrollbarGutter, { handle: handle, terminalWidth: terminalColumns });
+                         }
+                         return (_jsx(TimelineRail, { handle: handle, turns: timeline.turns, activeId: timeline.activeId, upId: timeline.upId, downId: timeline.downId, terminalWidth: terminalColumns, hoverEnabled: !promptSelectionActive, onRevealTurn: revealAndSeekRow }));
+-                    })()] }), _jsxs(Box, { flexDirection: "column", flexShrink: 0, children: [showPill && (_jsx(NewMessagesPill, { count: unseenCount, onClick: () => handle?.scrollToBottom() })), channel.working &&
++                    })()] }), _jsxs(Box, { flexDirection: "column", flexShrink: 0, children: [showPill && (_jsx(NewMessagesPill, { count: unseenCount, onClick: () => handle?.scrollToBottom() })), false &&
+                         (channel.activityEnabled &&
+                             !channel.minimal &&
+                             channel.workingActivity !== undefined &&
+@@ -2471,13 +2471,7 @@
+                                 void setClipboard(btw.answer ?? '').then(raw => { if (raw)
+                                     writeRaw?.(raw); });
+                                 channel.notify(t('copied-chars', { n: (btw.answer ?? '').length }), { timeoutMs: 1500 });
+-                            } }) })) : questionSnapshot !== null ? (_jsx(AskUserQuestionPanel, { question: questionSnapshot.question, position: questionSnapshot.position, total: questionSnapshot.total, answered: questionSnapshot.answered, onAnswer: selection => questionStore.answerCurrent(selection), onCancel: () => questionStore.cancelCurrent() }, questionSnapshot.key)) : (_jsx(PromptInput, { channel: channel, helpOpen: helpOpen, onToggleHelp: () => { setHelpOpen(previous => !previous); }, onRunCommand: runCommand, selectionActive: promptSelectionActive, fillText: historyFill, onFillConsumed: () => { setHistoryFill(null); }, onRewindRequest: openRewind, controllerRef: promptControllerRef })), _jsx(StatusLine, { channel: channel, selectionActive: selectionActive, helpOpen: helpOpen, wake: wakeBand === undefined
+-                            ? undefined
+-                            : {
+-                                band: wakeBand,
+-                                hint: trajectorySeen ? undefined : `${modLabel}t`,
+-                                tick: Math.floor(wakeTime / 120),
+-                            } }), dialogOverlayOpen && (_jsxs(OverlayAbove, { maxHeight: Math.max(terminalRows - 8, 1), children: [overlay.kind === 'thinking' && (_jsx(ThinkingToggle, { currentValue: thinkingVisible, focusIndex: overlay.focus, onPick: (index) => {
++                            } }) })) : questionSnapshot !== null ? (_jsx(AskUserQuestionPanel, { question: questionSnapshot.question, position: questionSnapshot.position, total: questionSnapshot.total, answered: questionSnapshot.answered, onAnswer: selection => questionStore.answerCurrent(selection), onCancel: () => questionStore.cancelCurrent() }, questionSnapshot.key)) : (_jsx(PromptInput, { channel: channel, helpOpen: helpOpen, onToggleHelp: () => { setHelpOpen(previous => !previous); }, onRunCommand: runCommand, selectionActive: promptSelectionActive, fillText: historyFill, onFillConsumed: () => { setHistoryFill(null); }, onRewindRequest: openRewind, controllerRef: promptControllerRef })), _jsx(StatusLine, { channel: channel, selectionActive: selectionActive, helpOpen: helpOpen, wake: undefined }), dialogOverlayOpen && (_jsxs(OverlayAbove, { maxHeight: Math.max(terminalRows - 8, 1), children: [overlay.kind === 'thinking' && (_jsx(ThinkingToggle, { currentValue: thinkingVisible, focusIndex: overlay.focus, onPick: (index) => {
+                                     // 点击行 = 设焦点 + 应用（与 Enter 同一条路径）
+                                     const visible = index === 0;
+                                     setThinkingVisible(visible);
