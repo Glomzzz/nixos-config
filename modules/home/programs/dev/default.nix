@@ -4,6 +4,5 @@ _: {
     ./direnv.nix
     ./editor
     ./git.nix
-    ./lang
   ];
 }

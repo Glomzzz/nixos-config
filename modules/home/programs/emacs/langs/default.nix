@@ -6,6 +6,7 @@ _: {
     ./javascript.nix
     ./koka.nix
     ./kotlin.nix
+    ./markdown.nix
     ./nix.nix
     ./ocaml.nix
     ./python.nix
