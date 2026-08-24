@@ -12,6 +12,7 @@ in {
     zip
     unzip
     p7zip
+    praxis
     ripgrep
     fd
     deepseek-harness
