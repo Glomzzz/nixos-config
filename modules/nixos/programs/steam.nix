@@ -11,15 +11,30 @@
         unset VK_DRIVER_FILES
       fi
 
-      # Just Go only exposes 16:9 modes. Match the game's render surface to its
-      # highest supported mode so Unity, Gamescope, and absolute input use the
-      # same coordinates; Gamescope letterboxes it on the 16:10 panel.
-      if [[ "''${SteamAppId:-''${STEAM_COMPAT_APP_ID:-}}" == "1862520" ]]; then
-        set -- "$@" \
-          -screen-width 2560 \
-          -screen-height 1440 \
-          -screen-fullscreen 1
-      fi
+      # 16:9-only titles (Just Go, Overcooked! 2): match the game's render
+      # surface to its highest supported mode so Unity, Gamescope, and
+      # absolute input use the same coordinates; Gamescope letterboxes it on
+      # the 16:10 panel.
+      #
+      # How to Fish (Unity 6) instead reads the satellite's DPI-virtualized
+      # desktop - 3840x2400, i.e. 2560x1600 at the 1.5 base scale - as its
+      # native mode, so its fullscreen surface overflows the logical screen
+      # and the game starts blown up to 1.5x. Pin its render surface to the
+      # panel's native mode instead.
+      case "''${SteamAppId:-''${STEAM_COMPAT_APP_ID:-}}" in
+        1862520|728880)
+          set -- "$@" \
+            -screen-width 2560 \
+            -screen-height 1440 \
+            -screen-fullscreen 1
+          ;;
+        4001890)
+          set -- "$@" \
+            -screen-width 2560 \
+            -screen-height 1600 \
+            -screen-fullscreen 1
+          ;;
+      esac
 
       # Niri presents eDP-1 as 1707x1066 logical pixels at scale 1.5. Let the
       # Wayland backend negotiate that outer surface while the nested game
