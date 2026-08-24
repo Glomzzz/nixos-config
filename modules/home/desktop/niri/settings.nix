@@ -454,16 +454,17 @@ in {
         open-on-output = "eDP-1";
       }
 
-      # Gamescope 3.16 leaves Just Go's outer surface app-id unset and only
-      # supplies the title, so match both the usual Steam game IDs and title.
-      # The game launcher supplies the fullscreen geometry; Niri only routes
-      # the surface and leaves the game's configure request intact.
+      # Gamescope 3.16 leaves its outer surface app-id unset and only supplies
+      # the nested window's title, so match both the usual Steam game IDs and
+      # the titles of the games adopted by `steam-game-laptop`. The game
+      # launcher supplies the fullscreen geometry; Niri only routes the
+      # surface and leaves the game's configure request intact.
       {
         matches = [
           {
             app-id = "(?i)^(steam_app_[0-9]+|dota2|cs2|gamescope|\\.gamescope-wrapped)$";
           }
-          {title = "^JustGo$";}
+          {title = "(?i)^(JustGo|How to Fish|Overcooked.*2)$";}
         ];
         open-on-output = "eDP-1";
         variable-refresh-rate = true;
