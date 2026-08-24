@@ -6,6 +6,7 @@
   home.packages = with pkgs; [
     (lib.hiPrio rust-analyzer)
     rustup
+    lldb
     trunk
     cargo-generate
     wasm-pack

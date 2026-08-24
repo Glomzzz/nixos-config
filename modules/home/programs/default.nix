@@ -5,6 +5,7 @@ _: {
     ./communication.nix
     ./dev
     ./documents.nix
+    ./emacs
     ./gaming
     ./multimedia.nix
   ];
