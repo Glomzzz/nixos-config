@@ -151,6 +151,23 @@
         "type": "github"
       }
     },
+    "nixpkgs-kernel-7-2-0": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1787360063,
+        "narHash": "sha256-dt4WdcvsA8/RCe+VZZwqU0X+XMM3wBbGCWA0/sFWzGo=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "2c423e03bbafcff28bfadc6781a4a8257f205cb5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "2c423e03bbafcff28bfadc6781a4a8257f205cb5",
+        "type": "github"
+      }
+    },
     "nixpkgs-stable": {
       "locked": {
         "lastModified": 1782847189,
@@ -222,6 +239,7 @@
         "niri": "niri",
         "nix-alien-source": "nix-alien-source",
         "nixpkgs": "nixpkgs_2",
+        "nixpkgs-kernel-7-2-0": "nixpkgs-kernel-7-2-0",
         "praxis": "praxis",
         "ryzenbit": "ryzenbit",
         "sops-nix": "sops-nix",
