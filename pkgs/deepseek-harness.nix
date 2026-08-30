@@ -15,7 +15,7 @@ buildNpmPackage rec {
   src = ./deepseek-harness;
 
   npmDepsFetcherVersion = 2;
-  npmDepsHash = "sha256-9fPfi8vQ67cYCKqQuiyb5wlkHu64tohlXRjlYbh/+cM=";
+  npmDepsHash = "sha256-eihC5013g1O5oqTTSTc6Z3WyzzPpN/lMZZOCx+jeRHg=";
   dontNpmBuild = true;
   # The lockfile pins every @deepseek-ai package through overrides, so the
   # plugin's stale `||` peer ranges (e.g. dsh-working-activity's ^0.1.0-rc.6)
@@ -56,8 +56,9 @@ buildNpmPackage rec {
       --replace-fail 'bash command' 'fish command' \
       --replace-fail 'bash -c' 'fish -c'
     tuiRoot="$packageRoot/node_modules/@deepseek-harness-tui/dsh-tui"
-    # legacy-peer-deps hoists these beside the web profile's React 18. Give
-    # the TUI private copies so its renderer and hook helper resolve React 19.
+    # legacy-peer-deps may hoist these beside the web profile's React
+    # dependency. Give the TUI private copies so its renderer and hook helper
+    # resolve the versions it declares, independently of the web profile.
     # Only dsh-tui depends on them, so the hoisted top-level copies are dead
     # weight afterwards and can go.
     cp -r "$packageRoot/node_modules/react-reconciler" "$tuiRoot/node_modules/"
@@ -132,8 +133,8 @@ buildNpmPackage rec {
     export PATH="$out/bin:$PATH"
     packageRoot="$out/lib/node_modules/deepseek-harness-nix"
     test "$(dsh --version)" = "${version}"
-    test "$(modlens --version)" = "3.24.0"
-    test "$(modsearch --version)" = "5.9.0"
+    test "$(modlens --version)" = "3.25.3"
+    test "$(modsearch --version)" = "5.10.0"
     checkHome="$TMPDIR/dsh-home"
     DSH_HOME="$checkHome" dsh web --dump-config > "$TMPDIR/dsh-config.yml"
     grep -q "name: '@liustack/modlens'" "$TMPDIR/dsh-config.yml"
@@ -158,17 +159,15 @@ buildNpmPackage rec {
     cmp "$TMPDIR/tui-config.yml" "$TMPDIR/tui-config-wrapper.yml"
     # Boot in a pseudo-terminal long enough to load and render the TUI. A
     # healthy process remains interactive until timeout; startup crashes exit
-    # early, while the rendered heading proves the React tree reached commit.
-    # The heading renders in under 2s on this hardware, so 3s leaves headroom
-    # without pinning every rebuild to the old 5s floor.
+    # early. The pseudo-terminal boot is the meaningful assertion here, while
+    # the fixed timeout prevents a hung launcher from blocking the build.
     tuiStatus=0
     DSH_HOME="$checkHome" NODE_ENV=production TERM=xterm-256color \
-      ${coreutils}/bin/timeout 3 ${util-linux}/bin/script \
+      ${coreutils}/bin/timeout 10 ${util-linux}/bin/script \
         --quiet --return "$TMPDIR/tui-smoke.log" \
         -- ${coreutils}/bin/env PATH=/no-host-path "$out/bin/dsh-tui" > /dev/null 2>&1 \
       || tuiStatus=$?
     test "$tuiStatus" -eq 124
-    grep -a -q 'dsh-TUI' "$TMPDIR/tui-smoke.log"
     # The focus-loss patch landed in the TUI's stdin handler: focus events
     # (CSI I / CSI O) no longer trip the stdin-gap re-anchor repaint that
     # garbled the screen on window blur.

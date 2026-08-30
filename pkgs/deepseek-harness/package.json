@@ -1,6 +1,6 @@
 {
   "name": "deepseek-harness-nix",
-  "version": "0.1.0",
+  "version": "0.1.1-rc.2",
   "private": true,
   "type": "module",
   "files": [
@@ -32,12 +32,12 @@
     "@deepseek-ai/dsh-timeout": "0.1.1-rc.2",
     "@deepseek-ai/dsh-workflow": "0.1.1-rc.2",
     "@deepseek-ai/node-addon-landlock-run-linux-x64": "0.1.1",
-    "@deepseek-harness-tui/dsh-tui": "0.9.0",
-    "@liustack/modlens": "3.24.0",
-    "@liustack/modsearch": "5.9.0",
+    "@deepseek-harness-tui/dsh-tui": "0.9.3",
+    "@liustack/modlens": "3.25.3",
+    "@liustack/modsearch": "5.10.0",
     "dsh-routing-suite": "0.1.2",
     "openviking-dsh-nix": "file:./openviking-dsh-nix",
-    "react": "18.3.1"
+    "react": "19.2.8"
   },
   "overrides": {
     "@deepseek-ai/cordis": "4.0.1",
