@@ -1,14 +1,10 @@
 --- a/node_modules/@deepseek-harness-tui/dsh-tui/cordis.patch.yml
 +++ b/node_modules/@deepseek-harness-tui/dsh-tui/cordis.patch.yml
-@@ -290,6 +290,11 @@
-         # inline 模式下由终端原生选择/复制/scrollback 接管；想用 fullscreen 在
-         # profile 用户层 cordis.patch.yml 同 id 覆盖整行 config（fullscreen: true）。
-         fullscreen: false
+@@ -304,2 +304,7 @@
+         fullscreen: true
 +        # [nix patch] scrollGutter hidden: the timeline rail appears one
 +        # frame after boot and narrows the transcript by ~3 columns, so every
 +        # row rewraps and the diff engine leaves stale cells (garbled rows).
 +        # A fixed-width transcript also keeps the working line from drifting.
 +        scrollGutter: hidden
          # Edit/Write diff 呈现：auto（≥110 列双栏对照，窄屏统一式）/
-         # split（强制双栏）/ unified（强制统一式）。/settings 屏可实时改。
-         # diffLayout: auto

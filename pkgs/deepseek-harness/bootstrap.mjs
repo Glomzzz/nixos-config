@@ -10,8 +10,8 @@ const TUI_LAUNCHER_BIN = join(PACKAGE_ROOT, 'node_modules/@deepseek-harness-tui/
 // Bundled plugins of the web profile, in boot order. Keep versions in sync
 // with package.json.
 const webPlugins = [
-  { name: '@liustack/modlens', version: '3.24.0' },
-  { name: '@liustack/modsearch', version: '5.9.0' },
+  { name: '@liustack/modlens', version: '3.25.3' },
+  { name: '@liustack/modsearch', version: '5.10.0' },
   { name: 'dsh-routing-suite', version: '0.1.2' },
   { name: 'openviking-dsh-nix', version: '0.1.0', local: true },
 ]
@@ -22,7 +22,7 @@ const webPlugins = [
 // the store symlink, so the bundled launcher runs its full logic (--resume
 // conversion, workspace target, dsh preflight) and delegates to
 // `dsh --profile dsh-tui`.
-const tuiPlugin = { name: '@deepseek-harness-tui/dsh-tui', version: '0.9.0' }
+const tuiPlugin = { name: '@deepseek-harness-tui/dsh-tui', version: '0.9.3' }
 
 function resolveHome() {
   const configured = process.env.DSH_HOME?.trim()
