@@ -6,10 +6,10 @@
   runCommand,
 }: let
   pname = "cherry-studio";
-  version = "2.0.8";
+  version = "2.0.10";
   src = fetchurl {
-    url = "https://github.com/CherryHQ/cherry-studio/releases/download/v${version}/Cherry-Studio-${version}-x86_64.AppImage";
-    hash = "sha256-JNUfsfcHY3lxpPlOyaR2nqs7gfpD9vY3dQ2FafZpsds=";
+    url = "https://github.com/CherryHQ/cherry-studio/releases/download/v${version}/Cherry-Studio-${version}-linux-x64.AppImage";
+    hash = "sha256-4q/DvOmHY8LiQMxLRsRnqHvGORtmoTPtxKCWYDdwj2k=";
   };
 
   appimageContents = appimageTools.extract {

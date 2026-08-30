@@ -11,18 +11,18 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "codex";
-  version = "0.149.0";
+  version = "0.151.0";
 
   src = fetchurl {
     url = "https://github.com/openai/codex/releases/download/rust-v${finalAttrs.version}/codex-x86_64-unknown-linux-musl.tar.gz";
-    hash = "sha256-c2iyBV7QIVf+omlbufWvPuew5AxaO+vIHfxZZwQkTP0=";
+    hash = "sha256-YFtLGD8ixkX13vY6W3GRdnQH+2am/q7E6vELW34AWPY=";
   };
 
   # Out-of-process V8 execution companion binary. Codex spawns this at
   # runtime; without it, Code Mode fails closed.
   codeModeHostSrc = fetchurl {
     url = "https://github.com/openai/codex/releases/download/rust-v${finalAttrs.version}/codex-code-mode-host-x86_64-unknown-linux-musl.tar.gz";
-    hash = "sha256-NgCkWsKwn+PJlfT0mGATH+o4i0bECcgqAmb8TQNCoEw=";
+    hash = "sha256-My2mghXwcDIctS6+eS7M6N/WFNAupVQTCdCl3wHhSJQ=";
   };
 
   sourceRoot = ".";

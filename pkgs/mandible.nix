@@ -8,16 +8,16 @@
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "mandible";
-  version = "0.3.2";
+  version = "0.5.0";
 
   src = fetchFromGitHub {
     owner = "AS-FOSS";
     repo = "mandible";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-U7SApBvuELkN4f9uhLdcThO09UphCiHR6ez0bKQE71Q=";
+    hash = "sha256-rTXdMRTS4pEQ3wftwJUkLLBmj//woGq1gGVASLl/h/Q=";
   };
 
-  cargoHash = "sha256-8sqi/SPOEdpYTxw2M9TFmnFlNInLYDVLmD7w/TEO8lY=";
+  cargoHash = "sha256-zdOVQR9Nq2C3LMzzvSYUjCGrkgrRpb7x9KrNdTjE3Lw=";
 
   nativeBuildInputs = [installShellFiles];
   nativeCheckInputs = [git];
@@ -34,8 +34,13 @@ rustPlatform.buildRustPackage (finalAttrs: {
   postInstall = ''
     installManPage packaging/mandible.1
 
-    completionDir="$(find target -type d -path '*/release/build/mandible-*/out' -print -quit)"
-    test -n "$completionDir"
+    mandibleBin="$(find target -type f -path '*/release/mandible' -print -quit)"
+    test -n "$mandibleBin"
+    completionDir="$TMPDIR/mandible-completions"
+    mkdir -p "$completionDir"
+    "$mandibleBin" --completions bash > "$completionDir/mandible.bash"
+    "$mandibleBin" --completions fish > "$completionDir/mandible.fish"
+    "$mandibleBin" --completions zsh > "$completionDir/_mandible"
     installShellCompletion --cmd mandible \
       --bash "$completionDir/mandible.bash" \
       --fish "$completionDir/mandible.fish" \
