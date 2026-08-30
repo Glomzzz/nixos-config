@@ -7,14 +7,14 @@
 }:
 stdenvNoCC.mkDerivation {
   pname = "openviking-agent-plugins";
-  version = "0.1.0";
+  version = "0.1.0-unstable-2026-08-30";
 
   src = fetchFromGitHub {
     owner = "volcengine";
     repo = "OpenViking";
-    rev = "daf5fb1774fa33804ffaed7b6f445340de59296c";
+    rev = "2c88269d5440b55456db4209866564d329e6308b";
     sparseCheckout = ["agent-plugins"];
-    hash = "sha256-eUo1otQEaIzyub918fCxz/cfLGIF3MO6SXqYxa34cAQ=";
+    hash = "sha256-v7oZ0TZYmOwMqWGuoSf3WOQA5lwPIY8vFmqLA0Ay1fc=";
   };
 
   # OpenViking's Python server is intentionally not vendored here: this
