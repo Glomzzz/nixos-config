@@ -462,9 +462,9 @@ in {
       {
         matches = [
           {
-            app-id = "(?i)^(steam_app_[0-9]+|dota2|cs2|gamescope|\\.gamescope-wrapped)$";
+            app-id = "(?i)^(Terraria|steam_app_[0-9]+|dota2|cs2|gamescope|\\.gamescope-wrapped)$";
           }
-          {title = "(?i)^(JustGo|How to Fish|Overcooked.*2)$";}
+          {title = "(?i)^(JustGo|How to Fish|Overcooked.*2|Terraria)$";}
         ];
         open-on-output = "eDP-1";
         variable-refresh-rate = true;

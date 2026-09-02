@@ -3,6 +3,10 @@
   # needs a fullscreen surface sized for the laptop panel.
   steamGameLaptop = pkgs.writeShellApplication {
     name = "steam-game-laptop";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.jq
+    ];
     text = ''
       # Older system generations exported an NVIDIA ICD filename that no
       # longer exists. Drop only that stale override so an already-running
@@ -33,6 +37,25 @@
             -screen-width 2560 \
             -screen-height 1600 \
             -screen-fullscreen 1
+          ;;
+        105600)
+          # Terraria persists Xwayland's DPI-scaled desktop (3840x2400) in
+          # config.json. Keep the saved mode at the panel's physical 2K mode;
+          # Gamescope supplies the same mode to the game at runtime.
+          terrariaConfig="''${XDG_DATA_HOME:-$HOME/.local/share}/Terraria/config.json"
+          if [[ -f "$terrariaConfig" ]]; then
+            terrariaConfigTmp=$(mktemp --tmpdir="$(dirname "$terrariaConfig")" .config.json.XXXXXX)
+            trap 'rm -f "$terrariaConfigTmp"' EXIT
+            if jq \
+              '.DisplayWidth = 2560 | .DisplayHeight = 1600 | .Fullscreen = true | .WindowBorderless = true' \
+              "$terrariaConfig" > "$terrariaConfigTmp"; then
+              mv "$terrariaConfigTmp" "$terrariaConfig"
+            else
+              rm -f "$terrariaConfigTmp"
+              echo "steam-game-laptop: could not update Terraria config; continuing" >&2
+            fi
+            trap - EXIT
+          fi
           ;;
       esac
 
