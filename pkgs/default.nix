@@ -1,6 +1,7 @@
 final: _prev: {
   cherry-studio = final.callPackage ./cherry-studio.nix {};
   cherry-studio-with-desktop = final.callPackage ./cherry-studio-with-desktop.nix {};
+  bun = final.callPackage ./bun.nix {};
   codex = final.callPackage ./codex.nix {};
   deepseek-harness = final.callPackage ./deepseek-harness.nix {};
   mandible = final.callPackage ./mandible.nix {};
