@@ -464,7 +464,7 @@ in {
           {
             app-id = "(?i)^(Terraria|steam_app_[0-9]+|dota2|cs2|gamescope|\\.gamescope-wrapped)$";
           }
-          {title = "(?i)^(JustGo|How to Fish|Overcooked.*2|Terraria)$";}
+          {title = "(?i)^(JustGo|How to Fish|Overcooked.*2|Terraria|Kingdom Come: Deliverance)$";}
         ];
         open-on-output = "eDP-1";
         variable-refresh-rate = true;
