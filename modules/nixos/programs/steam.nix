@@ -26,6 +26,14 @@
       # and the game starts blown up to 1.5x. Pin its render surface to the
       # panel's native mode instead.
       case "''${SteamAppId:-''${STEAM_COMPAT_APP_ID:-}}" in
+        379430)
+          # KCD's CryEngine launcher defaults to 1280x720 under Proton even
+          # when Gamescope exposes the panel's native mode.
+          set -- "$@" \
+            -r_width 2560 \
+            -r_height 1600 \
+            -r_fullscreen 1
+          ;;
         1862520|728880)
           set -- "$@" \
             -screen-width 2560 \
@@ -61,18 +69,23 @@
 
       # Niri presents eDP-1 as 1707x1066 logical pixels at scale 1.5. Let the
       # Wayland backend negotiate that outer surface while the nested game
-      # remains at the panel's native 2560x1600 pixels.
-      exec ${pkgs.gamescope}/bin/gamescope \
-        --backend wayland \
-        --fullscreen \
-        --nested-width 2560 \
-        --nested-height 1600 \
-        --nested-refresh 240 \
-        --nested-unfocused-refresh 60 \
-        --force-windows-fullscreen \
-        --force-grab-cursor \
-        --adaptive-sync \
-        -- "$@"
+      # remains at the panel's native 2560x1600 pixels. KCD currently trips a
+      # Gamescope input-thread abort with forced cursor grabbing, so leave that
+      # option off for KCD while retaining it for the other adopted games.
+      gamescopeArgs=(
+        --backend wayland
+        --fullscreen
+        --nested-width 2560
+        --nested-height 1600
+        --nested-refresh 240
+        --nested-unfocused-refresh 60
+        --force-windows-fullscreen
+        --adaptive-sync
+      )
+      if [[ "''${SteamAppId:-''${STEAM_COMPAT_APP_ID:-}}" != 379430 ]]; then
+        gamescopeArgs+=(--force-grab-cursor)
+      fi
+      exec ${pkgs.gamescope}/bin/gamescope "''${gamescopeArgs[@]}" -- "$@"
     '';
   };
 in {
