@@ -2,6 +2,7 @@ _: {
   imports = [
     ./cpp.nix
     ./flix.nix
+    ./haskell.nix
     ./java.nix
     ./javascript.nix
     ./koka.nix
