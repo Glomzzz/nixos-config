@@ -3,14 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    # The current nixpkgs snapshot's 7.2.1 kernel breaks eDP mode detection on
-    # the Zephyrus. Keep the known-good 7.2.0 package set available only for
-    # this host's kernel; the main nixpkgs input remains current for everything
-    # else.
-    nixpkgs-kernel-7-2-0 = {
-      url = "github:nixos/nixpkgs/2c423e03bbafcff28bfadc6781a4a8257f205cb5";
-      flake = false;
-    };
     home-manager = {
       url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";
