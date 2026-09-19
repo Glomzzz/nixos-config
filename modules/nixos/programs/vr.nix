@@ -72,40 +72,42 @@ in {
   # limit must be 99; the previous 95 left every realtime attempt failing with
   # EPERM (strace: sched_setscheduler(..., SCHED_RR, {sched_priority=99}) = -1
   # EPERM), which is what made the head-tracked view desync under load.
-  security.pam.loginLimits = [
-    {
-      domain = username;
-      item = "rtprio";
-      type = "-";
-      value = "99";
-    }
-    {
-      domain = username;
-      item = "nice";
-      type = "-";
-      value = "-20";
-    }
-    {
-      domain = username;
-      item = "memlock";
-      type = "-";
-      value = "infinity";
-    }
-  ];
+  security = {
+    pam.loginLimits = [
+      {
+        domain = username;
+        item = "rtprio";
+        type = "-";
+        value = "99";
+      }
+      {
+        domain = username;
+        item = "nice";
+        type = "-";
+        value = "-20";
+      }
+      {
+        domain = username;
+        item = "memlock";
+        type = "-";
+        value = "infinity";
+      }
+    ];
 
-  security.polkit.enablePkexecWrapper = true;
+    polkit.enablePkexecWrapper = true;
 
-  # See the steamVrGetcap comment: SteamVR's vrsetup.sh runs inside Steam's
-  # launcher-service sandbox, where /run/wrappers is mounted nosuid and pkexec
-  # fails with "pkexec must be setuid root", aborting setup with "SteamVR setup
-  # is incomplete". getcap is read-only (it only reports file capabilities), so
-  # running the shim with a setuid wrapper is harmless; inside the sandbox the
-  # setuid bit is ignored anyway and it runs as the plain user.
-  security.wrappers.getcap = {
-    source = "${steamVrGetcap}/bin/getcap";
-    owner = "root";
-    group = "root";
-    setuid = true;
+    # See the steamVrGetcap comment: SteamVR's vrsetup.sh runs inside Steam's
+    # launcher-service sandbox, where /run/wrappers is mounted nosuid and pkexec
+    # fails with "pkexec must be setuid root", aborting setup with "SteamVR setup
+    # is incomplete". getcap is read-only (it only reports file capabilities), so
+    # running the shim with a setuid wrapper is harmless; inside the sandbox the
+    # setuid bit is ignored anyway and it runs as the plain user.
+    wrappers.getcap = {
+      source = "${steamVrGetcap}/bin/getcap";
+      owner = "root";
+      group = "root";
+      setuid = true;
+    };
   };
 
   systemd = {
