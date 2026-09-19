@@ -8,12 +8,12 @@
     text = ''
       #!${pkgs.runtimeShell}
       exec ${pkgs.fish}/bin/fish --no-config --init-command '
-        set --prepend --global --export PATH ${config.programs.carapace.package}/bin
+        set --prepend --global --export PATH ${config.programs.carapace.finalPackage}/bin
         set --prepend fish_complete_path /etc/fish/generated_completions
         set --prepend fish_complete_path /run/current-system/sw/share/fish/vendor_completions.d
         set --prepend fish_complete_path ${config.xdg.dataFile."fish/home-manager/generated_completions".source}
         set --prepend fish_complete_path ${config.home.path}/share/fish/vendor_completions.d
-        ${config.programs.carapace.package}/bin/carapace _carapace fish | source
+        ${config.programs.carapace.finalPackage}/bin/carapace _carapace fish | source
       ' "$@"
     '';
   };
@@ -50,6 +50,6 @@
     enableFishIntegration = true;
     enableBashIntegration = false;
     enableZshIntegration = false;
-    ignoreCase = true;
+    environment.CARAPACE_MATCH = true;
   };
 }
