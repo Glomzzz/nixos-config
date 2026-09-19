@@ -2,9 +2,6 @@
   nixpkgs.overlays = [
     (import ../../pkgs)
     (_final: prev: {
-      # Ryzenbit compiler + `rz lsp` language server, built from the local
-      # checkout at ~/git/ryzenbit (flake input `ryzenbit`).
-      ryzenbit = inputs.ryzenbit.packages.${prev.stdenv.hostPlatform.system}.ryzenbit;
       # Praxis CLI + TUI, built from the local checkout at ~/git/praxis
       # (flake input praxis).
       praxis = inputs.praxis.packages.${prev.stdenv.hostPlatform.system}.praxis;
