@@ -26,7 +26,7 @@
       export GTK_IM_MODULE=fcitx
       export SDL_IM_MODULE=fcitx
       export GLFW_IM_MODULE=ibus
-      export QT_PLUGIN_PATH=${libsForQt5.fcitx5-qt}/lib/qt-5.15.18/plugins:${kdePackages.fcitx5-qt}/lib/qt-6/plugins:''${QT_PLUGIN_PATH:+:$QT_PLUGIN_PATH}
+      export QT_PLUGIN_PATH=${libsForQt5.fcitx5-qt}/${libsForQt5.qtbase.qtPluginPrefix}:${kdePackages.fcitx5-qt}/${kdePackages.qtbase.qtPluginPrefix}''${QT_PLUGIN_PATH:+:$QT_PLUGIN_PATH}
     fi
 
     exec @wrapped@ "$@"
