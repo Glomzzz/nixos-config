@@ -23,12 +23,6 @@ lint:
     '.#checks.x86_64-linux.dead-code' \
     '.#checks.x86_64-linux.lint'
 
-# Build the deepseek-harness package alone (fast iteration on its derivation
-# or bundled plugins). --cores 2 keeps the npm dependency fetcher's parallel
-# downloads below the registry's connection-reset threshold.
-dsh:
-  nix build ".#nixosConfigurations.nixos.pkgs.deepseek-harness" --no-link --cores 2
-
 debug:
   sudo nixos-rebuild switch --flake . --show-trace --verbose
 

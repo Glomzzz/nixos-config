@@ -15,10 +15,8 @@ in {
     praxis
     ripgrep
     fd
-    deepseek-harness
     mandible
     nix-alien
-    openviking-agent-plugins
     curl
     sysstat
     usbutils
