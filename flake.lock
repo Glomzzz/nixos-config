@@ -200,22 +200,6 @@
         "type": "github"
       }
     },
-    "nixpkgs_3": {
-      "locked": {
-        "lastModified": 1786599213,
-        "narHash": "sha256-yNJd40f11EzXBjSByCB7IPpeFFAdeoSKKM67dGkfFoU=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "0e251e24a4f24e036a084b6b4b2d2491af4167f4",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixos-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "praxis": {
       "inputs": {
         "nixpkgs": [
@@ -241,24 +225,8 @@
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-kernel-7-2-0": "nixpkgs-kernel-7-2-0",
         "praxis": "praxis",
-        "ryzenbit": "ryzenbit",
         "sops-nix": "sops-nix",
         "xwayland-satellite": "xwayland-satellite"
-      }
-    },
-    "ryzenbit": {
-      "inputs": {
-        "nixpkgs": "nixpkgs_3"
-      },
-      "locked": {
-        "lastModified": 1786915718,
-        "narHash": "sha256-UzXMHiwPInc5fE3Rf205nJmCa1jmqs1CF6jR9KD0fPs=",
-        "path": "/home/glom/git/ryzenbit",
-        "type": "path"
-      },
-      "original": {
-        "path": "/home/glom/git/ryzenbit",
-        "type": "path"
       }
     },
     "sops-nix": {

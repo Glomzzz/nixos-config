@@ -20,9 +20,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-alien-source.url = "github:thiagokokada/nix-alien";
-    # Local Ryzenbit compiler checkout (the repository at
-    # ~/git/ryzenbit); its flake exposes packages.ryzenbit.
-    ryzenbit.url = "path:/home/glom/git/ryzenbit";
     # Local Praxis checkout (the repository at ~/git/praxis); its flake
     # exposes packages.praxis (the praxis CLI + praxis-tui binaries).
     # nixpkgs follows the config's, so the whole system shares one nixpkgs.

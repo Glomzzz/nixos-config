@@ -12,7 +12,6 @@ _: {
     ./ocaml.nix
     ./python.nix
     ./rust.nix
-    ./ryzenbit.nix
     ./scala.nix
     ./scheme.nix
     ./typst.nix
