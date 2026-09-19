@@ -36,7 +36,7 @@
     # Pinned by revision rather than tracking a branch: this is an unmerged PR,
     # so its head can be rebased or force-pushed out from under us.
     xwayland-satellite = {
-      url = "github:Supreeeme/xwayland-satellite/0a95f18d9fd254e3f42e0b4e4132a59084b18b98";
+      url = "github:Supreeeme/xwayland-satellite/d10a015a9423c360d723ab7d65f824db662cbbd7";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.rust-overlay.follows = "";
     };
