@@ -5,7 +5,6 @@ _: {
     ./ios.nix
     ./network-tools.nix
     ./nix-ld.nix
-    ./opencode.nix
     ./steam.nix
     ./vr.nix
   ];
