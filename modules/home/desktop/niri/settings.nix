@@ -8,11 +8,9 @@
   # scale X11 clients per monitor at all; see the input's comment there and the
   # base scale in hardware/zephyrus/gpu.
   #
-  # The patch fixes the input-method candidate window appearing offset from the
-  # caret in X11 apps: satellite repositioned popups relative to the whole X
-  # screen instead of relative to the parent window, because it re-derived the
-  # parent from WM_TRANSIENT_FOR, which fcitx5's override-redirect popup does
-  # not set. The patch file's header explains it in full.
+  # The updated PR fixes candidate-window offsets for popups without
+  # WM_TRANSIENT_FOR (such as fcitx5). Keep the local regression test for that
+  # behavior, but no longer patch the upstream reposition implementation.
   xwaylandSatellite =
     xwayland-satellite.packages.${pkgs.stdenv.hostPlatform.system}.xwayland-satellite.overrideAttrs
     (old: {
