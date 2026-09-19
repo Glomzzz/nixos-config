@@ -1,7 +1,6 @@
 {
   username,
   hostname,
-  inputs,
   pkgs,
   ...
 }: {
@@ -15,15 +14,10 @@
   ];
 
   networking.hostName = hostname;
-  # Keep the Zephyrus display stack on the known-good 7.2.0 kernel. The
-  # current nixpkgs 7.2.1 kernel fails to retrieve the panel link information
-  # on this hybrid NVIDIA system, leaving eDP-1 connected but with no modes
-  # (and therefore black) while HDMI still works.
-  boot.kernelPackages =
-    (import inputs.nixpkgs-kernel-7-2-0 {
-      inherit (pkgs.stdenv.hostPlatform) system;
-      config.allowUnfree = true;
-    }).linuxPackages_7_2;
+  # Track the latest stable kernel from the locked nixpkgs (not an RC).
+  # 7.2.1 previously broke eDP mode detection on this machine: validate the
+  # laptop panel after booting an update and retain a known-good generation.
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   system.stateVersion = "26.11";
 }
