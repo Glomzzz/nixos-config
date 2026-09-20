@@ -5,6 +5,7 @@
     name = "steam-game-laptop";
     runtimeInputs = [
       pkgs.coreutils
+      pkgs.gnused
       pkgs.jq
     ];
     text = ''
@@ -26,6 +27,31 @@
       # and the game starts blown up to 1.5x. Pin its render surface to the
       # panel's native mode instead.
       case "''${SteamAppId:-''${STEAM_COMPAT_APP_ID:-}}" in
+        570)
+          # Dota 2 keeps its video mode in video.txt and, through Xwayland,
+          # only ever sees the satellite's 1707x1067 logical mode, so the
+          # panel's 2560x1600 never appears in its settings list. Pin the saved
+          # mode to the panel's native one; Gamescope below exposes exactly
+          # that mode to the game.
+          dotaUserdata="''${XDG_DATA_HOME:-$HOME/.local/share}/Steam/userdata"
+          for dotaVideo in "$dotaUserdata"/*/570/local/cfg/video.txt; do
+            [[ -f "$dotaVideo" ]] || continue
+            dotaVideoTmp=$(mktemp --tmpdir="$(dirname "$dotaVideo")" .video.txt.XXXXXX)
+            trap 'rm -f "$dotaVideoTmp"' EXIT
+            if sed -E \
+              -e 's/("setting\.defaultres"[[:space:]]+)"[^"]*"/\1"2560"/' \
+              -e 's/("setting\.defaultresheight"[[:space:]]+)"[^"]*"/\1"1600"/' \
+              -e 's/("setting\.fullscreen"[[:space:]]+)"[^"]*"/\1"1"/' \
+              -e 's/("setting\.nowindowborder"[[:space:]]+)"[^"]*"/\1"0"/' \
+              "$dotaVideo" > "$dotaVideoTmp"; then
+              mv "$dotaVideoTmp" "$dotaVideo"
+            else
+              rm -f "$dotaVideoTmp"
+              echo "steam-game-laptop: could not update Dota 2 video.txt; continuing" >&2
+            fi
+            trap - EXIT
+          done
+          ;;
         379430)
           # KCD's CryEngine launcher defaults to 1280x720 under Proton even
           # when Gamescope exposes the panel's native mode.
@@ -88,6 +114,72 @@
       exec ${pkgs.gamescope}/bin/gamescope "''${gamescopeArgs[@]}" -- "$@"
     '';
   };
+
+  # Steam dropped STEAM_FORCE_DESKTOPUI_SCALING and the -forcedesktopscaling
+  # switch (neither name survives in the 2026 client binaries). The desktop UI
+  # scale is now the persisted `Accessibility/DesktopUIScale` value in
+  # config.vdf, and Steam's dimension-based auto scale for this panel works out
+  # to 1.0 - one CEF CSS pixel per physical pixel, i.e. 1/1.5 of every native
+  # Wayland client on Niri's 1.5x output. Seed that value to 1.5 before each
+  # start; the client reads it once at startup and writes the same value back
+  # on exit, so a single successful start keeps it in place.
+  steamWithUiScale = steam: let
+    seedSteamUiScale = pkgs.writeShellApplication {
+      name = "steam-ui-scale";
+      runtimeInputs = [
+        pkgs.coreutils
+        pkgs.gnugrep
+        pkgs.gnused
+      ];
+      text = ''
+        uiScale=1.5
+        config="''${XDG_DATA_HOME:-$HOME/.local/share}/Steam/config/config.vdf"
+        configDir="$(dirname "$config")"
+        mkdir -p "$configDir"
+        configTmp=$(mktemp --tmpdir="$configDir" .config.vdf.XXXXXX)
+        trap 'rm -f "$configTmp"' EXIT
+
+        if [[ -s "$config" ]]; then
+          if grep -q '"DesktopUIScale"' "$config"; then
+            sed -E "s/(\"DesktopUIScale\"[[:space:]]+)\"[^\"]*\"/\\1\"$uiScale\"/" "$config" > "$configTmp"
+          else
+            # config.vdf keeps its top-level closing brace on the last line.
+            head -n -1 "$config" > "$configTmp"
+            printf '\t"Accessibility"\n\t{\n\t\t"DesktopUIScale"\t\t"%s"\n\t}\n' "$uiScale" >> "$configTmp"
+            tail -n 1 "$config" >> "$configTmp"
+          fi
+        else
+          # First run: hand Steam a client config whose only setting is the UI
+          # scale; it merges its own defaults in at startup.
+          printf '"Accessibility"\n{\n\t"DesktopUIScale"\t\t"%s"\n}\n' "$uiScale" > "$configTmp"
+        fi
+
+        mv "$configTmp" "$config"
+        trap - EXIT
+        exec ${steam}/bin/steam "$@"
+      '';
+    };
+  in
+    # programs.steam.package is run through an `apply` that calls `.override`,
+    # so the wrapper has to forward that to the Steam package it wraps instead
+    # of hiding it.
+    pkgs.symlinkJoin {
+      name = "steam";
+      paths = [steam];
+      postBuild = ''
+        rm -f $out/bin/steam
+        ln -s ${seedSteamUiScale}/bin/steam-ui-scale $out/bin/steam
+      '';
+      passthru =
+        # The module adds `steam-run` from this same option, and it goes through
+        # an `apply` that calls `.override` with the system's extra libraries
+        # and packages, so both have to be forwarded rather than hidden by the
+        # wrapper. `run` only needs the FHS environment, which is unchanged.
+        {inherit (steam) run run-free;}
+        // {
+          override = f: steamWithUiScale (steam.override f);
+        };
+    };
 in {
   environment.systemPackages = with pkgs; [
     wayvr
@@ -100,19 +192,17 @@ in {
     enable = true;
     # Steam Link on Quest 3 uses Steam Remote Play for the local VR stream.
     remotePlay.openFirewall = true;
-    package = pkgs.steam.override {
+    # steamWithUiScale seeds the 1.5x desktop UI scale described above; the
+    # nested override carries the arguments the module's `apply` extends.
+    package = steamWithUiScale (pkgs.steam.override {
       # Do not pass -pipewire: it routes Steam's desktop/Remote Play capture
       # into the PipeWire+EGL pipeline that cannot initialize on NVIDIA
       # Wayland hosts (Steam logs "CDesktopCapturePipeWire: Couldn't initialize
       # EGL: 0x3001"; upstream valve-software/steam-for-linux#10315/#11913),
       # and the ALVR use case it was added for is gone.
       extraArgs = "";
-      # Steam multiplies this by the 1.6x DPI reported through Xwayland.
-      # Its CEF UI clamps at 1x, so the reciprocal prevents another HiDPI
-      # enlargement on Niri's 1.5x laptop output.
       # SteamVR and every game launched by Steam must select the NVIDIA GPU.
       extraEnv = {
-        STEAM_FORCE_DESKTOPUI_SCALING = "0.625";
         # SteamVR bundles Qt5 with only the XCB platform plugin. The global
         # Wayland fallback value is interpreted literally by that runtime.
         QT_QPA_PLATFORM = "xcb";
@@ -120,7 +210,7 @@ in {
         __NV_PRIME_RENDER_OFFLOAD = "1";
         __VK_LAYER_NV_optimus = "NVIDIA_only";
       };
-    };
+    });
     fontPackages = with pkgs; [source-han-sans];
     extraPackages = with pkgs; [
       corefonts
