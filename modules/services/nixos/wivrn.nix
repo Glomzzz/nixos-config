@@ -1,6 +1,7 @@
 {pkgs, ...}: {
   services.wivrn = {
     enable = true;
+    package = pkgs.wivrn;
     # WiVRn is the selected Quest streaming runtime (replaces ALVR/Steam
     # Link): it runs its own OpenXR stack, so SteamVR is not involved in the
     # stream. Start the server with the desktop session.
