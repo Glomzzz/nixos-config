@@ -6,4 +6,5 @@ final: _prev: {
   ssh-proxy-mac-mini = final.callPackage ./ssh-proxy-mac-mini.nix {};
   v2raya-assets = final.callPackage ./v2raya-assets.nix {};
   wechat = final.callPackage ./wechat {};
+  wivrn = final.callPackage ./wivrn.nix {};
 }
