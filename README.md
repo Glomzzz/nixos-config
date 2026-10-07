@@ -60,6 +60,14 @@ host's SSH host key is used for age decryption. Do not add plaintext API keys or
 passwords to Nix files; add a new secret declaration under
 `modules/nixos/security/sops/` and encrypt its value with `sops`.
 
+## Authentication
+
+TTY1 requires the account password before Fish starts niri. Howdy is an
+additional required factor for sudo and screen unlocking only. Set the existing
+Login keyring's password interactively to match the account password; see
+[authentication setup and recovery](docs/authentication.md) before activating.
+Disk encryption is not configured.
+
 ## Home Manager backups
 
 When activation replaces an unmanaged file, its previous contents are moved to

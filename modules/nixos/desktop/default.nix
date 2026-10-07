@@ -1,6 +1,6 @@
 _: {
   imports = [
-    ./autologin.nix
+    ./session.nix
     ./file-manager.nix
     ./niri.nix
   ];
