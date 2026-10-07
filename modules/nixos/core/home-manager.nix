@@ -34,6 +34,7 @@ in {
     in "${backup}/bin/home-manager-backup";
 
     useGlobalPkgs = true;
+    useUserPackages = true;
 
     users.${username} = {
       imports = [
@@ -43,7 +44,17 @@ in {
     extraSpecialArgs = inputs // specialArgs;
   };
 
-  environment.extraInit = let
-    homeManagerSessionVars = "/etc/profiles/per-user/${username}/etc/profile.d/hm-session-vars.sh";
-  in "[[ -f ${homeManagerSessionVars} ]] && source ${homeManagerSessionVars}";
+  # NixOS does not automatically source user profile.d files. The system
+  # Fish login hook execs niri before ~/.config/fish/config.fish is read, so
+  # seed the session here as well as Home Manager's native Fish integration.
+  # Resolve the current user's profile, never another user's session values.
+  environment.extraInit = ''
+    if [ -n "''${USER:-}" ]; then
+      hm_session_vars="/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh"
+      if [ -r "$hm_session_vars" ]; then
+        . "$hm_session_vars"
+      fi
+      unset hm_session_vars
+    fi
+  '';
 }
