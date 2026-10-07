@@ -190,18 +190,10 @@ in {
       path = "${xwaylandSatellite}/bin/xwayland-satellite";
     };
 
-    # niri has no XDG-autostart handling of its own, so anything that must be
-    # running for the session to feel complete is spawned explicitly.
-    # Wallpaper, clipboard, notifications and idle locking are systemd user
-    # services instead (see the sibling modules).
-    spawn-at-startup = [
-      # fcitx5 previously came up via KDE's autostart; niri has no XDG-autostart
-      # handling, so without this Chinese input silently stops working.
-      # Deliberately unqualified: the i18n.inputMethod module builds its own
-      # fcitx5 with the rime addons and puts it on PATH. A store path to
-      # pkgs.fcitx5-with-addons would launch an addon-less build instead.
-      {argv = ["fcitx5" "-d" "--replace"];}
-    ];
+    # Fcitx is started by Home Manager's fcitx5-daemon.service with the Rime
+    # addons. A second spawn-at-startup daemon would race it for the D-Bus
+    # name and Wayland input-method seat. Wallpaper, clipboard, notifications
+    # and idle locking also run as graphical-session user services.
 
     binds = {
       # --- launching -------------------------------------------------------

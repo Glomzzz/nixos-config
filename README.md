@@ -107,6 +107,24 @@ After deploying, check `systemctl --user status clipferry` and
 terminal into QQ/WeChat and back. For failures, inspect
 `journalctl --user -u clipferry` (clipboard payloads are not logged).
 
+## Desktop Chinese input
+
+Fcitx/Rime is started once by Home Manager's `fcitx5-daemon.service`; the
+package's XDG autostart entry is masked and niri does not spawn another daemon.
+Foot uses native Wayland text-input-v3. GTK3/4 apps, including PGTK Emacs, also
+use text-input-v3 rather than the Fcitx GTK plugin, whose client-side popup can
+flicker when repositioning. `GTK_IM_MODULE` is intentionally unset; GTK config
+files retain Fcitx for X11/GTK2 apps. Qt5 keeps `QT_IM_MODULE=fcitx`.
+
+After deploying, log out and back in to clear the old session environment and
+start the single managed daemon. Save Emacs buffers before logging out; Home
+Manager deliberately does not automatically restart a running Emacs daemon.
+Check `systemctl --user status fcitx5-daemon` and confirm `printenv GTK_IM_MODULE`
+prints nothing. In Foot and Emacs, press **Ctrl+Space**, type `nihao`, and select
+`你好`; check that the Emacs candidate popup stays stable while typing and near
+window edges. These need interactive testing. Offline configuration regressions
+run with `nix build --no-link .#checks.x86_64-linux.fcitx5`.
+
 ## Dota 2 Chinese input
 
 Keep `steam-game-laptop %command%` in Dota 2's Steam launch options (existing
