@@ -1,6 +1,7 @@
 {pkgs, ...}: let
   # Use `steam-game-laptop %command%` as a game's Steam launch option when it
-  # needs a fullscreen surface sized for the laptop panel.
+  # needs a fullscreen surface sized for the laptop panel. Dota 2 runs directly
+  # on the desktop Xwayland display for Fcitx; other games use Gamescope.
   steamGameLaptop = pkgs.writeShellApplication {
     name = "steam-game-laptop";
     runtimeInputs = [
@@ -28,11 +29,19 @@
       # panel's native mode instead.
       case "''${SteamAppId:-''${STEAM_COMPAT_APP_ID:-}}" in
         570)
-          # Dota 2 keeps its video mode in video.txt and, through Xwayland,
-          # only ever sees the satellite's 1707x1067 logical mode, so the
-          # panel's 2560x1600 never appears in its settings list. Pin the saved
-          # mode to the panel's native one; Gamescope below exposes exactly
-          # that mode to the game.
+          # Gamescope's private display separates Dota from the desktop IME
+          # and its candidate windows. Use the satellite display where Fcitx
+          # is already connected, not a second daemon inside Gamescope.
+          # Both SDL2's and SDL3's driver hints are scoped to Dota here; SDL3
+          # otherwise prefers Wayland's text-input path over the Fcitx module.
+          export SDL_IM_MODULE=fcitx
+          export XMODIFIERS=@im=fcitx
+          export SDL_VIDEODRIVER=x11
+          export SDL_VIDEO_DRIVER=x11
+
+          # Compositor scaling now exposes 2560x1600 on the satellite too.
+          # Retain the saved native mode rather than restoring the old logical
+          # resolution when removing the nested compositor.
           dotaUserdata="''${XDG_DATA_HOME:-$HOME/.local/share}/Steam/userdata"
           for dotaVideo in "$dotaUserdata"/*/570/local/cfg/video.txt; do
             [[ -f "$dotaVideo" ]] || continue
@@ -51,6 +60,8 @@
             fi
             trap - EXIT
           done
+          # Also cover first launches where video.txt has not been written.
+          exec "$@" -w 2560 -h 1600 -fullscreen
           ;;
         379430)
           # KCD's CryEngine launcher defaults to 1280x720 under Proton even

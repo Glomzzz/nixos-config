@@ -105,6 +105,20 @@ After deploying, check `systemctl --user status clipferry` and
 terminal into QQ/WeChat and back. For failures, inspect
 `journalctl --user -u clipferry` (clipboard payloads are not logged).
 
+## Dota 2 Chinese input
+
+Keep `steam-game-laptop %command%` in Dota 2's Steam launch options (existing
+arguments can follow it). For app ID 570 the launcher now uses the desktop
+XWayland display instead of Gamescope, selects Fcitx and the X11 backend for
+both SDL2/SDL3, and retains 2560×1600 fullscreen. Other games still use Gamescope.
+Do not add another `gamescope` around Dota's command.
+
+After deploying, reload Fcitx with `fcitx5-remote -r` and restart Dota 2. Open a
+chat input, press **Ctrl+Space**, type `nihao`, and select `你好`. The existing
+Shift trigger is retained. Check both committing text and the candidate popup;
+these need an interactive in-game test, not just Nix evaluation. Offline launcher
+regressions run with `nix build --no-link .#checks.x86_64-linux.steam-game-laptop`.
+
 ## Development tools
 
 General editors, shells, language toolchains, and command-line utilities are

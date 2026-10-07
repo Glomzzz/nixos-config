@@ -111,6 +111,29 @@
             touch "$out"
           '';
 
+        steam-game-laptop = let
+          # Exercise the production launcher with a harmless compositor stub.
+          # writeShellApplication still runs shellcheck on the complete script.
+          fakeGamescope = pkgs.writeShellScriptBin "gamescope" ''
+            exec ${pkgs.python3}/bin/python3 ${./modules/nixos/programs/tests/steam-game-laptop.py} --capture-gamescope "$@"
+          '';
+          packages =
+            (import ./modules/nixos/programs/steam.nix {
+              pkgs = pkgs // {gamescope = fakeGamescope;};
+            }).environment.systemPackages;
+          launcher =
+            pkgs.lib.findFirst
+            (package: pkgs.lib.getName package == "steam-game-laptop")
+            (throw "steam-game-laptop package not found")
+            packages;
+        in
+          pkgs.runCommand "steam-game-laptop-check"
+          {nativeBuildInputs = [pkgs.python3];}
+          ''
+            python3 ${./modules/nixos/programs/tests/steam-game-laptop.py} ${launcher}/bin/steam-game-laptop
+            touch "$out"
+          '';
+
         host = self.nixosConfigurations.nixos.config.system.build.toplevel;
       }
     );
