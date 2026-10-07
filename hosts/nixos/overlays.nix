@@ -1,11 +1,6 @@
-{inputs, ...}: {
+_: {
   nixpkgs.overlays = [
     (import ../../pkgs)
-    (_final: prev: {
-      # Praxis CLI + TUI, built from the local checkout at ~/git/praxis
-      # (flake input praxis).
-      praxis = inputs.praxis.packages.${prev.stdenv.hostPlatform.system}.praxis;
-    })
     (final: prev: {
       python3 = prev.python3.override {
         packageOverrides = _: pySuper: {
