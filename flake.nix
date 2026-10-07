@@ -91,6 +91,26 @@
             touch "$out"
           '';
 
+        waybar = let
+          helpers = import ./modules/home/desktop/niri/waybar/helpers.nix {inherit pkgs;};
+          settings =
+            pkgs.writeText "waybar-settings.json"
+            (builtins.toJSON self.nixosConfigurations.nixos.config.home-manager.users.glom.programs.waybar.settings);
+        in
+          pkgs.runCommand "waybar-check"
+          {
+            nativeBuildInputs = [pkgs.bash pkgs.python3 pkgs.jq pkgs.gawk pkgs.shellcheck];
+            src = ./modules/home/desktop/niri/waybar;
+            # Realize every packaged helper, including writeShellApplication's
+            # shellcheck validation, without launching desktop services.
+            helpers = builtins.attrValues (builtins.removeAttrs helpers ["powerMenu"]);
+          }
+          ''
+            shellcheck --shell=bash "$src"/scripts/*.sh
+            python3 "$src/tests.py" ${settings}
+            touch "$out"
+          '';
+
         host = self.nixosConfigurations.nixos.config.system.build.toplevel;
       }
     );

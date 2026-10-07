@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <object class="GtkMenu" id="menu">
+    <child>
+      <object class="GtkMenuItem" id="profile">
+        <property name="label">Power Profile</property>
+        <child type="submenu">
+          <object class="GtkMenu" id="profile-menu">
+            <child>
+              <object class="GtkMenuItem" id="profile-quiet">
+                <property name="label">Quiet</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuItem" id="profile-balanced">
+                <property name="label">Balanced</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuItem" id="profile-performance">
+                <property name="label">Performance</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="prevent-lock">
+        <property name="label">Toggle Prevent Lock</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSeparatorMenuItem" id="separator1"/>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="session">
+        <property name="label">Session</property>
+        <child type="submenu">
+          <object class="GtkMenu" id="session-menu">
+            <child>
+              <object class="GtkMenuItem" id="lock">
+                <property name="label">Lock</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuItem" id="logout">
+                <property name="label">Log Out</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkSeparatorMenuItem" id="separator2"/>
+            </child>
+            <child>
+              <object class="GtkMenuItem" id="suspend">
+                <property name="label">Suspend</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuItem" id="hibernate">
+                <property name="label">Hibernate</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkSeparatorMenuItem" id="separator3"/>
+            </child>
+            <child>
+              <object class="GtkMenuItem" id="reboot">
+                <property name="label">Restart</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuItem" id="shutdown">
+                <property name="label">Shut Down</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
