@@ -29,6 +29,27 @@ sudo /nix/var/nix/profiles/system/bin/switch-to-configuration switch
 Use the bootloader's prior generation first when the current generation will not
 boot. Store GC does not back up mutable application or personal data.
 
+## VR privilege scope
+
+The SteamVR `getcap` shim stays first in PATH under `/run/wrappers/bin`, but is
+not setuid. PAM exceptions are restricted to `glom`. Because `niri-session`
+starts the compositor via systemd, explicit limits on **niri and WiVRn** preserve
+VR scheduling for the desktop and its child applications. Other background user
+services no longer receive elevated soft limits by default. WiVRn retains its
+dedicated `CAP_SYS_NICE` wrapper.
+
+A drop-in for `user@1000.service` raises only the desktop user's hard ceilings;
+its soft limits stay normal. This is a reduction in privilege scope/defaults,
+not isolation between processes of the same UID: that user can still raise a
+process's soft limits up to its hard ceilings.
+
+After activating, reboot (or fully stop/restart the user manager with no session
+running) so its new hard ceilings take effect, then test SteamVR/WiVRn. Inspect
+`systemctl --user show niri wivrn -p LimitRTPRIO -p LimitMEMLOCK`. If another
+specific user service actually needs a larger limit, grant it explicitly to that
+unit, not as a blanket global default. Confirm
+`stat -c '%A' /run/wrappers/bin/getcap` has no setuid `s`.
+
 ## Local Btrfs snapshots
 
 Snapper takes hourly and boot-time read-only snapshots of the root `@` subvolume.
