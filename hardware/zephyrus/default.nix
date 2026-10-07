@@ -11,6 +11,7 @@
     ./cpu
     ./gpu
     ./disk.nix
+    ./snapshots.nix
     ./bluetooth.nix
     ./audio.nix
     ./boot.nix

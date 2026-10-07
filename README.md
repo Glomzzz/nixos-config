@@ -65,7 +65,9 @@ passwords to Nix files; add a new secret declaration under
 GC runs weekly and retains generations from the last 30 days. Before enabling
 the new policy, use `just pin-known-good` on a verified running system to preserve
 its store closure independently of age-based pruning. See
-[recovery instructions](docs/recovery.md).
+[recovery instructions](docs/recovery.md). Snapper also takes local hourly and
+boot-time Btrfs snapshots; these do not protect against disk failure or theft.
+Off-device backups remain to be configured.
 
 ## Authentication
 
