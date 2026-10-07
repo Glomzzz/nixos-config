@@ -1,4 +1,6 @@
 {
+  config,
+  lib,
   pkgs,
   username,
   ...
@@ -61,13 +63,10 @@ in {
   # normal powersave policy.
   users.users.${username}.extraGroups = ["gamemode"];
 
-  # SteamVR is launched from the niri user session. The default systemd user
-  # limits (RTPRIO=0 and an 8 MiB memlock cap) prevent its compositor and
-  # encoder threads from using realtime scheduling, which shows up as head
-  # pose desync under load.
-  # Steam is normally started by the graphical login, not as a systemd user
-  # service. PAM limits ensure that this interactive process and its children
-  # inherit the same scheduling and locked-memory budget as user services.
+  # Restrict PAM allowances to the desktop user. niri-session actually starts
+  # niri via systemd, so PAM limits alone do not reach compositor children;
+  # explicit niri/WiVRn unit limits below preserve their VR scheduling budget
+  # without raising soft defaults for every account and background service.
   # The compositor requests SCHED_RR at the maximum priority (99), so the
   # limit must be 99; the previous 95 left every realtime attempt failing with
   # EPERM (strace: sched_setscheduler(..., SCHED_RR, {sched_priority=99}) = -1
@@ -99,22 +98,55 @@ in {
     # See the steamVrGetcap comment: SteamVR's vrsetup.sh runs inside Steam's
     # launcher-service sandbox, where /run/wrappers is mounted nosuid and pkexec
     # fails with "pkexec must be setuid root", aborting setup with "SteamVR setup
-    # is incomplete". getcap is read-only (it only reports file capabilities), so
-    # running the shim with a setuid wrapper is harmless; inside the sandbox the
-    # setuid bit is ignored anyway and it runs as the plain user.
+    # is incomplete". Keep the shim first in PATH via /run/wrappers, but it
+    # only reports capabilities and needs neither root nor a setuid bit.
     wrappers.getcap = {
       source = "${steamVrGetcap}/bin/getcap";
       owner = "root";
       group = "root";
-      setuid = true;
+      setuid = false;
     };
   };
 
   systemd = {
-    user.settings.Manager = {
-      DefaultLimitRTPRIO = 99;
-      DefaultLimitNICE = -20;
-      DefaultLimitMEMLOCK = "infinity";
+    # The user manager must inherit sufficient hard ceilings to raise limits
+    # for selected units. Keep its soft limits at normal defaults, and scope
+    # the drop-in to this user's instance rather than user@.service globally.
+    services."user@${toString config.users.users.${username}.uid}" = {
+      overrideStrategy = "asDropin";
+      enableDefaultPath = false;
+      # Apply hard ceilings at the next boot, not by killing the live session.
+      restartIfChanged = false;
+      serviceConfig = {
+        LimitRTPRIO = "0:99";
+        LimitNICE = "0:40";
+        LimitMEMLOCK = "8M:infinity";
+      };
+    };
+
+    user.services = {
+      # Preserve the vendor unit's ExecStart and session relationships.
+      niri = {
+        overrideStrategy = "asDropin";
+        # Preserve the login environment imported by niri-session (fcitx5,
+        # /run/wrappers, user packages), not NixOS's minimal service PATH.
+        enableDefaultPath = false;
+        restartIfChanged = false;
+        unitConfig.ConditionUser = username;
+        serviceConfig = {
+          LimitRTPRIO = 99;
+          LimitNICE = -20;
+          LimitMEMLOCK = "infinity";
+        };
+      };
+      wivrn = {
+        unitConfig.ConditionUser = lib.mkForce username;
+        serviceConfig = {
+          LimitRTPRIO = 99;
+          LimitNICE = -20;
+          LimitMEMLOCK = "infinity";
+        };
+      };
     };
 
     # The unit name intentionally differs from the old CAP_SYS_NICE grant
