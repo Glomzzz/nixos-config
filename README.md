@@ -85,6 +85,13 @@ directory, preserving the path relative to your home. Rebuilds never prune these
 backups or old `*.hm-backup` files. Review and restore or remove them manually.
 Files declared with `force = true` bypass Home Manager's collision backups.
 
+## Waybar
+
+`modules/home/desktop/niri/waybar.nix` is a small entrypoint. Its sibling
+`waybar/` directory owns Nix settings, GTK CSS, the XML menu, shell helpers, and
+offline tests. Run `nix build --no-link .#checks.x86_64-linux.waybar`; see the
+[Waybar layout](modules/home/desktop/niri/waybar/README.md).
+
 ## Development tools
 
 General editors, shells, language toolchains, and command-line utilities are

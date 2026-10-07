@@ -1,0 +1,605 @@
+/* ===================================================================
+   Panel geometry and shared resets.
+
+   height = 32 in the config above matches KDE's `thickness=32`, so the
+   only job here is to stop GTK from adding its own chrome on top of it:
+   `min-height: 0` lets a widget shrink to the bar's height instead of
+   GTK's default minimum, and the border/radius resets clear the theme's
+   button decoration so every module starts from the same flat surface.
+
+   The transition is declared once, globally, so that every colour and
+   fill change in the bar animates at the same speed - the workspace
+   pills, the hover tints and the battery/temperature state colours all
+   inherit it rather than each cluster picking its own timing. GTK3
+   supports `transition` and `@keyframes`; it has no CSS backdrop
+   filtering at all, so no such property appears anywhere in this sheet -
+   translucency comes from the rgba() base below and nothing else.
+   =================================================================== */
+* {
+  font-family: "JetBrainsMono Nerd Font";
+  font-size: 13px;
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+  transition:
+    background-color 150ms ease-in-out,
+    color 150ms ease-in-out;
+}
+
+/* KDE ran this panel at `panelOpacity=0` with the colorizer applet
+   painting a translucent Catppuccin surface over it, so an rgba() base is
+   the faithful equivalent rather than a stopgap. The alpha IS the final
+   appearance: niri-flake's typed layer-rules schema has no blur or
+   background-effect attribute, so nothing will ever be composited behind
+   this surface. Keep the alpha below 1.0.
+
+   The hairline bottom border is what KDE's panel shadow did - it stops
+   the bar dissolving into a light wallpaper - and it is deliberately a
+   translucent surface1 rather than a solid line so it reads as an edge,
+   not as a frame. */
+window#waybar {
+  background: rgba(30, 30, 46, 0.92);
+  color: #cdd6f4;
+  border-bottom: 1px solid rgba(69, 71, 90, 0.6);
+}
+
+/* ===================================================================
+   Left cluster: launcher, workspace pills, window title.
+   =================================================================== */
+
+/* The pill row is its own visual group, so the container carries no
+   decoration of its own - the buttons' margins do the spacing and the
+   group reads as a run of pills rather than a boxed widget. */
+#workspaces {
+  padding: 0 4px;
+}
+
+/* niri sets several of these classes on the SAME button - the focused
+   workspace is also its output's .active one, and an on-demand workspace
+   can be .empty while focused - so the four rules below genuinely
+   compete and the way each conflict is resolved differs. Two mechanisms
+   are at work, and neither is "later always wins":
+
+   - .empty vs .focused is a real source-order tie. Both are one id, one
+     type and one class, so specificity cannot separate them and GTK3
+     falls back to document order. .focused is written last for exactly
+     that reason; moving it above .empty would leave a focused-but-empty
+     pill drawn dim.
+   - .active:not(.focused) vs .focused is NOT decided by order. :not()
+     contributes its argument's specificity, so that selector counts two
+     classes and outranks .focused outright. It is also disjoint from it
+     by construction - a focused button cannot match :not(.focused) - so
+     the pair never actually collides. The guard, not the position, is
+     what stops the secondary blue text landing on the filled pill.
+
+   Net effect: keep .focused after .empty (order is load-bearing there),
+   and keep the :not(.focused) guard on .active (specificity and mutual
+   exclusion are load-bearing there). */
+#workspaces button {
+  padding: 0 8px;
+  margin: 4px 2px;
+  border-radius: 8px;
+  color: #cdd6f4;
+  background: #45475a;
+}
+
+/* Occupied pills read brighter than niri's on-demand empty ones. */
+#workspaces button.empty {
+  color: #6c7086;
+  background: transparent;
+}
+
+/* .active is per-output: the workspace each monitor is displaying. The
+   weaker secondary highlight (no fill) so the bar on the monitor WITHOUT
+   keyboard focus still marks its visible workspace. :not(.focused) keeps
+   this text colour off the filled pill, which would be blue-on-blue. */
+#workspaces button.active:not(.focused) {
+  color: #89b4fa;
+  background: transparent;
+  border-bottom: 2px solid #89b4fa;
+}
+
+/* .focused is globally unique: the one workspace holding keyboard focus.
+   Primary highlight, filled, and placed after .empty so it wins that
+   equal-specificity tie when the focused workspace is also empty. */
+#workspaces button.focused {
+  color: #1e1e2e;
+  background: #89b4fa;
+}
+
+#workspaces button.urgent {
+  color: #f38ba8;
+}
+
+/* The window title is the quietest thing in the bar - it changes on every
+   focus change, so it reads as secondary text (#a6adc8) rather than
+   competing with the pills next to it. */
+#window {
+  color: #a6adc8;
+  padding: 0 10px;
+}
+
+/* ===================================================================
+   Shared module geometry.
+
+   One padding value for every text module in the centre and right
+   clusters, so the bar has a single horizontal rhythm instead of each
+   module carrying its own. The bar's `spacing = 6` sits on top of this,
+   which is what keeps neighbours inside a cluster distinguishable
+   without a separator between every one of them.
+   =================================================================== */
+#clock,
+#pulseaudio,
+#backlight,
+#battery,
+#language,
+#tray {
+  padding: 0 10px;
+  color: #cdd6f4;
+}
+
+/* The centre cluster is the bar's headline, so the clock and the weather
+   reading are the one place the 13px body size is overridden upward: 17px
+   is the largest size that still fits the 32px panel with room for the
+   font's descenders (~1.2x line height puts 17px at ~21px of ink), and it
+   leaves the right cluster's readouts as clearly secondary text.
+
+   Both selectors carry the SAME size on purpose - they sit next to each
+   other in modules-center and read as one unit, so a mismatch here would
+   look like a bug rather than a hierarchy. The clock also gets a mild
+   letter-spacing because it is monospaced digits that change every
+   second; the extra tracking stops the seconds column from looking
+   cramped at this size. */
+#clock {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+#custom-weather {
+  font-size: 17px;
+}
+
+/* The sensors group is one cluster, so its members get a tighter 4px
+   inner padding than the 10px above - the group box has GTK spacing 0, so
+   this padding is the ONLY gap between them and 4px is what pulls cpu and
+   temperature together into a readable pair. #custom-network keeps a
+   little more room on its left so the trio does not touch the separator.
+
+   `#network` is deliberately NOT in this list: that id belongs to waybar's
+   built-in network module, which this bar does not use. The netspeed
+   readout is `custom/network`, so it is `#custom-network`. */
+#cpu,
+#temperature {
+  padding: 0 4px;
+  color: #cdd6f4;
+}
+
+/* ===================================================================
+   Cluster separators - CSS, not modules.
+
+   KDE broke this panel up with three third-party
+   `zayron.simple.separator` plasmoids (applets 58-61). Reproducing that
+   with waybar modules would mean adding fake custom modules that poll
+   nothing and exist only to draw a line, so the separator is a border on
+   the FIRST module of each cluster instead: indicators | volume+battery |
+   sensors | session.
+
+   The line is a 1px-wide background gradient rather than a border plus
+   `margin: 6px 0`, and that is a layout fix, not a style preference. A
+   vertical margin is added to the widget's height request, and waybar
+   grows the bar to whatever its tallest module asks for (it logs
+   "Requested height: 32 is less than the minimum height: N"). With the
+   two-line netspeed label inside #sensors, a 6px margin pushed the bar
+   from 32px to 44px - measured, one variant per margin value. Painting
+   the line into the background instead requests no extra space at all, so
+   the shortened line survives and `height = 32` is actually honoured.
+
+   The stops reproduce exactly what the margin did visually: transparent
+   for the first 6px, surface1 from 6px to 26px, transparent again to the
+   bottom - a 20px line centred in a 32px bar, the same proportion as
+   KDE's `lengthSeparator=80`. `background-size: 1px 100%` keeps it
+   hairline-thin and full-height, and no-repeat stops GTK tiling it across
+   the whole module.
+   =================================================================== */
+/* #sensors, not #cpu: the sensors trio is a group now, so the line goes on
+   the group box and the three members inside it are separator-free. A
+   border on #cpu would draw a line BETWEEN the netspeed readout and the cpu
+   readout, splitting the very cluster this groups them into. */
+#pulseaudio,
+#sensors,
+#custom-notification {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 6px,
+    rgba(69, 71, 90, 0.6) 6px,
+    rgba(69, 71, 90, 0.6) 26px,
+    transparent 26px,
+    transparent 100%
+  );
+  background-size: 1px 100%;
+  background-position: left center;
+  background-repeat: no-repeat;
+}
+
+/* ===================================================================
+   Right cluster: volume, battery, sensors.
+   =================================================================== */
+
+/* Muted is a state the user chose, so it recedes to the same overlay0
+   grey #bluetooth.off and the DND states use rather than warning. */
+#pulseaudio.muted {
+  color: #6c7086;
+}
+
+#battery.warning {
+  color: #f9e2af;
+}
+
+#battery.critical {
+  color: #f38ba8;
+}
+
+/* On mains, so the percentage stops being a warning at all - green wins
+   over the two rules above on source order, which is deliberate: a
+   charging battery at 12% should not read as an emergency. */
+#battery.charging,
+#battery.plugged {
+  color: #a6e3a1;
+}
+
+/* The one animation in the bar, and only for the state that genuinely
+   needs to interrupt: critical AND still discharging. GTK3 implements
+   @keyframes, so this is a real blink rather than a silent no-op. The
+   :not(.charging) guard stops it the moment the cable goes in. */
+@keyframes battery-blink {
+  to {
+    color: #1e1e2e;
+    background: #f38ba8;
+  }
+}
+
+#battery.critical:not(.charging) {
+  animation-name: battery-blink;
+  animation-duration: 1.2s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  border-radius: 6px;
+}
+
+/* Same two-step escalation as #battery, and the same palette, so the
+   temperature readout turns yellow then red the way KDE's piechart
+   recoloured its wedge. Placed after the shared padding rule above for
+   the same reason #battery's states are - id+class outranks a bare id,
+   but keeping the order consistent avoids relying on that. */
+#temperature.warning {
+  color: #f9e2af;
+}
+
+#temperature.critical {
+  color: #f38ba8;
+}
+
+/* The netspeed readout, and the one module in the bar whose width must not
+   move: it re-renders every second, so a single character of drift would
+   shove the whole right cluster sideways once a second.
+
+   Two mechanisms hold it still, and BOTH are needed:
+   - The script pads every value to exactly 6 characters, unit included, so
+     "   0 B", " 1.0KB" and " 1.4MB" occupy the same number of glyphs. That
+     is what leaves room for B/KB/MB/GB without a reflow.
+   - `monospace` is what makes 6 equal characters mean 6 equal pixels. The
+     nerd font is monospaced, but the fallback must be too, or a glyph
+     served from a proportional fallback would undo the padding.
+
+   min-width is the floor for the two-line label; the padding above it is
+   symmetric so the text stays centred inside that floor. font-size is
+   11px rather than the bar's 13px because this is the only module drawing
+   TWO stacked lines inside the 32px bar. */
+#custom-network {
+  font-family: "JetBrainsMono Nerd Font", monospace;
+  font-size: 11px;
+  min-width: 54px;
+  padding: 0 6px;
+  color: #cdd6f4;
+}
+
+/* ===================================================================
+   Clickable affordance.
+
+   KDE's applets all highlighted under the pointer, and that is the only
+   cue a module does something when pointed at - waybar draws no button
+   chrome of its own. Every module listed here really is interactive:
+   #clock through its `actions` block,
+   #pulseaudio/#custom-network/#bluetooth through `on-click`, and
+   #pulseaudio/#backlight additionally through the scroll handling those two
+   modules implement natively. #battery is here too now: its `menu` opens
+   the power popup, so it IS clickable.
+
+   `#custom-network`, not `#network`: the old selector named waybar's
+   built-in network module, which this bar does not use, so the netspeed
+   readout never actually highlighted despite having an on-click.
+
+   #window, #cpu, #temperature and #custom-weather are deliberately absent -
+   none of them has an action, so highlighting them would advertise a click
+   that does nothing. The fill animates via the global transition.
+
+   `background-color`, NOT the `background` shorthand: #pulseaudio carries
+   its cluster separator as a background-image (see the separator block
+   above), and the shorthand resets every background property it does not
+   mention - so `background: #45475a` here would silently delete that
+   separator line for as long as the pointer rests on the module. Naming
+   the colour channel alone leaves the image untouched. */
+#clock:hover,
+#pulseaudio:hover,
+#custom-network:hover,
+#battery:hover,
+#bluetooth:hover,
+#backlight:hover {
+  background-color: #45475a;
+  border-radius: 6px;
+}
+
+/* The four selectors waybar-tray(5) documents. `#tray > .x` reaches the
+   individual SNI item widgets inside the tray box, so the three status
+   classes are per-icon, not per-module. Passive items are dimmed rather
+   than hidden, which is the point of show-passive-items = true: an idle
+   item is still there, just visually demoted. needs-attention is the
+   SNI equivalent of KDE's blinking/highlighted tray member. */
+#tray > .passive {
+  -gtk-icon-effect: dim;
+}
+
+#tray > .active {
+  -gtk-icon-effect: none;
+}
+
+#tray > .needs-attention {
+  -gtk-icon-effect: highlight;
+  background: #f38ba8;
+  border-radius: 6px;
+}
+
+/* The drawer group. #tray-drawer is the group's own box (bar.cpp strips
+   the "group/" prefix to build the widget name), and .tray-drawer-child
+   is the children-class set explicitly in the drawer config above - it
+   lands on every module in the group EXCEPT the leader. Left padding
+   separates a revealed child from the always-visible tray, and the hover
+   tint on the group is the only affordance that it is clickable, since
+   click-to-reveal means nothing happens on mouse-over. */
+#tray-drawer {
+  padding: 0 2px;
+  border-radius: 8px;
+}
+
+#tray-drawer:hover {
+  background: #45475a;
+}
+
+.tray-drawer-child {
+  padding: 0 6px;
+  color: #a6adc8;
+}
+
+/* The secondary indicator cluster - bluetooth, media, clipboard and the
+   privacy dot. These all live inside the drawer, so .tray-drawer-child
+   already gives them padding and the dimmed #a6adc8; the rules below
+   only add what is specific to each one. Every selector
+   here is one waybar-<module>(5) documents - #bluetooth with its state
+   classes, #mpris with its per-status class, #custom-clipboard from the
+   custom module's #custom-<name> contract, and #privacy/#privacy-item. */
+#bluetooth,
+#mpris,
+#custom-clipboard,
+#privacy {
+  padding: 0 6px;
+}
+
+/* Off and disabled are the resting states, so they stay muted rather
+   than shouting. Ordered off/disabled -> on -> connected so the brighter
+   states win on source order, the same convention as the workspace
+   pills above. */
+#bluetooth.off,
+#bluetooth.disabled {
+  color: #6c7086;
+}
+
+#bluetooth.on {
+  color: #a6adc8;
+}
+
+/* Connected is the state worth noticing, hence the accent blue - the
+   same #89b4fa the focused workspace and the launcher use. */
+#bluetooth.connected {
+  color: #89b4fa;
+}
+
+/* Pairing and discovery are transient and end up in a dialog anyway, so
+   they get the yellow "in progress" colour shared with the warning
+   states rather than a colour of their own. */
+#bluetooth.discoverable,
+#bluetooth.discovering,
+#bluetooth.pairable {
+  color: #f9e2af;
+}
+
+/* mpris carries a variable-width track title, so it gets the only
+   italic in the bar for paused and a green tint while playing: the
+   module's width changes on its own and colour is what makes the state
+   readable at a glance. */
+#mpris.playing {
+  color: #a6e3a1;
+}
+
+#mpris.paused {
+  color: #a6adc8;
+  font-style: italic;
+}
+
+#mpris.stopped {
+  color: #6c7086;
+}
+
+#custom-clipboard {
+  color: #cdd6f4;
+}
+
+#custom-clipboard:hover {
+  background: #45475a;
+  border-radius: 6px;
+}
+
+/* #privacy is the container, #privacy-item each monitored type. Red,
+   because the whole point is that it is alarming: something is capturing
+   the screen. It renders nothing at all when idle, so this styling is
+   only ever visible during an actual capture. */
+#privacy {
+  color: #f38ba8;
+}
+
+#privacy-item {
+  padding: 0 4px;
+  color: #f38ba8;
+}
+
+#privacy-item.screenshare {
+  color: #f38ba8;
+}
+
+/* Appended below the workspace rules on purpose - see the source-order
+   note above. These selectors do not overlap them, so position is only a
+   convention here, but keeping additions at the end keeps it that way. */
+/* The NixOS logo is the leftmost thing in the bar and it is a single
+   glyph, so it is sized to fill the 32px panel rather than to match the
+   13px body text next to it.
+
+   23px, not larger, and the ceiling was measured rather than estimated:
+   waybar asks the compositor for whichever height its widgets need, so an
+   oversized glyph does not clip - it silently grows the whole bar past
+   `height = 32`. Rendering this bar against a real compositor at 18..24px
+   put every size up to 23px at exactly 32px and 24px at 33px, so 23px is
+   the largest glyph that still fits the configured panel.
+
+   `padding: 0` on the vertical axis matters for the same reason - any
+   vertical padding is added to the glyph's ~28px ink box and would push
+   the bar over 32px again, so the padding below is horizontal-only. */
+#custom-launcher {
+  padding: 0 12px 0 14px;
+  color: #89b4fa;
+  font-size: 23px;
+}
+
+#custom-launcher:hover,
+#custom-power:hover {
+  background: #45475a;
+}
+
+#custom-power {
+  padding: 0 12px 0 10px;
+  color: #f38ba8;
+}
+
+/* Weather sits beside the clock in modules-center, so it takes the same
+   0 10px padding the shared #clock rule gives its neighbour and reads as
+   one cluster with it. The two class values below are the ones the script
+   actually emits - `weather` on success, `unavailable` on any failure
+   path - and they exist so a dead API is visibly dimmed rather than
+   indistinguishable from a real reading. */
+#custom-weather {
+  padding: 0 10px;
+  color: #cdd6f4;
+}
+
+/* Yellow, the same "something is off" colour #battery.warning and
+   #temperature.warning use, so an unavailable reading is noticeable
+   without shouting like the red critical states. `text` is empty in that
+   branch, so this only ever colours the tooltip-bearing gap. */
+#custom-weather.unavailable {
+  color: #f9e2af;
+}
+
+/* The notification indicator. It sits in modules-right between the
+   battery and the power button, so it takes the same 0 10px padding the
+   shared #clock/#battery rule gives its neighbours and reads as part of
+   that cluster.
+
+   The eight class values below are exactly the eight format-icons keys -
+   swaync-client emits one of them per line and waybar sets it as a class
+   on this widget. They are mutually exclusive, so unlike the workspace
+   pills above no escalation is needed; the grouping is only for reading.
+   Ordered resting -> suppressed -> pending anyway, to keep this file's
+   one convention. */
+#custom-notification {
+  padding: 0 10px;
+  color: #cdd6f4;
+}
+
+/* Nothing waiting: the resting state, so it recedes to the same dimmed
+   #a6adc8 the drawer children use rather than sitting at full text
+   brightness beside modules that actually have something to say. */
+#custom-notification.none {
+  color: #a6adc8;
+}
+
+/* Do-not-disturb, with or without an inhibitor. Overlay0 - the same
+   "switched off" grey #bluetooth.off and the low-urgency swaync border
+   use - because DND is a state the user chose and should read as muted,
+   not as a fault. The two dnd-*-notification classes are deliberately
+   grouped here rather than with the red pending rules below: under DND a
+   waiting notification is being suppressed on purpose, and colouring it
+   red would defeat the whole point of the toggle. The glyph already
+   differs (md-bell_off), so the state is still distinguishable. */
+#custom-notification.dnd-none,
+#custom-notification.dnd-notification,
+#custom-notification.dnd-inhibited-none,
+#custom-notification.dnd-inhibited-notification {
+  color: #6c7086;
+}
+
+/* An inhibitor without DND: popups are held back by an application
+   (screen share, fullscreen) rather than by the user, and it lifts on its
+   own. Yellow, the transient "in progress" colour shared with
+   #battery.warning and #bluetooth.discovering. */
+#custom-notification.inhibited-none,
+#custom-notification.inhibited-notification {
+  color: #f9e2af;
+}
+
+/* Unread and nothing suppressing it - the one state that should pull the
+   eye. Red #f38ba8, the same accent as #privacy and the critical states,
+   which is also the colour upstream's snippet hard-coded into a Pango
+   <span>; keeping it here instead means the palette lives in one place
+   and the module can keep escape = true. Last, so it wins on source
+   order over the base rule. */
+#custom-notification.notification {
+  color: #f38ba8;
+}
+
+/* `background-color` for the same reason as the hover block above: this
+   module carries a separator background-image, and the shorthand would
+   drop it while hovered. */
+#custom-notification:hover {
+  background-color: #45475a;
+}
+
+/* The session popup is a real GtkMenu, not a waybar widget, so it is
+   styled by element name rather than by id. */
+menu {
+  background: #1e1e2e;
+  color: #cdd6f4;
+  border: 1px solid #45475a;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+menu menuitem {
+  padding: 4px 12px;
+  border-radius: 6px;
+}
+
+menu menuitem:hover {
+  background: #89b4fa;
+  color: #1e1e2e;
+}
