@@ -12,7 +12,6 @@ in {
     zip
     unzip
     p7zip
-    praxis
     ripgrep
     fd
     mandible
