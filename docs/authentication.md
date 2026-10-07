@@ -4,9 +4,14 @@ The desktop starts after a password login on tty1, using the existing Fish
 `exec niri-session` path. Autologin and empty login passwords are disabled. PAM
 passes the account password to GNOME Keyring.
 
-Howdy is a **required additional factor** for `sudo` and `swaylock` only. Login,
-SSH, `su`, and polkit do not depend on the camera. Face recognition is not a
-replacement for a password. The polkit helper keeps its upstream device sandbox.
+For `sudo`, a successful Howdy face match **replaces the password prompt**. If
+recognition fails or the camera is unavailable, sudo falls back to the account
+password. Face recognition is less secure than a password and can be spoofed.
+
+Howdy remains a **required additional factor** for `swaylock`: screen unlocking
+requires both face recognition and the account password. Login, SSH, `su`, and
+polkit do not depend on the camera. The polkit helper keeps its upstream device
+sandbox.
 
 ## Before activating
 
@@ -18,9 +23,11 @@ replacement for a password. The polkit helper keeps its upstream device sandbox.
    untested camera.
 3. Keep a root recovery shell open while testing PAM: `sudo -i`.
 4. Build first, then use `sudo nixos-rebuild test --flake .#nixos`. Test a fresh
-   password login on another VT, `sudo -k; sudo true`, and screen unlock before
-   making the generation persistent. Changes to getty may end the tty1 session;
-   save work and test from another VT or SSH.
+   password login on another VT and `sudo -k; sudo true`: a face match should
+   succeed without typing a password. Repeat with the camera covered to confirm
+   password fallback. Screen unlock should still require both factors. Test all
+   of these before making the generation persistent. Changes to getty may end
+   the tty1 session; save work and test from another VT or SSH.
 
 ## Set a non-empty keyring password
 
@@ -44,10 +51,11 @@ keyring. Complete these steps to protect its stored contents at rest.
 
 ## Recovery and limitations
 
-If face authentication fails, tty login still accepts the account password. Use
-a password-based polkit prompt or the root shell kept open during testing to
-restore the previous generation; boot the prior generation if necessary. Do not
-remove the password requirement to work around a camera issue.
+If face authentication fails, sudo falls back to the account password and tty
+login still accepts it. Screen unlock still requires face recognition; use a
+password login on another VT, a password-based polkit prompt, or the root shell
+kept open during testing to restore the previous generation. Boot the prior
+generation if necessary.
 
 Disk encryption is intentionally unchanged. A protected keyring does not encrypt
 other files on the laptop, and local snapshots are not off-device backups.

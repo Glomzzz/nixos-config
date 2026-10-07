@@ -3,21 +3,24 @@ _: {
   #   sudo linux-enable-ir-emitter configure
   #   sudo howdy add
   #   sudo howdy test
-  # Password login stays available if the camera fails. Only sudo and swaylock
-  # require face recognition as an additional factor, never as a replacement
-  # for the account password. See docs/authentication.md.
+  # Sudo accepts a successful face match without a password, falling back to
+  # the password if recognition fails. Swaylock still requires both factors.
+  # Password login is unaffected. See docs/authentication.md.
   services.howdy = {
     enable = true;
     control = "required";
     settings.video.device_path = "/dev/video2";
   };
 
-  # Howdy normally applies to every PAM service. Opt in only where both
-  # factors are intended; SSH, login, su and polkit remain password/key based.
+  # Howdy normally applies to every PAM service. Opt in only for sudo and
+  # swaylock; SSH, login, su and polkit remain password/key based.
   security.pam = {
     howdy.enable = false;
     services = {
-      sudo.howdy.enable = true;
+      sudo.howdy = {
+        enable = true;
+        control = "sufficient";
+      };
       swaylock.howdy.enable = true;
     };
   };
