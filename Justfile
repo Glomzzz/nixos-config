@@ -41,10 +41,6 @@ repl:
 clean:
   sudo nix profile wipe-history --profile /nix/var/nix/profiles/system --older-than 7d
 
-clean-backups:
-  find ~/.config -name "*.hm-backup*" -type f -delete 2>/dev/null || true
-  find ~ -maxdepth 1 -name ".*.hm-backup*" -type f -delete 2>/dev/null || true
-
 gc:
   sudo nix store gc --debug
   sudo nix-collect-garbage --delete-old
