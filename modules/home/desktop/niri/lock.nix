@@ -1,9 +1,13 @@
-{pkgs, ...}: let
+{
+  config,
+  pkgs,
+  ...
+}: let
   # swaylock-effects is a drop-in fork that still installs its binary as
   # `swaylock`. Plain swaylock does NOT understand screenshots/effect-blur/
   # clock/indicator, so those settings below require this package.
   swaylockPackage = pkgs.swaylock-effects;
-  locker = "${swaylockPackage}/bin/swaylock";
+  locker = "${config.programs.swaylock.package}/bin/swaylock";
 in {
   # swaylock draws the lock screen; swayidle decides when to show it.
   # The NixOS-side PAM service for swaylock is provided by niri-flake's module

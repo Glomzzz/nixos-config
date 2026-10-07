@@ -24,7 +24,7 @@
   noSpawnEditor = "${pkgs.coreutils}/bin/false";
   editor = ["${emc}" "-c" "-n" "-a" noSpawnEditor];
   filemanager = ["${emc}" "-c" "-n" "-a" noSpawnEditor config.home.homeDirectory];
-  locker = "${pkgs.swaylock}/bin/swaylock";
+  locker = "${config.programs.swaylock.package}/bin/swaylock";
   brightness = "${pkgs.brightnessctl}/bin/brightnessctl";
   playerctl = "${pkgs.playerctl}/bin/playerctl";
   wpctl = "${pkgs.wireplumber}/bin/wpctl";

@@ -707,7 +707,7 @@ in {
           profile-balanced = "${setProfile}/bin/waybar-set-profile Balanced";
           profile-performance = "${setProfile}/bin/waybar-set-profile Performance";
           prevent-lock = "${idleInhibit}/bin/waybar-idle-inhibit";
-          lock = "${pkgs.swaylock-effects}/bin/swaylock -f";
+          lock = "${config.programs.swaylock.package}/bin/swaylock -f";
           logout = "${pkgs.niri}/bin/niri msg action quit";
           suspend = "${pkgs.systemd}/bin/systemctl suspend";
           hibernate = "${pkgs.systemd}/bin/systemctl hibernate";
