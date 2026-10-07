@@ -92,6 +92,19 @@ Files declared with `force = true` bypass Home Manager's collision backups.
 offline tests. Run `nix build --no-link .#checks.x86_64-linux.waybar`; see the
 [Waybar layout](modules/home/desktop/niri/waybar/README.md).
 
+## Clipboard
+
+QQ and WeChat remain native Wayland applications. `clipferry` bridges their X11
+clipboard access with the Wayland clipboard, including text, images, and file
+URIs, even when no X11 window has focus. It runs with the graphical session in
+backstop mode alongside xwayland-satellite and cliphist; password-manager-hinted
+offers are excluded. PRIMARY (middle-click) is left unchanged.
+
+After deploying, check `systemctl --user status clipferry` and
+`clipferry --oneshot-check`. Test copying text and an image from Firefox or a
+terminal into QQ/WeChat and back. For failures, inspect
+`journalctl --user -u clipferry` (clipboard payloads are not logged).
+
 ## Development tools
 
 General editors, shells, language toolchains, and command-line utilities are
