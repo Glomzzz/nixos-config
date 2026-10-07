@@ -39,8 +39,11 @@ repl:
   nix repl -f flake:nixpkgs
 
 clean:
-  sudo nix profile wipe-history --profile /nix/var/nix/profiles/system --older-than 7d
+  sudo nix profile wipe-history --profile /nix/var/nix/profiles/system --older-than 30d
+
+# Pin only after this running generation has been verified on the hardware.
+pin-known-good:
+  sudo nix-store --add-root /nix/var/nix/gcroots/known-good-nixos --realise "$(readlink -f /run/current-system)"
 
 gc:
-  sudo nix store gc --debug
-  sudo nix-collect-garbage --delete-old
+  sudo nix-collect-garbage --delete-older-than 30d

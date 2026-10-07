@@ -60,6 +60,13 @@ host's SSH host key is used for age decryption. Do not add plaintext API keys or
 passwords to Nix files; add a new secret declaration under
 `modules/nixos/security/sops/` and encrypt its value with `sops`.
 
+## Recovery generations
+
+GC runs weekly and retains generations from the last 30 days. Before enabling
+the new policy, use `just pin-known-good` on a verified running system to preserve
+its store closure independently of age-based pruning. See
+[recovery instructions](docs/recovery.md).
+
 ## Authentication
 
 TTY1 requires the account password before Fish starts niri. Howdy is an
