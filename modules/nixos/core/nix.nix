@@ -1,4 +1,14 @@
 _: {
+  # Keep recent rollback generations instead of deleting everything but the
+  # current system. Explicit known-good GC roots survive age-based pruning.
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    randomizedDelaySec = "45min";
+    persistent = true;
+    options = "--delete-older-than 30d";
+  };
+
   nix.settings = {
     experimental-features = [
       "nix-command"
