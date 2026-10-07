@@ -126,6 +126,9 @@
 
           [Hotkey/TriggerKeys]
           0=Shift+Shift_R
+          # SDL games may not deliver modifier-only shortcuts reliably.
+          # Keep the existing trigger and add an explicit key for Dota chat.
+          1=Control+space
 
           [Hotkey/ActivateKeys]
 
