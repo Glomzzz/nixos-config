@@ -9,6 +9,7 @@
       liberation_ttf
       fira-code
       fira-code-symbols
+      cascadia-code # Includes the exact "Cascadia Mono NF" family used by Emacs.
       mplus-outline-fonts.githubRelease
       dina-font
       proggyfonts
