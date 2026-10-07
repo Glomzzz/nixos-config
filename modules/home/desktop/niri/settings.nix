@@ -180,10 +180,11 @@ in {
     # satellite alongside niri's own (both were running before this change,
     # each with its own Xwayland).
     #
-    # The base scale that goes with this build is XWAYLAND_SATELLITE_BASE_SCALE
-    # in hardware/zephyrus/gpu. It cannot be set in the environment block below:
-    # niri builds the satellite's command itself and never applies that block to
-    # it, so the variable has to be in niri's own environment.
+    # The compositor-scaling pin that goes with this build is
+    # XWAYLAND_SATELLITE_COMPOSITOR_SCALING plus XWAYLAND_SATELLITE_BASE_SCALE
+    # in hardware/zephyrus/gpu. Those cannot be set in niri's `environment`
+    # block: niri builds the satellite's command itself and never applies that
+    # block to it, so both have to be in niri's own environment.
     xwayland-satellite = {
       enable = true;
       path = "${xwaylandSatellite}/bin/xwayland-satellite";

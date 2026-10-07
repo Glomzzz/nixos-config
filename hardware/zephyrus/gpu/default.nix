@@ -123,10 +123,21 @@
     # app on both monitors at once, which is why no such variable is set
     # anywhere here yet: none of the X11 clients in this config has needed one.
     #
-    # It has to live here, in the *system* environment, rather than in niri's
-    # `environment` block: niri constructs the satellite's command itself and
-    # never applies that block to it, but does pass on its own environment, and
-    # niri-session re-execs as a login shell so /etc/profile reaches it.
+    # BASE_SCALE is ignored unless compositor scaling is on. This satellite
+    # build defaults that off unless XWAYLAND_SATELLITE_COMPOSITOR_SCALING is
+    # set; with it off, XRandR advertises niri's logical modes (eDP-1
+    # 1707x1067, HDMI-A-1 1920x1080) and the X screen is only 1080px tall.
+    # Steam, Slay the Spire 2, and any other X11 client that sizes itself to
+    # the panel's 2560x1600 then have their bottom clipped. Enable it here so
+    # the pin below actually takes effect: eDP-1 becomes 2560x1600 in X pixels
+    # and HDMI-A-1 2880x1620, with niri downscaling the latter.
+    #
+    # Both have to live here, in the *system* environment, rather than in
+    # niri's `environment` block: niri constructs the satellite's command
+    # itself and never applies that block to it, but does pass on its own
+    # environment, and niri-session re-execs as a login shell so /etc/profile
+    # reaches it.
+    XWAYLAND_SATELLITE_COMPOSITOR_SCALING = "1";
     XWAYLAND_SATELLITE_BASE_SCALE = "1.5";
   };
 
