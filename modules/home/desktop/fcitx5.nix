@@ -6,23 +6,38 @@
   i18n.inputMethod = {
     enable = true;
     type = "fcitx5";
-    fcitx5.waylandFrontend = true;
-    fcitx5.addons = with pkgs; [
-      rime-data
-      fcitx5-rime
-      fcitx5-gtk
-      qt6Packages.fcitx5-configtool
-      # Qt IM modules, needed so Qt apps get a working preedit. Spelled via
-      # qt6Packages/libsForQt5 rather than kdePackages: it is the identical
-      # derivation, but the kdePackages alias reads like a leftover KDE
-      # dependency now that Plasma is gone.
-      qt6Packages.fcitx5-qt
-      libsForQt5.fcitx5-qt
-    ];
+    fcitx5 = {
+      waylandFrontend = true;
+      # Home Manager owns startup; do not also spawn a daemon from niri.
+      systemd.enable = true;
+      addons = with pkgs; [
+        rime-data
+        fcitx5-rime
+        fcitx5-gtk
+        qt6Packages.fcitx5-configtool
+        # Qt IM modules, needed so Qt apps get a working preedit. Spelled via
+        # qt6Packages/libsForQt5 rather than kdePackages: it is the identical
+        # derivation, but the kdePackages alias reads like a leftover KDE
+        # dependency now that Plasma is gone.
+        qt6Packages.fcitx5-qt
+        libsForQt5.fcitx5-qt
+      ];
+    };
   };
+
+  systemd.user.services.fcitx5-daemon.Service.Restart = "on-failure";
 
   xdg = {
     configFile = {
+      # niri-session also runs XDG autostart. Mask the package's desktop entry
+      # so it cannot race the dedicated fcitx5-daemon.service.
+      "autostart/org.fcitx.Fcitx5.desktop".text = ''
+        [Desktop Entry]
+        Type=Application
+        Name=Fcitx 5
+        Hidden=true
+      '';
+
       "fcitx5/profile" = {
         force = true;
         text = ''
@@ -450,7 +465,11 @@
   home = {
     sessionVariables = {
       XMODIFIERS = "@im=fcitx";
-      GTK_IM_MODULE = "fcitx";
+      # Leave GTK_IM_MODULE unset: GTK3/4 on Wayland use text-input-v3,
+      # avoiding the GTK plugin's hide/show popup repositioning flicker.
+      # waylandFrontend supplies gtk-im-module=fcitx in GTK's config files
+      # for X11/GTK2 apps. Foot uses text-input-v3 directly, not this variable.
+      # Qt5 still needs its Fcitx plugin on niri (no text-input-v2 support).
       QT_IM_MODULE = "fcitx";
       SDL_IM_MODULE = "fcitx";
       GLFW_IM_MODULE = "ibus";

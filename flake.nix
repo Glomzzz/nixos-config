@@ -134,6 +134,55 @@
             touch "$out"
           '';
 
+        fcitx5 = let
+          home = self.nixosConfigurations.nixos.config.home-manager.users.glom;
+          settings = pkgs.writeText "fcitx5-settings.json" (builtins.toJSON {
+            inherit (home.home) sessionVariables;
+            gtk2 = home.gtk.gtk2.extraConfig;
+            gtk3 = home.gtk.gtk3.extraConfig.gtk-im-module;
+            gtk4 = home.gtk.gtk4.extraConfig.gtk-im-module;
+            service = home.systemd.user.services.fcitx5-daemon;
+            emacsUnsetEnvironment = home.systemd.user.services.emacs.Service.UnsetEnvironment;
+            niriStartup = home.programs.niri.settings.spawn-at-startup;
+            autostart = home.xdg.configFile."autostart/org.fcitx.Fcitx5.desktop".text;
+            footEnabled = home.programs.foot.enable;
+            waylandFrontend = home.i18n.inputMethod.fcitx5.waylandFrontend;
+            package = toString home.i18n.inputMethod.package;
+          });
+        in
+          pkgs.runCommand "fcitx5-check"
+          {nativeBuildInputs = [pkgs.python3];}
+          ''
+            python3 - ${settings} <<'PY'
+            import configparser
+            import json
+            import sys
+
+            with open(sys.argv[1]) as source:
+                settings = json.load(source)
+            env = settings["sessionVariables"]
+            assert "GTK_IM_MODULE" not in env, "GTK Wayland apps must use text-input-v3"
+            assert env["QT_IM_MODULE"] == "fcitx", "Qt5 still needs the Fcitx plugin"
+            assert env["XMODIFIERS"] == "@im=fcitx"
+            assert env["SDL_IM_MODULE"] == "fcitx"
+            assert 'gtk-im-module="fcitx"' in settings["gtk2"]
+            assert settings["gtk3"] == settings["gtk4"] == "fcitx"
+            assert "GTK_IM_MODULE" in settings["emacsUnsetEnvironment"]
+            assert settings["footEnabled"] and settings["waylandFrontend"]
+
+            service = settings["service"]
+            assert service["Service"]["ExecStart"] == [settings["package"] + "/bin/fcitx5"]
+            assert service["Service"]["Restart"] == "on-failure"
+            assert "graphical-session.target" in service["Install"]["WantedBy"]
+            assert not any("fcitx5" in arg for entry in settings["niriStartup"] for arg in entry["argv"])
+            autostart = configparser.ConfigParser()
+            autostart.read_string(settings["autostart"])
+            assert autostart["Desktop Entry"].getboolean("Hidden")
+            print("Fcitx startup and Wayland/GTK input settings passed")
+            PY
+            touch "$out"
+          '';
+
         host = self.nixosConfigurations.nixos.config.system.build.toplevel;
       }
     );
