@@ -60,6 +60,14 @@ host's SSH host key is used for age decryption. Do not add plaintext API keys or
 passwords to Nix files; add a new secret declaration under
 `modules/nixos/security/sops/` and encrypt its value with `sops`.
 
+## Home Manager backups
+
+When activation replaces an unmanaged file, its previous contents are moved to
+`${XDG_STATE_HOME:-~/.local/state}/home-manager/backups/` in a unique timestamped
+directory, preserving the path relative to your home. Rebuilds never prune these
+backups or old `*.hm-backup` files. Review and restore or remove them manually.
+Files declared with `force = true` bypass Home Manager's collision backups.
+
 ## Development tools
 
 General editors, shells, language toolchains, and command-line utilities are

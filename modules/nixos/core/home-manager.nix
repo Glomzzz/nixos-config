@@ -2,12 +2,36 @@
   inputs,
   specialArgs,
   username,
+  pkgs,
   ...
 }: let
   userRoot = ../../../users + "/${username}";
 in {
   home-manager = {
-    backupFileExtension = "hm-backup";
+    # Preserve every displaced file; repeated activations must not overwrite
+    # a previous backup or delete unrelated files in the user's home.
+    backupCommand = let
+      backup = pkgs.writeShellApplication {
+        name = "home-manager-backup";
+        runtimeInputs = [pkgs.coreutils];
+        text = ''
+          umask 077
+          target="$1"
+          case "$target" in
+            "$HOME"/*) relative="''${target#"$HOME"/}" ;;
+            *) printf 'Refusing to back up a path outside HOME: %s\n' "$target" >&2; exit 1 ;;
+          esac
+
+          root="''${XDG_STATE_HOME:-$HOME/.local/state}/home-manager/backups"
+          mkdir -p -- "$root"
+          backup_dir=$(mktemp -d "$root/$(date -u +%Y%m%dT%H%M%SZ).XXXXXX")
+          destination="$backup_dir/$relative"
+          mkdir -p -- "$(dirname "$destination")"
+          mv -- "$target" "$destination"
+          printf 'Home Manager backup: %s\n' "$destination" >&2
+        '';
+      };
+    in "${backup}/bin/home-manager-backup";
 
     useGlobalPkgs = true;
 
@@ -17,16 +41,6 @@ in {
       ];
     };
     extraSpecialArgs = inputs // specialArgs;
-  };
-
-  # Clean up old hm-backup files before activation to prevent conflicts
-  system.activationScripts.cleanup-hm-backups = {
-    deps = [];
-    text = ''
-      echo "Cleaning up old home-manager backup files..."
-      find /home/${username}/.config -name "*.hm-backup*" -type f -delete 2>/dev/null || true
-      find /home/${username} -maxdepth 1 -name ".*.hm-backup*" -type f -delete 2>/dev/null || true
-    '';
   };
 
   environment.extraInit = let
