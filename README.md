@@ -71,9 +71,11 @@ Off-device backups remain to be configured.
 
 ## Authentication
 
-TTY1 requires the account password before Fish starts niri. Sudo accepts a
-successful Howdy face match without a password, with password fallback if
-recognition fails. Screen unlocking still requires both Howdy and the password.
+TTY1 shows a wallpaper-backed, dark ReGreet login screen with a clock and
+user/session selection. Password authentication starts Niri and unlocks GNOME
+Keyring; other VTs remain recovery shells. Sudo accepts a successful Howdy face
+match without a password, with password fallback if recognition fails. Screen
+unlocking still requires both Howdy and the password.
 Set the existing Login keyring's password interactively to match the account
 password; see
 [authentication setup and recovery](docs/authentication.md) before activating.

@@ -1,9 +1,9 @@
 {pkgs, ...}: {
   # Caps Lock is a second Ctrl everywhere. This xkb block is the source for the
-  # virtual consoles, including the tty1 password login (via
-  # console.useXkbConfig); the niri session sets the same option itself in
-  # modules/home/desktop/niri/settings.nix because a Wayland compositor does
-  # not read these.
+  # virtual recovery consoles (via console.useXkbConfig). The ReGreet niri
+  # compositor reads this xkb block in desktop/session.nix; the user's niri
+  # session sets the same option in modules/home/desktop/niri/settings.nix
+  # because a Wayland compositor does not read the X11 settings itself.
   services.xserver.xkb = {
     layout = "us";
     options = "ctrl:nocaps";
