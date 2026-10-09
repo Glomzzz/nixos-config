@@ -48,7 +48,9 @@ in {
       line-wrong-color = "00000000";
 
       fade-in = 0.2;
-      ignore-empty-password = true;
+      # Enter with no password starts a face-only PAM attempt. If recognition
+      # fails, type the password and press Enter; PAM rejects empty passwords.
+      ignore-empty-password = false;
     };
   };
 

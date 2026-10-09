@@ -1,11 +1,11 @@
-_: {
+{lib, ...}: {
   # Enroll/test the IR camera before enabling the new generation:
   #   sudo linux-enable-ir-emitter configure
   #   sudo howdy add
   #   sudo howdy test
-  # Sudo accepts a successful face match without a password, falling back to
-  # the password if recognition fails. Swaylock still requires both factors.
-  # Password login is unaffected. See docs/authentication.md.
+  # Sudo and swaylock accept a successful face match without a password,
+  # falling back to the password if recognition fails or the camera is absent.
+  # Initial password login is unaffected. See docs/authentication.md.
   services.howdy = {
     enable = true;
     control = "required";
@@ -21,7 +21,16 @@ _: {
         enable = true;
         control = "sufficient";
       };
-      swaylock.howdy.enable = true;
+      swaylock = {
+        # Empty input can trigger Howdy, but must never authenticate via unix.
+        allowNullPassword = lib.mkForce false;
+        howdy = {
+          enable = true;
+          # NixOS orders Howdy before pam_unix: either sufficient rule can
+          # finish authentication; failed recognition does not veto a password.
+          control = "sufficient";
+        };
+      };
     };
   };
 

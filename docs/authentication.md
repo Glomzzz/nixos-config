@@ -15,10 +15,20 @@ For `sudo`, a successful Howdy face match **replaces the password prompt**. If
 recognition fails or the camera is unavailable, sudo falls back to the account
 password. Face recognition is less secure than a password and can be spoofed.
 
-Howdy remains a **required additional factor** for `swaylock`: screen unlocking
-requires both face recognition and the account password. Login, SSH, `su`, and
-polkit do not depend on the camera. The polkit helper keeps its upstream device
-sandbox.
+Screen unlocking with `swaylock` accepts **either Howdy or the account password**:
+
+- **Face only:** press Enter without typing a password, then look at the camera.
+  A successful match unlocks immediately; no password is required.
+- **Password:** type the account password and press Enter. Howdy is tried first;
+  if recognition fails, times out, or the camera is unavailable, PAM checks the
+  submitted password and unlocks if it is correct. A failed face match does not
+  veto a valid password. This is sequential fallback, not concurrent prompts.
+- If both methods fail, the screen stays locked. Empty input only starts face
+  recognition; it cannot authenticate as an empty password.
+
+Login, SSH, `su`, and polkit do not depend on the camera. The polkit helper keeps
+its upstream device sandbox. Face unlocking does not unlock a separately locked
+GNOME Keyring, since no account password is supplied.
 
 ## Before activating
 
@@ -26,14 +36,17 @@ sandbox.
    report `P`, not `NP` or `L`. Use `passwd` interactively if needed.
 2. With the current generation, verify enrollment: `sudo howdy test`. Enroll with
    `sudo howdy add` if needed; check the camera at `/dev/video2` and configure the
-   IR emitter if required. Do not activate required-face authentication with an
-   untested camera.
+   IR emitter if required. Verify face authentication before relying on it;
+   password fallback remains available.
 3. Keep a root recovery shell open while testing PAM: `sudo -i`.
 4. Build first, then use `sudo nixos-rebuild test --flake .#nixos`. Test a fresh
    password login on another VT and `sudo -k; sudo true`: a face match should
    succeed without typing a password. Repeat with the camera covered to confirm
-   password fallback. Screen unlock should still require both factors. Test all
-   of these before making the generation persistent. Save work and test from
+   password fallback. For screen unlock, test Enter with no input and a face
+   match, then cover the camera and verify the correct password still unlocks.
+   With the camera covered, incorrect and empty passwords must keep the screen
+   locked. Test all of these before making the generation persistent. Save work
+   and test from
    another VT or SSH: replacing tty1's getty with greetd may end the old desktop
    session. Test ReGreet with an incorrect password (must reject), then a correct
    password (must start Niri and unlock the Login keyring). Log out and verify
@@ -44,6 +57,9 @@ Configuration regressions run with
 `nix build --no-link .#checks.x86_64-linux.login`. The check validates the greeter
 compositor's KDL, session discovery, and password/keyring PAM integration;
 visual appearance and hardware login still require the interactive tests above.
+`nix build --no-link .#checks.x86_64-linux.authentication` checks the generated
+unlock PAM stack, including Howdy success, password fallback, both-failed denial,
+and empty-input handling, with synthetic modules rather than the real camera.
 
 ## Set a non-empty keyring password
 
@@ -67,11 +83,11 @@ keyring. Complete these steps to protect its stored contents at rest.
 
 ## Recovery and limitations
 
-If face authentication fails, sudo falls back to the account password and tty
-login still accepts it. Screen unlock still requires face recognition; use a
-password login on another VT, a password-based polkit prompt, or the root shell
-kept open during testing to restore the previous generation. Boot the prior
-generation if necessary.
+If face authentication fails, sudo and screen unlock fall back to the account
+password; graphical and tty login still accept it. If a greeter or PAM regression
+prevents access, use a password login on another VT, a password-based polkit
+prompt, or the root shell kept open during testing to restore the previous
+generation. Boot the prior generation if necessary.
 
 Disk encryption is intentionally unchanged. A protected keyring does not encrypt
 other files on the laptop, and local snapshots are not off-device backups.

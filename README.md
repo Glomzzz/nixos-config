@@ -75,7 +75,9 @@ TTY1 shows a wallpaper-backed, dark ReGreet login screen with a clock and
 user/session selection. Password authentication starts Niri and unlocks GNOME
 Keyring; other VTs remain recovery shells. Sudo accepts a successful Howdy face
 match without a password, with password fallback if recognition fails. Screen
-unlocking still requires both Howdy and the password.
+unlocking accepts **either Howdy or the password**: press Enter with no input to
+try your face, or type the account password and press Enter. Camera failure never
+blocks a valid password.
 Set the existing Login keyring's password interactively to match the account
 password; see
 [authentication setup and recovery](docs/authentication.md) before activating.
