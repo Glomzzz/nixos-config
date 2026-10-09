@@ -183,6 +183,11 @@
             touch "$out"
           '';
 
+        authentication = import ./modules/nixos/security/tests/authentication.nix {
+          inherit pkgs;
+          inherit (self.nixosConfigurations.nixos) config;
+        };
+
         login = import ./modules/nixos/desktop/tests/login.nix {
           inherit pkgs;
           inherit (self.nixosConfigurations.nixos) config;
