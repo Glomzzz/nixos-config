@@ -1,8 +1,15 @@
-# Password login and the Login keyring
+# Graphical login and the Login keyring
 
-The desktop starts after a password login on tty1, using the existing Fish
-`exec niri-session` path. Autologin and empty login passwords are disabled. PAM
-passes the account password to GNOME Keyring.
+TTY1 shows ReGreet: the desktop wallpaper behind a dark Catppuccin login card,
+with a clock, user/session selection, and reboot/power controls. Select **Niri**
+and sign in with the account password. ReGreet remembers the last authenticated
+user and their session. Autologin and empty login passwords are disabled.
+
+The greeter runs in its own niri compositor as the unprivileged `greeter` user.
+After authentication, it exits and greetd starts the packaged `niri-session`
+desktop entry. There is no Fish tty1 auto-launch hook. Greetd includes the
+`login` PAM stack, which passes the account password to GNOME Keyring. Other VTs
+and SSH remain plain password/key-based recovery shells.
 
 For `sudo`, a successful Howdy face match **replaces the password prompt**. If
 recognition fails or the camera is unavailable, sudo falls back to the account
@@ -26,8 +33,17 @@ sandbox.
    password login on another VT and `sudo -k; sudo true`: a face match should
    succeed without typing a password. Repeat with the camera covered to confirm
    password fallback. Screen unlock should still require both factors. Test all
-   of these before making the generation persistent. Changes to getty may end
-   the tty1 session; save work and test from another VT or SSH.
+   of these before making the generation persistent. Save work and test from
+   another VT or SSH: replacing tty1's getty with greetd may end the old desktop
+   session. Test ReGreet with an incorrect password (must reject), then a correct
+   password (must start Niri and unlock the Login keyring). Log out and verify
+   that ReGreet returns; check readability on the laptop panel and any docked
+   monitor. Ctrl+Alt+F2 opens a recovery console if the greeter fails.
+
+Configuration regressions run with
+`nix build --no-link .#checks.x86_64-linux.login`. The check validates the greeter
+compositor's KDL, session discovery, and password/keyring PAM integration;
+visual appearance and hardware login still require the interactive tests above.
 
 ## Set a non-empty keyring password
 

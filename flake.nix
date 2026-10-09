@@ -183,6 +183,11 @@
             touch "$out"
           '';
 
+        login = import ./modules/nixos/desktop/tests/login.nix {
+          inherit pkgs;
+          inherit (self.nixosConfigurations.nixos) config;
+        };
+
         host = self.nixosConfigurations.nixos.config.system.build.toplevel;
       }
     );
