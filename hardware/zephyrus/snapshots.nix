@@ -31,13 +31,13 @@ in {
   ];
 
   services.snapper = {
-    snapshotRootOnBoot = true;
-    snapshotInterval = "hourly";
-    persistentTimer = true;
+    # Disable automatic whole-root snapshots after the metadata-full incident.
+    # Keep the configuration for manual recovery and cleanup of existing snapshots.
+    snapshotRootOnBoot = false;
     configs.root = {
       SUBVOLUME = "/";
       FSTYPE = "btrfs";
-      TIMELINE_CREATE = true;
+      TIMELINE_CREATE = false;
       TIMELINE_CLEANUP = true;
       TIMELINE_LIMIT_HOURLY = 6;
       TIMELINE_LIMIT_DAILY = 7;
@@ -51,6 +51,10 @@ in {
     };
   };
 
+  # NixOS installs the timeline timer whenever any Snapper config exists,
+  # even with TIMELINE_CREATE disabled. Mask the creation units as well.
+  systemd.timers.snapper-timeline.enable = false;
+
   systemd.services = {
     prepare-root-snapshots = {
       description = "Prepare the private Snapper root snapshot subvolume";
@@ -62,14 +66,8 @@ in {
         ExecStart = lib.getExe prepareSnapshots;
       };
     };
-    snapper-boot = {
-      requires = ["prepare-root-snapshots.service"];
-      after = ["prepare-root-snapshots.service"];
-    };
-    snapper-timeline = {
-      requires = ["prepare-root-snapshots.service"];
-      after = ["prepare-root-snapshots.service"];
-    };
+    snapper-boot.enable = false;
+    snapper-timeline.enable = false;
     snapper-cleanup = {
       requires = ["prepare-root-snapshots.service"];
       after = ["prepare-root-snapshots.service"];

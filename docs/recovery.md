@@ -52,29 +52,55 @@ unit, not as a blanket global default. Confirm
 
 ## Local Btrfs snapshots
 
-Snapper takes hourly and boot-time read-only snapshots of the root `@` subvolume.
-The setup service creates a private `/.snapshots` **nested subvolume** before any
-Snapper service runs. It refuses to replace an existing non-subvolume directory
-or follow a symlink. This requires root privilege during activation/boot; do not
-run `snapper create-config`, since the configuration is already declarative.
+Automatic hourly and boot-time snapshots are **disabled** after a Btrfs
+metadata-full incident. Their origin was `hardware/zephyrus/snapshots.nix`,
+introduced by commit `cba846c` (`feat(recovery): add bounded local Btrfs snapshots
+with Snapper`). The module remains imported to keep Snapper available for manual
+recovery and daily cleanup of existing snapshots. It disables `TIMELINE_CREATE`
+and `snapshotRootOnBoot`, and masks the timeline timer and both creation services.
 
-Retention is 6 hourly, 7 daily, 4 weekly, and 2 monthly timeline snapshots, plus
-up to 5 ordinary numbered snapshots (including boot snapshots). Cleanup runs
-daily. Minimum-age rules mean counts are not strict instantaneous upper bounds.
-Inspect both retention and free space after enabling:
+To stop automatic creation immediately, before rebuilding:
+
+```bash
+sudo systemctl stop snapper-timeline.timer snapper-timeline.service snapper-boot.service
+```
+
+Stopping these units is temporary: rebooting or activating the old configuration
+can start them again. Rebuild with the updated configuration to make this
+persistent. Do not rely on runtime masks here: NixOS unit definitions in `/etc`
+take precedence over masks in `/run`. The cleanup timer is deliberately left
+enabled. This does not delete existing snapshots immediately, but daily cleanup
+continues pruning
+according to the existing retention policy: 6 hourly, 7 daily, 4 weekly, and 2
+monthly timeline snapshots, plus up to 5 ordinary numbered snapshots (including
+old boot snapshots). Minimum-age rules mean counts are not strict instantaneous
+upper bounds; retention counts are not a disk-space budget.
+
+The setup service still prepares a private `/.snapshots` **nested subvolume**
+before cleanup or the Snapper daemon runs. It refuses to replace an existing
+non-subvolume directory or follow a symlink. Do not run `snapper create-config`,
+since the configuration is already declarative.
+
+Inspect the retained snapshots, automation, and actual Btrfs allocation:
 
 ```bash
 sudo snapper -c root list
-sudo systemctl status prepare-root-snapshots snapper-boot
-systemctl list-timers 'snapper-*'
+systemctl list-timers --all 'snapper-*'
+systemctl is-enabled snapper-timeline.timer snapper-timeline.service snapper-boot.service
 sudo btrfs filesystem usage /
 ```
 
-Snapshots share disk blocks with the live filesystem; large file changes or game
-updates can consume substantial space. Counts alone are not a disk-space budget.
-Nested subvolumes, other filesystems, and FUSE mounts are **not** included.
-On the current layout `/home` is an ordinary directory inside `@`, so local home
-files are included, but the mounted Mac mini share and `/boot` are not.
+After activation, the three creation units should report `masked`; only
+`snapper-cleanup.timer` should be scheduled. Disabling creation does not reclaim
+space by itself. Review snapshot IDs before deleting any with Snapper. Check
+metadata usage and **Device unallocated**, not just `df`: free space inside data
+chunks cannot directly be allocated as new metadata chunks.
+
+Existing snapshots share disk blocks with the live filesystem; large file
+changes or game updates can retain substantial space. The root `@` snapshots
+include `/nix` and local `/home` files, since both are ordinary directories inside
+`@` on the current layout. Nested subvolumes, other filesystems, and FUSE mounts
+are **not** included, so neither the mounted Mac mini share nor `/boot` is covered.
 
 For file recovery, copy only the needed files out of
 `/.snapshots/NUMBER/snapshot/` using root privileges. Avoid blindly restoring the

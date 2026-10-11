@@ -65,9 +65,11 @@ passwords to Nix files; add a new secret declaration under
 GC runs weekly and retains generations from the last 30 days. Before enabling
 the new policy, use `just pin-known-good` on a verified running system to preserve
 its store closure independently of age-based pruning. See
-[recovery instructions](docs/recovery.md). Snapper also takes local hourly and
-boot-time Btrfs snapshots; these do not protect against disk failure or theft.
-Off-device backups remain to be configured.
+[recovery instructions](docs/recovery.md). Automatic hourly and boot-time Btrfs
+snapshots are disabled after a metadata-full incident. Snapper remains available
+for manual recovery, with daily cleanup of existing snapshots. These local
+snapshots do not protect against disk failure or theft; off-device backups remain
+to be configured.
 
 ## Authentication
 
