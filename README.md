@@ -122,11 +122,17 @@ use text-input-v3 rather than the Fcitx GTK plugin, whose client-side popup can
 flicker when repositioning. `GTK_IM_MODULE` is intentionally unset; GTK config
 files retain Fcitx for X11/GTK2 apps. Qt5 keeps `QT_IM_MODULE=fcitx`.
 
+**Right Shift** is the only Chinese/English toggle. Ctrl+Space, preedit toggling,
+input-method group cycling, clipboard, quick phrase, Unicode entry, and keyboard
+hint shortcuts are unbound so they cannot intercept Emacs commands. Rime also
+leaves Ctrl shortcuts and mode switching alone; candidate navigation still uses
+arrows, Tab/Shift+Tab, and punctuation.
+
 After deploying, log out and back in to clear the old session environment and
 start the single managed daemon. Save Emacs buffers before logging out; Home
 Manager deliberately does not automatically restart a running Emacs daemon.
 Check `systemctl --user status fcitx5-daemon` and confirm `printenv GTK_IM_MODULE`
-prints nothing. In Foot and Emacs, press **Ctrl+Space**, type `nihao`, and select
+prints nothing. In Foot and Emacs, press **Right Shift**, type `nihao`, and select
 `你好`; check that the Emacs candidate popup stays stable while typing and near
 window edges. These need interactive testing. Offline configuration regressions
 run with `nix build --no-link .#checks.x86_64-linux.fcitx5`.
@@ -140,10 +146,10 @@ both SDL2/SDL3, and retains 2560×1600 fullscreen. Other games still use Gamesco
 Do not add another `gamescope` around Dota's command.
 
 After deploying, reload Fcitx with `fcitx5-remote -r` and restart Dota 2. Open a
-chat input, press **Ctrl+Space**, type `nihao`, and select `你好`. The existing
-Shift trigger is retained. Check both committing text and the candidate popup;
-these need an interactive in-game test, not just Nix evaluation. Offline launcher
-regressions run with `nix build --no-link .#checks.x86_64-linux.steam-game-laptop`.
+chat input, press **Right Shift**, type `nihao`, and select `你好`. No Ctrl+Space
+fallback is configured. Check the modifier-only toggle, committing text, and the
+candidate popup; these need an interactive in-game test, not just Nix evaluation.
+Offline launcher regressions run with `nix build --no-link .#checks.x86_64-linux.steam-game-laptop`.
 
 ## Development tools
 
