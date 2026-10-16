@@ -148,15 +148,27 @@
             footEnabled = home.programs.foot.enable;
             waylandFrontend = home.i18n.inputMethod.fcitx5.waylandFrontend;
             package = toString home.i18n.inputMethod.package;
+            globalConfig = home.xdg.configFile."fcitx5/config".text;
+            addonConfigs = pkgs.lib.genAttrs ["clipboard" "keyboard" "quickphrase" "unicode"] (
+              name: home.xdg.configFile."fcitx5/conf/${name}.conf".text
+            );
+            rimeConfigs = pkgs.lib.genAttrs ["default.custom.yaml" "luna_pinyin_simp.custom.yaml" "pin.schema.yaml"] (
+              name: home.xdg.dataFile."fcitx5/rime/${name}".text
+            );
           });
         in
           pkgs.runCommand "fcitx5-check"
-          {nativeBuildInputs = [pkgs.python3];}
+          {nativeBuildInputs = [(pkgs.python3.withPackages (ps: [ps.pyyaml])) pkgs.librime];}
           ''
             python3 - ${settings} <<'PY'
             import configparser
             import json
+            from pathlib import Path
+            import subprocess
             import sys
+            import tempfile
+
+            import yaml
 
             with open(sys.argv[1]) as source:
                 settings = json.load(source)
@@ -178,7 +190,55 @@
             autostart = configparser.ConfigParser()
             autostart.read_string(settings["autostart"])
             assert autostart["Desktop Entry"].getboolean("Hidden")
-            print("Fcitx startup and Wayland/GTK input settings passed")
+
+            hotkeys = configparser.ConfigParser()
+            hotkeys.optionxform = str
+            hotkeys.read_string(settings["globalConfig"])
+            assert dict(hotkeys["Hotkey/TriggerKeys"]) == {"0": "Shift+Shift_R"}
+            assert not hotkeys["Hotkey"].getboolean("EnumerateWithTriggerKeys")
+            for key in ("EnumerateForwardKeys", "EnumerateBackwardKeys"):
+                assert not hotkeys["Hotkey"][key], key
+            for key in ("ActivateKeys", "DeactivateKeys", "AltTriggerKeys",
+                        "EnumerateGroupForwardKeys", "EnumerateGroupBackwardKeys", "TogglePreedit"):
+                assert not dict(hotkeys["Hotkey/" + key]), key
+
+            addon_keys = {
+                "clipboard": ("TriggerKey", "PastePrimaryKey"),
+                "keyboard": ("Hint Trigger", "One Time Hint Trigger"),
+                "quickphrase": ("TriggerKey",),
+                "unicode": ("TriggerKey", "DirectUnicodeMode"),
+            }
+            for addon, keys in addon_keys.items():
+                config = configparser.ConfigParser()
+                config.optionxform = str
+                config.read_string("[Addon]\n" + settings["addonConfigs"][addon])
+                for key in keys:
+                    assert config["Addon"][key] == "", (addon, key)
+
+            # Compile the real schema: inherited bindings/+ can silently append
+            # Ctrl shortcuts after an apparently complete custom replacement.
+            with tempfile.TemporaryDirectory() as directory:
+                user_data = Path(directory)
+                for name, text in settings["rimeConfigs"].items():
+                    (user_data / name).write_text(text)
+                result = subprocess.run(
+                    ["rime_deployer", "--build", directory,
+                     "${pkgs.rime-data}/share/rime-data", str(user_data / "build")],
+                    capture_output=True, text=True,
+                )
+                assert result.returncode == 0, result.stderr
+                default = yaml.safe_load((user_data / "build/default.yaml").read_text())
+                schema = yaml.safe_load((user_data / "build/pin.schema.yaml").read_text())
+                assert default["switcher"]["hotkeys"] == []
+                assert all(value == "noop" for value in default["ascii_composer"]["switch_key"].values())
+                bindings = default["key_binder"]["bindings"]
+                assert schema["key_binder"]["bindings"] == bindings
+                assert len(bindings) == 6, "Keep punctuation and Tab candidate navigation"
+                for binding in bindings:
+                    assert not any(modifier in binding["accept"] for modifier in ("Control+", "Alt+", "Super+"))
+                    assert "toggle" not in binding
+
+            print("Fcitx startup, Wayland/GTK input, and Emacs-safe hotkeys passed")
             PY
             touch "$out"
           '';

@@ -124,12 +124,45 @@
         '';
       };
 
+      # Optional addon shortcuts steal Emacs bindings even in keyboard-us.
+      # Keep the addons available, but make their actions menu-only.
+      "fcitx5/conf/clipboard.conf" = {
+        force = true;
+        text = ''
+          TriggerKey=
+          PastePrimaryKey=
+        '';
+      };
+
+      "fcitx5/conf/keyboard.conf" = {
+        force = true;
+        text = ''
+          Hint Trigger=
+          One Time Hint Trigger=
+        '';
+      };
+
+      "fcitx5/conf/quickphrase.conf" = {
+        force = true;
+        text = ''
+          TriggerKey=
+        '';
+      };
+
+      "fcitx5/conf/unicode.conf" = {
+        force = true;
+        text = ''
+          TriggerKey=
+          DirectUnicodeMode=
+        '';
+      };
+
       "fcitx5/config" = {
         force = true;
         text = ''
           [Hotkey]
           # Enumerate when holding modifier of Toggle key
-          EnumerateWithTriggerKeys=True
+          EnumerateWithTriggerKeys=False
           # Enumerate Input Method Forward
           EnumerateForwardKeys=
           # Enumerate Input Method Backward
@@ -139,11 +172,9 @@
           # Time limit in milliseconds for triggering modifier key shortcuts
           ModifierOnlyKeyTimeout=250
 
+          # Right Shift is the only toggle; leave Ctrl/Alt chords to Emacs.
           [Hotkey/TriggerKeys]
           0=Shift+Shift_R
-          # SDL games may not deliver modifier-only shortcuts reliably.
-          # Keep the existing trigger and add an explicit key for Dota chat.
-          1=Control+space
 
           [Hotkey/ActivateKeys]
 
@@ -152,10 +183,8 @@
           [Hotkey/AltTriggerKeys]
 
           [Hotkey/EnumerateGroupForwardKeys]
-          0=Control+Shift
 
           [Hotkey/EnumerateGroupBackwardKeys]
-          0=Control+Alt+Shift
 
           [Hotkey/PrevPage]
           0=Up
@@ -170,7 +199,6 @@
           0=Tab
 
           [Hotkey/TogglePreedit]
-          0=Control+Alt+P
 
           [Behavior]
           # Active By Default
@@ -359,7 +387,9 @@
             switcher/caption: 〔拼〕
 
             ascii_composer/good_old_caps_lock: true
-            ascii_composer/switch_key/Caps_Lock: clear
+            # Fcitx owns switching; Rime must not add a second ASCII toggle.
+            ascii_composer/switch_key/Caps_Lock: noop
+            ascii_composer/switch_key/Eisu_toggle: noop
             ascii_composer/switch_key/Shift_L: noop
             ascii_composer/switch_key/Shift_R: noop
             ascii_composer/switch_key/Control_L: noop
@@ -383,8 +413,6 @@
               - {accept: period, send: Page_Down, when: has_menu}
               - {accept: Tab, send: Shift+Right, when: composing}
               - {accept: Shift+Tab, send: Shift+Left, when: composing}
-              - {accept: Control+j, send: Down, when: has_menu}
-              - {accept: Control+k, send: Up, when: has_menu}
         '';
       };
 
@@ -413,8 +441,6 @@
               - {accept: period, send: Page_Down, when: has_menu}
               - {accept: Tab, send: Shift+Right, when: composing}
               - {accept: Shift+Tab, send: Shift+Left, when: composing}
-              - {accept: Control+j, send: Down, when: has_menu}
-              - {accept: Control+k, send: Up, when: has_menu}
 
             translator/enable_sentence: true
             translator/enable_user_dict: true
@@ -457,6 +483,11 @@
 
           translator:
             prism: pin
+
+          # Drop inherited Ctrl+Shift+4/$ bindings. import_preset: default
+          # still supplies the candidate navigation configured above.
+          __patch:
+            key_binder/bindings: []
         '';
       };
     };
