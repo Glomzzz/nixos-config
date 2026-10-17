@@ -3,6 +3,8 @@ final: _prev: {
   cherry-studio-with-desktop = final.callPackage ./cherry-studio-with-desktop.nix {};
   clipferry = final.callPackage ./clipferry.nix {};
   bun = final.callPackage ./bun.nix {};
+  jjui = final.callPackage ./jjui.nix {};
+  jujutsu = final.callPackage ./jujutsu.nix {};
   mandible = final.callPackage ./mandible.nix {};
   ssh-proxy-mac-mini = final.callPackage ./ssh-proxy-mac-mini.nix {};
   v2raya-assets = final.callPackage ./v2raya-assets.nix {};
