@@ -6,10 +6,10 @@
   emacs = config.programs.emacs.finalPackage;
   noSpawnEditor = "${pkgs.coreutils}/bin/false";
 in {
-  # emacsclient wrapper used by the niri binds and the `magit' fish
-  # function: when the hand-written config is newer than the running
-  # daemon and no frame is open (the launching client is the only
-  # one), restart the daemon first so the edited config is loaded.
+  # emacsclient wrapper used by the niri binds and the Dirvish launcher:
+  # when the hand-written config is newer than the running daemon and no
+  # frame is open (the launching client is the only one), restart the
+  # daemon first so the edited config is loaded.
   #
   # The probe only asks for functions defined by modules/emc.el.
   # a daemon that cannot answer it is running some other config and

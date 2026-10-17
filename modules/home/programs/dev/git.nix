@@ -4,7 +4,11 @@
   email,
   ...
 }: {
-  home.packages = [pkgs.gh];
+  home.packages = with pkgs; [
+    gh
+    jujutsu
+    jjui
+  ];
 
   programs.git = {
     enable = true;

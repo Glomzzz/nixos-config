@@ -6,22 +6,6 @@
   emc = "${config.home.homeDirectory}/.local/bin/emc";
   noSpawnEditor = "${pkgs.coreutils}/bin/false";
 in {
-  programs.fish.functions.magit = {
-    description = "Open Magit in a new Emacs window for the current directory";
-    body = ''
-      if not command git -C "$PWD" rev-parse --show-toplevel >/dev/null 2>/dev/null
-        echo "magit: $PWD is not inside a Git repository" >&2
-        return 1
-      end
-
-      # Always ask emacsclient for a fresh graphical frame.  The Elisp
-      # entry point uses that request's selected frame, so existing Magit
-      # windows are left untouched.
-      ${emc} --create-frame --no-wait --suppress-output --alternate-editor=${noSpawnEditor} --eval '(git/status-window default-directory)'
-      and echo "Magit opened in a new Emacs window"
-    '';
-  };
-
   xdg.desktopEntries.emacs-dirvish = {
     name = "Emacs Dirvish";
     genericName = "File Manager";
