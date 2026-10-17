@@ -7,7 +7,7 @@
   home.packages = with pkgs; [
     gh
     jujutsu
-    jjui
+    lazyjj
   ];
 
   programs.git = {
