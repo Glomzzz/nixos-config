@@ -6,9 +6,17 @@
 }: {
   home.packages = with pkgs; [
     gh
-    jujutsu
     lazyjj
   ];
+
+  programs.jujutsu = {
+    enable = true;
+    ediff = false;
+    settings.user = {
+      name = "Glomzzz";
+      inherit email;
+    };
+  };
 
   programs.git = {
     enable = true;
