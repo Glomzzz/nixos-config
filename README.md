@@ -124,13 +124,19 @@ files retain Fcitx for X11/GTK2 apps. Qt5 keeps `QT_IM_MODULE=fcitx`.
 
 **Right Shift** is the only Chinese/English toggle. Ctrl+Space, preedit toggling,
 input-method group cycling, clipboard, quick phrase, Unicode entry, and keyboard
-hint shortcuts are unbound so they cannot intercept Emacs commands. Rime also
+hint shortcuts are unbound so they cannot intercept Emacs commands. In particular,
+**Ctrl+;** (clipboard) and **Ctrl+Alt+P** (toggle preedit) are unbound. Rime also
 leaves Ctrl shortcuts and mode switching alone; candidate navigation still uses
-arrows, Tab/Shift+Tab, and punctuation.
+arrows, Tab/Shift+Tab, and punctuation. In Pinyin mode, `.` commits the fullwidth
+full stop `．` (U+FF0E), not the ideographic full stop `。`; other punctuation,
+letters, and digits are unchanged.
 
-After deploying, log out and back in to clear the old session environment and
-start the single managed daemon. Save Emacs buffers before logging out; Home
-Manager deliberately does not automatically restart a running Emacs daemon.
+For shortcut-only changes, `systemctl --user restart fcitx5-daemon` reloads global
+and addon settings together, clearing any stale in-memory shortcut bindings.
+After deploying session environment changes, log out and back in to clear the old
+session environment and start the single managed daemon. Save Emacs buffers before
+logging out; Home Manager deliberately does not automatically restart a running
+Emacs daemon.
 Check `systemctl --user status fcitx5-daemon` and confirm `printenv GTK_IM_MODULE`
 prints nothing. In Foot and Emacs, press **Right Shift**, type `nihao`, and select
 `你好`; check that the Emacs candidate popup stays stable while typing and near
