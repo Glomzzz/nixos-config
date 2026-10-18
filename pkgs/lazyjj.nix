@@ -20,6 +20,9 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   cargoHash = "sha256-LLbMR3FT5Ci7A9TlhRtU0rpMilXZXb4DH85/R776OQY=";
 
+  # Upstream only exposes log-tab keybindings; patch the remaining input contexts.
+  patches = [../patches/lazyjj-emacs-keymap.patch];
+
   nativeBuildInputs = [makeWrapper];
   nativeCheckInputs = [jujutsu];
 
