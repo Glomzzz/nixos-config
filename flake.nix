@@ -158,8 +158,19 @@
           });
         in
           pkgs.runCommand "fcitx5-check"
-          {nativeBuildInputs = [(pkgs.python3.withPackages (ps: [ps.pyyaml])) pkgs.librime];}
+          {
+            nativeBuildInputs = [
+              (pkgs.python3.withPackages (ps: [ps.pyyaml]))
+              pkgs.librime
+              pkgs.stdenv.cc
+              pkgs.pkg-config
+              pkgs.fcitx5
+            ];
+          }
           ''
+            c++ -std=c++20 $(pkg-config --cflags Fcitx5Config) \
+              ${./modules/home/desktop/tests/fcitx-hotkeys.cpp} \
+              -o fcitx-hotkeys-check $(pkg-config --libs Fcitx5Config)
             python3 - ${settings} <<'PY'
             import configparser
             import json
@@ -219,6 +230,20 @@
             # Ctrl shortcuts after an apparently complete custom replacement.
             with tempfile.TemporaryDirectory() as directory:
                 user_data = Path(directory)
+                # Check effective key lists with Fcitx, not just INI syntax.
+                global_config = user_data / "fcitx5.conf"
+                global_config.write_text(settings["globalConfig"])
+                subprocess.run(
+                    ["./fcitx-hotkeys-check", str(global_config), "Hotkey/TogglePreedit"],
+                    check=True,
+                )
+                for addon, keys in addon_keys.items():
+                    addon_config = user_data / (addon + ".conf")
+                    addon_config.write_text(settings["addonConfigs"][addon])
+                    for key in keys:
+                        subprocess.run(
+                            ["./fcitx-hotkeys-check", str(addon_config), key], check=True,
+                        )
                 for name, text in settings["rimeConfigs"].items():
                     (user_data / name).write_text(text)
                 result = subprocess.run(
@@ -234,11 +259,13 @@
                 bindings = default["key_binder"]["bindings"]
                 assert schema["key_binder"]["bindings"] == bindings
                 assert len(bindings) == 6, "Keep punctuation and Tab candidate navigation"
+                for shape in ("half_shape", "full_shape"):
+                    assert schema["punctuator"][shape]["."] == {"commit": "\uff0e"}, shape
                 for binding in bindings:
                     assert not any(modifier in binding["accept"] for modifier in ("Control+", "Alt+", "Super+"))
                     assert "toggle" not in binding
 
-            print("Fcitx startup, Wayland/GTK input, and Emacs-safe hotkeys passed")
+            print("Fcitx startup, Wayland/GTK input, fullwidth period, and Emacs-safe hotkeys passed")
             PY
             touch "$out"
           '';

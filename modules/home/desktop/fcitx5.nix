@@ -129,6 +129,7 @@
       "fcitx5/conf/clipboard.conf" = {
         force = true;
         text = ''
+          # Leave Ctrl+semicolon to applications.
           TriggerKey=
           PastePrimaryKey=
         '';
@@ -198,6 +199,7 @@
           [Hotkey/NextCandidate]
           0=Tab
 
+          # Leave Ctrl+Alt+P to applications.
           [Hotkey/TogglePreedit]
 
           [Behavior]
@@ -488,6 +490,10 @@
           # still supplies the candidate navigation configured above.
           __patch:
             key_binder/bindings: []
+            # Use the fullwidth full stop (U+FF0E), not the ideographic 。.
+            # Patch the schema directly: import_preset skips custom presets.
+            "punctuator/half_shape/.": {commit: "．"}
+            "punctuator/full_shape/.": {commit: "．"}
         '';
       };
     };
