@@ -4,5 +4,6 @@ _: {
     ./direnv.nix
     ./editor
     ./git.nix
+    ./ix.nix
   ];
 }

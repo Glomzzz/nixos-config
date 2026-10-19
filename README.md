@@ -163,3 +163,24 @@ General editors, shells, language toolchains, and command-line utilities are
 installed through Home Manager under `modules/home/programs/`. Project-specific
 dependencies should stay in the project's own flake or development shell so
 they remain reproducible and do not enlarge the base system.
+
+### Ix codebase graph
+
+`pkgs/ix.nix` pins the official Ix release bundle, including its native parsers
+and Compass UI. `modules/home/programs/dev/ix.nix` installs the CLI through Home
+Manager. Node.js 22 and command-line dependencies are provided by the package;
+Docker and the user's Docker group membership are already configured system-wide.
+
+After deploying, start the backend explicitly and map a repository:
+
+```bash
+ix docker start
+ix map /path/to/repository
+ix view
+```
+
+State stays in `~/.ix` (or `$IX_HOME`). The backend is downloaded and run by
+Docker on first start; it is not built by Nix. No containers are started or MCP
+clients modified during activation. Update the version and hash in `pkgs/ix.nix`
+and rebuild rather than running `ix upgrade`, which manages a separate,
+non-Nix installation. Automatic upstream update notices are disabled by default.
