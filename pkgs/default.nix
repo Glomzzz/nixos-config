@@ -3,6 +3,7 @@ final: _prev: {
   cherry-studio-with-desktop = final.callPackage ./cherry-studio-with-desktop.nix {};
   clipferry = final.callPackage ./clipferry.nix {};
   bun = final.callPackage ./bun.nix {};
+  ix = final.callPackage ./ix.nix {};
   jujutsu = final.callPackage ./jujutsu.nix {};
   lazyjj = final.callPackage ./lazyjj.nix {};
   mandible = final.callPackage ./mandible.nix {};
