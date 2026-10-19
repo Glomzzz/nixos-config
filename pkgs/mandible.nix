@@ -8,19 +8,25 @@
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "mandible";
-  version = "0.8.0";
+  version = "0.8.4";
 
   src = fetchFromGitHub {
     owner = "AS-FOSS";
     repo = "mandible";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-NUiZedFJu8su9qILNRAQuVJ+K+Q5ezuLS3iU9t2ZrHE=";
+    hash = "sha256-eR6WkKD1qFV0zYKIKkeuwBngF7dVGnAhCkMUr4Nzaj0=";
   };
 
-  cargoHash = "sha256-lQmObuihaB9TFwTSLDXSvUf/YsiZj+HQKuWTyNqkEis=";
+  cargoHash = "sha256-pX8MOcUxZXSMhEGBukEM27S1xEFGTGoTuXOaoEdaAW4=";
 
   nativeBuildInputs = [installShellFiles];
   nativeCheckInputs = [git];
+
+  # Extraction probes need a writable, private $HOME/.cache/mandible.
+  preCheck = ''
+    export HOME="$TMPDIR/mandible-test-home"
+    mkdir -p "$HOME"
+  '';
 
   cargoBuildFlags = [
     "--package"

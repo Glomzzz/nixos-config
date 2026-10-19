@@ -23,16 +23,31 @@
   # capability there. /run/wrappers/bin is the first PATH entry inside that
   # sandbox (shadowing the steam-fhsenv /usr/bin/getcap), which makes the
   # getcap check short-circuit before pkexec is ever attempted.
-  steamVrGetcap = pkgs.writeShellScriptBin "getcap" ''
-    #!/usr/bin/env bash
-    set -euo pipefail
+  # security.wrappers requires an ELF target, even for a non-setuid shim.
+  # Keep the launcher exception native rather than bypassing that validation.
+  steamVrGetcap = pkgs.writeCBin "getcap" ''
+    #include <stdio.h>
+    #include <string.h>
+    #include <unistd.h>
 
-    if [[ "''${1:-}" == */SteamVR/bin/linux64/vrcompositor-launcher ]]; then
-      printf '%s cap_sys_nice=eip\n' "$1"
-      exit 0
-    fi
+    int main(int argc, char **argv) {
+      static const char suffix[] = "/SteamVR/bin/linux64/vrcompositor-launcher";
+      static char real_getcap[] = "${pkgs.libcap}/bin/getcap";
 
-    exec ${pkgs.libcap}/bin/getcap "$@"
+      if (argc > 1) {
+        size_t length = strlen(argv[1]);
+        size_t suffix_length = sizeof(suffix) - 1;
+        if (length >= suffix_length &&
+            strcmp(argv[1] + length - suffix_length, suffix) == 0) {
+          return printf("%s cap_sys_nice=eip\n", argv[1]) < 0 ? 1 : 0;
+        }
+      }
+
+      argv[0] = real_getcap;
+      execv(real_getcap, argv);
+      perror(real_getcap);
+      return 127;
+    }
   '';
   steamVrClearCapability = pkgs.writeShellScript "steamvr-clear-cap-sys-nice" ''
     set -eu

@@ -134,6 +134,47 @@
             touch "$out"
           '';
 
+        steamvr-getcap = let
+          shim = self.nixosConfigurations.nixos.config.security.wrappers.getcap;
+        in
+          assert !shim.setuid && !shim.setgid && shim.capabilities == "";
+            pkgs.runCommand "steamvr-getcap-check"
+            {nativeBuildInputs = [pkgs.python3];}
+            ''
+              python3 - ${shim.source} ${pkgs.libcap}/bin/getcap <<'PY'
+              from pathlib import Path
+              import subprocess
+              import sys
+              import tempfile
+
+              shim, real = sys.argv[1:]
+              with open(shim, "rb") as binary:
+                  assert binary.read(4) == b"\x7fELF", "Wrapper targets must be native executables"
+              for launcher in (
+                  "/tmp/SteamVR/bin/linux64/vrcompositor-launcher",
+                  "/tmp/path with spaces/SteamVR/bin/linux64/vrcompositor-launcher",
+              ):
+                  result = subprocess.run([shim, launcher], capture_output=True, text=True)
+                  assert result.returncode == 0 and not result.stderr
+                  assert result.stdout == launcher + " cap_sys_nice=eip\n"
+              with tempfile.TemporaryDirectory() as directory:
+                  plain = Path(directory) / "plain-file"
+                  plain.write_text("No capabilities")
+                  for args in (
+                      [], ["-h"], [str(plain)], ["-v", str(plain)],
+                      ["-r", directory],
+                      [directory + "/SteamVR/bin/linux64/vrcompositor-launcher-other"],
+                  ):
+                      expected = subprocess.run([real, *args], capture_output=True)
+                      actual = subprocess.run([shim, *args], capture_output=True)
+                      assert (actual.returncode, actual.stdout, actual.stderr) == (
+                          expected.returncode, expected.stdout, expected.stderr
+                      ), args
+              print("Native, unprivileged SteamVR getcap shim and delegation passed")
+              PY
+              touch "$out"
+            '';
+
         fcitx5 = let
           home = self.nixosConfigurations.nixos.config.home-manager.users.glom;
           settings = pkgs.writeText "fcitx5-settings.json" (builtins.toJSON {

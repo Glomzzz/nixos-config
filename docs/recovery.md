@@ -31,8 +31,8 @@ boot. Store GC does not back up mutable application or personal data.
 
 ## VR privilege scope
 
-The SteamVR `getcap` shim stays first in PATH under `/run/wrappers/bin`, but is
-not setuid. PAM exceptions are restricted to `glom`. Because `niri-session`
+The native SteamVR `getcap` shim stays first in PATH under `/run/wrappers/bin`,
+but is not setuid. PAM exceptions are restricted to `glom`. Because `niri-session`
 starts the compositor via systemd, explicit limits on **niri and WiVRn** preserve
 VR scheduling for the desktop and its child applications. Other background user
 services no longer receive elevated soft limits by default. WiVRn retains its
