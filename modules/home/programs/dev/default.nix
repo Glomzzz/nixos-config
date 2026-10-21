@@ -5,5 +5,6 @@ _: {
     ./editor
     ./git.nix
     ./ix.nix
+    ./openpgp.nix
   ];
 }

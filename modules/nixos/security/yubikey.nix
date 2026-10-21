@@ -1,0 +1,45 @@
+{
+  config,
+  hostname,
+  lib,
+  pkgs,
+  username,
+  ...
+}: {
+  # Includes pcscd and the Yubico USB permissions needed by ykman/OpenPGP.
+  programs.yubikey-manager.enable = true;
+  environment.systemPackages = [pkgs.pam_u2f];
+
+  # Enrollment data is public, but must not be user-writable at runtime.
+  # The initially empty mapping simply falls through to face/password auth.
+  environment.etc."u2f-mappings" = {
+    source = ../../../users + "/${username}/u2f_keys";
+    mode = "0444";
+  };
+
+  security.pam = {
+    u2f = {
+      # Opt in below, never add a key dependency to login/SSH/recovery shells.
+      enable = false;
+      settings = {
+        authfile = "/etc/u2f-mappings";
+        origin = "pam://${hostname}";
+        appid = "pam://${hostname}";
+        cue = true;
+        # This is touch-only convenience auth, not password + key or key + PIN.
+        userpresence = 1;
+        pinverification = 0;
+        userverification = 0;
+      };
+    };
+    services = lib.genAttrs ["sudo" "swaylock"] (service: {
+      u2f = {
+        enable = true;
+        control = "sufficient";
+      };
+      # NixOS normally orders U2F before Howdy. Preserve face-first behavior,
+      # then try touch, then pam_unix. These methods are sequential, not parallel.
+      rules.auth.u2f.order = config.security.pam.services.${service}.rules.auth.howdy.order + 10;
+    });
+  };
+}

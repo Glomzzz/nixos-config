@@ -3,5 +3,6 @@ _: {
     ./howdy.nix
     ./soteria.nix
     ./sops
+    ./yubikey.nix
   ];
 }

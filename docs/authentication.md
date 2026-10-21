@@ -12,23 +12,28 @@ desktop entry. There is no Fish tty1 auto-launch hook. Greetd includes the
 and SSH remain plain password/key-based recovery shells.
 
 For `sudo`, a successful Howdy face match **replaces the password prompt**. If
-recognition fails or the camera is unavailable, sudo falls back to the account
-password. Face recognition is less secure than a password and can be spoofed.
+recognition fails or the camera is unavailable, sudo tries an enrolled YubiKey
+touch, then falls back to the account password. Face recognition is less secure
+than a password and can be spoofed. YubiKey enrollment is initially empty; see
+[yubikey.md](yubikey.md) for enrollment, OpenPGP provisioning, and commit signing.
 
-Screen unlocking with `swaylock` accepts **either Howdy or the account password**:
+Screen unlocking with `swaylock` accepts **Howdy OR YubiKey touch OR password**:
 
 - **Face only:** press Enter without typing a password, then look at the camera.
   A successful match unlocks immediately; no password is required.
-- **Password:** type the account password and press Enter. Howdy is tried first;
-  if recognition fails, times out, or the camera is unavailable, PAM checks the
-  submitted password and unlocks if it is correct. A failed face match does not
-  veto a valid password. This is sequential fallback, not concurrent prompts.
-- If both methods fail, the screen stays locked. Empty input only starts face
-  recognition; it cannot authenticate as an empty password.
+- **Key only:** press Enter; after Howdy fails/times out, touch the enrolled key
+  when it flashes. No account password or FIDO PIN is required.
+- **Password:** type the account password and press Enter. Howdy is tried first,
+  then the key, then PAM checks the submitted password. A missing camera/key or
+  failed hardware match does not veto a valid password. A connected, untouched
+  key may delay password fallback; unplug it to skip that attempt. These methods
+  run sequentially, not concurrently.
+- If all methods fail, the screen stays locked. Empty input only starts hardware
+  authentication; it cannot authenticate as an empty password.
 
-Login, SSH, `su`, and polkit do not depend on the camera. The polkit helper keeps
-its upstream device sandbox. Face unlocking does not unlock a separately locked
-GNOME Keyring, since no account password is supplied.
+Login, SSH, `su`, and polkit do not depend on the camera or YubiKey. The polkit
+helper keeps its upstream device sandbox. Face/key unlocking does not unlock a
+separately locked GNOME Keyring, since no account password is supplied.
 
 ## Before activating
 
@@ -41,13 +46,14 @@ GNOME Keyring, since no account password is supplied.
 3. Keep a root recovery shell open while testing PAM: `sudo -i`.
 4. Build first, then use `sudo nixos-rebuild test --flake .#nixos`. Test a fresh
    password login on another VT and `sudo -k; sudo true`: a face match should
-   succeed without typing a password. Repeat with the camera covered to confirm
-   password fallback. For screen unlock, test Enter with no input and a face
-   match, then cover the camera and verify the correct password still unlocks.
-   With the camera covered, incorrect and empty passwords must keep the screen
-   locked. Test all of these before making the generation persistent. Save work
-   and test from
-   another VT or SSH: replacing tty1's getty with greetd may end the old desktop
+   succeed without typing a password. If a key is enrolled, cover the camera and
+   confirm touch succeeds after Howdy fails. Unplug the key and keep the camera
+   covered to confirm password fallback. For screen unlock, test Enter with no
+   input and a face match, then an enrolled key with the camera covered. With
+   camera covered and key unplugged, the correct password must unlock; incorrect
+   and empty passwords must keep the screen locked. Test all of these before
+   making the generation persistent. Save work and test from another VT or SSH:
+   replacing tty1's getty with greetd may end the old desktop
    session. Test ReGreet with an incorrect password (must reject), then a correct
    password (must start Niri and unlock the Login keyring). Log out and verify
    that ReGreet returns; check readability on the laptop panel and any docked
@@ -57,9 +63,10 @@ Configuration regressions run with
 `nix build --no-link .#checks.x86_64-linux.login`. The check validates the greeter
 compositor's KDL, session discovery, and password/keyring PAM integration;
 visual appearance and hardware login still require the interactive tests above.
-`nix build --no-link .#checks.x86_64-linux.authentication` checks the generated
-unlock PAM stack, including Howdy success, password fallback, both-failed denial,
-and empty-input handling, with synthetic modules rather than the real camera.
+`nix build --no-link .#checks.x86_64-linux.authentication` checks both generated
+sudo/unlock PAM stacks, including all face/key/password OR outcomes, missing
+hardware modules, all-failed denial, opt-in scope, and empty-input policy, using
+synthetic modules rather than real hardware or credentials.
 
 ## Set a non-empty keyring password
 
@@ -83,9 +90,9 @@ keyring. Complete these steps to protect its stored contents at rest.
 
 ## Recovery and limitations
 
-If face authentication fails, sudo and screen unlock fall back to the account
-password; graphical and tty login still accept it. If a greeter or PAM regression
-prevents access, use a password login on another VT, a password-based polkit
+If face authentication fails, sudo and screen unlock try the enrolled key, then
+the account password; graphical and tty login still accept the password. If a
+greeter or PAM regression prevents access, use a password login on another VT, a password-based polkit
 prompt, or the root shell kept open during testing to restore the previous
 generation. Boot the prior generation if necessary.
 
