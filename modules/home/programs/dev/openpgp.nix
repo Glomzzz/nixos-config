@@ -26,6 +26,9 @@ in {
   programs = {
     gpg = {
       enable = true;
+      settings = lib.mkIf signingReady {
+        default-key = identity.signingKey;
+      };
       # Share smart-card access with ykman through pcscd rather than grabbing USB.
       scdaemonSettings = {
         disable-ccid = true;

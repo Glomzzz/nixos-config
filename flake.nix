@@ -336,7 +336,7 @@
         hostname = "nixos";
         username = "glom";
         usernameFull = "Glom Zhao";
-        email = "glom@skillw.com";
+        email = "me@glomzzz.com";
         specialArgs = {
           inherit hostname;
           inherit username;

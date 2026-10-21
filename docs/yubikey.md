@@ -15,13 +15,17 @@ No key generation, reset, PIN change, or transfer is performed by Nix activation
   PAM runs them sequentially: touch begins only after Howdy fails/times out.
   A connected, untouched key can delay password fallback; unplug it to skip it.
   Missing enrollment or hardware must fall through, never authenticate anyone.
-- Initial graphical/TTY login, SSH, `su`, and polkit remain unchanged.
+- Initial graphical/TTY login, SSH, and `su` remain unchanged. A polkit rule
+  allows only the configured user (`glom`) the two PC/SC access actions, including
+  background GPG processes without an active session. Other polkit permissions
+  remain unchanged; OpenPGP still requires its configured PIN/touch checks.
 - Home Manager configures GnuPG, a socket-activated agent, Qt pinentry, and
   shared PC/SC access. GnuPG does not replace the SSH agent.
 - Git/Jujutsu signing stays **disabled until provisioned**. Once both fields in
-  `users/glom/openpgp.nix` are set, the public certificate is imported, Git signs
-  commits/tags by default, and Jujutsu signs your outgoing mutable commits on
-  push. `jj sign -r REV` can sign an explicitly selected revision sooner.
+  `users/glom/openpgp.nix` are set, the public certificate is imported, and GnuPG,
+  Git, and Jujutsu all select the same exact signing subkey. Git signs commits/tags
+  by default, and Jujutsu signs your outgoing mutable commits on push.
+  `jj sign -r REV` can sign an explicitly selected revision sooner.
   Jujutsu deliberately drops signatures on rewrites and re-signs at push rather
   than requesting a touch for every working-copy snapshot. Signing rewrites
   commit hashes; review the outgoing stack before pushing.
@@ -106,7 +110,7 @@ install -m 600 "$HOME/.gnupg/gpg-agent.conf" "$workdir/gpg-agent.conf"
 install -m 600 "$HOME/.gnupg/scdaemon.conf" "$workdir/scdaemon.conf"
 export GNUPGHOME="$workdir"
 
-gpg --quick-generate-key 'Glom Zhao <glom@skillw.com>' ed25519 cert 2y
+gpg --quick-generate-key 'Glom Zhao <me@glomzzz.com>' ed25519 cert 2y
 gpg --list-keys --with-subkey-fingerprint
 ```
 
@@ -273,7 +277,7 @@ Home Manager imports this public certificate with ultimate ownertrust
 and activate with `test`; then test real signing before `switch`.
 
 Upload `public.asc` to GitHub's **GPG keys** settings if using GitHub, and ensure
-`glom@skillw.com` is verified there. Do not upload the secret backup or revoke.asc.
+`me@glomzzz.com` is verified there. Do not upload the secret backup or revoke.asc.
 Use a disposable repository to test Git signing; in this jj workspace use jj
 commands, not `git commit`. `jj sign -r REV` signs now; otherwise signing is
 performed at push. Verify signatures locally and on the hosting service.
@@ -293,6 +297,11 @@ unset workdir verifydir
 If the card disappears or is busy, close ongoing GPG operations, run
 `gpgconf --kill scdaemon`, and reinsert it; check `systemctl status pcscd.socket`.
 The configured `disable-ccid`/`pcsc-shared` settings let GPG and ykman share PC/SC.
+If `gpg --card-status` reports "Service is not running" while pcscd is active,
+check `journalctl -u pcscd.service` for `NOT authorized` / `access_pcsc` errors.
+Activate the targeted PC/SC polkit rule with `sudo nixos-rebuild test --flake .#nixos`,
+then restart `scdaemon` and check card access before retrying signing. Do not run
+signing commands as root or broaden permissions to unrelated polkit actions.
 Private backups and revocation material must remain secure and available even
 once daily signing works. System SOPS decryption continues using the host SSH
 identity; it does not depend on the removable key.
