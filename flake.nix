@@ -311,6 +311,11 @@
             touch "$out"
           '';
 
+        openpgp = import ./modules/home/programs/dev/tests/openpgp.nix {
+          inherit pkgs;
+          inherit (self.nixosConfigurations.nixos) config;
+        };
+
         authentication = import ./modules/nixos/security/tests/authentication.nix {
           inherit pkgs;
           inherit (self.nixosConfigurations.nixos) config;

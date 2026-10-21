@@ -4,7 +4,8 @@
   #   sudo howdy add
   #   sudo howdy test
   # Sudo and swaylock accept a successful face match without a password,
-  # falling back to the password if recognition fails or the camera is absent.
+  # falling back to YubiKey touch, then the password, if recognition fails or
+  # the camera is absent. YubiKey ordering is in yubikey.nix.
   # Initial password login is unaffected. See docs/authentication.md.
   services.howdy = {
     enable = true;

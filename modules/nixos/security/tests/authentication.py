@@ -1,7 +1,8 @@
 """Validate generated auth policy and execute its control flow using Linux PAM.
 
-Replace only the camera/password modules with pam_debug, retaining the generated
-control flags, ordering, and final pam_deny. No real credentials or camera access.
+Replace only camera/key/password modules with pam_debug or missing modules,
+retaining generated control flags, ordering, and final pam_deny. No real hardware
+or credentials are used, and the system PAM configuration is never changed.
 """
 
 import itertools
@@ -16,57 +17,64 @@ with open(settings_path) as source:
     settings = json.load(source)
 pam = settings["pam"]
 assert not settings["globalHowdy"], "Howdy must be opt-in, not system-wide"
-for service in ("login", "greetd", "sshd", "su", "polkit-1"):
-    assert "pam_howdy.so" not in pam[service], f"camera unexpectedly required by {service}"
+assert not settings["globalU2f"], "U2F must be opt-in, not system-wide"
+for service, text in pam.items():
+    if service not in ("sudo", "swaylock"):
+        for module in ("pam_howdy.so", "pam_u2f.so"):
+            assert module not in text, f"{module} unexpectedly enabled for {service}"
 
 assert "ignore-empty-password" not in settings["locker"].splitlines(), (
-    "empty Enter must reach PAM to start face authentication"
+    "empty Enter must reach PAM to start face/key authentication"
 )
 
 
 def auth_rules(service):
-    # The expected local-account stack uses simple PAM control flags.
     return [line.split("#", 1)[0].split() for line in pam[service].splitlines()
             if line.startswith("auth ")]
 
 
+modules = {"pam_howdy.so": "face", "pam_u2f.so": "key", "pam_unix.so": "password"}
 for service in ("sudo", "swaylock"):
     rules = auth_rules(service)
-    howdy = [rule for rule in rules if rule[2].endswith("/pam_howdy.so")]
-    unix = [rule for rule in rules if rule[2].endswith("/pam_unix.so")]
-    assert len(howdy) == len(unix) == 1, f"unexpected {service} authentication stack"
-    assert howdy[0][1] == unix[0][1] == "sufficient", f"{service} must accept either factor"
-    assert rules.index(howdy[0]) < rules.index(unix[0]), "face success must skip the password"
-    assert "nullok" not in unix[0], "empty passwords must not authenticate"
-    assert rules[-1][1] == "required" and rules[-1][2].endswith("/pam_deny.so")
-
-# Test swaylock's actual generated control flow with safe synthetic results.
-rules = auth_rules("swaylock")
-assert len(rules) == 3, "review the truth-table test when adding authentication modules"
-with tempfile.TemporaryDirectory() as directory:
-    for face, password in itertools.product((False, True), repeat=2):
-        service = f"face-{int(face)}-password-{int(password)}"
-        stack = []
-        for rule in rules:
-            module = pathlib.Path(rule[2]).name
-            if module in ("pam_howdy.so", "pam_unix.so"):
-                success = face if module == "pam_howdy.so" else password
-                result = "success" if success else "auth_err"
-                stack.append(f"auth {rule[1]} {pam_modules}/pam_debug.so auth={result}")
-            else:
-                stack.append(" ".join(rule))
-        pathlib.Path(directory, service).write_text("\n".join(stack) + "\n")
-        result = subprocess.run([runner, directory, service], check=False)
-        assert result.returncode == (0 if face or password else 1), (
-            f"face={face}, password={password}: incorrect OR authentication"
-        )
-
-    # A missing camera module must still permit a successful password.
-    pathlib.Path(directory, "missing-camera").write_text(
-        f"auth {rules[0][1]} /missing/pam_howdy.so\n"
-        f"auth {rules[1][1]} {pam_modules}/pam_debug.so auth=success\n"
-        + " ".join(rules[2]) + "\n"
+    assert len(rules) == 4, "review the truth-table test when adding authentication modules"
+    assert [pathlib.Path(rule[2]).name for rule in rules] == [
+        "pam_howdy.so", "pam_u2f.so", "pam_unix.so", "pam_deny.so",
+    ], f"{service} must try face, key, password, then deny"
+    assert all(rule[1] == "sufficient" for rule in rules[:3]), (
+        f"{service} must accept any one of face/key/password"
     )
-    subprocess.run([runner, directory, "missing-camera"], check=True)
+    assert rules[-1][1] == "required"
+    assert "nullok" not in rules[2], "empty passwords must not authenticate"
+    options = set(rules[1][3:])
+    origin = f"pam://{settings['hostname']}"
+    assert {"authfile=/etc/u2f-mappings", f"origin={origin}", f"appid={origin}",
+            "cue", "userpresence=1", "pinverification=0", "userverification=0"} <= options
+    assert not {"nouserok", "alwaysok"} & options, "missing enrollment must not authenticate"
 
-print("Howdy/password OR truth table, camera fallback, and locker input settings passed")
+    # Exercise both stacks: the full OR truth table plus absent/broken modules.
+    # An unenrolled/missing key is a failure, never a successful authentication.
+    with tempfile.TemporaryDirectory() as directory:
+        for face, key, password in itertools.product(
+                ("success", "auth_err", "missing"),
+                ("success", "auth_err", "missing"),
+                ("success", "auth_err")):
+            name = f"{service}-face-{face}-key-{key}-password-{password}"
+            results = {"face": face, "key": key, "password": password}
+            stack = []
+            for rule in rules:
+                module = pathlib.Path(rule[2]).name
+                if module not in modules:
+                    stack.append(" ".join(rule))
+                elif results[modules[module]] == "missing":
+                    stack.append(f"auth {rule[1]} /missing/{module}")
+                else:
+                    result = results[modules[module]]
+                    stack.append(f"auth {rule[1]} {pam_modules}/pam_debug.so auth={result}")
+            pathlib.Path(directory, name).write_text("\n".join(stack) + "\n")
+            result = subprocess.run([runner, directory, name], check=False)
+            accepted = "success" in results.values()
+            assert result.returncode == (0 if accepted else 1), (
+                f"{name}: incorrect face OR key OR password authentication"
+            )
+
+print("Face/key/password OR truth tables, missing-device fallback, PAM scope, and locker input passed")
