@@ -30,12 +30,14 @@ in
     && jj.signing.backends.gpg.program == pkgs.lib.getExe gpg.package
     && jj.signing.behavior == "drop"
     && jj.git.sign-on-push
+    && gpg.settings.default-key == identity.signingKey
     && builtins.length gpg.publicKeys == 1
   else
     git.signing.signByDefault
     != true
     && !(jj ? signing)
     && !(jj.git.sign-on-push or false)
+    && !(gpg.settings ? default-key)
     && gpg.publicKeys == [];
     pkgs.runCommand "openpgp-check" {
       nativeBuildInputs = [pkgs.gnupg pkgs.python3];
@@ -47,7 +49,7 @@ in
       ${pkgs.lib.optionalString ready ''
         export GNUPGHOME
         GNUPGHOME=$(mktemp -d)
-        gpg --batch --no-options --with-colons --show-keys ${pkgs.lib.escapeShellArg (toString identity.publicKeyFile)} > public-keys.txt
+        gpg --batch --no-options --with-colons --show-keys ${pkgs.lib.escapeShellArg "${identity.publicKeyFile}"} > public-keys.txt
         python3 - "$signingKey" public-keys.txt <<'PY'
         import pathlib
         import sys

@@ -10,6 +10,22 @@
   programs.yubikey-manager.enable = true;
   environment.systemPackages = [pkgs.pam_u2f];
 
+  # Background gpg-agent/scdaemon processes may have no active login session.
+  # Allow only this account to use PC/SC; card PIN/touch checks still apply.
+  security.polkit.extraConfig = ''
+    polkit.addRule(function(action, subject) {
+      if (
+        subject.user === ${builtins.toJSON username}
+        && (
+          action.id === "org.debian.pcsc-lite.access_pcsc"
+          || action.id === "org.debian.pcsc-lite.access_card"
+        )
+      ) {
+        return polkit.Result.YES;
+      }
+    });
+  '';
+
   # Enrollment data is public, but must not be user-writable at runtime.
   # The initially empty mapping simply falls through to face/password auth.
   environment.etc."u2f-mappings" = {

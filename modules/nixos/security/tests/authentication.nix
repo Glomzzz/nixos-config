@@ -8,15 +8,18 @@
     globalHowdy = config.security.pam.howdy.enable;
     globalU2f = config.security.pam.u2f.enable;
     hostname = config.networking.hostName;
+    pcscPolicy = config.security.polkit.extraConfig;
+    pcscUser = config.home-manager.users.glom.home.username;
   });
 in
   pkgs.runCommand "authentication-check"
   {
-    nativeBuildInputs = [pkgs.python3 pkgs.stdenv.cc];
+    nativeBuildInputs = [pkgs.python3 pkgs.nodejs pkgs.stdenv.cc];
     buildInputs = [pkgs.pam];
   }
   ''
     cc -Wall -Wextra -Werror ${./pam-check.c} -o pam-check -lpam
     python3 ${./authentication.py} ${settings} ${pkgs.pam}/lib/security ./pam-check
+    node ${./pcsc-policy.js} ${settings}
     touch "$out"
   ''
