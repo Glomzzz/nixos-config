@@ -7,6 +7,7 @@
   nix-alien = inputs.nix-alien-source.packages.${system}.nix-alien;
 in {
   home.packages = with pkgs; [
+    age
     just
     fastfetch
     zip
