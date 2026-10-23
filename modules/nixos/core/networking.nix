@@ -6,10 +6,9 @@ _: {
       checkReversePath = "loose";
     };
 
-    nameservers = [
-      "1.1.1.1"
-      "8.8.8.8"
-    ];
+    # Let NetworkManager and systemd-resolved preserve DHCP, VPN, and split-DNS
+    # data instead of replacing it with fixed public resolvers.
+    nameservers = [];
   };
 
   services.resolved.enable = true;
