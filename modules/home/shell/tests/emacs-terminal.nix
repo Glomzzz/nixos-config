@@ -7,6 +7,8 @@
     desktopTerminals = home.xdg.terminal-exec.settings.default;
     kittyConfig = pkgs.writeText "tested-kitty.conf" home.xdg.configFile."kitty/kitty.conf".text;
     kitty = "${home.programs.kitty.package}/bin/kitty";
+    clipboardKitten = home.xdg.configFile."kitty/clipboard.py".source;
+    clipboardTest = ./kitty-clipboard.py;
     emacs = "${home.programs.emacs.finalPackage}/bin/emacs";
     client = "${home.programs.emacs.finalPackage}/bin/emacsclient";
     environment = home.systemd.user.services.emacs.Service.Environment;

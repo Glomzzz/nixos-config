@@ -25,13 +25,16 @@
       clipboard_control = "write-clipboard write-primary read-clipboard-ask read-primary-ask";
 
       # Let Emacs receive Ctrl/Alt/Shift combinations, including Ctrl+Tab,
-      # Ctrl+Shift+arrows, and Ctrl+Shift+letters. Terminal actions use a
-      # deliberately uncommon modifier chord instead.
+      # Ctrl+Shift+arrows, and Ctrl+Shift+letters. Clipboard shortcuts below
+      # defer to applications that negotiate extended keyboard reporting.
       clear_all_shortcuts = true;
       kitty_mod = "ctrl+alt+shift";
     };
 
     keybindings = {
+      "ctrl+shift+c" = "kitten clipboard.py copy";
+      "ctrl+shift+v" = "kitten clipboard.py paste";
+      # Explicit terminal clipboard access even in protocol-aware applications.
       "kitty_mod+c" = "copy_to_clipboard";
       "kitty_mod+v" = "paste_from_clipboard";
       "kitty_mod+equal" = "change_font_size current +1.0";
@@ -51,6 +54,8 @@
       symbol_map U+E000-U+F8FF,U+F0000-U+FFFFD Symbols Nerd Font Mono
     '';
   };
+
+  xdg.configFile."kitty/clipboard.py".source = ./kitty-clipboard.py;
 
   fonts.fontconfig.enable = true;
   home.packages = with pkgs; [

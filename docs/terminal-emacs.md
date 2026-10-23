@@ -19,8 +19,14 @@ per-buffer font zoom cannot configure a terminal's cell font. Complex emoji
 sequences can still have width/cursor limitations in Emacs 31.
 
 Kitty's default keyboard shortcuts are cleared so Ctrl/Alt/Shift combinations,
-Ctrl+Tab, and modified arrows can reach Emacs. Terminal actions instead use
-**Ctrl+Alt+Shift**:
+Ctrl+Tab, and modified arrows can reach Emacs. **Ctrl+Shift+C / V** copy the
+terminal selection / paste the clipboard when extended keyboard reporting is
+inactive. When an application negotiates the Kitty keyboard protocol (including
+terminal Emacs and Pi), the clipboard kitten forwards those keys using Kitty's
+own key encoder instead: the application owns their meaning. This uses the
+current window's protocol state, not its title or a process-name heuristic.
+
+Unconditional terminal actions use **Ctrl+Alt+Shift**:
 
 | Chord | Action |
 | --- | --- |
@@ -30,7 +36,7 @@ Ctrl+Tab, and modified arrows can reach Emacs. Terminal actions instead use
 | Ctrl+Alt+Shift+Enter | New terminal window in the current directory |
 | Ctrl+Alt+Shift+F5 / F6 | Reload / inspect Kitty configuration |
 
-These few terminal chords and compositor shortcuts are still reserved; no
+The Ctrl+Alt+Shift chords and compositor shortcuts are still reserved; no
 terminal can forward keys the compositor intercepts. Hold Shift while dragging
 to select terminal text when Emacs has captured the mouse. Otherwise clicks,
 selection, and wheel input go to Emacs.
@@ -114,10 +120,10 @@ sh ~/.config/emacs/tests/launcher-tests.sh
 
 The Nix check parses the generated configuration using Kitty's actual parser,
 then starts a clean, display-less daemon and real pseudo-terminal clients. It
-verifies 24-bit output for Kitty and Foot and 256-color behavior for an ordinary
-xterm client. The launcher check uses mocked clients/services in real PTYs to
-verify frontend selection, blocking behavior, desktop handoff, and safe restart
-handling. The Emacs suite checks startup laziness, GUI isolation, terminal
+verifies clipboard routing and protocol key encoding, 24-bit output for Kitty
+and Foot, and 256-color behavior for an ordinary xterm client. The launcher
+check uses mocked clients/services in real PTYs to verify frontend selection,
+blocking behavior, desktop handoff, and safe restart handling. The Emacs suite checks startup laziness, GUI isolation, terminal
 setup, clipboard policy, restart guards, and the optional graphics declaration. Actual font
 appearance, IME candidate placement, and interactive graphics still require a
 real Wayland terminal session to assess.

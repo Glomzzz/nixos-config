@@ -40,6 +40,9 @@ emacs_options = load_config({settings['kittyConfig']!r},
 assert not bad, bad
 assert emacs_options.confirm_os_window_close[0] == 0
 assert not emacs_options.allow_remote_control
+import runpy
+runpy.run_path({settings['clipboardTest']!r}, init_globals=dict(
+    options=options, kitten_path={settings['clipboardKitten']!r}))
 print('Kitty configuration parsed; fonts, IME, keys, clipboard and scoped close policy passed')
 """
 subprocess.run([settings["kitty"], "+runpy", parser], check=True)
