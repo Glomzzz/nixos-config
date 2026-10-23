@@ -14,7 +14,9 @@ _: {
       "nix-command"
       "flakes"
     ];
-    auto-optimise-store = true;
+    # The root filesystem is Btrfs; avoid Nix hard-link deduplication, which
+    # defeats copy-on-write sharing and adds needless store maintenance cost.
+    auto-optimise-store = false;
     download-buffer-size = 524288000;
     min-free = 1 * 1024 * 1024 * 1024;
     max-free = 5 * 1024 * 1024 * 1024;
