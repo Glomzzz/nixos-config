@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   usernameFull,
   email,
@@ -26,7 +27,7 @@
         inherit email;
       };
       core = {
-        editor = "emacsclient -c --alternate-editor=${pkgs.coreutils}/bin/false";
+        editor = "${config.home.homeDirectory}/.local/bin/emc";
       };
     };
   };

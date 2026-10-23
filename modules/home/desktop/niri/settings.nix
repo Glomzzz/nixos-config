@@ -21,9 +21,8 @@
   terminal = "${config.programs.kitty.package}/bin/kitty";
   launcher = "${pkgs.fuzzel}/bin/fuzzel";
   emc = "${config.home.homeDirectory}/.local/bin/emc";
-  noSpawnEditor = "${pkgs.coreutils}/bin/false";
-  editor = ["${emc}" "-c" "-n" "-a" noSpawnEditor];
-  filemanager = ["${emc}" "-c" "-n" "-a" noSpawnEditor config.home.homeDirectory];
+  editor = [emc];
+  filemanager = [emc config.home.homeDirectory];
   locker = "${config.programs.swaylock.package}/bin/swaylock";
   brightness = "${pkgs.brightnessctl}/bin/brightnessctl";
   playerctl = "${pkgs.playerctl}/bin/playerctl";
@@ -169,6 +168,8 @@ in {
     # as a login shell, so /etc/profile already exports them to everything niri
     # spawns. Repeating them here would just be two places to keep in sync.
     environment = {
+      # Reuse the editor policy after reload, even before the next login.
+      inherit (config.home.sessionVariables) EDITOR VISUAL SUDO_EDITOR ALTERNATE_EDITOR;
       # Xwayland apps launched by niri find the satellite display here.
       DISPLAY = ":0";
     };

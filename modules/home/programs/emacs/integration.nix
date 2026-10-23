@@ -1,21 +1,52 @@
 {
   config,
-  pkgs,
+  lib,
   ...
 }: let
   emc = "${config.home.homeDirectory}/.local/bin/emc";
-  noSpawnEditor = "${pkgs.coreutils}/bin/false";
-in {
-  xdg.desktopEntries.emacs-dirvish = {
-    name = "Emacs Dirvish";
-    genericName = "File Manager";
-    comment = "Manage files with Dirvish in Emacs";
-    exec = "${emc} --create-frame --no-wait --alternate-editor=${noSpawnEditor} %f";
+  terminalEditor = {
+    name = "Emacs (Terminal)";
+    genericName = "Text Editor";
+    comment = "Edit text in terminal Emacs";
+    exec = "${emc} --tty %F";
     icon = "emacs";
-    terminal = false;
-    categories = ["System" "FileTools" "FileManager"];
-    mimeType = ["inode/directory"];
-    startupNotify = true;
+    terminal = true;
+    categories = ["Development" "TextEditor"];
+    startupNotify = false;
+    mimeType = builtins.attrNames (lib.filterAttrs
+      (_: applications: lib.elem "emacsclient.desktop" applications)
+      config.xdg.mimeApps.defaultApplications);
+  };
+in {
+  # Preserve the desktop IDs used by existing MIME associations, but never
+  # detach a TTY client: its terminal must stay alive until editing finishes.
+  xdg.desktopEntries = {
+    emacs = terminalEditor;
+    emacsclient =
+      terminalEditor
+      // {
+        name = "Emacs Client (Terminal)";
+        noDisplay = true;
+      };
+    emacs-gui =
+      terminalEditor
+      // {
+        name = "Emacs (GUI)";
+        comment = "Explicitly open a graphical Emacs client frame";
+        exec = "${emc} --create-frame --no-wait %F";
+        terminal = false;
+      };
+    emacs-dirvish = {
+      name = "Emacs Dirvish";
+      genericName = "File Manager";
+      comment = "Manage files with Dirvish in terminal Emacs";
+      exec = "${emc} --tty %f";
+      icon = "emacs";
+      terminal = true;
+      categories = ["System" "FileTools" "FileManager"];
+      mimeType = ["inode/directory"];
+      startupNotify = false;
+    };
   };
 
   # Language-specific file associations (C/C++, Java) live in the
