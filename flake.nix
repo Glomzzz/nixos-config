@@ -145,7 +145,10 @@
             && force config.networking.nftables.enable
             && force config.virtualisation.docker.rootless.enable
             && force config.virtualisation.docker.rootless.setSocketVariable
-            && force config.systemd.services.v2raya.environment.V2RAYA_ADDRESS
+            && config.virtualisation.docker.enable == false
+            && !(builtins.elem "docker" config.users.users.glom.extraGroups)
+            && config.nix.settings.trusted-users == ["root"]
+            && config.systemd.services.v2raya.environment.V2RAYA_ADDRESS == "127.0.0.1:2017"
             && force config.services.wivrn.enable
             && force config.services.wivrn.autoStart
             && force config.services.wivrn.highPriority
