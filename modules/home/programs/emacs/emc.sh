@@ -43,7 +43,10 @@ if [ "$frontend" = tty ]; then
     fi
     # Desktop launches and GUI editor callers do not own a controlling TTY.
     # Wait for this Kitty window, so Git/sudoedit keep their blocking contract.
-    exec '@kitty@' --class emacs-terminal "$0" "$@"
+    # Closing this dedicated client window leaves the daemon/buffers alive.
+    # Keep Kitty's running-program confirmation enabled in ordinary terminals.
+    exec '@kitty@' --class emacs-terminal \
+      --override confirm_os_window_close=0 "$0" "$@"
   fi
 fi
 
