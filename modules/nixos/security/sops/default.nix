@@ -5,10 +5,7 @@
 }: {
   imports = [
     inputs.sops-nix.nixosModules.sops
-    ./ai.nix
     ./tailscale.nix
-    ./github.nix
-    ./smb.nix
   ];
 
   sops = {

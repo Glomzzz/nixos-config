@@ -5,7 +5,10 @@
   ...
 }: let
   mountPoint = "${config.home.homeDirectory}/mnt/mac-mini";
-  credentials = "/run/secrets/rendered/smb-mac-mini-credentials";
+  credentials = import ../../home/programs/dev/credentials/package.nix {
+    inherit pkgs;
+    secretsFile = ../../../secrets/users + "/${config.home.username}.yaml";
+  };
 
   macMiniSmbMount = pkgs.writeShellApplication {
     name = "mac-mini-smb-mount";
@@ -13,13 +16,13 @@
       coreutils
       iproute2
       libressl.nc
-      gnused
+      jq
       rclone
       util-linux
     ];
     text = ''
       mount_point=${lib.escapeShellArg mountPoint}
-      credentials=${lib.escapeShellArg credentials}
+      credentials="''${CREDENTIALS_DIRECTORY:?systemd credentials are required}/smb.json"
 
       mkdir -p "$mount_point"
 
@@ -39,14 +42,6 @@
         exit 1
       fi
 
-      username=$(sed -n 's/^username=//p' "$credentials")
-      password=$(sed -n 's/^password=//p' "$credentials")
-      if [ -z "$username" ] || [ -z "$password" ]; then
-        printf 'mac-mini-smb-mount: incomplete credentials in %s\n' \
-          "$credentials" >&2
-        exit 1
-      fi
-
       lan_ip=192.168.50.198
       smb_host=mac-mini
       lan_route=$(ip -4 route get "$lan_ip" 2>/dev/null || true)
@@ -61,31 +56,18 @@
       printf 'mac-mini-smb-mount: using SMB host %s\n' "$smb_host"
 
       cache_root="''${XDG_CACHE_HOME:-$HOME/.cache}/rclone/mac-mini"
-      credentials_cache="$cache_root/smb-credentials"
       mkdir -p "$cache_root"
 
-      password_fingerprint=$(printf '%s' "$password" | sha256sum | sed 's/ .*//')
-      cached_fingerprint=$(sed -n '1p' "$credentials_cache" 2>/dev/null || true)
-      obscured_password=$(sed -n '2p' "$credentials_cache" 2>/dev/null || true)
-      if [ "$password_fingerprint" != "$cached_fingerprint" ] || \
-        [ -z "$obscured_password" ]
-      then
-        obscured_password=$(printf '%s\n' "$password" | rclone obscure -)
-        credentials_cache_tmp=$(mktemp "$cache_root/.smb-credentials.XXXXXX")
-        trap 'rm -f "$credentials_cache_tmp"' EXIT
-        chmod 600 "$credentials_cache_tmp"
-        printf '%s\n%s\n' "$password_fingerprint" "$obscured_password" \
-          >"$credentials_cache_tmp"
-        mv -f "$credentials_cache_tmp" "$credentials_cache"
-        trap - EXIT
-      fi
-
-      # Stable config values keep dirty VFS entries resumable after restarts.
+      # Keep the stable obscured value inside OpenPGP encryption at rest, then
+      # receive it through systemd's runtime-only credential directory. Randomly
+      # obscuring on every restart would change rclone's VFS cache identity.
+      username=$(jq -er '.username | strings | select(length > 0)' "$credentials")
+      obscured_password=$(jq -er '.obscured_password | strings | select(length > 0)' "$credentials")
       export RCLONE_CONFIG_MACMINI_TYPE=smb
       export RCLONE_CONFIG_MACMINI_HOST="$smb_host"
       export RCLONE_CONFIG_MACMINI_USER="$username"
       export RCLONE_CONFIG_MACMINI_PASS="$obscured_password"
-      unset password obscured_password password_fingerprint
+      unset obscured_password
 
       exec rclone mount macmini:glom "$mount_point" \
         --config /dev/null \
@@ -130,6 +112,12 @@
         exit 1
       fi
 
+      # Prompt exactly once in this foreground command, never from a restarting
+      # background mount. Already-active connections need no new decryption.
+      if ! systemctl --user is-active --quiet "$service"; then
+        ${credentials}/bin/user-credentials unlock-smb
+      fi
+
       trap 'exit 130' INT TERM
       mkdir -p "$mount_point"
 
@@ -163,7 +151,17 @@
     '';
   };
 in {
-  home.packages = [macMiniConnect];
+  home.packages = [
+    macMiniConnect
+    (pkgs.writeShellApplication {
+      name = "mac-mini-disconnect";
+      runtimeInputs = [pkgs.systemd];
+      text = ''
+        systemctl --user stop mac-mini-smb.service
+        ${credentials}/bin/user-credentials lock-smb
+      '';
+    })
+  ];
 
   systemd.user.services.mac-mini-smb = {
     Unit = {
@@ -171,6 +169,8 @@ in {
     };
     Service = {
       Type = "simple";
+      LoadCredential = ["smb.json:%t/nixos-credentials/mac-mini-smb.json"];
+      UMask = "0077";
       ExecStart = "${macMiniSmbMount}/bin/mac-mini-smb-mount";
       ExecStopPost = "-/run/wrappers/bin/fusermount3 -u -z ${mountPoint}";
       KillMode = "mixed";

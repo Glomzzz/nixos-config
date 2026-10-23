@@ -321,6 +321,11 @@
           inherit (self.nixosConfigurations.nixos) config;
         };
 
+        credentials = import ./modules/home/programs/dev/credentials/tests.nix {
+          inherit pkgs;
+          inherit (self.nixosConfigurations.nixos) config;
+        };
+
         sops = import ./modules/nixos/security/tests/sops.nix {
           inherit pkgs;
           inherit (self.nixosConfigurations.nixos) config;
