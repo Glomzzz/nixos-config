@@ -18,7 +18,6 @@ modules/home/            Home Manager programs, shell, and desktop settings
 modules/services/home/   Home Manager services
 users/glom/              NixOS and Home Manager user entrypoints
 pkgs/                    local package definitions and overlays
-secrets/                 sops-encrypted host secrets
 scripts/                 manual rebuild and proxy helpers
 ```
 
@@ -55,15 +54,22 @@ and can restart system services.
 
 ## Secrets
 
-Machine secrets in `secrets/hosts/` use SOPS with OpenPGP operator access and
+Encrypted SOPS files and evaluation-time personal metadata live in the private
+`Glomzzz/nixos-secrets` flake. The public configuration consumes that flake but
+never contains its source files. Machine secrets use OpenPGP operator access and
 unattended host-age decryption. The separately enrolled YubiKey user PIN is a
 host-age-only convenience exception: the laptop can recover it without the key,
 so it removes independent PIN protection while retaining card touch checks.
-User credentials in `secrets/users/` use only
-the YubiKey-backed OpenPGP identity; `user-credentials` explicitly unlocks them
-for a command or SMB connection. No API tokens are automatically exported into
-shells. See [secret management](docs/secrets.md) for commands and migration limits.
-Never add plaintext API keys, passwords, private keys, or PINs to Nix files.
+User credentials use only the YubiKey-backed OpenPGP identity;
+`user-credentials` explicitly unlocks them for a command or SMB connection. No
+API tokens are automatically exported into shells. See [secret management](docs/secrets.md)
+for commands and migration limits. Never add plaintext API keys, passwords,
+private keys, or PINs to Nix files.
+
+Commands that evaluate this flake need a GitHub token for the private input. Use
+`just check`, `just build`, or `just deploy`; they obtain the token through `gh`
+and pass it ephemerally via `NIX_CONFIG`. Do not put a token in `flake.nix` or a
+committed environment file.
 
 ## Recovery generations
 

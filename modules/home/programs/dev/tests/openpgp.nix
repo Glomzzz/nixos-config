@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  secretFiles,
 }: let
   home = config.home-manager.users.glom;
   identity = import ../../../../../users/glom/openpgp.nix;
@@ -13,7 +14,7 @@
     inherit pkgs;
     inherit (identity) cardSerial;
   };
-  pinFile = ../../../../../secrets/hosts/nixos-yubikey-pin.yaml;
+  pinFile = secretFiles.hosts."nixos-yubikey-pin";
   pinReady = builtins.pathExists pinFile;
 in
   assert config.programs.yubikey-manager.enable;

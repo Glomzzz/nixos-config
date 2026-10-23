@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if (($# == 0)); then
+  printf 'usage: %s COMMAND [ARGUMENT ...]\n' "$0" >&2
+  exit 2
+fi
+
+# Keep the token in an ephemeral child environment. gh reads it from its
+# configured credential store; it is never written to this repository.
+token=$(gh auth token)
+if [[ -z "$token" || "$token" == *$'\n'* ]]; then
+  printf '%s\n' 'Unable to obtain a GitHub token from gh.' >&2
+  exit 1
+fi
+export NIX_CONFIG="access-tokens = github.com=$token"
+unset token
+exec "$@"

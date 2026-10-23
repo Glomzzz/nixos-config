@@ -1,42 +1,42 @@
 # Common commands for the NixOS configuration.
 
 deploy:
-  sudo nixos-rebuild switch --flake .
+  ./scripts/with-github-token sudo --preserve-env=NIX_CONFIG nixos-rebuild switch --flake .
 
 build HOST="nixos":
-  host='{{HOST}}'; host="${host#HOST=}"; nix build ".#nixosConfigurations.${host}.config.system.build.toplevel" --no-link
+  host='{{HOST}}'; host="${host#HOST=}"; ./scripts/with-github-token nix build ".#nixosConfigurations.${host}.config.system.build.toplevel" --no-link
 
 check:
-  nix flake check --no-build
+  ./scripts/with-github-token nix flake check --no-build
 
 # Format every .nix file in place with alejandra (the flake's formatter).
 format:
-  nix fmt -- .
+  ./scripts/with-github-token nix fmt -- .
 
 format-check:
-  nix fmt -- --check .
+  ./scripts/with-github-token nix fmt -- --check .
 
 # Everything CI enforces: formatting, dead code, lints, and a full eval.
 lint:
-  nix build --no-link \
+  ./scripts/with-github-token nix build --no-link \
     '.#checks.x86_64-linux.formatting' \
     '.#checks.x86_64-linux.dead-code' \
     '.#checks.x86_64-linux.lint'
 
 debug:
-  sudo nixos-rebuild switch --flake . --show-trace --verbose
+  ./scripts/with-github-token sudo --preserve-env=NIX_CONFIG nixos-rebuild switch --flake . --show-trace --verbose
 
 update:
-  nix flake update
+  ./scripts/with-github-token nix flake update
 
 upgrade NAME:
-  name='{{NAME}}'; name="${name#NAME=}"; nix flake update "$name"
+  name='{{NAME}}'; name="${name#NAME=}"; ./scripts/with-github-token nix flake update "$name"
 
 history:
   sudo nix profile history --profile /nix/var/nix/profiles/system
 
 repl:
-  nix repl -f flake:nixpkgs
+  ./scripts/with-github-token nix repl -f flake:nixpkgs
 
 clean:
   sudo nix profile wipe-history --profile /nix/var/nix/profiles/system --older-than 30d

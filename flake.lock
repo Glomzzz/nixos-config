@@ -135,6 +135,21 @@
         "type": "github"
       }
     },
+    "nixos-secrets": {
+      "locked": {
+        "lastModified": 1792787421,
+        "narHash": "sha256-44ii6a7JJz2UwCunjZORioioSefuP5eObHMLa/5wsFg=",
+        "owner": "Glomzzz",
+        "repo": "nixos-secrets",
+        "rev": "4e13503b6c143bf960ace4b857d16e921ea024f1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Glomzzz",
+        "repo": "nixos-secrets",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1791956154,
@@ -188,6 +203,7 @@
         "home-manager": "home-manager",
         "niri": "niri",
         "nix-alien-source": "nix-alien-source",
+        "nixos-secrets": "nixos-secrets",
         "nixpkgs": "nixpkgs_2",
         "sops-nix": "sops-nix",
         "xwayland-satellite": "xwayland-satellite"

@@ -1,10 +1,11 @@
 {
   config,
   pkgs,
+  secretFiles,
 }: let
   identity = import ../../../../users/glom/openpgp.nix;
   python = pkgs.python3.withPackages (ps: [ps.pyyaml]);
-  pinFile = ../../../../secrets/hosts/nixos-yubikey-pin.yaml;
+  pinFile = secretFiles.hosts."nixos-yubikey-pin";
   pinPath =
     if builtins.pathExists pinFile
     then "${pinFile}"
@@ -14,7 +15,7 @@ in
     pkgs.runCommand "sops-recipients-check" {
       nativeBuildInputs = [python];
     } ''
-      python3 - ${../../../../.sops.yaml} ${../../../../secrets/hosts/nixos.yaml} ${../../../../secrets/users/glom.yaml} ${identity.primaryFingerprint} '${pinPath}' <<'PY'
+      python3 - ${secretFiles.policy} ${secretFiles.hosts.nixos} ${secretFiles.users.glom} ${identity.primaryFingerprint} '${pinPath}' <<'PY'
       import re
       import sys
       import yaml
@@ -48,7 +49,7 @@ in
       assert [entry["fp"] for entry in user["sops"]["pgp"]] == [operator]
       for fallback in ("age", "kms", "gcp_kms", "azure_kv", "hc_vault", "key_groups"):
           assert not user["sops"].get(fallback), "User secrets must have no alternate decryption recipient"
-      assert set(user) == {"github", "skillw", "smb", "opencode", "sops"}
+      assert set(user) == {"github", "smb", "sops"}
       assert set(user["smb"]["mac-mini"]) == {"username", "obscured_password"}
 
       def encrypted_leaves(value):

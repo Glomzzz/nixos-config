@@ -1,5 +1,6 @@
 {
   config,
+  email,
   pkgs,
 }: let
   home = config.home-manager.users.glom;
@@ -19,7 +20,7 @@ in
   assert home.programs.mbsync.enable && home.programs.msmtp.enable && home.programs.mu.enable;
   assert home.programs.password-store.enable;
   assert account.primary && account.mu.enable && account.msmtp.enable && account.mbsync.enable;
-  assert account.address == "me@glomzzz.com" && account.userName == account.address;
+  assert account.address == email && account.userName == account.address;
   assert account.imap.tls.enable && !account.imap.tls.useStartTls && account.imap.port == 993;
   assert account.smtp.tls.enable && account.smtp.tls.useStartTls && account.smtp.port == 587;
   assert account.mbsync.create == "maildir" && account.mbsync.remove == "none" && account.mbsync.expunge == "none";
@@ -31,7 +32,7 @@ in
       nativeBuildInputs = [python home.programs.mu.package];
     } ''
       python3 ${./credential-tests.py} ${./credential.py}
-      python3 - ${settings} <<'PY'
+      python3 - ${settings} '${email}' <<'PY'
       import json
       import sys
 
@@ -58,15 +59,15 @@ in
       assert "ExecStartPost" not in service["Service"], "mu4e must own the index lock"
       assert s["timer"]["Timer"]["OnCalendar"] == "*:0/5"
       assert s["timer"]["Timer"]["Persistent"]
-      assert "--my-address=me@glomzzz.com" in s["muInit"]
+      assert "--my-address=" + sys.argv[2] in s["muInit"]
       assert "--maildir=/home/glom/Maildir" in s["muInit"]
       PY
 
       # Exercise the pinned mu version with a private, synthetic mailbox only.
       export HOME="$TMPDIR/home" MUHOME="$TMPDIR/mu"
       mkdir -p "$HOME/Maildir/infomaniak/INBOX/"{cur,new,tmp}
-      printf 'From: sender@example.org\nTo: me@glomzzz.com\nSubject: Mail smoke test\nMessage-ID: <mail-check@example.org>\nDate: Wed, 21 Oct 2026 12:00:00 +0000\n\nOffline test.\n' > "$HOME/Maildir/infomaniak/INBOX/new/test-message"
-      mu init --maildir="$HOME/Maildir" --my-address=me@glomzzz.com
+      printf 'From: sender@example.org\nTo: %s\nSubject: Mail smoke test\nMessage-ID: <mail-check@example.org>\nDate: Wed, 21 Oct 2026 12:00:00 +0000\n\nOffline test.\n' '${email}' > "$HOME/Maildir/infomaniak/INBOX/new/test-message"
+      mu init --maildir="$HOME/Maildir" --my-address='${email}'
       mu index
       mu find 'subject:"Mail smoke test"' --fields=subject | grep -F 'Mail smoke test'
       touch "$out"

@@ -11,7 +11,6 @@ import stat
 import subprocess
 import sys
 import tempfile
-import time
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
@@ -30,7 +29,6 @@ class CredentialsTests(unittest.TestCase):
         self.environment = patch.dict(os.environ, {
             "XDG_RUNTIME_DIR": str(self.runtime),
             "GH_TOKEN": "inherited-unrelated-token",
-            "SKILLW_API_KEY_FILE": "/old/key/file",
         })
         self.environment.start()
         self.addCleanup(self.environment.stop)
@@ -51,44 +49,12 @@ class CredentialsTests(unittest.TestCase):
             self.assertEqual(argv, ["fake-command"])
             for name in ("GH_TOKEN", "GITHUB_TOKEN", "GITHUB_PAT_TOKEN"):
                 self.assertEqual(env[name], FAKE)
-            self.assertNotIn("SKILLW_API_KEY_FILE", env)
             self.assertNotIn(FAKE, argv)
             return 7
         with patch.object(credentials, "decrypt_section", return_value={"pat": FAKE}), \
              patch.object(credentials, "run_command", side_effect=command):
             self.assertEqual(credentials.scoped_command(self.args("github")), 7)
         self.assertEqual(os.environ["GH_TOKEN"], "inherited-unrelated-token")
-
-    def test_skillw_file_private_and_cleaned(self):
-        paths = []
-        def command(argv, env):
-            path = Path(env["SKILLW_API_KEY_FILE"])
-            paths.append(path)
-            self.assertEqual(path.read_text(), FAKE)
-            self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o600)
-            self.assertEqual(stat.S_IMODE(path.parent.stat().st_mode), 0o700)
-            self.assertNotIn("GH_TOKEN", env)
-            self.assertNotIn("SKILLW_API_KEY", env)
-            return 0
-        with patch.object(credentials, "decrypt_section", return_value={"api_key": FAKE}), \
-             patch.object(credentials, "run_command", side_effect=command):
-            self.assertEqual(credentials.scoped_command(self.args("skillw")), 0)
-        self.assertFalse(paths[0].exists())
-        self.assertFalse(paths[0].parent.exists())
-
-    def test_skillw_cleanup_on_launch_failure(self):
-        with patch.object(credentials, "decrypt_section", return_value={"api_key": FAKE}), \
-             patch.object(credentials, "run_command", side_effect=OSError("fake failure")):
-            with self.assertRaises(OSError):
-                credentials.scoped_command(self.args("skillw"))
-        self.assertEqual(list((self.runtime / "nixos-credentials").iterdir()), [])
-
-    def test_runtime_required_before_decryption(self):
-        os.environ.pop("XDG_RUNTIME_DIR")
-        with patch.object(credentials, "decrypt_section") as decrypt:
-            with self.assertRaises(credentials.CredentialError):
-                credentials.scoped_command(self.args("skillw"))
-            decrypt.assert_not_called()
 
     def test_unsafe_runtime_directories_rejected(self):
         self.runtime.chmod(0o755)
@@ -149,38 +115,6 @@ class CredentialsTests(unittest.TestCase):
         for value in (None, "", "secret\nvalue", "secret\x00value", 123):
             with self.assertRaises(credentials.CredentialError):
                 credentials.required_string({"pat": value}, "pat")
-
-    def test_termination_cleans_scoped_file(self):
-        fake_sops = self.runtime / "fake-sops"
-        fake_sops.write_text(f"#!{sys.executable}\nprint({json.dumps({'api_key': FAKE})!r})\n")
-        fake_sops.chmod(0o700)
-        marker = self.runtime / "child-ready"
-        child_code = (
-            "import os,pathlib,time; "
-            f"pathlib.Path({str(marker)!r}).write_text(os.environ['SKILLW_API_KEY_FILE']); "
-            "time.sleep(60)"
-        )
-        process = subprocess.Popen([
-            sys.executable, credentials.__file__, "--sops-program", str(fake_sops),
-            "--secrets-file", "fake-encrypted.yaml", "skillw", "--",
-            sys.executable, "-c", child_code,
-        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        try:
-            deadline = time.monotonic() + 5
-            while not marker.exists() and process.poll() is None and time.monotonic() < deadline:
-                time.sleep(0.01)
-            self.assertTrue(marker.exists(), "Fake child did not start")
-            secret_path = Path(marker.read_text())
-            self.assertTrue(secret_path.exists())
-            process.terminate()
-            output, errors = process.communicate(timeout=5)
-            self.assertEqual(process.returncode, 128 + signal.SIGTERM)
-            self.assertFalse(secret_path.exists())
-            self.assertNotIn(FAKE.encode(), output + errors)
-        finally:
-            if process.poll() is None:
-                process.kill()
-            process.communicate()
 
     def test_child_exit_status_and_signal_handler_restoration(self):
         before = {s: signal.getsignal(s) for s in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)}

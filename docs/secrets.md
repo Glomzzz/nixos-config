@@ -2,7 +2,7 @@
 
 ## Human access: OpenPGP
 
-The operator recipient in `.sops.yaml` is the primary fingerprint from
+The operator recipient in `~/nixos-secrets/.sops.yaml` is the primary fingerprint from
 `users/glom/openpgp.nix`. Its encryption subkey is on the YubiKey, with touch
 required. The public certificate is imported by Home Manager. Plaintext PINs,
 private keys, recovery material, and the old operator age identity stay outside
@@ -12,6 +12,7 @@ OpenPGP user PIN described below is the only saved-PIN exception.
 Use SOPS as the normal user, not root:
 
 ```sh
+cd ~/nixos-secrets
 sops secrets/users/glom.yaml
 ```
 
@@ -21,20 +22,20 @@ with plaintext; use a trusted editor with recovery/backup files disabled or
 confined to a nonpersistent runtime directory. This machine's swap is currently
 unencrypted, so tmpfs alone does not guarantee plaintext cannot reach disk.
 
-Changing `.sops.yaml` only changes policy for future operations. To apply new
+Changing `~/nixos-secrets/.sops.yaml` only changes policy for future operations. To apply new
 recipients to an existing file, use `sops updatekeys FILE` and inspect only the
 encrypted diff. The regression check validates both policy and encrypted-file
 metadata without decrypting anything:
 
 ```sh
-nix build --no-link .#checks.x86_64-linux.sops
+./scripts/with-github-token nix build --no-link .#checks.x86_64-linux.sops
 ```
 
 ## On-demand user credentials
 
 `secrets/users/glom.yaml` has **only** the operator OpenPGP recipient: no age,
-cloud KMS, or unattended host recipient. GitHub, Skillw, SMB, and the preserved
-but currently unused OpenCode credentials live here. They are not provisioned
+cloud KMS, or unattended host recipient. GitHub and SMB credentials live here.
+They are not provisioned
 into `/run/secrets` during boot or activation.
 
 The installed helper never prints credentials. It decrypts the requested object
@@ -44,17 +45,12 @@ runtime file. It never invokes a shell to interpolate a secret:
 ```sh
 user-credentials github -- gh api user
 user-credentials github -- YOUR_COMMAND ARGUMENTS
-user-credentials skillw -- YOUR_AI_COMMAND ARGUMENTS
 mac-mini-connect
 mac-mini-disconnect
 ```
 
 - `github`: sets `GH_TOKEN`, `GITHUB_TOKEN`, and the legacy `GITHUB_PAT_TOKEN`
   only for the child and its descendants, not every Fish shell.
-- `skillw`: sets `SKILLW_API_KEY_FILE` only for the child. The mode-0600 file
-  lives in a mode-0700 temporary directory under `$XDG_RUNTIME_DIR` and is
-  removed after command exit, including launch failure and normal termination.
-  A daemon that outlives the command cannot rely on that file remaining available.
 - `mac-mini-connect`: explicitly decrypts SMB credentials before starting an
   inactive service. Restarting the mount never triggers a background PIN prompt.
   The service uses systemd `LoadCredential` from a private runtime JSON file.
@@ -109,13 +105,12 @@ tracing around credential operations.
 No deployed services or credentials are changed just by committing this config.
 After building and testing the new generation, activate it and start a fresh
 login session. Existing shells/processes may still hold the previously exported
-GitHub token or the old `SKILLW_API_KEY_FILE`; logout is needed to discard those
+GitHub token; logout is needed to discard that
 inherited values. Stop/reconnect any old SMB service using the new commands.
 Mail remains unchanged: GNOME Keyring supports automatic synchronization without
 requiring the YubiKey every five minutes.
 
-**Rotate the provider-side GitHub, AI/OpenCode, and SMB credentials after this
-migration.** Earlier repository history, Nix-store generations, snapshots, and
+**Rotate the provider-side GitHub and SMB credentials after this migration.** Earlier repository history, Nix-store generations, snapshots, and
 old host-decrypted runtime files can retain copies encrypted to the host or old
 operator age key. Moving the same value to a new OpenPGP-only file does not
 invalidate those copies. Secure deletion is not guaranteed on Btrfs/SSDs;
@@ -125,13 +120,13 @@ old provisioning behavior; use only updated secrets/rotated credentials there.
 These helpers do not isolate processes sharing your UID. An unlocked child can
 use/disclose its credential; root can compromise it. Runtime storage is
 nonpersistent, not a guarantee against swapping. SIGKILL/crashes can leave the
-Skillw temporary file until runtime-directory cleanup. Full-disk and swap
+credential files until runtime-directory cleanup. Full-disk and swap
 encryption remain necessary for offline protection.
 
 Regression tests use fake credentials, never real decryption or network access:
 
 ```sh
-nix build --no-link .#checks.x86_64-linux.credentials .#checks.x86_64-linux.sops
+./scripts/with-github-token nix build --no-link .#checks.x86_64-linux.credentials .#checks.x86_64-linux.sops
 ```
 
 ## Opt-in automatic OpenPGP user-PIN entry

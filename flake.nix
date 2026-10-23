@@ -11,6 +11,7 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-secrets.url = "github:Glomzzz/nixos-secrets";
     nix-alien-source.url = "github:thiagokokada/nix-alien";
     niri = {
       url = "github:sodiboo/niri-flake";
@@ -39,6 +40,7 @@
     self,
     nixpkgs,
     home-manager,
+    nixos-secrets,
     ...
   }: let
     systems = ["x86_64-linux"];
@@ -324,21 +326,25 @@
         openpgp = import ./modules/home/programs/dev/tests/openpgp.nix {
           inherit pkgs;
           inherit (self.nixosConfigurations.nixos) config;
+          inherit (nixos-secrets) secretFiles;
         };
 
         mail = import ./modules/home/programs/mail/tests.nix {
           inherit pkgs;
           inherit (self.nixosConfigurations.nixos) config;
+          email = nixos-secrets.sensitive.identities.glom.email;
         };
 
         credentials = import ./modules/home/programs/dev/credentials/tests.nix {
           inherit pkgs;
           inherit (self.nixosConfigurations.nixos) config;
+          inherit (nixos-secrets) secretFiles;
         };
 
         sops = import ./modules/nixos/security/tests/sops.nix {
           inherit pkgs;
           inherit (self.nixosConfigurations.nixos) config;
+          inherit (nixos-secrets) secretFiles;
         };
 
         yubikey-touch = import ./modules/home/desktop/tests/yubikey-touch.nix {
@@ -365,15 +371,15 @@
         system = "x86_64-linux";
         hostname = "nixos";
         username = "glom";
-        usernameFull = "Glom Zhao";
-        email = "me@glomzzz.com";
+        sensitive = nixos-secrets.sensitive.identities.${username};
+        inherit (nixos-secrets) secretFiles;
         specialArgs = {
           inherit hostname;
           inherit username;
-          inherit usernameFull;
-          inherit email;
           inherit system;
           inherit inputs;
+          inherit secretFiles;
+          inherit (sensitive) usernameFull email;
         };
       in
         nixpkgs.lib.nixosSystem {

@@ -62,7 +62,7 @@ def main(argv=None):
             raise ValueError("Run in a local terminal; refusing non-TTY PIN input.")
         repository = args.repo.resolve()
         if not (repository / ".sops.yaml").is_file() or not (repository / "flake.nix").is_file():
-            raise ValueError("Run from the nixos-config repository, or supply --repo.")
+            raise ValueError("Run from the private nixos-secrets repository, or supply --repo.")
         relative = f"secrets/hosts/{args.hostname}-yubikey-pin.yaml"
         target = repository / relative
         if target.is_symlink() or target.exists() and not args.replace:
