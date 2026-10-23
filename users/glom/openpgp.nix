@@ -7,6 +7,10 @@
   # fingerprint or email. The ! prevents GnuPG from choosing another subkey.
   signingKey = "AF48DC862D8E359C5AABFAF36DCFBF390C116EF3!";
 
+  # SSH uses only the card's authentication subkey, never the signing subkey.
+  authenticationKey = "B478495BFB189DA1EE25CE4571D0C043EACB76FE";
+  sshPublicKeyFile = ./ssh/yubikey-openpgp.pub;
+
   # Set to ./keys/openpgp.asc after exporting your PUBLIC certificate there.
   # Never put private keys, revocation certificates, or PINs in this repository.
   publicKeyFile = ./keys/openpgp.asc;

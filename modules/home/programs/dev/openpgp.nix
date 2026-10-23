@@ -64,8 +64,9 @@ in {
   services.gpg-agent = {
     enable = true;
     enableScDaemon = true;
-    # Leave the existing SSH agent alone; commit signing uses OpenPGP directly.
-    enableSshSupport = false;
+    # Home Manager exports the socket to shells, systemd and D-Bus. The card's
+    # authentication key is exposed automatically after card discovery.
+    enableSshSupport = true;
     pinentry.package = pkgs.pinentry-qt;
     noAllowExternalCache = true;
   };

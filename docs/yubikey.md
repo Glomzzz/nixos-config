@@ -20,7 +20,8 @@ No key generation, reset, PIN change, or transfer is performed by Nix activation
   background GPG processes without an active session. Other polkit permissions
   remain unchanged; OpenPGP still requires its configured PIN/touch checks.
 - Home Manager configures GnuPG, a socket-activated agent, Qt pinentry, and
-  shared PC/SC access. GnuPG does not replace the SSH agent.
+  shared PC/SC access. Its SSH socket uses the card's authentication subkey;
+  [SSH setup](ssh.md) covers installing the public key on remote accounts.
 - Git/Jujutsu signing stays **disabled until provisioned**. Once both fields in
   `users/glom/openpgp.nix` are set, the public certificate is imported, and GnuPG,
   Git, and Jujutsu all select the same exact signing subkey. Git signs commits/tags

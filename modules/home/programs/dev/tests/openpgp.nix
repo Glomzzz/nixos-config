@@ -14,7 +14,14 @@ in
   assert config.services.pcscd.enable;
   assert gpg.enable && agent.enable && agent.enableScDaemon;
   assert gpg.scdaemonSettings.disable-ccid && gpg.scdaemonSettings.pcsc-shared;
-  assert !agent.enableSshSupport;
+  assert agent.enableSshSupport;
+  assert !config.programs.ssh.startAgent && !home.services.ssh-agent.enable;
+  assert home.sshAuthSock.enable;
+  assert home.sshAuthSock.systemd.socketProviderUnit == "gpg-agent-ssh.socket";
+  assert home.programs.ssh.settings."*".data.IdentityFile == "~/.ssh/yubikey-openpgp.pub";
+  assert home.programs.ssh.settings."*".data.IdentitiesOnly;
+  assert home.programs.ssh.settings."*".data.ForwardAgent == false;
+  assert home.home.file.".ssh/yubikey-openpgp.pub".source == identity.sshPublicKeyFile;
   assert agent.pinentry.package == pkgs.pinentry-qt;
   assert agent.noAllowExternalCache;
   assert gpg.mutableKeys && gpg.mutableTrust;
@@ -40,16 +47,35 @@ in
     && !(gpg.settings ? default-key)
     && gpg.publicKeys == [];
     pkgs.runCommand "openpgp-check" {
-      nativeBuildInputs = [pkgs.gnupg pkgs.python3];
+      nativeBuildInputs = [pkgs.gnupg pkgs.openssh pkgs.python3];
       signingKey =
         if ready
         then identity.signingKey
         else "";
     } ''
+      ssh -G -F ${home.home.file.".ssh/config".source} github.com > ssh-settings.txt
+      python3 - <<'PY'
+      import pathlib
+
+      settings = [line.split(maxsplit=1) for line in pathlib.Path("ssh-settings.txt").read_text().splitlines()]
+      assert [value for key, value in settings if key == "identityfile"] == ["~/.ssh/yubikey-openpgp.pub"]
+      assert [value for key, value in settings if key == "identitiesonly"] == ["yes"]
+      assert [value for key, value in settings if key == "forwardagent"] == ["no"]
+      PY
       ${pkgs.lib.optionalString ready ''
         export GNUPGHOME
         GNUPGHOME=$(mktemp -d)
-        gpg --batch --no-options --with-colons --show-keys ${pkgs.lib.escapeShellArg "${identity.publicKeyFile}"} > public-keys.txt
+        gpg --batch --no-options --import ${pkgs.lib.escapeShellArg "${identity.publicKeyFile}"}
+        gpg --batch --no-options --with-colons --list-keys > public-keys.txt
+        gpg --batch --no-options --export-ssh-key '${identity.authenticationKey}!' > ssh-key.pub
+        python3 - ${identity.sshPublicKeyFile} <<'PY'
+        import pathlib
+        import sys
+
+        expected = pathlib.Path(sys.argv[1]).read_text().split()[:2]
+        actual = pathlib.Path("ssh-key.pub").read_text().split()[:2]
+        assert actual == expected, "SSH public key must match the exact authentication subkey"
+        PY
         python3 - "$signingKey" public-keys.txt <<'PY'
         import pathlib
         import sys
