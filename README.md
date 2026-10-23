@@ -56,7 +56,10 @@ and can restart system services.
 ## Secrets
 
 Machine secrets in `secrets/hosts/` use SOPS with OpenPGP operator access and
-unattended host-age decryption. User credentials in `secrets/users/` use only
+unattended host-age decryption. The separately enrolled YubiKey user PIN is a
+host-age-only convenience exception: the laptop can recover it without the key,
+so it removes independent PIN protection while retaining card touch checks.
+User credentials in `secrets/users/` use only
 the YubiKey-backed OpenPGP identity; `user-credentials` explicitly unlocks them
 for a command or SMB connection. No API tokens are automatically exported into
 shells. See [secret management](docs/secrets.md) for commands and migration limits.

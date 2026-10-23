@@ -2,14 +2,27 @@
   config,
   lib,
   pkgs,
+  hostname,
   username,
   ...
 }: let
   identity = import (../../../../users + "/${username}/openpgp.nix");
   signingReady = identity.signingKey != null && identity.publicKeyFile != null;
+  pinentry = import ./yubikey-pin/package.nix {
+    inherit pkgs;
+    inherit (identity) cardSerial;
+  };
   gpg = lib.getExe config.programs.gpg.package;
 in {
+  home.packages = [
+    (import ./yubikey-pin/provision.nix {inherit pkgs hostname;})
+  ];
+
   assertions = [
+    {
+      assertion = builtins.match "[0-9]{1,8}" identity.cardSerial != null;
+      message = "OpenPGP cardSerial must be the public decimal YubiKey serial for automatic user-PIN entry.";
+    }
     {
       assertion =
         identity.signingKey
@@ -68,7 +81,10 @@ in {
     # Home Manager exports the socket to shells, systemd and D-Bus. The card's
     # authentication key is exposed automatically after card discovery.
     enableSshSupport = true;
-    pinentry.package = pkgs.pinentry-qt;
+    # Explicit opt-in saved-PIN provider; all unrelated prompts fall back to Qt.
+    pinentry.package = pinentry;
+    # Keep generic desktop/password-manager caching off. The saved card PIN is
+    # a deliberate exception, supplied only by our serial-scoped helper.
     noAllowExternalCache = true;
   };
 }

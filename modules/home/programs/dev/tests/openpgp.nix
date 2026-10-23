@@ -9,6 +9,12 @@
   jj = home.programs.jujutsu.settings;
   gpg = home.programs.gpg;
   agent = home.services.gpg-agent;
+  pinentry = import ../yubikey-pin/package.nix {
+    inherit pkgs;
+    inherit (identity) cardSerial;
+  };
+  pinFile = ../../../../../secrets/hosts/nixos-yubikey-pin.yaml;
+  pinReady = builtins.pathExists pinFile;
 in
   assert config.programs.yubikey-manager.enable;
   assert config.services.pcscd.enable;
@@ -23,8 +29,17 @@ in
   assert home.programs.ssh.settings."*".data.IdentitiesOnly;
   assert home.programs.ssh.settings."*".data.ForwardAgent == false;
   assert home.home.file.".ssh/yubikey-openpgp.pub".source == identity.sshPublicKeyFile;
-  assert agent.pinentry.package == pkgs.pinentry-qt;
+  assert agent.pinentry.package == pinentry;
   assert agent.noAllowExternalCache;
+  assert (config.sops.secrets ? "yubikey/openpgp-user-pin") == pinReady;
+  assert !pinReady
+  || (
+    config.sops.secrets."yubikey/openpgp-user-pin".owner
+    == "glom"
+    && config.sops.secrets."yubikey/openpgp-user-pin".mode == "0400"
+    && config.sops.secrets."yubikey/openpgp-user-pin".key == "openpgp_user_pin"
+    && config.sops.secrets."yubikey/openpgp-user-pin".sopsFile == pinFile
+  );
   assert gpg.mutableKeys && gpg.mutableTrust;
   assert if ready
   then
@@ -48,12 +63,14 @@ in
     && !(gpg.settings ? default-key)
     && gpg.publicKeys == [];
     pkgs.runCommand "openpgp-check" {
-      nativeBuildInputs = [pkgs.gnupg pkgs.openssh pkgs.python3];
+      nativeBuildInputs = [pkgs.gnupg pkgs.openssh pkgs.python3 pinentry];
       signingKey =
         if ready
         then identity.signingKey
         else "";
     } ''
+      export PYTHONDONTWRITEBYTECODE=1
+      python3 ${../yubikey-pin/tests.py} ${../yubikey-pin/pinentry.py} ${../yubikey-pin/provision.py}
       ssh -G -F ${home.home.file.".ssh/config".source} github.com > ssh-settings.txt
       python3 - <<'PY'
       import pathlib

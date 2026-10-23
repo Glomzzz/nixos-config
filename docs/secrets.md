@@ -4,9 +4,10 @@
 
 The operator recipient in `.sops.yaml` is the primary fingerprint from
 `users/glom/openpgp.nix`. Its encryption subkey is on the YubiKey, with touch
-required. The public certificate is imported by Home Manager. PINs, private
-keys, recovery material, and the old operator age identity stay outside this
-repository and the Nix store.
+required. The public certificate is imported by Home Manager. Plaintext PINs,
+private keys, recovery material, and the old operator age identity stay outside
+this repository and the Nix store. The explicitly opted-in host-encrypted
+OpenPGP user PIN described below is the only saved-PIN exception.
 
 Use SOPS as the normal user, not root:
 
@@ -133,14 +134,39 @@ Regression tests use fake credentials, never real decryption or network access:
 nix build --no-link .#checks.x86_64-linux.credentials .#checks.x86_64-linux.sops
 ```
 
+## Opt-in automatic OpenPGP user-PIN entry
+
+`secrets/hosts/nixos-yubikey-pin.yaml` is a separate convenience secret with only
+the host age recipient. It must not be added to the YubiKey-only user file:
+that would require the PIN to decrypt itself. It does not add a host recipient
+to any existing user credentials.
+
+The local `sops-save-yubikey-pin` command takes hidden terminal input and writes
+only ciphertext. sops-nix exposes the enrolled value as a mode-0400, user-owned
+runtime secret; a serial-scoped pinentry provider supplies it over GPG's pipe,
+with Qt fallback and conservative replay protection. Until the encrypted file
+exists, no saved-PIN runtime secret is installed. Never print the runtime file,
+put the PIN in Nix expressions, or pass it in command arguments/environment.
+
+This **removes the PIN as an independent protection** from this laptop. The host
+can decrypt it, the owning UID can read its runtime copy, and the current
+unencrypted disk/swap exposes it to offline compromise. Card private keys and
+required touches remain on the YubiKey, but other OpenPGP-protected user secrets
+now rely on that hardware/touch rather than a manually entered PIN. Encrypting
+the saved PIN in SOPS does not undo this trade-off. See
+[YubiKey setup](yubikey.md#optional-host-decryptable-user-pin) for enrollment,
+activation, testing, stale-PIN handling, and revoking historical saved values.
+
 ## Unattended machine access
 
 `modules/nixos/security/sops/default.nix` retains age decryption using
 `/etc/ssh/ssh_host_ed25519_key`. Host secrets have both this recipient and the
 operator's OpenPGP recipient in the **same key group**: either can decrypt.
 Adding OpenPGP does not force a hardware check for host access. Only the
-`tailscale/ip` entry remains in the host file; user credentials are deliberately
-excluded from this unattended path.
+`tailscale/ip` entry remains in the original host file; the optional saved user
+PIN uses its own host-only file. Existing user credentials remain excluded from
+the unattended decryption path, although saved PIN entry deliberately removes
+the need to type their card PIN.
 
 The former software operator age recipient is removed from the current file.
 Keep recovery material offline until OpenPGP access and backups have been

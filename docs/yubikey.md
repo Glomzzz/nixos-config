@@ -19,8 +19,10 @@ No key generation, reset, PIN change, or transfer is performed by Nix activation
   allows only the configured user (`glom`) the two PC/SC access actions, including
   background GPG processes without an active session. Other polkit permissions
   remain unchanged; OpenPGP still requires its configured PIN/touch checks.
-- Home Manager configures GnuPG, a socket-activated agent, Qt pinentry, and
-  exclusive PC/SC access to preserve PIN verification between operations. Release
+- Home Manager configures GnuPG, a socket-activated agent, a saved-user-PIN
+  provider with Qt fallback, and exclusive PC/SC access to preserve PIN
+  verification between operations. Automatic entry is available only after
+  explicitly enrolling the separate host-encrypted PIN below. Release
   GPG's card connection before OpenPGP management with `ykman` (see below).
   Its SSH socket uses the card's authentication subkey;
   [SSH setup](ssh.md) covers installing the public key on remote accounts.
@@ -36,7 +38,9 @@ No key generation, reset, PIN change, or transfer is performed by Nix activation
 
 Public FIDO enrollment records and OpenPGP public certificates may live in this
 repository/Nix store. **Never add private keys, secret-key exports, revocation
-certificates, PINs, or passphrases.** Nix does not provision private keys.
+certificates, plaintext PINs, or passphrases.** The optional encrypted user PIN
+below is a deliberate convenience exception, not a private-key backup.
+Nix does not provision private keys.
 
 ## 1. Build and activate the tooling safely
 
@@ -316,10 +320,11 @@ Ordinary `gpg-agent` passphrase-cache TTLs do not reliably control this card sta
 
 `disable-ccid` keeps GPG on the PC/SC backend; `pcsc-shared` is deliberately absent.
 Shared access has a [reported repeated-PIN problem](https://dev.gnupg.org/T7041),
-and another smart-card client can invalidate the state GPG relies on. External
-password caching remains disabled, and Jujutsu still signs local snapshots and
-rewrites. This change neither stores the PIN on disk nor changes the card's
-PIN/touch policies.
+and another smart-card client can invalidate the state GPG relies on. Generic
+desktop password caching remains disabled, and Jujutsu still signs local
+snapshots and rewrites. Exclusive access does not change the card's PIN/touch
+policies. The separate saved-PIN opt-in below deliberately automates user-PIN
+entry; it is not enabled by the `no-allow-external-cache` setting.
 
 Exclusive access means `ykman openpgp` and other smart-card clients cannot use the
 card while GPG holds it. When all signing, decryption, and SSH authentication
@@ -369,8 +374,102 @@ second signature should require touch, not another PIN entry. Cancel rather than
 guess if unsure of the PIN. If the second operation still asks, inspect
 `journalctl --user -u gpg-agent.service` and other running smart-card clients;
 exclusive access is a candidate fix, not proof that every reset source is gone.
-The automated OpenPGP check validates configuration/public data, not hardware PIN
-retention.
+The automated OpenPGP check validates configuration/public data and exercises
+the PIN provider with fake secrets/devices, not hardware PIN retention.
+
+## Optional host-decryptable user PIN
+
+This account explicitly opts into automatic entry from
+`secrets/hosts/nixos-yubikey-pin.yaml`, encrypted **only** to the existing host
+age recipient. It must not be encrypted to the YubiKey it unlocks. Other user
+credentials retain their OpenPGP-only recipients. Only the existing OpenPGP
+**user** PIN is enrolled; admin, FIDO, reset-code, and new-PIN prompts stay manual.
+
+**Security trade-off:** the laptop can recover this PIN without the YubiKey.
+The host SSH private key and this machine's unencrypted disk/swap do not protect
+it against offline disk access. A process running as this user can also read
+the runtime PIN. Private keys still remain on the card, and its touch policies
+are unchanged. Full-disk/swap encryption is still needed; tmpfs is not proof
+that plaintext never reaches disk. This is convenience, not independent PIN
+protection or isolation between processes sharing the UID.
+
+From a local Bash terminal in this repository, enroll with hidden input:
+
+```bash
+python3 modules/home/programs/dev/yubikey-pin/provision.py \
+  --sops-program "$(command -v sops)" --hostname nixos
+```
+
+After installation, `sops-save-yubikey-pin` is the equivalent command. Enter the
+current user PIN twice; the command does not change or verify the card PIN. It
+refuses nonterminal input and existing targets unless `--replace` is explicit.
+Only ciphertext is written, atomically; the PIN travels to SOPS via stdin, never
+argv, environment, a plaintext editor file, or output. Never paste it into chat
+or run a command that prints the runtime secret. A typo can still consume a card
+retry during the first real use: cancel instead of repeatedly guessing.
+
+Review only the encrypted diff and use `jj status` to include the new encrypted
+file and helper sources in the flake (this can require YubiKey touches). Build
+and activate safely:
+
+```bash
+nix build --no-link .#checks.x86_64-linux.openpgp \
+  .#checks.x86_64-linux.sops .#checks.x86_64-linux.credentials
+sudo nixos-rebuild build --flake .#nixos
+sudo nixos-rebuild test --flake .#nixos
+```
+
+Until the encrypted PIN exists, Nix omits its secret declaration and the provider
+uses Qt normally. Once enrolled, sops-nix installs
+`/run/secrets/yubikey/openpgp-user-pin`, owned by `glom` with mode `0400`. Nix
+copies only ciphertext and helper code to the store: it never evaluates the
+plaintext PIN or embeds it in a derivation. After activation, when no GPG/SSH
+operation is busy, restart the agent so it uses the new pinentry program:
+
+```bash
+gpgconf --homedir "$HOME/.cache/emacs/elpa/gnupg" --kill scdaemon
+gpgconf --homedir "$HOME/.gnupg" --kill gpg-agent
+```
+
+Use the disposable two-signature test above, leaving normal pinentry mode
+(`ask`): the first unlock should obtain the saved PIN without a dialog, and
+both signatures should require touch. `--pinentry-mode error` intentionally
+forbids **any** PIN provider and therefore is unsuitable for testing an initial
+automatic unlock. It remains useful to test subsequent on-card verification.
+
+The provider accepts only the expected English OpenPGP user-PIN prompt and
+configured public card serial, with a private, bounded runtime PIN file. Admin,
+new/repeated PIN, software-key, error, low-remaining-attempt, unknown/localized,
+and explicitly redirected prompts are delegated to Qt. Generic Qt external
+password caching is disabled even if a client requests it. Matching prompt text
+is a scope check, not authentication against a malicious same-UID client.
+
+### Stale PIN and conservative fallback
+
+Pinentry cannot reliably observe card verification results. Before an automatic
+submission, the helper records **nonsecret** attempt metadata under
+`$XDG_RUNTIME_DIR/yubikey-pin/` (private directory/files). It will not replay the
+same saved PIN unless the signature counter has advanced, the secret was
+replaced, or the USB device was reconnected. No PIN or PIN hash is stored there.
+Concurrent requests use a lock. Thus a stale saved PIN is not repeatedly retried
+against an unchanged card context; remaining-attempt warnings always use Qt.
+
+An authentication/decryption prompt without a signature counter is limited to
+one automatic attempt per USB connection/secret version. Restarting scdaemon
+without a successful intervening signature can therefore deliberately fall back
+to manual entry. Ambiguous multiple YubiKeys or unavailable USB metadata also
+fall back. This guard favors avoiding a lockout over guaranteeing touch-only
+behavior in every recovery situation. Replugging/rebooting can permit a new
+attempt, so do not use those actions to repeatedly retry a suspected stale PIN.
+
+If automatic entry fails, fix the enrolled value locally with
+`sops-save-yubikey-pin --replace`, then rebuild/test. This does **not** change the
+card PIN. If the card PIN itself was changed, the stored value must be updated
+separately. Never save the admin PIN as a workaround. Removing this dedicated
+encrypted file and rebuilding disables saved entry; do not delete other secrets
+or the hardware keys. Historical encrypted PIN copies remain decryptable to the
+host key: change the card's user PIN to revoke old copies, using a separately
+reviewed recovery procedure and without exhausting retries.
 
 If the card disappears or is busy, close ongoing GPG operations, release the
 relevant scdaemon, and reinsert it; check `systemctl status pcscd.socket`.
