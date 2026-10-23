@@ -184,6 +184,13 @@ installed through Home Manager under `modules/home/programs/`. Project-specific
 dependencies should stay in the project's own flake or development shell so
 they remain reproducible and do not enlarge the base system.
 
+Docker runs rootless in `glom`'s user manager with declarative subordinate ID
+ranges and lingering enabled. The account is intentionally not in the
+root-equivalent `docker` group. After switching from a previous rootful Docker
+setup, rootful containers and volumes under `/var/lib/docker` are not visible to
+the rootless daemon; migrate or export anything needed before relying on the
+new daemon. `DOCKER_HOST` is set automatically for login shells.
+
 ### Ix codebase graph
 
 `pkgs/ix.nix` pins the official Ix release bundle, including its native parsers
@@ -200,7 +207,8 @@ ix view
 ```
 
 State stays in `~/.ix` (or `$IX_HOME`). The backend is downloaded and run by
-Docker on first start; it is not built by Nix. No containers are started or MCP
-clients modified during activation. Update the version and hash in `pkgs/ix.nix`
-and rebuild rather than running `ix upgrade`, which manages a separate,
-non-Nix installation. Automatic upstream update notices are disabled by default.
+rootless Docker on first start; it is not built by Nix. No containers are
+started or MCP clients modified during activation. Update the version and hash
+in `pkgs/ix.nix` and rebuild rather than running `ix upgrade`, which manages a
+separate, non-Nix installation. Automatic upstream update notices are disabled
+by default.
