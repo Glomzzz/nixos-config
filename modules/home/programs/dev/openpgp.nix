@@ -53,9 +53,10 @@ in {
         backend = "gpg";
         key = identity.signingKey;
         backends.gpg.program = gpg;
-        # Signing every working-copy rewrite would repeatedly require a touch.
-        behavior = "drop";
+        # Sign our commits on creation and rewrite, including working-copy snapshots.
+        behavior = "own";
       };
+      # Also sign any unsigned outgoing mutable commits authored by us.
       git.sign-on-push = true;
     };
   };

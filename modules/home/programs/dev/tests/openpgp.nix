@@ -28,7 +28,7 @@ in
     && jj.signing.backend == "gpg"
     && jj.signing.key == identity.signingKey
     && jj.signing.backends.gpg.program == pkgs.lib.getExe gpg.package
-    && jj.signing.behavior == "drop"
+    && jj.signing.behavior == "own"
     && jj.git.sign-on-push
     && gpg.settings.default-key == identity.signingKey
     && builtins.length gpg.publicKeys == 1
