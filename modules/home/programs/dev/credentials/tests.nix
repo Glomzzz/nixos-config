@@ -1,11 +1,12 @@
 {
   config,
   pkgs,
+  secretFiles,
 }: let
   home = config.home-manager.users.glom;
   credentials = import ./package.nix {
     inherit pkgs;
-    secretsFile = ../../../../../secrets/users/glom.yaml;
+    secretsFile = secretFiles.users.glom;
   };
   smb = home.systemd.user.services.mac-mini-smb.Service;
 in
@@ -13,7 +14,6 @@ in
   == ["tailscale/ip"]
   ++ pkgs.lib.optional (config.sops.secrets ? "yubikey/openpgp-user-pin") "yubikey/openpgp-user-pin";
   assert !(config.sops.templates ? "smb-mac-mini-credentials");
-  assert !(home.home.sessionVariables ? SKILLW_API_KEY_FILE);
   assert !(pkgs.lib.hasInfix "GITHUB_PAT_TOKEN" home.programs.fish.shellInit);
   assert smb.LoadCredential == ["smb.json:%t/nixos-credentials/mac-mini-smb.json"];
   assert smb.UMask == "0077";

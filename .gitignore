@@ -4,3 +4,5 @@
 .codegraph
 result
 result-*
+secrets/
+.sops.yaml

@@ -1,5 +1,5 @@
 #!/usr/bin/env fish
 
-while not sudo nixos-rebuild switch --flake path:.
+while not ./scripts/with-github-token sudo --preserve-env=NIX_CONFIG nixos-rebuild switch --flake path:.
     sleep 3
 end

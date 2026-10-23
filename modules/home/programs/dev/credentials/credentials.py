@@ -15,10 +15,7 @@ class CredentialError(Exception):
     pass
 
 
-TOKEN_VARIABLES = (
-    "GITHUB_PAT_TOKEN", "GITHUB_TOKEN", "GH_TOKEN",
-    "SKILLW_API_KEY", "SKILLW_API_KEY_FILE",
-)
+TOKEN_VARIABLES = ("GITHUB_PAT_TOKEN", "GITHUB_TOKEN", "GH_TOKEN")
 
 
 def clean_environment():
@@ -108,15 +105,7 @@ def scoped_command(args):
             env[name] = token
         return run_command(command, env)
 
-    root = runtime_root()
-    data = decrypt_section(args.sops_program, args.secrets_file, "skillw")
-    token = required_string(data, "api_key")
-    with tempfile.TemporaryDirectory(prefix="skillw.", dir=root) as directory:
-        path = Path(directory) / "api-key"
-        with open(path, "x", opener=lambda p, flags: os.open(p, flags, 0o600)) as target:
-            target.write(token)
-        env["SKILLW_API_KEY_FILE"] = str(path)
-        return run_command(command, env)
+    raise CredentialError(f"Unsupported credential action: {args.action}")
 
 
 def smb_credential(args):
@@ -145,13 +134,12 @@ def main(argv=None):
     parser.add_argument("--sops-program", default="sops")
     parser.add_argument("--secrets-file", required=True)
     actions = parser.add_subparsers(dest="action", required=True)
-    for name in ("github", "skillw"):
-        actions.add_parser(name).add_argument("command", nargs=argparse.REMAINDER)
+    actions.add_parser("github").add_argument("command", nargs=argparse.REMAINDER)
     actions.add_parser("unlock-smb")
     actions.add_parser("lock-smb")
     args = parser.parse_args(argv)
     try:
-        if args.action in ("github", "skillw"):
+        if args.action == "github":
             return scoped_command(args)
         return smb_credential(args)
     except (CredentialError, OSError) as error:

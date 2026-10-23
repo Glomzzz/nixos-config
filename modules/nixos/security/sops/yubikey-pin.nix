@@ -1,10 +1,11 @@
 {
   hostname,
   lib,
+  secretFiles,
   username,
   ...
 }: let
-  secretFile = ../../../../secrets/hosts + "/${hostname}-yubikey-pin.yaml";
+  secretFile = secretFiles.hosts."${hostname}-yubikey-pin";
 in
   # Permit building the provisioning command before the PIN has been enrolled.
   lib.mkIf (builtins.pathExists secretFile) {

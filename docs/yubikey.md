@@ -167,12 +167,12 @@ install -m 600 "$HOME/.gnupg/gpg-agent.conf" "$workdir/gpg-agent.conf"
 install -m 600 "$HOME/.gnupg/scdaemon.conf" "$workdir/scdaemon.conf"
 export GNUPGHOME="$workdir"
 
-gpg --quick-generate-key 'Glom Zhao <me@glomzzz.com>' ed25519 cert 2y
+gpg --quick-generate-key 'YOUR NAME <your-address@example.org>' ed25519 cert 2y
 gpg --list-keys --with-subkey-fingerprint
 ```
 
 Record the **full primary fingerprint** in `PRIMARY` (no spaces). The name/email
-above match this repository; change them before generation if inappropriate.
+above are placeholders; replace them before generation.
 Use interactive pinentry; never pass a passphrase as a command argument.
 
 ```bash
@@ -338,7 +338,7 @@ Home Manager imports this public certificate with ultimate ownertrust
 and activate with `test`; then test real signing before `switch`.
 
 Upload `public.asc` to GitHub's **GPG keys** settings if using GitHub, and ensure
-`me@glomzzz.com` is verified there. Do not upload the secret backup or revoke.asc.
+your address is verified there. Do not upload the secret backup or revoke.asc.
 Use a disposable repository to test Git signing; in this jj workspace use jj
 commands, not `git commit`. Jujutsu signs your commits on creation and rewrite;
 `jj sign -r REV` signs an explicitly selected revision manually. Push also signs
@@ -429,7 +429,7 @@ the PIN provider with fake secrets/devices, not hardware PIN retention.
 ## Optional host-decryptable user PIN
 
 This account explicitly opts into automatic entry from
-`secrets/hosts/nixos-yubikey-pin.yaml`, encrypted **only** to the existing host
+`~/nixos-secrets/secrets/hosts/nixos-yubikey-pin.yaml`, encrypted **only** to the existing host
 age recipient. It must not be encrypted to the YubiKey it unlocks. Other user
 credentials retain their OpenPGP-only recipients. Only the existing OpenPGP
 **user** PIN is enrolled; admin, FIDO, reset-code, and new-PIN prompts stay manual.
@@ -446,10 +446,12 @@ From a local Bash terminal in this repository, enroll with hidden input:
 
 ```bash
 python3 modules/home/programs/dev/yubikey-pin/provision.py \
-  --sops-program "$(command -v sops)" --hostname nixos
+  --sops-program "$(command -v sops)" --hostname nixos \
+  --repo "$HOME/nixos-secrets"
 ```
 
-After installation, `sops-save-yubikey-pin` is the equivalent command. Enter the
+After installation, `sops-save-yubikey-pin` is the equivalent command; it writes
+into `~/nixos-secrets` by default. Enter the
 current user PIN twice; the command does not change or verify the card PIN. It
 refuses nonterminal input and existing targets unless `--replace` is explicit.
 Only ciphertext is written, atomically; the PIN travels to SOPS via stdin, never
@@ -457,8 +459,8 @@ argv, environment, a plaintext editor file, or output. Never paste it into chat
 or run a command that prints the runtime secret. A typo can still consume a card
 retry during the first real use: cancel instead of repeatedly guessing.
 
-Review only the encrypted diff and use `jj status` to include the new encrypted
-file and helper sources in the flake (this can require YubiKey touches). Build
+Review only the encrypted diff in `~/nixos-secrets` and push that repository
+before evaluating this flake. Build
 and activate safely:
 
 ```bash

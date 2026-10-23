@@ -1,6 +1,6 @@
 # Emacs mail: Infomaniak, mu4e, mbsync, and msmtp
 
-The account is **Glom Zhao <me@glomzzz.com>**. Configuration lives in:
+The account identity is supplied by the private secrets flake. Configuration lives in:
 
 - `modules/home/programs/mail/default.nix`: Home Manager account, programs, sync timer.
 - `~/.config/emacs/modules/feat/mail.el`: lazy mu4e UI and msmtp sending.

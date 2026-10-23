@@ -2,12 +2,13 @@
   config,
   lib,
   pkgs,
+  secretFiles,
   username,
   ...
 }: let
   credentials = import ./package.nix {
     inherit pkgs;
-    secretsFile = ../../../../../secrets/users + "/${username}.yaml";
+    secretsFile = secretFiles.users.${username};
   };
 in {
   home.packages = [credentials pkgs.sops];

@@ -2,12 +2,13 @@
   config,
   lib,
   pkgs,
+  secretFiles,
   ...
 }: let
   mountPoint = "${config.home.homeDirectory}/mnt/mac-mini";
   credentials = import ../../home/programs/dev/credentials/package.nix {
     inherit pkgs;
-    secretsFile = ../../../secrets/users + "/${config.home.username}.yaml";
+    secretsFile = secretFiles.users.${config.home.username};
   };
 
   macMiniSmbMount = pkgs.writeShellApplication {

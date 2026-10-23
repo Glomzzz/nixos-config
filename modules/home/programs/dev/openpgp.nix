@@ -12,11 +12,12 @@
     inherit pkgs;
     inherit (identity) cardSerial;
   };
+  saveYubikeyPin = import ./yubikey-pin/provision.nix {
+    inherit pkgs hostname username;
+  };
   gpg = lib.getExe config.programs.gpg.package;
 in {
-  home.packages = [
-    (import ./yubikey-pin/provision.nix {inherit pkgs hostname;})
-  ];
+  home.packages = [saveYubikeyPin];
 
   assertions = [
     {
