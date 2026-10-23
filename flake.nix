@@ -134,6 +134,28 @@
             touch "$out"
           '';
 
+        configuration-evaluation = let
+          config = self.nixosConfigurations.nixos.config;
+          force = value: builtins.seq value true;
+          forced =
+            force config.networking.firewall.backend
+            && force config.networking.firewall.extraInputRules
+            && force config.networking.nftables.enable
+            && force config.virtualisation.docker.rootless.enable
+            && force config.virtualisation.docker.rootless.setSocketVariable
+            && force config.systemd.services.v2raya.environment.V2RAYA_ADDRESS
+            && force config.services.wivrn.enable
+            && force config.services.wivrn.autoStart
+            && force config.services.wivrn.highPriority
+            && force config.services.wivrn.openFirewall
+            && force config.services.wivrn.steam.importOXRRuntimes
+            && force config.services.wivrn.config.enable;
+        in
+          assert forced;
+            pkgs.runCommand "configuration-evaluation-check" {} ''
+              touch "$out"
+            '';
+
         waybar = let
           helpers = import ./modules/home/desktop/niri/waybar/helpers.nix {inherit pkgs;};
           settings =
