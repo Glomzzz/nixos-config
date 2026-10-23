@@ -25,7 +25,7 @@ bad = []
 options = load_config({settings['kittyConfig']!r}, accumulate_bad_lines=bad)
 assert not bad, bad
 assert options.font_family == 'Cascadia Mono NF', options.font_family
-assert options.font_size == 16
+assert options.font_size == 15
 assert options.wayland_enable_ime
 assert options.clear_all_shortcuts
 assert not options.allow_remote_control

@@ -4,7 +4,7 @@
     font = {
       name = "Cascadia Mono NF";
       package = pkgs.cascadia-code;
-      size = 16;
+      size = 15;
     };
     themeFile = "Catppuccin-Mocha";
     # A new window can be launched from a session that still advertises Foot.
