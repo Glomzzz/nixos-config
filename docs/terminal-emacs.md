@@ -52,6 +52,15 @@ Terminal Emacs is the default editor:
 When launched without a TTY, the managed `emc` wrapper opens Kitty and waits
 for editing to finish. Never use `--no-wait` for TTY sessions: the terminal
 must stay alive. `--eval`, `--help`, and `--version` do not open a terminal.
+
+Dedicated Emacs windows use Kitty's `--override confirm_os_window_close=0`,
+so **Win+Q / Mod+Q** closes them without Kitty's running-program confirmation.
+This disconnects the client, not the daemon: buffers, including unsaved edits,
+remain in Emacs, but are not automatically saved to disk. Desktop Emacs/Dirvish
+entries use `Terminal=false` so `emc` creates this dedicated Kitty itself;
+they still run terminal Emacs. Other Kitty windows retain the default close
+confirmation, including an existing shell window where you manually run `emc`.
+
 The raw `emacs` executable remains unchanged for batch/daemon/standalone use.
 Existing shells keep their inherited editor variables until refreshed; Niri
 uses the new values for processes spawned after its configuration reloads.

@@ -23,7 +23,8 @@ assert settings['editorShortcut'] == [emc]
 assert settings['directoryShortcut'] == [emc, str(Path(emc).parents[2])]
 for name in ('emacs', 'emacsclient', 'emacs-dirvish'):
     entry = settings['desktopEntries'][name]
-    assert entry['terminal'], name
+    # The managed wrapper, not the desktop, must create the dedicated Kitty.
+    assert not entry['terminal'], name
     assert entry['exec'].startswith(emc + ' --tty '), entry
     assert '--no-wait' not in entry['exec'], name
 entry = settings['desktopEntries']['emacs-gui']
@@ -146,9 +147,12 @@ elif kind == 'systemctl':
     assert code != 0 and calls[-1][0] == 'systemctl', calls
 
     # A detached desktop call obtains a TTY before touching the daemon.
-    code, _, calls = invoke(['file with spaces.txt'], terminal=False)
-    assert code == 0 and calls == [['kitty', ['--class', 'emacs-terminal', str(wrapper),
-                                             '--tty', 'file with spaces.txt']]], calls
+    # Emacs-only close policy must cover both default and desktop --tty calls.
+    for arguments in (['file with spaces.txt'], ['--tty', 'file with spaces.txt']):
+        code, _, calls = invoke(arguments, terminal=False)
+        assert code == 0 and calls == [['kitty', [
+            '--class', 'emacs-terminal', '--override', 'confirm_os_window_close=0',
+            str(wrapper), '--tty', 'file with spaces.txt']]], calls
     code, text, calls = invoke(terminal=False, desktop=False)
     assert code != 0 and not calls and 'attach a TTY' in text
     assert '--tty' not in client_args(['--create-frame'], terminal=False)

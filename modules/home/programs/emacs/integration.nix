@@ -10,7 +10,8 @@
     comment = "Edit text in terminal Emacs";
     exec = "${emc} --tty %F";
     icon = "emacs";
-    terminal = true;
+    # emc supplies Kitty itself, including its Emacs-only close policy.
+    terminal = false;
     categories = ["Development" "TextEditor"];
     startupNotify = false;
     mimeType = builtins.attrNames (lib.filterAttrs
@@ -20,6 +21,7 @@
 in {
   # Preserve the desktop IDs used by existing MIME associations, but never
   # detach a TTY client: its terminal must stay alive until editing finishes.
+  # Terminal=false avoids a generic terminal wrapping emc before its handoff.
   xdg.desktopEntries = {
     emacs = terminalEditor;
     emacsclient =
@@ -42,7 +44,7 @@ in {
       comment = "Manage files with Dirvish in terminal Emacs";
       exec = "${emc} --tty %f";
       icon = "emacs";
-      terminal = true;
+      terminal = false;
       categories = ["System" "FileTools" "FileManager"];
       mimeType = ["inode/directory"];
       startupNotify = false;

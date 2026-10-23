@@ -33,7 +33,14 @@ assert options.text_fg_override_threshold == 0
 assert options.symbol_map
 assert 'read-clipboard' not in options.clipboard_control
 assert 'read-clipboard-ask' in options.clipboard_control
-print('Kitty configuration parsed; font maps, IME, key and clipboard policy passed')
+# Ordinary Kitty windows still confirm before closing a running program.
+assert options.confirm_os_window_close[0] == -1
+emacs_options = load_config({settings['kittyConfig']!r},
+    overrides=('confirm_os_window_close 0',), accumulate_bad_lines=bad)
+assert not bad, bad
+assert emacs_options.confirm_os_window_close[0] == 0
+assert not emacs_options.allow_remote_control
+print('Kitty configuration parsed; fonts, IME, keys, clipboard and scoped close policy passed')
 """
 subprocess.run([settings["kitty"], "+runpy", parser], check=True)
 
