@@ -24,11 +24,12 @@ No key generation, reset, PIN change, or transfer is performed by Nix activation
 - Git/Jujutsu signing stays **disabled until provisioned**. Once both fields in
   `users/glom/openpgp.nix` are set, the public certificate is imported, and GnuPG,
   Git, and Jujutsu all select the same exact signing subkey. Git signs commits/tags
-  by default, and Jujutsu signs your outgoing mutable commits on push.
-  `jj sign -r REV` can sign an explicitly selected revision sooner.
-  Jujutsu deliberately drops signatures on rewrites and re-signs at push rather
-  than requesting a touch for every working-copy snapshot. Signing rewrites
-  commit hashes; review the outgoing stack before pushing.
+  by default, and Jujutsu signs commits authored by you when creating or rewriting
+  them (`signing.behavior = "own"`), including working-copy snapshots. This may
+  require a YubiKey touch on each rewrite. Sign-on-push remains enabled as a fallback
+  for unsigned outgoing mutable commits authored by you.
+  `jj sign -r REV` can sign an explicitly selected revision manually. Signing
+  changes commit hashes; review the outgoing stack before pushing.
 
 Public FIDO enrollment records and OpenPGP public certificates may live in this
 repository/Nix store. **Never add private keys, secret-key exports, revocation
@@ -279,8 +280,10 @@ and activate with `test`; then test real signing before `switch`.
 Upload `public.asc` to GitHub's **GPG keys** settings if using GitHub, and ensure
 `me@glomzzz.com` is verified there. Do not upload the secret backup or revoke.asc.
 Use a disposable repository to test Git signing; in this jj workspace use jj
-commands, not `git commit`. `jj sign -r REV` signs now; otherwise signing is
-performed at push. Verify signatures locally and on the hosting service.
+commands, not `git commit`. Jujutsu signs your commits on creation and rewrite;
+`jj sign -r REV` signs an explicitly selected revision manually. Push also signs
+any remaining unsigned mutable commits authored by you. Verify signatures locally
+and on the hosting service.
 No commit or push is performed by this configuration change.
 
 Only after backups and card operations are verified, stop agents in the two
