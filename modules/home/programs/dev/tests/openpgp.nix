@@ -13,7 +13,8 @@ in
   assert config.programs.yubikey-manager.enable;
   assert config.services.pcscd.enable;
   assert gpg.enable && agent.enable && agent.enableScDaemon;
-  assert gpg.scdaemonSettings.disable-ccid && gpg.scdaemonSettings.pcsc-shared;
+  assert gpg.scdaemonSettings.disable-ccid;
+  assert !(gpg.scdaemonSettings ? pcsc-shared);
   assert agent.enableSshSupport;
   assert !config.programs.ssh.startAgent && !home.services.ssh-agent.enable;
   assert home.sshAuthSock.enable;
