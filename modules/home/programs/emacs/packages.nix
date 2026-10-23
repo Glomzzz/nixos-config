@@ -7,6 +7,8 @@
     ghostscript
     imagemagick
     libtool
+    # Optional kitty-graphics.el can also render in the Foot fallback via Sixel.
+    libsixel
     # Configured as the Han fontset family in `modules/ui/appearance.el' and
     # as the `variable-pitch' family for EPUB reading in `reading.el'.
     lxgw-wenkai

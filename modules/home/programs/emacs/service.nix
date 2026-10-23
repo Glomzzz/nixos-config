@@ -36,10 +36,14 @@ in {
   # makes "no process matched" harmless.  The sleep gives a signaled orphan
   # time to release the socket path before the new daemon binds it.
   systemd.user.services.emacs.Service = {
-    # The system ncurses database has an older foot entry without Tc.  The
-    # daemon does not inherit Foot's TERMINFO, so prefer Foot's own database
-    # to detect true color without forcing it on less capable TTY clients.
-    Environment = ["TERMINFO=${pkgs.foot.terminfo}/share/terminfo"];
+    # The daemon does not inherit its clients' TERMINFO. Prefer the terminals'
+    # own databases: the system ncurses foot entry omits true-color support.
+    # The empty TERMINFO_DIRS entry retains ncurses' normal fallback paths,
+    # without forcing true color on less capable TTY clients.
+    Environment = [
+      "TERMINFO=${pkgs.kitty.terminfo}/share/terminfo"
+      "TERMINFO_DIRS=${pkgs.foot.terminfo}/share/terminfo:"
+    ];
     # The session manager may still have GTK_IM_MODULE=fcitx imported from
     # before a rebuild. Do not let it force the flickering GTK3 client-side
     # input panel; PGTK should use native Wayland text-input-v3 instead.

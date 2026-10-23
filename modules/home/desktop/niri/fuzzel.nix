@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  config,
+  pkgs,
+  ...
+}: {
   # fuzzel is the launcher and dmenu replacement. It reads XDG .desktop entries,
   # so anything installed through home.packages shows up without extra wiring.
   programs.fuzzel = {
@@ -6,7 +10,7 @@
 
     settings = {
       main = {
-        terminal = "${pkgs.foot}/bin/foot";
+        terminal = "${config.programs.kitty.package}/bin/kitty";
         layer = "overlay";
         font = "JetBrainsMono Nerd Font:size=13";
         prompt = "'  '";

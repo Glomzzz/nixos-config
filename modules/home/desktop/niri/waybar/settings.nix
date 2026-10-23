@@ -114,7 +114,7 @@ in {
     format = "{icon} {volume}%";
     format-muted = "󰝟";
     format-icons.default = ["󰕿" "󰖀" "󰕾"];
-    on-click = "${pkgs.foot}/bin/foot -a wiremix ${pkgs.wiremix}/bin/wiremix";
+    on-click = "${config.programs.kitty.package}/bin/kitty --class wiremix ${pkgs.wiremix}/bin/wiremix";
   };
 
   backlight = {
@@ -206,7 +206,7 @@ in {
     # makes the value safe once it is inside that JSON. Same reason
     # custom/weather sets it.
     escape = true;
-    on-click = "${pkgs.foot}/bin/foot -a nmtui ${nmtui}/bin/nmtui-themed";
+    on-click = "${config.programs.kitty.package}/bin/kitty --class nmtui ${nmtui}/bin/nmtui-themed";
   };
 
   "group/tray-drawer" = {

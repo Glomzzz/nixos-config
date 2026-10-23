@@ -111,6 +111,11 @@
             touch "$out"
           '';
 
+        emacs-terminal = import ./modules/home/shell/tests/emacs-terminal.nix {
+          inherit pkgs;
+          home = self.nixosConfigurations.nixos.config.home-manager.users.glom;
+        };
+
         steam-game-laptop = let
           # Exercise the production launcher with a harmless compositor stub.
           # writeShellApplication still runs shellcheck on the complete script.

@@ -47,7 +47,7 @@
     # Supply a Wayland terminal for any desktop entry declaring Terminal=true.
     terminal-exec = {
       enable = true;
-      settings.default = ["foot.desktop"];
+      settings.default = ["kitty.desktop" "foot.desktop"];
     };
   };
 
