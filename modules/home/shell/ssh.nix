@@ -1,12 +1,22 @@
 {
   lib,
   pkgs,
+  username,
   ...
-}: {
+}: let
+  identity = import (../../../users + "/${username}/openpgp.nix");
+in {
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
     settings = {
+      "*" = {
+        # A public IdentityFile selects the matching private key in gpg-agent.
+        # Avoid silently falling back to unrelated software keys in the agent.
+        IdentityFile = "~/.ssh/yubikey-openpgp.pub";
+        IdentitiesOnly = true;
+        ForwardAgent = false;
+      };
       "macmini mac-mini" = {
         hostname = "mac-mini";
         proxyCommand = "${pkgs.ssh-proxy-mac-mini} %p %h";
@@ -16,7 +26,10 @@
     };
   };
 
-  home.file.".ssh/config".force = true;
+  home.file = {
+    ".ssh/config".force = true;
+    ".ssh/yubikey-openpgp.pub".source = identity.sshPublicKeyFile;
+  };
 
   home.activation.installPrivateSshConfig = lib.hm.dag.entryAfter ["linkGeneration"] ''
     config_path="$HOME/.ssh/config"
