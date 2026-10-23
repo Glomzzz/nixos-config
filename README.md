@@ -196,7 +196,7 @@ new daemon. `DOCKER_HOST` is set automatically for login shells.
 `pkgs/ix.nix` pins the official Ix release bundle, including its native parsers
 and Compass UI. `modules/home/programs/dev/ix.nix` installs the CLI through Home
 Manager. Node.js 22 and command-line dependencies are provided by the package;
-Docker and the user's Docker group membership are already configured system-wide.
+rootless Docker is configured through the system module and the user's manager.
 
 After deploying, start the backend explicitly and map a repository:
 
