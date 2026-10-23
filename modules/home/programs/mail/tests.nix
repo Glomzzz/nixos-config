@@ -4,7 +4,9 @@
 }: let
   home = config.home-manager.users.glom;
   account = home.accounts.email.accounts.infomaniak;
+  python = pkgs.python3.withPackages (ps: [ps.secretstorage]);
   settings = pkgs.writeText "mail-settings.json" (builtins.toJSON {
+    inherit (account) passwordCommand;
     mbsync = home.xdg.configFile."isyncrc".text;
     msmtp = home.xdg.configFile."msmtp/config".text;
     muInit = home.home.activation.runMuInit.data;
@@ -23,9 +25,12 @@ in
   assert account.mbsync.create == "maildir" && account.mbsync.remove == "none" && account.mbsync.expunge == "none";
   assert home.services.mbsync.postExec == null;
   assert home.services.gpg-agent.enable;
+  assert config.services.gnome.gnome-keyring.enable;
+  assert config.security.pam.services.login.enableGnomeKeyring;
     pkgs.runCommand "mail-check" {
-      nativeBuildInputs = [pkgs.python3 home.programs.mu.package];
+      nativeBuildInputs = [python home.programs.mu.package];
     } ''
+      python3 ${./credential-tests.py} ${./credential.py}
       python3 - ${settings} <<'PY'
       import json
       import sys
@@ -35,8 +40,10 @@ in
       for config_name, password_option in (("mbsync", "PassCmd"), ("msmtp", "passwordeval")):
           text = s[config_name]
           assert "mail.infomaniak.com" in text
-          assert "pass show email/infomaniak" in text
-          assert "PASSWORD_STORE_DIR=/home/glom/.password-store" in text
+          assert "/bin/infomaniak-password" in text
+          assert "pass show" not in text, "no automatic hardware-backed fallback"
+          assert " ".join(s["passwordCommand"]) in text
+          assert s["passwordCommand"][1:] == ["lookup"]
           assert password_option in text
       for line in ("Create Near", "Remove None", "Expunge None", "SubFolders Verbatim",
                    "Inbox /home/glom/Maildir/infomaniak/INBOX"):
@@ -45,7 +52,8 @@ in
           assert line in s["msmtp"]
       assert s["legacyConfig"] == s["xdgConfig"]
       service = s["service"]
-      assert service["Unit"]["ConditionPathExists"].endswith("/email/infomaniak.gpg")
+      assert "ConditionPathExists" not in service.get("Unit", {})
+      assert service["Service"]["ExecCondition"] == s["passwordCommand"][0] + " check"
       assert service["Service"]["UMask"] == "0077"
       assert "ExecStartPost" not in service["Service"], "mu4e must own the index lock"
       assert s["timer"]["Timer"]["OnCalendar"] == "*:0/5"

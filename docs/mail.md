@@ -4,14 +4,17 @@ The account is **Glom Zhao <me@glomzzz.com>**. Configuration lives in:
 
 - `modules/home/programs/mail/default.nix`: Home Manager account, programs, sync timer.
 - `~/.config/emacs/modules/feat/mail.el`: lazy mu4e UI and msmtp sending.
-- `~/.password-store/email/infomaniak.gpg`: encrypted mailbox password, **not in this repository**.
+- GNOME Keyring's encrypted **Login** collection: live mailbox credential.
+- `~/.password-store/email/infomaniak.gpg`: optional YubiKey-encrypted backup, **not in this repository**.
 - `~/Maildir/infomaniak/`: synchronized mail, with private directory permissions.
 - `~/.cache/mu/`: the local index (Home Manager exports `MUHOME`).
 
-The existing `gpg-agent`/Qt pinentry and YubiKey encryption subkey are reused.
-No keys, PIN policies, or agent cache lifetimes are changed. The mail password is
-separate from the Infomaniak account login password: use the mailbox-specific
-password/device password required by Infomaniak for external mail clients.
+Both fetching and ordinary SMTP sending use the encrypted Login keyring, not
+the YubiKey. Password login already unlocks this keyring through PAM. The GPG
+keys, YubiKey PIN/touch policies, and agent cache lifetimes are unchanged; `pass`
+is retained for explicit import and backup only. The mail password is separate
+from the Infomaniak Manager login password: use a mailbox-specific device
+password for external mail clients.
 
 ## First-time setup
 
@@ -21,18 +24,23 @@ Apply the configuration from this repository (requires local sudo authentication
 sudo nixos-rebuild switch --flake ~/nixos-config#nixos
 ```
 
-Then enter the mailbox password **locally in your terminal**, not in chat or a
-Nix file. Use a single-line pass entry containing only the password; do not append
-notes or other metadata.
+Ensure the Login keyring has a **non-empty password**, ideally matching your
+account login password; see [keyring setup](authentication.md#set-a-non-empty-keyring-password).
+The helper refuses a plaintext keyring and never changes its password.
+
+Enter the mailbox device password **locally in your terminal**, not in chat,
+command arguments, an environment variable, or a Nix file:
 
 ```sh
-export PASSWORD_STORE_DIR="$HOME/.password-store"
-# Only for a new password store. Do not reinitialize an existing store casually.
-pass init AE7977EF0356263C91F34C5D99A8A2212CBE37ED
-pass insert email/infomaniak
+# Hidden input; stores only this mailbox's credential in the Login collection.
+infomaniak-password store
 
-# Verify decryption without printing the password; insert/unlock the YubiKey.
-pass show email/infomaniak >/dev/null
+# OR migrate the existing pass entry once (requires the YubiKey for this step).
+# Nothing prints the password; the encrypted pass entry is not changed/deleted.
+infomaniak-password import-pass
+
+# Verify availability without printing the password or prompting for unlock.
+infomaniak-password check
 
 # List remote folders before the first synchronization.
 mbsync --list --all
@@ -44,10 +52,11 @@ find ~/Maildir/infomaniak -type d -name cur -printf '%h\n'
 ```
 
 The timer runs every five minutes while the user systemd manager is active and
-catches up after missed runs. It skips synchronization until the encrypted pass
-entry exists. It can still fail or wait for pinentry when the card is absent or
-locked; unattended sync is not guaranteed with a hardware-backed encryption key.
-A job times out after 15 minutes. To retry after unlocking:
+catches up after missed runs. An `ExecCondition` checks the credential without
+printing it: if the Login keyring is locked or its mailbox entry is missing,
+that attempt is skipped. No background password/PIN prompt or GPG fallback is
+allowed. The next timer tick tries again; a running sync times out after 15
+minutes. To retry after unlocking the Login keyring:
 
 ```sh
 systemctl --user start mbsync.service
@@ -64,7 +73,9 @@ systemctl --user restart emacs.service
 ```
 
 Open **`C-c M`** (`M-x mu4e`). The existing **`C-c m`** remains `consult-man`.
-mu4e starts indexing immediately and every five minutes while running. Use
+mu4e starts indexing immediately and every five minutes while running. These
+are independent timers, so new upstream mail can take nearly ten minutes to
+appear in the UI, plus synchronization time/scheduling delays. Use
 `M-x mu4e-update-index` to refresh immediately after an external sync.
 
 ## Verify special folders before composing or moving mail
@@ -104,6 +115,56 @@ replying to an address you control, then run another sync and check webmail.
 If the provider also saves sent messages automatically, verify duplication before
 considering a different sent-copy policy. Nothing sends a test message automatically.
 
+## Background sending
+
+In a mu4e compose buffer, **`C-c C-c`** sends and closes the draft on success;
+**`C-c C-s`** sends but keeps the buffer. The source configuration's local
+`~/.config/emacs/pkgs/mail-async.el` package runs msmtp in a background process.
+SMTP network traffic and password/PIN waiting no longer block Emacs. No new
+Nix package or outgoing service is needed.
+
+The draft is read-only with `[sending mail]` in the mode line while submission
+is pending. Sent filing, reply flags, and draft cleanup run only after msmtp
+reports success. Failure keeps the draft editable and opens a `*Mail delivery*`
+error buffer; there are no automatic retries. Use `M-x mail-async/status` to
+inspect a pending draft's log or `M-x mail-async/cancel` to stop its process
+with an explicit warning. Cancellation or a lost connection can leave delivery
+uncertain: check before retrying. If SMTP accepted mail but local Sent filing
+failed, sending again is blocked; recover the Sent copy locally rather than
+resubmit the message.
+
+Message's MIME preparation, attachment reads/encoding, and OpenPGP message
+signing/encryption still happen in Emacs before the background transport starts.
+Large messages can therefore still pause during preparation. This is not an
+outgoing queue: wait for pending sends before exiting/restarting Emacs. Staging
+uses a mode-600 temporary file, removed on normal success, failure, or process
+cancellation; a forced Emacs shutdown can leave a private orphaned file.
+
+## Credential security and unlocking
+
+`infomaniak-password` defaults to a silent availability check. Its `lookup`
+subcommand is for mbsync/msmtp and intentionally writes the password to their
+pipe; do not run `lookup` directly in a terminal or include it in diagnostic logs.
+The provider targets GNOME's persistent Login collection explicitly, not a
+session/default collection, and checks its encrypted on-disk format. The item
+is matched by application `nixos-mail`, service `infomaniak`, and the email
+account. No password or decryption key enters a Nix derivation or repository.
+
+A password login unlocks Login automatically only when the keyring password
+matches the login password. Otherwise unlock it manually in **Passwords and
+Keys** (`seahorse`). Screen locking does not necessarily lock the keyring;
+fetching can continue while it remains unlocked. Conversely, face/YubiKey screen
+unlocking cannot unlock a separately locked keyring. No successful fetch is
+promised before login or while the keyring is locked.
+
+The security boundary is the unlocked user session: software running as your
+user can potentially retrieve its secrets, and root can compromise it. This
+is less restrictive than requiring a physical YubiKey for each decryption. The
+mailbox password is independently revocable. Protect the Login keyring with a
+strong non-empty password; full-disk encryption and encrypted backups remain
+recommended. The retained pass backup is optional, never a runtime dependency.
+OpenPGP message signing/encryption may still use the YubiKey separately.
+
 ## Authentication troubleshooting
 
 If mbsync reports `Invalid login or password`, the IMAP connection reached the
@@ -121,7 +182,9 @@ Use that generated password, not the Manager login password. See
 [Infomaniak's device-password guide](https://www.infomaniak.com/en/support/faq/1321).
 
 ```sh
-pass insert --force email/infomaniak
+infomaniak-password store
+# If you retain the pass backup, update it separately to avoid a stale backup:
+# pass insert --force email/infomaniak
 systemctl --user reset-failed mbsync.service
 systemctl --user start mbsync.service
 # Only resume automatic attempts once the manual sync succeeds:
@@ -167,6 +230,10 @@ cd ~/.config/emacs
 emacs --batch -Q -l tests/run.el
 ```
 
-These checks use synthetic messages and do not retrieve real mail, decrypt
-credentials, or send messages. The Emacs suite exercises mu4e-specific checks
-when the Nix-managed mu4e package is on its load path.
+These checks use synthetic messages and mocked keyrings; they do not retrieve
+real mail, decrypt real credentials, or send messages. Provider tests cover
+locked/missing/plaintext keyrings, silent checks, explicit import, and rejection
+of empty/ambiguous credentials without automatic unlock or GPG fallback. The Emacs suite exercises mu4e-specific checks
+when the Nix-managed mu4e package is on its load path. Its background-send tests
+use a gated fake SMTP executable to exercise real process success, rejection,
+termination, MIME attachments, and delayed Sent filing without sending mail.
