@@ -98,12 +98,14 @@
             pkgs.writeText
             "firewall-settings.json"
             (builtins.toJSON {
-              inherit (self.nixosConfigurations.nixos.config.networking.firewall)
+              inherit
+                (self.nixosConfigurations.nixos.config.networking.firewall)
                 allowedTCPPorts
                 allowedUDPPorts
                 allowedUDPPortRanges
                 backend
-                extraInputRules;
+                extraInputRules
+                ;
               nftables = self.nixosConfigurations.nixos.config.networking.nftables.enable;
             });
         in
