@@ -55,10 +55,11 @@ and can restart system services.
 
 ## Secrets
 
-Secrets are encrypted with `sops-nix` and stored under `secrets/hosts/`. The
-host's SSH host key is used for age decryption. Do not add plaintext API keys or
-passwords to Nix files; add a new secret declaration under
-`modules/nixos/security/sops/` and encrypt its value with `sops`.
+Secrets are encrypted with SOPS and stored under `secrets/hosts/`. Human access
+uses the YubiKey-backed OpenPGP identity; the host's SSH host key provides
+unattended age decryption. Either recipient can decrypt host secrets: this is
+not a requirement to possess both keys. See [secret management](docs/secrets.md).
+Never add plaintext API keys, passwords, private keys, or PINs to Nix files.
 
 ## Recovery generations
 
