@@ -29,10 +29,11 @@ in {
       settings = lib.mkIf signingReady {
         default-key = identity.signingKey;
       };
-      # Share smart-card access with ykman through pcscd rather than grabbing USB.
+      # Use pcscd rather than grabbing USB, but retain exclusive card access.
+      # Shared access can lose PIN verification between operations (GnuPG T7041).
+      # Release scdaemon before OpenPGP management with ykman; see docs/yubikey.md.
       scdaemonSettings = {
         disable-ccid = true;
-        pcsc-shared = true;
       };
       publicKeys = lib.optional signingReady {
         source = identity.publicKeyFile;

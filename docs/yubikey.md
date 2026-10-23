@@ -20,7 +20,9 @@ No key generation, reset, PIN change, or transfer is performed by Nix activation
   background GPG processes without an active session. Other polkit permissions
   remain unchanged; OpenPGP still requires its configured PIN/touch checks.
 - Home Manager configures GnuPG, a socket-activated agent, Qt pinentry, and
-  shared PC/SC access. Its SSH socket uses the card's authentication subkey;
+  exclusive PC/SC access to preserve PIN verification between operations. Release
+  GPG's card connection before OpenPGP management with `ykman` (see below).
+  Its SSH socket uses the card's authentication subkey;
   [SSH setup](ssh.md) covers installing the public key on remote accounts.
 - Git/Jujutsu signing stays **disabled until provisioned**. Once both fields in
   `users/glom/openpgp.nix` are set, the public certificate is imported, and GnuPG,
@@ -107,7 +109,7 @@ set -euo pipefail
 workdir="$(mktemp -d "$XDG_RUNTIME_DIR/openpgp.XXXXXXXX")"
 chmod 700 "$workdir"
 # Copy only non-secret configuration, not the normal keyring. Temporary homes
-# also need a working pinentry and shared PC/SC settings.
+# also need a working pinentry and the same PC/SC settings.
 install -m 600 "$HOME/.gnupg/gpg-agent.conf" "$workdir/gpg-agent.conf"
 install -m 600 "$HOME/.gnupg/scdaemon.conf" "$workdir/scdaemon.conf"
 export GNUPGHOME="$workdir"
@@ -189,9 +191,11 @@ unplugged/offline when no longer needed.
 
 ## 4. Move only the subkeys onto the YubiKey
 
-First inspect `gpg --card-status` and `ykman openpgp info` again. Stop if any slot
-is occupied unexpectedly; **do not reset the card**. Never overwrite an existing
-key without a separately reviewed recovery plan.
+First inspect `gpg --card-status`, release that keyring's card connection with
+`gpgconf --kill scdaemon`, then inspect `ykman openpgp info` again. Stop if any
+slot is occupied unexpectedly; **do not reset the card**. Never overwrite an
+existing key without a separately reviewed recovery plan. If another keyring
+holds the card, release its scdaemon too, using an explicit `--homedir` (see below).
 
 Change the OpenPGP user PIN and admin PIN interactively, using the existing PINs:
 
@@ -225,9 +229,11 @@ Subkey numbers depend on your keyring; do not copy guessed indices. After
 `save`, the working subkeys should show `ssb>` references. The verified pre-transfer
 backup remains essential: card private keys cannot be exported back out.
 
-Enable touch for each OpenPGP operation, with reversible `on` policies:
+Release the working keyring's card connection, then enable touch for each
+OpenPGP operation, with reversible `on` policies:
 
 ```bash
+gpgconf --kill scdaemon
 ykman openpgp keys set-touch sig on
 ykman openpgp keys set-touch dec on
 ykman openpgp keys set-touch aut on
@@ -298,9 +304,76 @@ rm -r -- "$workdir" "$verifydir"
 unset workdir verifydir
 ```
 
-If the card disappears or is busy, close ongoing GPG operations, run
-`gpgconf --kill scdaemon`, and reinsert it; check `systemctl status pcscd.socket`.
-The configured `disable-ccid`/`pcsc-shared` settings let GPG and ykman share PC/SC.
+## PIN retention and card-management access
+
+The inspected card uses **Signature PIN: not forced** (`ykman` calls this
+**Require PIN for signature: Once**) and touch policy **On** for all three slots.
+With that PIN policy, consecutive signatures should not need a newly typed PIN
+while the card's verification state remains intact. Touch is still required for
+each operation. Unplugging, a card reset, or restarting scdaemon can require the
+PIN again; signing and decryption/SSH can also need separate initial verification.
+Ordinary `gpg-agent` passphrase-cache TTLs do not reliably control this card state.
+
+`disable-ccid` keeps GPG on the PC/SC backend; `pcsc-shared` is deliberately absent.
+Shared access has a [reported repeated-PIN problem](https://dev.gnupg.org/T7041),
+and another smart-card client can invalidate the state GPG relies on. External
+password caching remains disabled, and Jujutsu still signs local snapshots and
+rewrites. This change neither stores the PIN on disk nor changes the card's
+PIN/touch policies.
+
+Exclusive access means `ykman openpgp` and other smart-card clients cannot use the
+card while GPG holds it. When all signing, decryption, and SSH authentication
+operations are idle, release the connection **before** using those tools:
+
+```bash
+gpgconf --homedir "$HOME/.gnupg" --kill scdaemon
+ykman openpgp info
+```
+
+The next GPG operation starts scdaemon again. Do not run `ykman` between signatures
+when testing PIN retention. FIDO browser/PAM authentication uses a separate
+interface and does not need this release procedure.
+
+Each GnuPG home can have its own agent/scdaemon. If a public-only Emacs package
+verification keyring has acquired the card, release its connection while package
+operations are idle:
+
+```bash
+gpgconf --homedir "$HOME/.cache/emacs/elpa/gnupg" --kill scdaemon
+```
+
+Likewise, release the previously active keyring's scdaemon before using a
+provisioning/verification keyring. Do not delete keyrings or kill an agent that is
+performing an operation. Repeated interference from a public-only keyring should
+be fixed by preventing its card access, not by weakening the card PIN policy.
+
+After activating this configuration with `nixos-rebuild test`, restart the normal
+keyring's scdaemon using the command above so it reads the new settings. Test two
+signatures outside the repository, using the configured default signing subkey:
+
+```bash
+(
+  set -e
+  probe="$(mktemp -d)"
+  trap 'rm -r -- "$probe"' EXIT
+  printf 'PIN retention test\n' > "$probe/message"
+  gpg --output "$probe/first.sig" --detach-sign "$probe/message"
+  gpg --verify "$probe/first.sig" "$probe/message"
+  gpg --output "$probe/second.sig" --detach-sign "$probe/message"
+  gpg --verify "$probe/second.sig" "$probe/message"
+)
+```
+
+Enter the user PIN in pinentry if requested and touch for each signature. The
+second signature should require touch, not another PIN entry. Cancel rather than
+guess if unsure of the PIN. If the second operation still asks, inspect
+`journalctl --user -u gpg-agent.service` and other running smart-card clients;
+exclusive access is a candidate fix, not proof that every reset source is gone.
+The automated OpenPGP check validates configuration/public data, not hardware PIN
+retention.
+
+If the card disappears or is busy, close ongoing GPG operations, release the
+relevant scdaemon, and reinsert it; check `systemctl status pcscd.socket`.
 If `gpg --card-status` reports "Service is not running" while pcscd is active,
 check `journalctl -u pcscd.service` for `NOT authorized` / `access_pcsc` errors.
 Activate the targeted PC/SC polkit rule with `sudo nixos-rebuild test --flake .#nixos`,
