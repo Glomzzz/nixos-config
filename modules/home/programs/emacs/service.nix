@@ -5,16 +5,12 @@
 }: let
   emacs = config.programs.emacs.finalPackage;
   emacsInit = "${config.home.homeDirectory}/.config/emacs/init.el";
-  noSpawnEditor = "${pkgs.coreutils}/bin/false";
 in {
   services.emacs = {
     enable = true;
-    client = {
-      enable = true;
-      # A non-empty command that always fails makes emacsclient report
-      # an unavailable server without spawning an unmanaged daemon.
-      arguments = ["-c" "--alternate-editor=${noSpawnEditor}"];
-    };
+    # integration.nix owns terminal desktop entries and the explicit GUI entry.
+    # Home Manager's generated client entry always declares Terminal=false.
+    client.enable = false;
     # Socket activation is disabled on purpose: the generated
     # emacs.socket unit listens on %t/emacs/server while the daemon
     # also binds that exact path, and after every service restart

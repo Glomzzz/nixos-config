@@ -98,7 +98,9 @@ Files declared with `force = true` bypass Home Manager's collision backups.
 ## Terminal Emacs
 
 Kitty is the default terminal, with explicit Latin/CJK/emoji/icon fonts and
-Emacs-friendly keyboard shortcuts. Foot remains available as a fallback.
+Emacs-friendly keyboard shortcuts. Emacs editor commands and desktop launchers
+use a TTY by default; `emc -c` or **Emacs (GUI)** requests a graphical frame.
+Foot remains available as a fallback.
 See [terminal Emacs](docs/terminal-emacs.md) for mouse/clipboard integration,
 optional image/PDF support, reserved terminal shortcuts, and GUI limitations.
 

@@ -40,7 +40,27 @@ selection, and wheel input go to Emacs.
 The separate source configuration at `~/.config/emacs/` owns TTY behavior in
 `modules/ui/tty.el` and keyboard negotiation through the existing KKP package.
 
-Open terminal Emacs with `emacsclient -t` (or `emc -t`). Then:
+Terminal Emacs is the default editor:
+
+- `emc` or `emc file` opens a blocking TTY client, even on a graphical desktop.
+- `EDITOR`, `VISUAL`, `SUDO_EDITOR`, and Git's editor use `emc`.
+- Niri **Mod+Return** opens terminal Emacs; **Mod+E** opens terminal Dirvish.
+- The Emacs desktop launcher and existing file associations use a Kitty TTY.
+- **`emc -c`** explicitly opens a GUI frame; add `-n` to return immediately.
+  The application menu also offers **Emacs (GUI)**.
+
+When launched without a TTY, the managed `emc` wrapper opens Kitty and waits
+for editing to finish. Never use `--no-wait` for TTY sessions: the terminal
+must stay alive. `--eval`, `--help`, and `--version` do not open a terminal.
+The raw `emacs` executable remains unchanged for batch/daemon/standalone use.
+Existing shells keep their inherited editor variables until refreshed; Niri
+uses the new values for processes spawned after its configuration reloads.
+
+The stale-config restart guard counts both GUI and TTY frames and preserves
+modified files and background mail sends. An unanswered probe against an
+active service fails safely rather than restarting a possibly busy editor.
+
+Inside terminal Emacs:
 
 - `M-x tty/describe` reports colors, mouse, clipboard, and child-frame support.
 - `M-x kkp-status` checks Kitty keyboard protocol negotiation; `C-h k` checks
@@ -78,14 +98,17 @@ ordinary limited-color clients must retain their real capabilities.
 ## Validation
 
 ```sh
-nix build .#checks.x86_64-linux.emacs-terminal
+nix build .#checks.x86_64-linux.emacs-terminal .#checks.x86_64-linux.emacs-launchers
 emacs --batch -Q -l ~/.config/emacs/tests/run.el
+sh ~/.config/emacs/tests/launcher-tests.sh
 ```
 
 The Nix check parses the generated configuration using Kitty's actual parser,
 then starts a clean, display-less daemon and real pseudo-terminal clients. It
 verifies 24-bit output for Kitty and Foot and 256-color behavior for an ordinary
-xterm client. The Emacs suite checks startup laziness, GUI isolation, terminal
-setup, clipboard policy, and the optional graphics declaration. Actual font
+xterm client. The launcher check uses mocked clients/services in real PTYs to
+verify frontend selection, blocking behavior, desktop handoff, and safe restart
+handling. The Emacs suite checks startup laziness, GUI isolation, terminal
+setup, clipboard policy, restart guards, and the optional graphics declaration. Actual font
 appearance, IME candidate placement, and interactive graphics still require a
 real Wayland terminal session to assess.
