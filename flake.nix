@@ -341,6 +341,11 @@
           inherit (self.nixosConfigurations.nixos) config;
         };
 
+        yubikey-touch = import ./modules/home/desktop/tests/yubikey-touch.nix {
+          inherit pkgs;
+          inherit (self.nixosConfigurations.nixos) config;
+        };
+
         authentication = import ./modules/nixos/security/tests/authentication.nix {
           inherit pkgs;
           inherit (self.nixosConfigurations.nixos) config;

@@ -50,6 +50,11 @@ for service in ("sudo", "swaylock"):
     assert {"authfile=/etc/u2f-mappings", f"origin={origin}", f"appid={origin}",
             "cue", "userpresence=1", "pinverification=0", "userverification=0"} <= options
     assert not {"nouserok", "alwaysok"} & options, "missing enrollment must not authenticate"
+    marker = f"/run/yubikey-touch/{settings['pcscUser']}/{service}"
+    assert f"authpending_file={marker}" in options
+    assert f"f {marker} 0444 root root -" in settings["tmpfiles"], (
+        "PAM attribution markers must be precreated, empty, root-owned and read-only"
+    )
 
     # Exercise both stacks: the full OR truth table plus absent/broken modules.
     # An unenrolled/missing key is a failure, never a successful authentication.

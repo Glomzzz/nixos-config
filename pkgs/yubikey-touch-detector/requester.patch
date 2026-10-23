@@ -1,0 +1,253 @@
+--- a/detector/gpg_linux.go
++++ b/detector/gpg_linux.go
+@@ -25,6 +25,7 @@
+ const maxAssuanLine = 64 * 1024
+ 
+ type gpgOperation struct {
++	requester  int
+ 	blocked    map[string]bool
+ 	generation uint64
+ 	notified   bool
+@@ -153,8 +154,11 @@
+ 	return tracker
+ }
+ 
+-func (tracker *gpgOperationTracker) start() *gpgOperation {
++func (tracker *gpgOperationTracker) start(requester ...int) *gpgOperation {
+ 	op := &gpgOperation{blocked: make(map[string]bool)}
++	if len(requester) != 0 {
++		op.requester = requester[0]
++	}
+ 	tracker.events <- gpgTrackerEvent{kind: gpgTrackerStart, op: op}
+ 	return op
+ }
+@@ -228,6 +232,7 @@
+ 				stop(event.op)
+ 				if event.op.notified {
+ 					event.op.notified = false
++					notifier.SetRequester("gpg", 0)
+ 					tracker.notifications.set(gpgProxySource, false)
+ 				}
+ 			}
+@@ -248,6 +253,7 @@
+ 			stop(event.op)
+ 			if event.op.notified {
+ 				event.op.notified = false
++				notifier.SetRequester("gpg", 0)
+ 				tracker.notifications.set(gpgProxySource, false)
+ 			}
+ 			queue = append(queue[:index], queue[index+1:]...)
+@@ -260,6 +266,7 @@
+ 			}
+ 			event.op.timer = nil
+ 			event.op.notified = true
++			notifier.SetRequester("gpg", event.op.requester)
+ 			tracker.notifications.set(gpgProxySource, true)
+ 		case gpgTrackerReset:
+ 			wasNotified := false
+@@ -269,6 +276,7 @@
+ 			}
+ 			queue = nil
+ 			if wasNotified {
++				notifier.SetRequester("gpg", 0)
+ 				tracker.notifications.set(gpgProxySource, false)
+ 			}
+ 		}
+@@ -296,6 +304,7 @@
+ }
+ 
+ type gpgAgentConnectionState struct {
++	requester  int
+ 	mutex      sync.Mutex
+ 	tracker    *gpgOperationTracker
+ 	cardKeys   map[string]bool
+@@ -321,7 +330,7 @@
+ 	}
+ 	state.inquiry = false
+ 	if cardBacked {
+-		state.operation = state.tracker.start()
++		state.operation = state.tracker.start(state.requester)
+ 	}
+ }
+ 
+@@ -677,7 +686,7 @@
+ 	defer client.Close()
+ 	defer backend.Close()
+ 
+-	state := &gpgAgentConnectionState{tracker: session.tracker, cardKeys: session.cardKeys}
++	state := &gpgAgentConnectionState{tracker: session.tracker, cardKeys: session.cardKeys, requester: notifier.PeerPID(client)}
+ 	defer state.close()
+ 	clientParser := &assuanLineParser{}
+ 	serverParser := &assuanLineParser{}
+@@ -795,7 +804,7 @@
+ 	}
+ }
+ 
+-func checkGPGOnRequest(requestGPGCheck chan bool, notifications *gpgNotifications, ctx *gpgme.Context) {
++func checkGPGOnRequest(requestGPGCheck chan int, notifications *gpgNotifications, ctx *gpgme.Context) {
+ 	check := func(response chan error, timer *time.Timer) {
+ 		err := ctx.AssuanSend("LEARN", nil, nil, func(status, args string) error {
+ 			log.Debugf("AssuanSend/status: %v, %v", status, args)
+@@ -805,14 +814,16 @@
+ 			response <- err
+ 		}
+ 	}
+-	for range requestGPGCheck {
++	for pid := range requestGPGCheck {
+ 		response := make(chan error)
+ 		timer := time.AfterFunc(gpgTouchDelay, func() {
++			notifier.SetRequester("ssh", pid)
+ 			notifications.set(gpgBusyCheckSource, true)
+ 			err := <-response
+ 			if err != nil {
+ 				log.Errorf("Agent returned an error: %v", err)
+ 			}
++			notifier.SetRequester("ssh", 0)
+ 			notifications.set(gpgBusyCheckSource, false)
+ 		})
+ 		time.Sleep(200 * time.Millisecond)
+@@ -834,7 +845,7 @@
+ 		return
+ 	}
+ 
+-	requestGPGCheck := make(chan bool)
++	requestGPGCheck := make(chan int)
+ 	go checkGPGOnRequest(requestGPGCheck, notifications, ctx)
+ 	WatchSSH(requestGPGCheck, exits)
+ }
+--- a/detector/ssh.go
++++ b/detector/ssh.go
+@@ -8,11 +8,12 @@
+ 	"strings"
+ 	"sync"
+ 
++	"github.com/maximbaz/yubikey-touch-detector/notifier"
+ 	log "github.com/sirupsen/logrus"
+ )
+ 
+ // WatchSSH watches for hints that YubiKey is maybe waiting for a touch on a SSH auth request
+-func WatchSSH(requestGPGCheck chan bool, exits *sync.Map) {
++func WatchSSH(requestGPGCheck chan int, exits *sync.Map) {
+ 	socketFile := os.Getenv("SSH_AUTH_SOCK")
+ 
+ 	if socketFile == "" {
+@@ -94,12 +95,12 @@
+ 			return
+ 		}
+ 
+-		go proxyUnixSocket(proxyConnection, originalConnection, requestGPGCheck)
+-		go proxyUnixSocket(originalConnection, proxyConnection, requestGPGCheck)
++		go proxyUnixSocket(proxyConnection, originalConnection, requestGPGCheck, notifier.PeerPID(proxyConnection))
++		go proxyUnixSocket(originalConnection, proxyConnection, requestGPGCheck, 0)
+ 	}
+ }
+ 
+-func proxyUnixSocket(reader net.Conn, writer net.Conn, requestGPGCheck chan bool) {
++func proxyUnixSocket(reader net.Conn, writer net.Conn, requestGPGCheck chan int, pid int) {
+ 	defer (func() {
+ 		reader.Close()
+ 		writer.Close()
+@@ -117,9 +118,11 @@
+ 			return
+ 		}
+ 
+-		select {
+-		case requestGPGCheck <- true:
+-		default:
++		if pid > 0 {
++			select {
++			case requestGPGCheck <- pid:
++			default:
++			}
+ 		}
+ 	}
+ }
+--- a/detector/u2f_linux.go
++++ b/detector/u2f_linux.go
+@@ -121,6 +121,7 @@
+ 		case devicePath := <-readyDevices:
+ 			startWatcher(devicePath)
+ 		case event := <-watcherEvents:
++			notifier.SetTouchDevice(event.id, event.devicePath, event.active)
+ 			if message, changed := state.update(event.id, event.active); changed {
+ 				publish(message)
+ 			}
+--- a/notifier/desktop.go
++++ b/notifier/desktop.go
+@@ -10,7 +10,8 @@
+ const DefaultNotificationBody = "Touch your YubiKey to continue ({{.Reasons}})."
+ 
+ type notificationTemplateData struct {
+-	Reasons string
++	Reasons    string
++	Requesters string
+ }
+ 
+ type notificationTemplates struct {
+@@ -31,7 +32,7 @@
+ }
+ 
+ func (templates *notificationTemplates) render(reasons string) (string, string, error) {
+-	data := notificationTemplateData{Reasons: reasons}
++	data := notificationTemplateData{Reasons: reasons, Requesters: requesterSummary(reasons)}
+ 	var title bytes.Buffer
+ 	if err := templates.title.Execute(&title, data); err != nil {
+ 		return "", "", fmt.Errorf("rendering notification title: %w", err)
+--- a/notifier/libnotify.go
++++ b/notifier/libnotify.go
+@@ -2,6 +2,7 @@
+ 
+ import (
+ 	"sync"
++	"time"
+ 
+ 	"github.com/esiqveland/notify"
+ 	"github.com/godbus/dbus/v5"
+@@ -42,6 +43,7 @@
+ }
+ 
+ func setupLibnotifyNotifier(notifiers *sync.Map, title, body string) {
++	watchPAMRequests()
+ 	templates, err := newNotificationTemplates(title, body)
+ 	if err != nil {
+ 		log.Error("Cannot initialize desktop notifications: ", err)
+@@ -56,6 +58,7 @@
+ 		AppIcon: "yubikey-touch-detector",
+ 	}
+ 	notification.AddHint(notify.Hint{ID: "transient", Variant: dbus.MakeVariant(true)})
++	notification.AddHint(notify.Hint{ID: "urgency", Variant: dbus.MakeVariant(byte(2))})
+ 
+ 	conn, signals, err := connectDBus()
+ 	if err != nil {
+@@ -68,6 +71,8 @@
+ 
+ 	state := newTouchState()
+ 	reference := notificationReference{}
++	refresh := time.NewTicker(time.Second)
++	defer refresh.Stop()
+ 
+ 	for {
+ 		var value Message
+@@ -80,14 +85,21 @@
+ 			}
+ 			continue
+ 		case value = <-touch:
++		case <-refresh.C:
++			// Refresh attribution while requests overlap or change behind a
++			// coalesced ON event. Never reopen an unchanged, dismissed popup.
+ 		}
+ 		wasActive, isActive, changed := state.update(value)
+-		if isActive && changed {
++		if isActive {
++			previousSummary, previousBody := notification.Summary, notification.Body
+ 			notification.Summary, notification.Body, err = templates.render(state.reasons())
+ 			if err != nil {
+ 				log.Error("Cannot render desktop notification: ", err)
+ 				continue
+ 			}
++			if !changed && previousSummary == notification.Summary && previousBody == notification.Body {
++				continue
++			}
+ 			if err := showNotification(conn, &reference, &notification); err != nil {
+ 				log.Error("Cannot show notification (will reconnect to DBUS): ", err)
+ 				newConn, newSignals, err := reconnectDBus(conn, &reference)

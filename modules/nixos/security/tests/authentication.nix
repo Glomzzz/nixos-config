@@ -10,6 +10,7 @@
     hostname = config.networking.hostName;
     pcscPolicy = config.security.polkit.extraConfig;
     pcscUser = config.home-manager.users.glom.home.username;
+    tmpfiles = config.systemd.tmpfiles.rules;
   });
 in
   pkgs.runCommand "authentication-check"
