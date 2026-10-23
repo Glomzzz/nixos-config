@@ -33,6 +33,16 @@
     mode = "0444";
   };
 
+  # pam-u2f opens/closes these empty markers during authentication. The user
+  # notifier watches the events to name sudo/swaylock without inspecting root
+  # processes. Markers are advisory only and never affect authentication.
+  systemd.tmpfiles.rules =
+    [
+      "d /run/yubikey-touch 0755 root root -"
+      "d /run/yubikey-touch/${username} 0755 root root -"
+    ]
+    ++ map (service: "f /run/yubikey-touch/${username}/${service} 0444 root root -") ["sudo" "swaylock"];
+
   security.pam = {
     u2f = {
       # Opt in below, never add a key dependency to login/SSH/recovery shells.
@@ -53,6 +63,7 @@
         enable = true;
         control = "sufficient";
       };
+      rules.auth.u2f.settings.authpending_file = "/run/yubikey-touch/${username}/${service}";
       # NixOS normally orders U2F before Howdy. Preserve face-first behavior,
       # then try touch, then pam_unix. These methods are sequential, not parallel.
       rules.auth.u2f.order = config.security.pam.services.${service}.rules.auth.howdy.order + 10;

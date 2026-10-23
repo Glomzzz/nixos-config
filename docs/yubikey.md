@@ -36,6 +36,55 @@ No key generation, reset, PIN change, or transfer is performed by Nix activation
   `jj sign -r REV` can sign an explicitly selected revision manually. Signing
   changes commit hashes; review the outgoing stack before pushing.
 
+### Touch notifications
+
+The graphical session runs `yubikey-touch-detector` with requester attribution.
+A critical, transient notification says **`WHO requires a yubikey touch`** and is
+closed when the request ends (touch, cancellation, timeout, or device removal).
+It covers OpenPGP signing/decryption, SSH through gpg-agent, FIDO/U2F/WebAuthn
+(including browsers and PAM), and HMAC challenge-response. It does not change
+card touch policies, PIN handling, authentication order, or password fallback.
+
+- OpenPGP and SSH use the agent socket's kernel peer credentials. For a GPG child,
+  the immediate parent is named where useful (e.g. `git` or `jj`); an interactive
+  shell is not mistaken for the requester.
+- FIDO uses actual presence-needed HID reports. Writable device descriptors give
+  a **best-effort application name**, e.g. `firefox`. The website/RP name is not
+  exposed by those reports. Multiple openers, inaccessible process metadata, or
+  simultaneous requests fall back to **`FIDO/WebAuthn`**, not a guessed app.
+- PAM opens/closes empty, root-owned `/run/yubikey-touch/glom/{sudo,swaylock}`
+  markers to supply service names without granting the notifier root privileges.
+  Markers alone never trigger a notification; a FIDO touch-wait event is required.
+- Unattributable OpenPGP/SSH requests use **`OpenPGP/SSH`**; HMAC uses
+  **`HMAC challenge-response`**. OpenPGP/SSH touch detection is a pending-operation
+  heuristic, not a hardware guarantee; short/cached operations are filtered and
+  reported pinentry waits are excluded.
+
+These labels are informational, **not trusted proof of the requesting app**.
+Only touch for an operation you initiated. No PINs, command-line arguments,
+OpenPGP payloads, or browser URLs are collected by the attribution code.
+Notifications may be hidden while the screen is locked; this does not bypass
+swaylock or put authentication information above its secure surface.
+
+After rebuilding, log out/in (or restart the user service once the graphical
+session is active), then test a signed commit, SSH, a browser security-key login,
+and `sudo -k; sudo true`. Cover the camera so sudo reaches U2F. Verify the title,
+then touch/cancel and check that the popup disappears. An unplugged key must not
+leave a pending notification or prevent password fallback.
+
+```sh
+systemctl --user status yubikey-touch-detector.service
+journalctl --user -u yubikey-touch-detector.service -b
+nix build --no-link .#checks.x86_64-linux.yubikey-touch .#checks.x86_64-linux.authentication
+```
+
+Stop/restart the detector gracefully: it proxies the local GPG and SSH agent
+sockets and restores them on termination. Do not run a second copy alongside the
+user service or kill it with `SIGKILL`. The tests use a private D-Bus session,
+private sockets, and fake process metadata. They verify requester labels,
+notification creation/replacement/closure, and critical/transient hints without
+prompting for touches or altering the live agent.
+
 Public FIDO enrollment records and OpenPGP public certificates may live in this
 repository/Nix store. **Never add private keys, secret-key exports, revocation
 certificates, plaintext PINs, or passphrases.** The optional encrypted user PIN

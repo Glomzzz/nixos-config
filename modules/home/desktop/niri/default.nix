@@ -8,5 +8,6 @@ _: {
     ./settings.nix
     ./wallpaper.nix
     ./waybar.nix
+    ./yubikey-touch.nix
   ];
 }
