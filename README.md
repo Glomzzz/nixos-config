@@ -55,10 +55,11 @@ and can restart system services.
 
 ## Secrets
 
-Secrets are encrypted with SOPS and stored under `secrets/hosts/`. Human access
-uses the YubiKey-backed OpenPGP identity; the host's SSH host key provides
-unattended age decryption. Either recipient can decrypt host secrets: this is
-not a requirement to possess both keys. See [secret management](docs/secrets.md).
+Machine secrets in `secrets/hosts/` use SOPS with OpenPGP operator access and
+unattended host-age decryption. User credentials in `secrets/users/` use only
+the YubiKey-backed OpenPGP identity; `user-credentials` explicitly unlocks them
+for a command or SMB connection. No API tokens are automatically exported into
+shells. See [secret management](docs/secrets.md) for commands and migration limits.
 Never add plaintext API keys, passwords, private keys, or PINs to Nix files.
 
 ## Recovery generations
