@@ -6,6 +6,7 @@
   imports = [
     inputs.sops-nix.nixosModules.sops
     ./tailscale.nix
+    ./yubikey-pin.nix
   ];
 
   sops = {
