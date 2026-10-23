@@ -1,12 +1,6 @@
-{
-  lib,
-  username,
-  ...
-}: {
-  nix.settings.trusted-users = lib.mkForce [
-    "root"
-    username
-  ];
+{lib, ...}: {
+  # Keep the normal account out of the root-equivalent trusted-user set.
+  nix.settings.trusted-users = lib.mkForce ["root"];
 
   # Follow the current system instead of keeping a copied Bash binary whose
   # store-backed loader and libraries can be removed by garbage collection.
