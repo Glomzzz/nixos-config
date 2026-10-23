@@ -4,6 +4,7 @@
 in {
   imports = [
     ./foot.nix
+    ./kitty.nix
     ./fish.nix
     ./ssh.nix
     ./starship.nix
@@ -13,7 +14,7 @@ in {
     sessionVariables = {
       LESSHISTFILE = cache + "/less/history";
       LESSKEY = c + "/less/lesskey";
-      TERMINAL = "foot";
+      TERMINAL = "kitty";
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
     };
 

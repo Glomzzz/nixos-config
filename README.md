@@ -95,6 +95,13 @@ directory, preserving the path relative to your home. Rebuilds never prune these
 backups or old `*.hm-backup` files. Review and restore or remove them manually.
 Files declared with `force = true` bypass Home Manager's collision backups.
 
+## Terminal Emacs
+
+Kitty is the default terminal, with explicit Latin/CJK/emoji/icon fonts and
+Emacs-friendly keyboard shortcuts. Foot remains available as a fallback.
+See [terminal Emacs](docs/terminal-emacs.md) for mouse/clipboard integration,
+optional image/PDF support, reserved terminal shortcuts, and GUI limitations.
+
 ## Waybar
 
 `modules/home/desktop/niri/waybar.nix` is a small entrypoint. Its sibling

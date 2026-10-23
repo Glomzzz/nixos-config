@@ -18,7 +18,7 @@
         (old.patches or [])
         ++ [../../../../patches/xwayland-satellite-popup-parent-offset.patch];
     });
-  terminal = "${pkgs.foot}/bin/foot";
+  terminal = "${config.programs.kitty.package}/bin/kitty";
   launcher = "${pkgs.fuzzel}/bin/fuzzel";
   emc = "${config.home.homeDirectory}/.local/bin/emc";
   noSpawnEditor = "${pkgs.coreutils}/bin/false";
@@ -461,7 +461,7 @@ in {
       # `nmtui` rather than `impala`: impala is an iwd frontend and this host
       # runs NetworkManager with the wpa_supplicant backend (see
       # modules/nixos/core/networking.nix), so impala had no iwd D-Bus service to
-      # talk to and crashed on launch. The app-id is the `foot -a` value in
+      # talk to and crashed on launch. The app-id is the `kitty --class` value in
       # waybar.nix, not the binary name, so these two must stay in sync.
       {
         matches = [
