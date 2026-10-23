@@ -9,6 +9,7 @@
       # responsiveness; give them native codegen.
       NIX_CFLAGS_COMPILE = "-O2 -march=native";
     });
-    # Lisp packages are managed by Emacs config.
+    # Lisp packages are managed by Emacs config, except mu4e (see ../mail),
+    # which must be supplied by Nix to match the mu executable.
   };
 }
