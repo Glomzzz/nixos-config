@@ -316,6 +316,11 @@
           inherit (self.nixosConfigurations.nixos) config;
         };
 
+        mail = import ./modules/home/programs/mail/tests.nix {
+          inherit pkgs;
+          inherit (self.nixosConfigurations.nixos) config;
+        };
+
         authentication = import ./modules/nixos/security/tests/authentication.nix {
           inherit pkgs;
           inherit (self.nixosConfigurations.nixos) config;
