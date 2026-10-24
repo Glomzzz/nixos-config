@@ -142,6 +142,12 @@ use text-input-v3 rather than the Fcitx GTK plugin, whose client-side popup can
 flicker when repositioning. `GTK_IM_MODULE` is intentionally unset; GTK config
 files retain Fcitx for X11/GTK2 apps. Qt5 keeps `QT_IM_MODULE=fcitx`.
 
+The Catppuccin candidate theme uses generated PNG backgrounds with solid padding
+inside the border, avoiding procedural-background artifacts in bundled Qt clients
+such as WeChat. WeChat stays native Wayland; no application-wide rendering or IM
+backend override is needed. After deploying a theme change, restart WeChat if its
+client-side candidate window still shows the old background.
+
 **Right Shift** is the only Chinese/English toggle. Ctrl+Space, preedit toggling,
 input-method group cycling, clipboard, quick phrase, Unicode entry, and keyboard
 hint shortcuts are unbound so they cannot intercept Emacs commands. In particular,
