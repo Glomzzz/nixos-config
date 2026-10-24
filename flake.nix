@@ -282,6 +282,10 @@
             );
             addons = map pkgs.lib.getName home.i18n.inputMethod.fcitx5.addons;
             dataFiles = builtins.attrNames home.xdg.dataFile;
+            themeConfig = toString home.xdg.dataFile."fcitx5/themes/catppuccin-mocha/theme.conf".source;
+            themeBackgrounds = map (
+              name: toString home.xdg.dataFile."fcitx5/themes/catppuccin-mocha/${name}.png".source
+            ) ["input-panel" "menu"];
             hasRimeDeployment = home.home.activation ? deployRimeConfig;
           });
         in
@@ -293,8 +297,13 @@
               pkgs.pkg-config
               pkgs.fcitx5
             ];
+            buildInputs = [pkgs.qt6Packages.qtbase];
+            dontWrapQtApps = true;
           }
           ''
+            c++ -std=c++17 $(pkg-config --cflags Qt6Gui) \
+              ${./modules/home/desktop/tests/fcitx-theme.cpp} \
+              -o fcitx-theme-check $(pkg-config --libs Qt6Gui)
             c++ -std=c++20 $(pkg-config --cflags Fcitx5Config) \
               ${./modules/home/desktop/tests/fcitx-hotkeys.cpp} \
               -o fcitx-hotkeys-check $(pkg-config --libs Fcitx5Config)
@@ -309,6 +318,10 @@
 
             with open(sys.argv[1]) as source:
                 settings = json.load(source)
+            subprocess.run(
+                ["./fcitx-theme-check", settings["themeConfig"], *settings["themeBackgrounds"]],
+                check=True,
+            )
             env = settings["sessionVariables"]
             assert "GTK_IM_MODULE" not in env, "GTK Wayland apps must use text-input-v3"
             assert env["QT_IM_MODULE"] == "fcitx", "Qt5 still needs the Fcitx plugin"

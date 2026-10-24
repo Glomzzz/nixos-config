@@ -2,7 +2,21 @@
   lib,
   pkgs,
   ...
-}: {
+}: let
+  # Explicit PNGs avoid procedural-background rendering differences in bundled
+  # Qt clients such as WeChat. Keep one solid pixel inside the two-pixel border
+  # before the stretchable center starts (Background/Margin=3 below).
+  themeBackgrounds =
+    pkgs.runCommand "fcitx5-catppuccin-backgrounds" {
+      nativeBuildInputs = [pkgs.imagemagick];
+    } ''
+      mkdir -p "$out"
+      magick -size 32x32 xc:'#1e1e2e' -bordercolor '#89b4fa' -border 2 \
+        -strip PNG32:"$out/input-panel.png"
+      magick -size 32x32 xc:'#1e1e2e' -bordercolor '#45475a' -border 2 \
+        -strip PNG32:"$out/menu.png"
+    '';
+in {
   i18n.inputMethod = {
     enable = true;
     type = "fcitx5";
@@ -69,11 +83,9 @@
         '';
       };
 
-      # The candidate window is drawn by the classicui addon, and its default
-      # theme is the light "default" one - that is the whole reason the IME
-      # popup was the only light surface left in a dark session. Verified
-      # against the running daemon: `GetConfig fcitx://config/addon/classicui`
-      # reported Theme=default, UseDarkTheme=False.
+      # Classic UI and Qt's client-side candidate windows share this theme.
+      # The bundled default is light even in a dark session; pin the palette
+      # explicitly rather than relying on a client or portal's dark preference.
       #
       # Theme is pinned to the Catppuccin Mocha theme written below rather than
       # to the bundled "default-dark", because default-dark is pure #000000 with
@@ -303,15 +315,16 @@
           Bottom=3
 
           [InputPanel/Background]
+          Image=input-panel.png
           Color=#1e1e2e
           BorderColor=#89b4fa
           BorderWidth=2
 
           [InputPanel/Background/Margin]
-          Left=2
-          Right=2
-          Top=2
-          Bottom=2
+          Left=3
+          Right=3
+          Top=3
+          Bottom=3
 
           [InputPanel/Highlight]
           Color=#89b4fa
@@ -345,15 +358,16 @@
           HighlightCandidateColor=#1e1e2e
 
           [Menu/Background]
+          Image=menu.png
           Color=#1e1e2e
           BorderColor=#45475a
           BorderWidth=2
 
           [Menu/Background/Margin]
-          Left=2
-          Right=2
-          Top=2
-          Bottom=2
+          Left=3
+          Right=3
+          Top=3
+          Bottom=3
 
           [Menu/ContentMargin]
           Left=3
@@ -386,6 +400,9 @@
           Bottom=5
         '';
       };
+
+      "fcitx5/themes/catppuccin-mocha/input-panel.png".source = "${themeBackgrounds}/input-panel.png";
+      "fcitx5/themes/catppuccin-mocha/menu.png".source = "${themeBackgrounds}/menu.png";
 
       # theme.conf resolves Image= relative to its own directory, so the four
       # sprites it names have to exist alongside it. They are reused verbatim
