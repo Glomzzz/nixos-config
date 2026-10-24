@@ -37,6 +37,13 @@ To make Shuangpin the permanent default, change `DefaultIM=phono` to
 changes will be replaced on activation. Shuangpin defaults to Xiaohe; choose
 another scheme in Phono's settings if needed.
 
+In Chinese punctuation mode, `.` produces the fullwidth full stop `．` (U+FF0E)
+instead of `。` (U+3002). Home Manager manages
+`~/.local/share/fcitx5/punctuation/punc.mb.zh_CN`, preserving all other upstream
+punctuation mappings. This table is shared by Phono Pinyin and Shuangpin;
+English-mode punctuation is unchanged. After deploying, restart
+`fcitx5-daemon` to reload the table.
+
 The former Rime schemas, spelling/punctuation overrides, and deployment hook
 have been removed. Existing Rime user dictionaries and generated files under
 `~/.local/share/fcitx5/rime/` are left on disk, but Phono does not use them.
@@ -82,7 +89,8 @@ nix build --no-link .#checks.x86_64-linux.fcitx5
 The configuration check verifies the profile, both Phono input-method entries,
 loads the installed Phono/punctuation/fullwidth shared libraries from the final
 Fcitx bundle, checks that Rime and its deployment/configuration are absent, and
-checks that the managed addon hotkeys remain empty. Offline
+checks that the managed addon hotkeys remain empty and that only the Chinese
+full-stop mapping differs from upstream. Offline
 checks do not exercise model inference or a live Wayland application; test
 those interactively after downloading a model and deploying.
 
