@@ -272,6 +272,16 @@ in {
     };
 
     dataFile = {
+      # User punctuation profiles replace the whole table, so preserve upstream
+      # mappings and change only the Chinese full stop to U+FF0E.
+      "fcitx5/punctuation/punc.mb.zh_CN" = {
+        force = true;
+        source = pkgs.runCommand "fcitx5-punctuation-zh_CN" {} ''
+          substitute ${pkgs.qt6Packages.fcitx5-chinese-addons}/share/fcitx5/punctuation/punc.mb.zh_CN "$out" \
+            --replace-fail '. 。' '. ．'
+        '';
+      };
+
       # Catppuccin Mocha theme for the candidate window, selected by
       # conf/classicui.conf above.
       #

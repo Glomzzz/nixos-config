@@ -292,6 +292,7 @@
             );
             addons = map pkgs.lib.getName home.i18n.inputMethod.fcitx5.addons;
             dataFiles = builtins.attrNames home.xdg.dataFile;
+            punctuationProfile = toString home.xdg.dataFile."fcitx5/punctuation/punc.mb.zh_CN".source;
             themeConfig = toString home.xdg.dataFile."fcitx5/themes/catppuccin-mocha/theme.conf".source;
             themeBackgrounds = map (
               name: toString home.xdg.dataFile."fcitx5/themes/catppuccin-mocha/${name}.png".source
@@ -374,6 +375,12 @@
                 entry.read(package / f"share/fcitx5/inputmethod/{name}.conf")
                 assert entry["InputMethod"]["Addon"] == "phono", name
 
+            punctuation = Path(settings["punctuationProfile"]).read_text()
+            default_punctuation = (package / "share/fcitx5/punctuation/punc.mb.zh_CN").read_text()
+            assert default_punctuation.splitlines().count(". 。") == 1
+            assert punctuation == default_punctuation.replace(". 。", ". ．")
+            assert punctuation.splitlines().count(". ．") == 1
+
             hotkeys = configparser.ConfigParser()
             hotkeys.optionxform = str
             hotkeys.read_string(settings["globalConfig"])
@@ -417,7 +424,7 @@
                             ["./fcitx-hotkeys-check", str(addon_config), key], check=True,
                         )
 
-            print("Fcitx startup, Phono-only runtime/profile, Wayland/GTK input, and Emacs-safe hotkeys passed")
+            print("Fcitx startup, Phono-only runtime/profile, fullwidth full stop, Wayland/GTK input, and Emacs-safe hotkeys passed")
             PY
             touch "$out"
           '';
