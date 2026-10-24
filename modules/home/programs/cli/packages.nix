@@ -5,6 +5,7 @@
   ...
 }: let
   nix-alien = inputs.nix-alien-source.packages.${system}.nix-alien;
+  sevenZip = import ./7zip.nix {inherit pkgs;};
 in {
   home.packages = with pkgs; [
     age
@@ -12,7 +13,7 @@ in {
     fastfetch
     zip
     unzip
-    p7zip
+    sevenZip
     ripgrep
     fd
     mandible
