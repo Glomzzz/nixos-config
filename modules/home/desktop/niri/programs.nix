@@ -163,8 +163,8 @@ in {
     # drags too; ripdrag remains useful for less cooperative XWayland targets.
     ripdrag
 
-    # Audio control panel replacing the Plasma mixer applet.
-    wiremix
+    # Native PipeWire GUI replacing the terminal mixer.
+    pwvucontrol
     # gnome-keyring front end (replaces kwalletmanager). Needed to change the
     # login keyring's own password, which is stored inside the keyring file and
     # so cannot be set declaratively. See docs/authentication.md.

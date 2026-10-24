@@ -462,7 +462,7 @@ in {
         matches = [
           {title = "^Picture-in-Picture$";}
           {app-id = "^(blueman-manager|blueman-adapters|org\\.blueman\\.(Manager|Adapters))$";}
-          {app-id = "^wiremix$";}
+          {app-id = "^(pwvucontrol|com\\.saivert\\.pwvucontrol)$";}
           {app-id = "^(nm-connection-editor|org\\.gnome\\.nm_connection_editor)$";}
         ];
         open-floating = true;

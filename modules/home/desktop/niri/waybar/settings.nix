@@ -115,7 +115,7 @@ in {
     format = "{icon} {volume}%";
     format-muted = "󰝟";
     format-icons.default = ["󰕿" "󰖀" "󰕾"];
-    on-click = "${config.programs.kitty.package}/bin/kitty --class wiremix ${pkgs.wiremix}/bin/wiremix";
+    on-click = lib.getExe pkgs.pwvucontrol;
   };
 
   backlight = {
