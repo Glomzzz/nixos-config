@@ -191,7 +191,7 @@ in {
       path = "${xwaylandSatellite}/bin/xwayland-satellite";
     };
 
-    # Fcitx is started by Home Manager's fcitx5-daemon.service with the Rime
+    # Fcitx is started by Home Manager's fcitx5-daemon.service with the Phono
     # addons. A second spawn-at-startup daemon would race it for the D-Bus
     # name and Wayland input-method seat. Wallpaper, clipboard, notifications
     # and idle locking also run as graphical-session user services.
