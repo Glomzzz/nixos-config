@@ -28,4 +28,16 @@ nix build --no-link .#checks.x86_64-linux.waybar
 - NetworkManager and saved connections are unchanged; the old nmtui launcher,
   palette, and terminal window rule have been removed.
 
+## Bluetooth controls
+
+- Click the Bluetooth indicator to open Blueman's device manager for discovery,
+  pairing, connecting/disconnecting, and device settings. Its window floats in Niri.
+- The existing Waybar connection count, device list, and battery tooltip are kept.
+- `../bluetooth.nix` owns Blueman's session applet and pairing agent. Its tray
+  icon and dependent connection-display plugin are disabled to avoid a second
+  Bluetooth indicator; the package's XDG autostart entry is masked so only the
+  session service starts the applet.
+- NixOS enables `services.blueman` for its system D-Bus/polkit integration.
+  Overskride is removed; BlueZ and existing pairings are unchanged.
+
 Runtime layout and hardware behavior still require a desktop session to validate.

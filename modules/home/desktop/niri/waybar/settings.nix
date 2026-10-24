@@ -14,6 +14,7 @@
     "clipboard-history";
   swayncClient = lib.getExe' config.services.swaync.package "swaync-client";
   networkEditor = lib.getExe' config.services.network-manager-applet.package "nm-connection-editor";
+  bluetoothManager = lib.getExe' config.services.blueman-applet.package "blueman-manager";
   inherit (helpers) powerMenu setProfile idleInhibit weatherScript netspeed;
 in {
   layer = "top";
@@ -23,9 +24,8 @@ in {
 
   modules-left = ["custom/launcher" "niri/workspaces" "niri/window"];
   modules-center = ["clock" "custom/weather"];
-  # it in both places instantiates the module TWICE - two icons, two D-Bus
-  # watchers, and the shared #bluetooth CSS applying to both - so the drawer
-  # membership is the single home for it.
+  # Keep Bluetooth here, not also in the tray drawer: duplicate membership
+  # would instantiate two indicators and two D-Bus watchers.
   modules-right = [
     "group/tray-drawer"
     "group/sensors"
@@ -281,7 +281,7 @@ in {
     # every row, battery or not.
     tooltip-format-enumerate-connected = "{device_alias:<16.16}        {device_address}";
     tooltip-format-enumerate-connected-battery = "{device_alias:<16.16}  {device_battery_percentage:>3}%  {device_address}";
-    on-click = "${pkgs.overskride}/bin/overskride";
+    on-click = bluetoothManager;
   };
 
   mpris = {

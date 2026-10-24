@@ -461,7 +461,7 @@ in {
       {
         matches = [
           {title = "^Picture-in-Picture$";}
-          {app-id = "^overskride$";}
+          {app-id = "^(blueman-manager|blueman-adapters|org\\.blueman\\.(Manager|Adapters))$";}
           {app-id = "^wiremix$";}
           {app-id = "^(nm-connection-editor|org\\.gnome\\.nm_connection_editor)$";}
         ];

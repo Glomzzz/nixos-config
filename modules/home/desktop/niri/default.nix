@@ -1,5 +1,6 @@
 _: {
   imports = [
+    ./bluetooth.nix
     ./clipboard.nix
     ./fuzzel.nix
     ./lock.nix
