@@ -23,6 +23,10 @@
     package = pkgs.niri;
   };
 
+  # Register Blueman's system D-Bus service and privileged mechanism. Home
+  # Manager owns its session applet; Waybar opens the device manager.
+  services.blueman.enable = true;
+
   # X11 applications (Steam, Discord, JetBrains) talk to niri through
   # xwayland-satellite. niri spawns it on demand when it is on PATH.
   environment.systemPackages = [

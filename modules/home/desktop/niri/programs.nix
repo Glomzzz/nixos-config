@@ -163,9 +163,8 @@ in {
     # drags too; ripdrag remains useful for less cooperative XWayland targets.
     ripdrag
 
-    # GUI/TUI control panels that replace the Plasma applets.
-    overskride # Bluetooth
-    wiremix # audio mixer
+    # Audio control panel replacing the Plasma mixer applet.
+    wiremix
     # gnome-keyring front end (replaces kwalletmanager). Needed to change the
     # login keyring's own password, which is stored inside the keyring file and
     # so cannot be set declaratively. See docs/authentication.md.

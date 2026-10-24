@@ -53,6 +53,21 @@ class WaybarTests(unittest.TestCase):
         self.assertIn("custom/network", settings["group/sensors"]["modules"])
         self.assertEqual(settings["group/tray-drawer"]["modules"].count("tray"), 1)
 
+    def test_bluetooth_opens_blueman_without_losing_status(self):
+        if SETTINGS is None:
+            self.skipTest("Pass evaluated Waybar settings JSON to check Bluetooth controls")
+        settings = json.loads(SETTINGS.read_text())["main"]
+        bluetooth = settings["bluetooth"]
+        manager = Path(bluetooth["on-click"])
+        self.assertTrue(manager.is_absolute())
+        self.assertEqual(manager.name, "blueman-manager")
+        self.assertTrue(os.access(manager, os.X_OK))
+        self.assertEqual(settings["modules-right"].count("bluetooth"), 1)
+        self.assertNotIn("bluetooth", settings["group/tray-drawer"]["modules"])
+        self.assertIn("{num_connections}", bluetooth["format-connected"])
+        self.assertIn("{device_enumerate}", bluetooth["tooltip-format-connected"])
+        self.assertIn("device_battery_percentage", bluetooth["tooltip-format-enumerate-connected-battery"])
+
     def test_workspace_style_precedence(self):
         css = (ROOT / "style.css").read_text()
         self.assertLess(
