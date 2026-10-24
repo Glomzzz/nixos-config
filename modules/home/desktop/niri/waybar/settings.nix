@@ -13,7 +13,8 @@
       config.home.packages)
     "clipboard-history";
   swayncClient = lib.getExe' config.services.swaync.package "swaync-client";
-  inherit (helpers) powerMenu setProfile idleInhibit weatherScript nmtui netspeed;
+  networkEditor = lib.getExe' config.services.network-manager-applet.package "nm-connection-editor";
+  inherit (helpers) powerMenu setProfile idleInhibit weatherScript netspeed;
 in {
   layer = "top";
   position = "top";
@@ -187,12 +188,8 @@ in {
     tooltip-format = "CPU package: {temperatureC}°C ({temperatureF}°F)";
   };
 
-  # nmtui, not impala: impala is an iwd frontend, and this host runs
-  # NetworkManager over wpa_supplicant (modules/nixos/core/networking.nix)
-  # with no iwd service and no net.connman.iwd on the bus at all, so impala
-  # panicked on startup ("reader source not set" / "No such device or
-  # address") every time it was clicked. nmtui talks to the daemon this
-  # machine actually runs.
+  # Keep the speed/connection readout; its click opens the GTK profile editor.
+  # Wi-Fi selection and password prompts live in nm-applet's tray menu.
   "custom/network" = {
     exec = "${netspeed}/bin/waybar-netspeed";
     return-type = "json";
@@ -206,7 +203,7 @@ in {
     # makes the value safe once it is inside that JSON. Same reason
     # custom/weather sets it.
     escape = true;
-    on-click = "${config.programs.kitty.package}/bin/kitty --class nmtui ${nmtui}/bin/nmtui-themed";
+    on-click = networkEditor;
   };
 
   "group/tray-drawer" = {

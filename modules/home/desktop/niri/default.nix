@@ -3,6 +3,7 @@ _: {
     ./clipboard.nix
     ./fuzzel.nix
     ./lock.nix
+    ./network.nix
     ./notifications.nix
     ./programs.nix
     ./settings.nix

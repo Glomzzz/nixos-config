@@ -4,10 +4,9 @@
 - `settings.nix`: module layout, behavior, and actions, with Nix-resolved paths.
 - `style.css`: GTK3 stylesheet; selector order is preserved from the original.
 - `power-menu.xml`: GtkBuilder session/profile popup.
-- `nmtui-colors`: newt/S-Lang palette for the bar's nmtui wrapper only.
 - `helpers.nix`: packages shell helpers with explicit runtime dependencies.
-- `scripts/*.sh`: profile switching, idle inhibition, weather, nmtui, and network
-  speed/connection information. `@nmtuiColors@` is substituted at build time.
+- `scripts/*.sh`: profile switching, idle inhibition, weather, and network
+  speed/connection information.
 - `tests.py`: offline JSON, failure-path, padding, XML/action, and CSS-order tests.
 
 No JavaScript runtime is needed: Waybar consumes JSON settings, GTK CSS, XML menus,
@@ -19,6 +18,14 @@ Run the tests and build/shellcheck every helper:
 nix build --no-link .#checks.x86_64-linux.waybar
 ```
 
-The refactor preserves the rendered stylesheet and module settings; store paths
-change when scripts become separate packaged files. Runtime layout and hardware
-behavior still require a fresh desktop session to validate.
+## Network controls
+
+- Click the network-speed readout to open the GTK NetworkManager connection editor.
+- Use nm-applet's network icon in the system tray for available Wi-Fi networks,
+  connecting/disconnecting, VPN controls, and Wi-Fi password prompts.
+- `../network.nix` owns the session service and enables the StatusNotifierItem
+  protocol (`nm-applet --indicator`) required by Waybar's native Wayland tray.
+- NetworkManager and saved connections are unchanged; the old nmtui launcher,
+  palette, and terminal window rule have been removed.
+
+Runtime layout and hardware behavior still require a desktop session to validate.

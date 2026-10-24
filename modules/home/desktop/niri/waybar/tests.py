@@ -40,6 +40,19 @@ class WaybarTests(unittest.TestCase):
         settings = json.loads(SETTINGS.read_text())
         self.assertEqual(actions, set(settings["main"]["battery"]["menu-actions"]))
 
+    def test_network_opens_graphical_connection_editor(self):
+        if SETTINGS is None:
+            self.skipTest("Pass evaluated Waybar settings JSON to check network controls")
+        settings = json.loads(SETTINGS.read_text())["main"]
+        network = settings["custom/network"]
+        editor = Path(network["on-click"])
+        self.assertTrue(editor.is_absolute())
+        self.assertEqual(editor.name, "nm-connection-editor")
+        self.assertTrue(os.access(editor, os.X_OK))
+        self.assertTrue(network["escape"])
+        self.assertIn("custom/network", settings["group/sensors"]["modules"])
+        self.assertEqual(settings["group/tray-drawer"]["modules"].count("tray"), 1)
+
     def test_workspace_style_precedence(self):
         css = (ROOT / "style.css").read_text()
         self.assertLess(

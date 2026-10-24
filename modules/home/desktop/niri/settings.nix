@@ -455,21 +455,15 @@ in {
         block-out-from = "screencast";
       }
 
-      # Picture-in-picture, the Bluetooth GUI and the TUI control panels are
-      # launched as one-off windows (see waybar.nix, which starts wiremix and
-      # nmtui under these app-ids), so tiling them just displaces real work.
-      #
-      # `nmtui` rather than `impala`: impala is an iwd frontend and this host
-      # runs NetworkManager with the wpa_supplicant backend (see
-      # modules/nixos/core/networking.nix), so impala had no iwd D-Bus service to
-      # talk to and crashed on launch. The app-id is the `kitty --class` value in
-      # waybar.nix, not the binary name, so these two must stay in sync.
+      # Float one-off control panels instead of displacing tiled work.
+      # The network editor uses its GtkApplication ID on native Wayland;
+      # also match its legacy X11 class for XWayland launches.
       {
         matches = [
           {title = "^Picture-in-Picture$";}
           {app-id = "^overskride$";}
           {app-id = "^wiremix$";}
-          {app-id = "^nmtui$";}
+          {app-id = "^(nm-connection-editor|org\\.gnome\\.nm_connection_editor)$";}
         ];
         open-floating = true;
       }
