@@ -187,6 +187,11 @@
             touch "$out"
           '';
 
+        seven-zip = import ./modules/home/programs/cli/tests/7zip.nix {
+          inherit pkgs;
+          home = self.nixosConfigurations.nixos.config.home-manager.users.glom;
+        };
+
         emacs-terminal = import ./modules/home/shell/tests/emacs-terminal.nix {
           inherit pkgs;
           home = self.nixosConfigurations.nixos.config.home-manager.users.glom;
