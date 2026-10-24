@@ -25,16 +25,6 @@
     text = builtins.readFile ./scripts/weather.sh;
   };
 
-  # NEWT_COLORS_FILE themes only the nmtui launched from Waybar; the bar's
-  # systemd service does not inherit arbitrary home.sessionVariables.
-  nmtui = pkgs.writeShellApplication {
-    name = "nmtui-themed";
-    runtimeInputs = [pkgs.networkmanager];
-    text =
-      pkgs.lib.replaceStrings ["@nmtuiColors@"] ["${./nmtui-colors}"]
-      (builtins.readFile ./scripts/nmtui.sh);
-  };
-
   netspeed = pkgs.writeShellApplication {
     name = "waybar-netspeed";
     runtimeInputs = [pkgs.coreutils pkgs.gawk pkgs.jq pkgs.networkmanager];
