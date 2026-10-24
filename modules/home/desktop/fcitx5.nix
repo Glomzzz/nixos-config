@@ -11,8 +11,9 @@
       # Home Manager owns startup; do not also spawn a daemon from niri.
       systemd.enable = true;
       addons = with pkgs; [
-        rime-data
-        fcitx5-rime
+        phono-fcitx5-addon
+        # Phono uses the native punctuation and fullwidth modules.
+        qt6Packages.fcitx5-chinese-addons
         fcitx5-gtk
         qt6Packages.fcitx5-configtool
         # Qt IM modules, needed so Qt apps get a working preedit. Spelled via
@@ -47,7 +48,7 @@
           # Layout
           Default Layout=us
           # Default Input Method
-          DefaultIM=rime
+          DefaultIM=phono
 
           [Groups/0/Items/0]
           # Name
@@ -56,9 +57,11 @@
           Layout=
 
           [Groups/0/Items/1]
-          # Name
-          Name=rime
-          # Layout
+          Name=phono
+          Layout=
+
+          [Groups/0/Items/2]
+          Name=phono-shuangpin
           Layout=
 
           [GroupOrder]
@@ -155,6 +158,21 @@
         text = ''
           TriggerKey=
           DirectUnicodeMode=
+        '';
+      };
+
+      # Phono's native modules must not introduce Ctrl+. or width toggles.
+      "fcitx5/conf/punctuation.conf" = {
+        force = true;
+        text = ''
+          Hotkey=
+        '';
+      };
+
+      "fcitx5/conf/fullwidth.conf" = {
+        force = true;
+        text = ''
+          Hotkey=
         '';
       };
 
@@ -377,125 +395,6 @@
       "fcitx5/themes/catppuccin-mocha/next.png".source = "${pkgs.fcitx5}/share/fcitx5/themes/default-dark/next.png";
       "fcitx5/themes/catppuccin-mocha/radio.png".source = "${pkgs.fcitx5}/share/fcitx5/themes/default-dark/radio.png";
       "fcitx5/themes/catppuccin-mocha/arrow.png".source = "${pkgs.fcitx5}/share/fcitx5/themes/default-dark/arrow.png";
-
-      "fcitx5/rime/default.custom.yaml" = {
-        force = true;
-        text = ''
-          patch:
-            schema_list:
-              - schema: pin
-
-            menu/page_size: 7
-            switcher/caption: 〔拼〕
-
-            ascii_composer/good_old_caps_lock: true
-            # Fcitx owns switching; Rime must not add a second ASCII toggle.
-            ascii_composer/switch_key/Caps_Lock: noop
-            ascii_composer/switch_key/Eisu_toggle: noop
-            ascii_composer/switch_key/Shift_L: noop
-            ascii_composer/switch_key/Shift_R: noop
-            ascii_composer/switch_key/Control_L: noop
-            ascii_composer/switch_key/Control_R: noop
-
-            switcher/hotkeys: []
-
-            # Disable backtick reverse lookup — output ` directly
-            "recognizer/patterns/reverse_lookup": "^$"
-
-            # Map < > to Chinese guillemets 《》
-            "punctuator/half_shape/<": {commit: "《"}
-            "punctuator/half_shape/>": {commit: "》"}
-            "punctuator/full_shape/<": {commit: "《"}
-            "punctuator/full_shape/>": {commit: "》"}
-
-            key_binder/bindings:
-              - {accept: minus, send: Page_Up, when: has_menu}
-              - {accept: equal, send: Page_Down, when: has_menu}
-              - {accept: comma, send: Page_Up, when: paging}
-              - {accept: period, send: Page_Down, when: has_menu}
-              - {accept: Tab, send: Shift+Right, when: composing}
-              - {accept: Shift+Tab, send: Shift+Left, when: composing}
-        '';
-      };
-
-      "fcitx5/rime/luna_pinyin_simp.custom.yaml" = {
-        force = true;
-        text = ''
-          patch:
-            switches:
-              - name: ascii_mode
-                reset: 0
-                states: [中文, 西文]
-              - name: full_shape
-                reset: 0
-                states: [半角, 全角]
-              - name: zh_simp
-                reset: 1
-                states: [简体, 简体]
-              - name: ascii_punct
-                reset: 0
-                states: [。，, ．，]
-
-            key_binder/bindings:
-              - {accept: minus, send: Page_Up, when: has_menu}
-              - {accept: equal, send: Page_Down, when: has_menu}
-              - {accept: comma, send: Page_Up, when: paging}
-              - {accept: period, send: Page_Down, when: has_menu}
-              - {accept: Tab, send: Shift+Right, when: composing}
-              - {accept: Shift+Tab, send: Shift+Left, when: composing}
-
-            translator/enable_sentence: true
-            translator/enable_user_dict: true
-            translator/enable_completion: true
-            translator/enable_encoder: true
-            translator/encode_commit_history: true
-            translator/max_phrase_length: 7
-            translator/initial_quality: 1.2
-
-            speller/algebra:
-              __patch:
-                - pinyin:/zh_z_bufen
-                - pinyin:/en_eng_bufen
-                - pinyin:/abbreviation
-                - pinyin:/spelling_correction
-                - pinyin:/key_correction
-              __append:
-                - derive/ian$/iang/
-                - derive/iang$/ian/
-
-        '';
-      };
-
-      "fcitx5/rime/pin.schema.yaml" = {
-        force = true;
-        text = ''
-          # Rime schema
-          # encoding: utf-8
-
-          __include: luna_pinyin_simp.schema:/
-
-          schema:
-            schema_id: pin
-            name: 拼
-            version: "0.1"
-            author:
-              - 佛振 <chen.sst@gmail.com>
-            description: |
-              简体拼音输入。
-
-          translator:
-            prism: pin
-
-          # Drop inherited Ctrl+Shift+4/$ bindings. import_preset: default
-          # still supplies the candidate navigation configured above.
-          __patch:
-            key_binder/bindings: []
-            # Use the fullwidth full stop (U+FF0E), not the ideographic 。.
-            # Patch the schema directly: import_preset skips custom presets.
-            "punctuator/half_shape/.": {commit: "．"}
-            "punctuator/full_shape/.": {commit: "．"}
-        '';
-      };
     };
   };
 
@@ -516,48 +415,7 @@
       removeObsoleteFcitxPinyinConfig = lib.hm.dag.entryAfter ["linkGeneration"] ''
         run rm -f \
           "$HOME/.config/fcitx5/conf/pinyin.conf" \
-          "$HOME/.config/fcitx5/conf/cloudpinyin.conf" \
-          "$HOME/.config/fcitx5/conf/punctuation.conf"
-      '';
-
-      deployRimeConfig = lib.hm.dag.entryAfter ["linkGeneration"] ''
-        rime_data_home="''${XDG_DATA_HOME:-$HOME/.local/share}/fcitx5/rime"
-        run rm -f "$rime_data_home/user.yaml"
-        run rm -rf "$rime_data_home/build"
-        run mkdir -p "$rime_data_home"
-
-        # Build default Rime config from shared data
-        run ${pkgs.librime}/bin/rime_deployer \
-          --build \
-          "$rime_data_home" \
-          "${pkgs.rime-data}/share/rime-data" \
-          "$rime_data_home/build"
-
-        # === Post-process: force direct symbol output in pinyin mode ===
-        # rime_deployer ignores .custom.yaml patches for config presets
-        # loaded via import_preset. So we directly patch the built schema
-        # to replace list-based half_shape entries with {commit: ...}
-        # for immediate ASCII output — no candidate selection bar.
-        built="$rime_data_home/build/pin.schema.yaml"
-        run sed -i "$built" \
-          -e 's_^    "~": \[.*_    "~": {commit: "~"}_' \
-          -e 's_^    "`": \[.*_    "`": {commit: "`"}_' \
-          -e 's_^    "@": \[.*_    "@": {commit: "@"}_' \
-          -e 's_^    "#": \[.*_    "#": {commit: "#"}_' \
-          -e 's_^    "\$": \[.*_    "$": {commit: "$"}_' \
-          -e 's_^    "%": \[.*_    "%": {commit: "%"}_' \
-          -e 's_^    "\*": \[.*_    "*": {commit: "*"}_' \
-          -e 's_^    "<": \[.*_    "<": {commit: "<"}_' \
-          -e 's_^    "=": \[.*_    "=": {commit: "="}_' \
-          -e 's_^    ">": \[.*_    ">": {commit: ">"}_' \
-          -e 's_^    "\?": \[.*_    "?": {commit: "?"}_' \
-          -e 's_^    "\[": \[.*_    "[": {commit: "["}_' \
-          -e 's_^    "\\\\": \[.*_    "\\\\": {commit: "\\\\"}_' \
-          -e 's_^    "\]": \[.*_    "]": {commit: "]"}_' \
-          -e 's_^    "{": \[.*_    "{": {commit: "{"}_' \
-          -e 's_^    "|": \[.*_    "|": {commit: "|"}_' \
-          -e 's_^    "}": \[.*_    "}": {commit: "}"}_' \
-          -e 's_^    "/": \[.*_    "/": {commit: "/"}_'
+          "$HOME/.config/fcitx5/conf/cloudpinyin.conf"
       '';
     };
   };

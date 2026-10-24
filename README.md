@@ -135,7 +135,7 @@ terminal into QQ/WeChat and back. For failures, inspect
 
 ## Desktop Chinese input
 
-Fcitx/Rime is started once by Home Manager's `fcitx5-daemon.service`; the
+Fcitx5 is started once by Home Manager's `fcitx5-daemon.service`; the
 package's XDG autostart entry is masked and niri does not spawn another daemon.
 Foot uses native Wayland text-input-v3. GTK3/4 apps, including PGTK Emacs, also
 use text-input-v3 rather than the Fcitx GTK plugin, whose client-side popup can
@@ -145,11 +145,10 @@ files retain Fcitx for X11/GTK2 apps. Qt5 keeps `QT_IM_MODULE=fcitx`.
 **Right Shift** is the only Chinese/English toggle. Ctrl+Space, preedit toggling,
 input-method group cycling, clipboard, quick phrase, Unicode entry, and keyboard
 hint shortcuts are unbound so they cannot intercept Emacs commands. In particular,
-**Ctrl+;** (clipboard) and **Ctrl+Alt+P** (toggle preedit) are unbound. Rime also
-leaves Ctrl shortcuts and mode switching alone; candidate navigation still uses
-arrows, Tab/Shift+Tab, and punctuation. In Pinyin mode, `.` commits the fullwidth
-full stop `．` (U+FF0E), not the ideographic full stop `。`; other punctuation,
-letters, and digits are unchanged.
+**Ctrl+;** (clipboard), **Ctrl+Alt+P** (toggle preedit), and **Ctrl+.**
+(punctuation toggle) are unbound. Phono uses its own candidate navigation and
+Fcitx's native punctuation settings; the former Rime-specific spelling,
+navigation, and punctuation overrides no longer apply.
 
 For shortcut-only changes, `systemctl --user restart fcitx5-daemon` reloads global
 and addon settings together, clearing any stale in-memory shortcut bindings.
@@ -162,6 +161,13 @@ prints nothing. In Foot and Emacs, press **Right Shift**, type `nihao`, and sele
 `你好`; check that the Emacs candidate popup stays stable while typing and near
 window edges. These need interactive testing. Offline configuration regressions
 run with `nix build --no-link .#checks.x86_64-linux.fcitx5`.
+
+Phono 0.1.2 is the Chinese input engine, with Pinyin as the default and Shuangpin
+also available in the managed profile. Rime and its deployment hooks are removed;
+existing personal Rime data is not deleted. The phono-core 0.1.1 runtime is
+packaged locally, and dictionary input works without a model. See
+[Phono setup](docs/phono.md) for method selection, the separate model download,
+and local inference settings.
 
 ## Dota 2 Chinese input
 

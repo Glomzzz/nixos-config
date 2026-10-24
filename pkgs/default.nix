@@ -7,6 +7,8 @@ final: _prev: {
   jujutsu = final.callPackage ./jujutsu.nix {};
   lazyjj = final.callPackage ./lazyjj.nix {};
   mandible = final.callPackage ./mandible.nix {};
+  phono-core = final.callPackage ./phono-core.nix {};
+  phono-fcitx5-addon = final.callPackage ./phono-fcitx5-addon.nix {};
   ssh-proxy-mac-mini = final.callPackage ./ssh-proxy-mac-mini.nix {};
   v2raya-assets = final.callPackage ./v2raya-assets.nix {};
   wechat = final.callPackage ./wechat {};

@@ -53,6 +53,12 @@
   in {
     formatter = forAllSystems (system: (pkgsFor system).alejandra);
 
+    packages = forAllSystems (system: let
+      pkgs = (pkgsFor system).extend (import ./pkgs);
+    in {
+      inherit (pkgs) phono-core phono-fcitx5-addon;
+    });
+
     checks = forAllSystems (
       system: let
         pkgs = pkgsFor system;
@@ -270,19 +276,19 @@
             waylandFrontend = home.i18n.inputMethod.fcitx5.waylandFrontend;
             package = toString home.i18n.inputMethod.package;
             globalConfig = home.xdg.configFile."fcitx5/config".text;
-            addonConfigs = pkgs.lib.genAttrs ["clipboard" "keyboard" "quickphrase" "unicode"] (
+            profile = home.xdg.configFile."fcitx5/profile".text;
+            addonConfigs = pkgs.lib.genAttrs ["clipboard" "keyboard" "quickphrase" "unicode" "punctuation" "fullwidth"] (
               name: home.xdg.configFile."fcitx5/conf/${name}.conf".text
             );
-            rimeConfigs = pkgs.lib.genAttrs ["default.custom.yaml" "luna_pinyin_simp.custom.yaml" "pin.schema.yaml"] (
-              name: home.xdg.dataFile."fcitx5/rime/${name}".text
-            );
+            addons = map pkgs.lib.getName home.i18n.inputMethod.fcitx5.addons;
+            dataFiles = builtins.attrNames home.xdg.dataFile;
+            hasRimeDeployment = home.home.activation ? deployRimeConfig;
           });
         in
           pkgs.runCommand "fcitx5-check"
           {
             nativeBuildInputs = [
-              (pkgs.python3.withPackages (ps: [ps.pyyaml]))
-              pkgs.librime
+              pkgs.python3
               pkgs.stdenv.cc
               pkgs.pkg-config
               pkgs.fcitx5
@@ -294,13 +300,12 @@
               -o fcitx-hotkeys-check $(pkg-config --libs Fcitx5Config)
             python3 - ${settings} <<'PY'
             import configparser
+            import ctypes
             import json
             from pathlib import Path
             import subprocess
             import sys
             import tempfile
-
-            import yaml
 
             with open(sys.argv[1]) as source:
                 settings = json.load(source)
@@ -323,6 +328,29 @@
             autostart.read_string(settings["autostart"])
             assert autostart["Desktop Entry"].getboolean("Hidden")
 
+            profile = configparser.ConfigParser()
+            profile.read_string(settings["profile"])
+            assert profile["Groups/0"]["DefaultIM"] == "phono"
+            items = [section for section in profile.sections() if section.startswith("Groups/0/Items/")]
+            assert [profile[section]["Name"] for section in items] == [
+                "keyboard-us", "phono", "phono-shuangpin",
+            ]
+            assert not {"fcitx5-rime", "rime-data"}.intersection(settings["addons"])
+            assert not any(path.startswith("fcitx5/rime/") for path in settings["dataFiles"])
+            assert not settings["hasRimeDeployment"]
+            package = Path(settings["package"])
+            for path in ("share/fcitx5/addon/rime.conf", "share/fcitx5/inputmethod/rime.conf",
+                         "lib/fcitx5/librime.so", "share/rime-data"):
+                assert not (package / path).exists(), path
+            for addon in ("phono", "punctuation", "fullwidth"):
+                assert (package / f"share/fcitx5/addon/{addon}.conf").is_file(), addon
+                # Catch missing runtime dependencies/RPATHs in the final addon bundle.
+                ctypes.CDLL(str(package / f"lib/fcitx5/lib{addon}.so"))
+            for name in ("phono", "phono-shuangpin"):
+                entry = configparser.ConfigParser()
+                entry.read(package / f"share/fcitx5/inputmethod/{name}.conf")
+                assert entry["InputMethod"]["Addon"] == "phono", name
+
             hotkeys = configparser.ConfigParser()
             hotkeys.optionxform = str
             hotkeys.read_string(settings["globalConfig"])
@@ -339,6 +367,8 @@
                 "keyboard": ("Hint Trigger", "One Time Hint Trigger"),
                 "quickphrase": ("TriggerKey",),
                 "unicode": ("TriggerKey", "DirectUnicodeMode"),
+                "punctuation": ("Hotkey",),
+                "fullwidth": ("Hotkey",),
             }
             for addon, keys in addon_keys.items():
                 config = configparser.ConfigParser()
@@ -347,8 +377,6 @@
                 for key in keys:
                     assert config["Addon"][key] == "", (addon, key)
 
-            # Compile the real schema: inherited bindings/+ can silently append
-            # Ctrl shortcuts after an apparently complete custom replacement.
             with tempfile.TemporaryDirectory() as directory:
                 user_data = Path(directory)
                 # Check effective key lists with Fcitx, not just INI syntax.
@@ -365,28 +393,8 @@
                         subprocess.run(
                             ["./fcitx-hotkeys-check", str(addon_config), key], check=True,
                         )
-                for name, text in settings["rimeConfigs"].items():
-                    (user_data / name).write_text(text)
-                result = subprocess.run(
-                    ["rime_deployer", "--build", directory,
-                     "${pkgs.rime-data}/share/rime-data", str(user_data / "build")],
-                    capture_output=True, text=True,
-                )
-                assert result.returncode == 0, result.stderr
-                default = yaml.safe_load((user_data / "build/default.yaml").read_text())
-                schema = yaml.safe_load((user_data / "build/pin.schema.yaml").read_text())
-                assert default["switcher"]["hotkeys"] == []
-                assert all(value == "noop" for value in default["ascii_composer"]["switch_key"].values())
-                bindings = default["key_binder"]["bindings"]
-                assert schema["key_binder"]["bindings"] == bindings
-                assert len(bindings) == 6, "Keep punctuation and Tab candidate navigation"
-                for shape in ("half_shape", "full_shape"):
-                    assert schema["punctuator"][shape]["."] == {"commit": "\uff0e"}, shape
-                for binding in bindings:
-                    assert not any(modifier in binding["accept"] for modifier in ("Control+", "Alt+", "Super+"))
-                    assert "toggle" not in binding
 
-            print("Fcitx startup, Wayland/GTK input, fullwidth period, and Emacs-safe hotkeys passed")
+            print("Fcitx startup, Phono-only runtime/profile, Wayland/GTK input, and Emacs-safe hotkeys passed")
             PY
             touch "$out"
           '';
