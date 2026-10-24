@@ -40,6 +40,16 @@ class WaybarTests(unittest.TestCase):
         settings = json.loads(SETTINGS.read_text())
         self.assertEqual(actions, set(settings["main"]["battery"]["menu-actions"]))
 
+    def test_audio_opens_native_pipewire_mixer(self):
+        if SETTINGS is None:
+            self.skipTest("Pass evaluated Waybar settings JSON to check audio controls")
+        settings = json.loads(SETTINGS.read_text())["main"]
+        mixer = Path(settings["pulseaudio"]["on-click"])
+        self.assertTrue(mixer.is_absolute())
+        self.assertEqual(mixer.name, "pwvucontrol")
+        self.assertTrue(os.access(mixer, os.X_OK))
+        self.assertEqual(settings["modules-right"].count("pulseaudio"), 1)
+
     def test_network_opens_graphical_connection_editor(self):
         if SETTINGS is None:
             self.skipTest("Pass evaluated Waybar settings JSON to check network controls")

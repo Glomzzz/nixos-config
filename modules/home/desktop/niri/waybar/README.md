@@ -18,6 +18,14 @@ Run the tests and build/shellcheck every helper:
 nix build --no-link .#checks.x86_64-linux.waybar
 ```
 
+## Audio controls
+
+- Click the volume indicator to open pwvucontrol's native PipeWire GUI for
+  per-application volume, output routing, and device profiles.
+- The mixer opens floating in Niri. The old wiremix package, terminal launcher,
+  and terminal window rule are removed.
+- qpwgraph and EasyEffects remain available for patching and audio effects.
+
 ## Network controls
 
 - Click the network-speed readout to open the GTK NetworkManager connection editor.
