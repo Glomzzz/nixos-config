@@ -120,6 +120,19 @@ optional image/PDF support, reserved terminal shortcuts, and GUI limitations.
 offline tests. Run `nix build --no-link .#checks.x86_64-linux.waybar`; see the
 [Waybar layout](modules/home/desktop/niri/waybar/README.md).
 
+## Media playback
+
+Celluloid is the graphical audio/video player and owns the media file defaults.
+It embeds libmpv rather than installing a second standalone player. Its generated
+`~/.config/celluloid/mpv.conf` retains safe hardware decoding, the high-quality
+profile, and keep-open behavior. The old standalone `vo=gpu-next` and Vulkan
+options are not carried over: Celluloid manages its embedded GTK render context.
+MPRIS remains enabled for media keys and Waybar through playerctld.
+
+Run `nix build --no-link .#checks.x86_64-linux.celluloid` to check the desktop/MIME
+integration, GSettings schema, and config loading with the real libmpv. Rendering
+and hardware decoding still need a playback test after activation.
+
 ## Clipboard
 
 QQ and WeChat remain native Wayland applications. `clipferry` bridges their X11

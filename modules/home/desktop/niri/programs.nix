@@ -104,20 +104,6 @@
 in {
   # Viewers and daemons that KDE used to supply. Each entry here replaces a
   # Plasma component rather than adding something new.
-  programs = {
-    # Video player, replacing vlc.
-    mpv = {
-      enable = true;
-      config = {
-        hwdec = "auto-safe";
-        vo = "gpu-next";
-        gpu-api = "vulkan";
-        profile = "high-quality";
-        keep-open = true;
-      };
-    };
-  };
-
   home.packages = with pkgs; [
     # FUSE-backed MTP mount used by the Dirvish Android commands.
     androidPhone

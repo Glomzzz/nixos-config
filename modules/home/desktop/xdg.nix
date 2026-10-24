@@ -12,8 +12,8 @@
       defaultApplications = let
         archive = ["org.gnome.FileRoller.desktop"];
         image = ["oculante.desktop"];
-        video = ["mpv.desktop"];
-        audio = ["mpv.desktop"];
+        video = ["io.github.celluloid_player.Celluloid.desktop"];
+        audio = video;
       in {
         # Archives
         "application/zip" = archive;
