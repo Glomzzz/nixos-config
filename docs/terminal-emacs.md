@@ -49,6 +49,10 @@ The separate source configuration at `~/.config/emacs/` owns TTY behavior in
 Terminal Emacs is the default editor:
 
 - `emc` or `emc file` opens a blocking TTY client, even on a graphical desktop.
+- `majj` opens Majutsu's change graph and working-copy status in terminal
+  Emacs for the current Jujutsu workspace; `majj DIRECTORY` selects another
+  workspace. Use `C-x C-c` to close the client and return to the shell without
+  stopping the daemon. Majutsu is managed by `~/.config/emacs/`, not Nix.
 - `EDITOR`, `VISUAL`, `SUDO_EDITOR`, and Git's editor use `emc`.
 - Niri **Mod+Return** opens terminal Emacs; **Mod+E** opens terminal Dirvish.
 - The Emacs desktop launcher and existing file associations use a Kitty TTY.
@@ -123,7 +127,8 @@ then starts a clean, display-less daemon and real pseudo-terminal clients. It
 verifies clipboard routing and protocol key encoding, 24-bit output for Kitty
 and Foot, and 256-color behavior for an ordinary xterm client. The launcher
 check uses mocked clients/services in real PTYs to verify frontend selection,
-blocking behavior, desktop handoff, and safe restart handling. The Emacs suite checks startup laziness, GUI isolation, terminal
+blocking behavior, Majutsu directory selection, desktop handoff, and safe
+restart handling. The Emacs suite checks startup laziness, GUI isolation, terminal
 setup, clipboard policy, restart guards, and the optional graphics declaration. Actual font
 appearance, IME candidate placement, and interactive graphics still require a
 real Wayland terminal session to assess.

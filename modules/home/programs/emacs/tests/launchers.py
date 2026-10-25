@@ -19,6 +19,8 @@ for key in ('EDITOR', 'VISUAL', 'SUDO_EDITOR'):
     assert settings['niriEnvironment'][key] == emc, key
 assert settings['gitEditor'] == emc
 assert not settings['generatedClient']
+assert settings['majjExecutable']
+assert 'lazyjj' not in settings['packages']
 assert settings['editorShortcut'] == [emc]
 assert settings['directoryShortcut'] == [emc, str(Path(emc).parents[2])]
 for name in ('emacs', 'emacsclient', 'emacs-dirvish'):
@@ -44,6 +46,7 @@ kind = pathlib.Path(sys.argv[0]).name
 args = sys.argv[1:]
 with open(os.environ['EMC_TEST_LOG'], 'a') as stream:
     stream.write(json.dumps([kind, args]) + '\\n')
+pathlib.Path(os.environ['EMC_TEST_CWD']).write_text(os.getcwd())
 if kind == 'client' and any('emc/launcher-state' in arg for arg in args):
     probe = os.environ.get('EMC_TEST_PROBE', 'ok')
     if probe == 'ERROR':
@@ -65,11 +68,19 @@ elif kind == 'systemctl':
     wrapper = root / 'emc'
     wrapper.write_text(source)
     wrapper.chmod(0o755)
+    majj = root / 'majj'
+    source = Path(settings['majjWrapper']).read_text()
+    assert source.count(emc) == 1
+    majj.write_text(source.replace(emc, str(wrapper)))
+    majj.chmod(0o755)
+    client_cwd = root / 'client-cwd'
 
-    def invoke(args=(), *, terminal=True, probe='ok', active='yes', failure='0', desktop=True):
+    def invoke(args=(), *, terminal=True, probe='ok', active='yes', failure='0', desktop=True,
+               launcher=wrapper, cwd=None):
         log.write_text('')
         environment = dict(os.environ, EMACSCLIENT=str(root / 'client'),
                            EMC_TEST_LOG=str(log), EMC_TEST_PROBE=probe,
+                           EMC_TEST_CWD=str(client_cwd),
                            EMC_TEST_ACTIVE=active, EMC_TEST_SERVICE_FAILURE=failure)
         for key in ('DISPLAY', 'WAYLAND_DISPLAY'):
             environment.pop(key, None)
@@ -83,7 +94,7 @@ elif kind == 'systemctl':
                 fcntl.ioctl(0, termios.TIOCSCTTY, 0)
 
             try:
-                process = subprocess.Popen([wrapper, *args], env=environment,
+                process = subprocess.Popen([launcher, *args], env=environment, cwd=cwd,
                                            stdin=slave, stdout=slave, stderr=slave,
                                            preexec_fn=controlling_terminal)
                 os.close(slave)
@@ -106,9 +117,9 @@ elif kind == 'systemctl':
                     os.close(slave)
                 os.close(master)
         else:
-            result = subprocess.run([wrapper, *args], env=environment,
+            result = subprocess.run([launcher, *args], env=environment, cwd=cwd,
                                     capture_output=True, text=True, timeout=10)
-            code, text = result.returncode, result.stderr
+            code, text = result.returncode, result.stdout + result.stderr
         calls = [json.loads(line) for line in log.read_text().splitlines()]
         return code, text, calls
 
@@ -156,4 +167,36 @@ elif kind == 'systemctl':
     code, text, calls = invoke(terminal=False, desktop=False)
     assert code != 0 and not calls and 'attach a TTY' in text
     assert '--tty' not in client_args(['--create-frame'], terminal=False)
-print('Managed launcher frontend, blocking, terminal handoff, and restart-safety checks passed')
+
+    # Majutsu must use this same managed, blocking TTY path. Directory names
+    # are passed by chdir, never interpolated into an executable Lisp form.
+    expression = None
+    workspace = root / 'workspace "quotes" \\backslash\n中文'
+    workspace.mkdir()
+    for arguments, cwd, expected in (([], workspace, workspace),
+                                     ([workspace.name], root, workspace),
+                                     ([str(workspace)], root, workspace)):
+        args = client_args(arguments, launcher=majj, cwd=cwd)
+        assert args[1] == '--eval' and args[-2:] == ['--tty', '--suppress-output'], args
+        assert '--no-wait' not in args and '--create-frame' not in args, args
+        assert Path(client_cwd.read_text()) == expected
+        if expression is None:
+            expression = args[2]
+            assert '(majutsu-log default-directory)' in expression
+        else:
+            assert args[2] == expression, args
+    for arguments in (['--help'], ['-h'], ['one', 'two'], [str(root / 'missing')]):
+        code, text, calls = invoke(arguments, launcher=majj, terminal=False)
+        assert not calls, calls
+        if arguments[0] in ('--help', '-h'):
+            assert code == 0 and 'Usage: majj' in text
+        else:
+            assert code != 0
+    code, _, calls = invoke(launcher=majj, terminal=False, cwd=workspace)
+    assert code == 0 and calls == [['kitty', [
+        '--class', 'emacs-terminal', '--override', 'confirm_os_window_close=0',
+        str(wrapper), '--eval', expression, '--tty', '--suppress-output']]], calls
+    assert Path(client_cwd.read_text()) == workspace
+    code, text, calls = invoke(launcher=majj, terminal=False, desktop=False)
+    assert code != 0 and not calls and 'attach a TTY' in text
+print('Managed Emacs/Majutsu launchers, directories, blocking, terminal handoff, and restart-safety checks passed')
