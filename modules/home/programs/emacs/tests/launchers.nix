@@ -4,6 +4,9 @@
 }: let
   settings = pkgs.writeText "emacs-launchers.json" (builtins.toJSON {
     wrapper = home.home.file.".local/bin/emc".source;
+    majjWrapper = home.home.file.".local/bin/majj".source;
+    majjExecutable = home.home.file.".local/bin/majj".executable;
+    packages = map pkgs.lib.getName home.home.packages;
     kitty = "${home.programs.kitty.package}/bin/kitty";
     emc = "${home.home.homeDirectory}/.local/bin/emc";
     environment = {
@@ -25,7 +28,7 @@ in
   pkgs.runCommand "emacs-launchers-check"
   {nativeBuildInputs = [pkgs.python3 pkgs.shellcheck];}
   ''
-    shellcheck --shell=sh ${home.home.file.".local/bin/emc".source}
+    shellcheck --shell=sh ${home.home.file.".local/bin/emc".source} ${home.home.file.".local/bin/majj".source}
     python3 ${./launchers.py} ${settings}
     touch "$out"
   ''

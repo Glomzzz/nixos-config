@@ -7,7 +7,6 @@
 }: {
   home.packages = with pkgs; [
     gh
-    lazyjj
   ];
 
   programs.jujutsu = {
