@@ -3,6 +3,7 @@
 import json
 import os
 from pathlib import Path
+import shlex
 import subprocess
 import shutil
 import sys
@@ -40,11 +41,20 @@ class WaybarTests(unittest.TestCase):
         settings = json.loads(SETTINGS.read_text())
         self.assertEqual(actions, set(settings["main"]["battery"]["menu-actions"]))
 
+    def spawned_program(self, command):
+        # Click handlers run `niri msg action spawn -- <program>` so the launch
+        # carries an activation token (see waybar/settings.nix).
+        argv = shlex.split(command)
+        self.assertEqual(Path(argv[0]).name, "niri")
+        self.assertEqual(argv[1:5], ["msg", "action", "spawn", "--"])
+        self.assertEqual(len(argv), 6)
+        return Path(argv[5])
+
     def test_audio_opens_native_pipewire_mixer(self):
         if SETTINGS is None:
             self.skipTest("Pass evaluated Waybar settings JSON to check audio controls")
         settings = json.loads(SETTINGS.read_text())["main"]
-        mixer = Path(settings["pulseaudio"]["on-click"])
+        mixer = self.spawned_program(settings["pulseaudio"]["on-click"])
         self.assertTrue(mixer.is_absolute())
         self.assertEqual(mixer.name, "pwvucontrol")
         self.assertTrue(os.access(mixer, os.X_OK))
@@ -68,7 +78,7 @@ class WaybarTests(unittest.TestCase):
             self.skipTest("Pass evaluated Waybar settings JSON to check Bluetooth controls")
         settings = json.loads(SETTINGS.read_text())["main"]
         bluetooth = settings["bluetooth"]
-        manager = Path(bluetooth["on-click"])
+        manager = self.spawned_program(bluetooth["on-click"])
         self.assertTrue(manager.is_absolute())
         self.assertEqual(manager.name, "blueman-manager")
         self.assertTrue(os.access(manager, os.X_OK))
