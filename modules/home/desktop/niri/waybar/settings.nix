@@ -15,6 +15,12 @@
   swayncClient = lib.getExe' config.services.swaync.package "swaync-client";
   networkEditor = lib.getExe' config.services.network-manager-applet.package "nm-connection-editor";
   bluetoothManager = lib.getExe' config.services.blueman-applet.package "blueman-manager";
+  # Audio and Bluetooth apps are single-instance GApplications. A plain launch
+  # from Waybar forwards the activation to the running copy without an
+  # activation token, so niri ignores it when that window sits on another
+  # workspace: the click looks dead and the user clicks again. Spawning through
+  # niri attaches a token, and niri focuses the existing window instead.
+  niriSpawn = "${pkgs.niri}/bin/niri msg action spawn --";
   inherit (helpers) powerMenu setProfile idleInhibit weatherScript netspeed;
 in {
   layer = "top";
@@ -115,7 +121,7 @@ in {
     format = "{icon} {volume}%";
     format-muted = "󰝟";
     format-icons.default = ["󰕿" "󰖀" "󰕾"];
-    on-click = lib.getExe pkgs.pwvucontrol;
+    on-click = "${niriSpawn} ${lib.getExe pkgs.pwvucontrol}";
   };
 
   backlight = {
@@ -281,7 +287,7 @@ in {
     # every row, battery or not.
     tooltip-format-enumerate-connected = "{device_alias:<16.16}        {device_address}";
     tooltip-format-enumerate-connected-battery = "{device_alias:<16.16}  {device_battery_percentage:>3}%  {device_address}";
-    on-click = bluetoothManager;
+    on-click = "${niriSpawn} ${bluetoothManager}";
   };
 
   mpris = {
