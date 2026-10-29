@@ -5,6 +5,7 @@ final: _prev: {
   bun = final.callPackage ./bun.nix {};
   ix = final.callPackage ./ix.nix {};
   jujutsu = final.callPackage ./jujutsu.nix {};
+  logisim-evolution = final.callPackage ./logisim-evolution {};
   mandible = final.callPackage ./mandible.nix {};
   phono-core = final.callPackage ./phono-core.nix {};
   phono-fcitx5-addon = final.callPackage ./phono-fcitx5-addon.nix {};
