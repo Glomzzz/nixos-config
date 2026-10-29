@@ -15,13 +15,13 @@
 }:
 stdenv.mkDerivation rec {
   pname = "phono-fcitx5-addon";
-  version = "0.1.2";
+  version = "0.1.3";
 
   src = fetchFromGitHub {
     owner = "phono-project";
     repo = "phono-fcitx5-addon";
     tag = "v${version}";
-    hash = "sha256-CEBlLSIkKAaj3EFB1Kj17k6u/kPHhxc1RhsrToNgEdU=";
+    hash = "sha256-OZfFJ/m8pngs/LNtgu+JHqJVQ1RZ6ZKIgLX8UcEoJy4=";
   };
 
   nativeBuildInputs = [cmake gettext pkg-config];
