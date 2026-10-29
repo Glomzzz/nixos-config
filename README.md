@@ -181,9 +181,9 @@ prints nothing. In Foot and Emacs, press **Right Shift**, type `nihao`, and sele
 window edges. These need interactive testing. Offline configuration regressions
 run with `nix build --no-link .#checks.x86_64-linux.fcitx5`.
 
-Phono 0.1.2 is the Chinese input engine, with Pinyin as the default and Shuangpin
+Phono 0.1.3 is the Chinese input engine, with Pinyin as the default and Shuangpin
 also available in the managed profile. Rime and its deployment hooks are removed;
-existing personal Rime data is not deleted. The phono-core 0.1.1 runtime is
+existing personal Rime data is not deleted. The phono-core 0.1.2 runtime is
 packaged locally, and dictionary input works without a model. See
 [Phono setup](docs/phono.md) for method selection, the separate model download,
 and local inference settings.

@@ -6,10 +6,10 @@ fallback. No cloud service is needed.
 
 ## Packaging and configuration
 
-- `pkgs/phono-fcitx5-addon.nix` builds release **0.1.2** from source against the
+- `pkgs/phono-fcitx5-addon.nix` builds release **0.1.3** from source against the
   flake's Fcitx5 and libime. All ten upstream offline tests run during the build,
   including loading the addon in Fcitx and generating dictionary candidates.
-- `pkgs/phono-core.nix` packages the upstream **0.1.1 x86_64 Linux binary SDK**
+- `pkgs/phono-core.nix` packages the upstream **0.1.2 x86_64 Linux binary SDK**
   pinned by the addon's `ci/core-sdk.json`. It includes ExecuTorch and third-party
   license notices. `autoPatchelfHook` fixes its runtime library paths for NixOS.
   The addon links to this separate store package instead of copying the SDK's

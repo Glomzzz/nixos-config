@@ -6,13 +6,13 @@
 }:
 stdenv.mkDerivation rec {
   pname = "phono-core";
-  version = "0.1.1";
+  version = "0.1.2";
 
   # Use the release SDK pinned by phono-fcitx5-addon's ci/core-sdk.json.
   # It contains the self-contained ExecuTorch runtime and dependency notices.
   src = fetchurl {
     url = "https://github.com/phono-project/phono-core/releases/download/v${version}/phono-core-sdk-${version}-linux-x86_64.tar.gz";
-    hash = "sha256-zOHMrf9n0Z3E81vJrf8Hk+c00InelgFacJKGxRKEx70=";
+    hash = "sha256-0lH8dWh+0xJXTJ7l3V/xTdGcSQ6HVetsAEC3GnCtBt0=";
   };
 
   sourceRoot = ".";
