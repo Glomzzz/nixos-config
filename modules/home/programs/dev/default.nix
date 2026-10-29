@@ -6,6 +6,7 @@ _: {
     ./editor
     ./git.nix
     ./ix.nix
+    ./logisim-evolution.nix
     ./openpgp.nix
   ];
 }
