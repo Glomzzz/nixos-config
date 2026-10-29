@@ -1,6 +1,8 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
-    graalvmPackages.graalvm-oracle
+    # GraalVM's native-image install check segfaults with the nixpkgs revision
+    # pinned in flake.lock, so use the plain JDK jdt-language-server runs on.
+    jdk25
     jdt-language-server # Java LSP
   ];
 
