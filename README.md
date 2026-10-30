@@ -97,6 +97,13 @@ for manual recovery, with daily cleanup of existing snapshots. These local
 snapshots do not protect against disk failure or theft; off-device backups remain
 to be configured.
 
+## Network trust
+
+Streaming/discovery ports are limited to Tailscale and explicitly approved home
+NetworkManager profiles, not every network using private addresses. See
+[network policy](docs/networking.md) before changing profiles or travelling with
+the approved wired adapter.
+
 ## Laptop power and firmware
 
 UPower reports low battery at 20%, critical at 10%, and requests hibernation at

@@ -39,48 +39,10 @@
       touch "$out"
     '';
 
-  firewall = let
-    settings =
-      pkgs.writeText
-      "firewall-settings.json"
-      (builtins.toJSON {
-        inherit
-          (self.nixosConfigurations.nixos.config.networking.firewall)
-          allowedTCPPorts
-          allowedUDPPorts
-          allowedUDPPortRanges
-          backend
-          extraInputRules
-          ;
-        nftables = self.nixosConfigurations.nixos.config.networking.nftables.enable;
-      });
-  in
-    pkgs.runCommand "firewall-check"
-    {nativeBuildInputs = [pkgs.python3];}
-    ''
-      python3 - ${settings} <<'PY'
-      import json
-      import sys
-
-      with open(sys.argv[1]) as source:
-          settings = json.load(source)
-      assert settings["nftables"] and settings["backend"] == "nftables"
-      assert settings["allowedTCPPorts"] == []
-      assert settings["allowedUDPPorts"] == []
-      assert settings["allowedUDPPortRanges"] == []
-      rules = settings["extraInputRules"]
-      for rule in (
-          "ip saddr { 10.0.0.0/8, 100.64.0.0/10, 172.16.0.0/12, 192.168.0.0/16 }",
-          "ip6 saddr { fc00::/7, fe80::/10 }",
-      ):
-          assert rules.count(rule) == 3, rule
-      assert "tcp dport { 9757, 27036, 27037 } accept" in rules
-      assert "udp dport { 5353, 9757, 10400, 10401, 27036 } accept" in rules
-      assert "udp dport 27031-27035 accept" in rules
-      print("Firewall ports are nftables-only and source scoped to private networks")
-      PY
-      touch "$out"
-    '';
+  firewall = import ./firewall.nix {
+    inherit pkgs;
+    inherit (self.nixosConfigurations.nixos) config;
+  };
 
   configuration-evaluation = let
     config = self.nixosConfigurations.nixos.config;
