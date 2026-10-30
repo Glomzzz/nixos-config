@@ -8,8 +8,11 @@ Niri's `Mod+/`, Fuzzel, and the Waybar mixer/network launchers use Kitty.
 
 `modules/home/shell/kitty.nix` sets:
 
-- **Cascadia Mono NF, 15 pt** for ordinary text (GUI Emacs remains at 16 pt).
+- **Cascadia Mono NF, 15 pt** for ordinary text.  GUI Emacs uses the same 15 pt
+  (`appearance/font-height` in `~/.config/emacs`); measured glyphs match.
 - **LXGW WenKai** for Han, Bopomofo, and Chinese punctuation.
+- **Noto Sans Symbols 2** for the symbol ranges GUI Emacs maps to it (for example
+  U+2605), and **Noto Sans Mono CJK JP** for kana, so fallbacks match the GUI.
 - **Noto Color Emoji** for emoji and **Symbols Nerd Font Mono** for icon ranges.
 - Native Wayland IME support, keeping Fcitx5 available for Chinese input.
 - True color, without contrast-based recoloring of application faces.
