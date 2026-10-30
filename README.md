@@ -132,7 +132,9 @@ blocks a valid password.
 Set the existing Login keyring's password interactively to match the account
 password; see
 [authentication setup and recovery](docs/authentication.md) before activating.
-Disk encryption is not configured.
+Disk and swap encryption are not configured. Follow the separately approved
+[migration gate](docs/encryption.md); no live storage conversion is part of
+ordinary activation.
 
 ## Home Manager backups
 
