@@ -45,18 +45,19 @@ in {
     };
     # Win+; and Win+' (niri/settings.nix) run these through fish, since niri
     # spawns argv directly. Each opens a new GUI frame and returns at once.
-    # calc and mu4e run after a short delay: called synchronously in a brand-new
-    # frame, they intermittently fail with "too small for splitting".
+    # emc/open-calc waits 0.3 s for a brand-new frame to settle; emc/open-mail
+    # shows mu4e at once and falls back to the whole window if the frame refuses
+    # to split (both in modules/core/emc.el).
     functions.calc = {
       description = "Open Emacs calc in a new GUI frame";
       body = ''
-        ${emc} --create-frame --no-wait --eval '(run-at-time 0.3 nil (function calc))'
+        ${emc} --create-frame --no-wait --eval '(emc/open-calc)'
       '';
     };
     functions.email = {
       description = "Open Emacs mu4e mail in a new GUI frame";
       body = ''
-        ${emc} --create-frame --no-wait --eval '(run-at-time 0.3 nil (function mu4e))'
+        ${emc} --create-frame --no-wait --eval '(emc/open-mail)'
       '';
     };
   };
