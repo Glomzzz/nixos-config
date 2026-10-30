@@ -1,8 +1,4 @@
-{
-  config,
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
     SDL
@@ -121,5 +117,6 @@
     zlib
     systemd
   ];
-  environment.systemPackages = config.programs.nix-ld.libraries;
+  # The NixOS module exposes these under share/nix-ld/lib. Do not also
+  # install their executables: compiler internals are not wrapped toolchains.
 }

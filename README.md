@@ -216,7 +216,10 @@ Offline launcher regressions run with `nix build --no-link .#checks.x86_64-linux
 General editors, shells, language toolchains, and command-line utilities are
 installed through Home Manager under `modules/home/programs/`. Project-specific
 dependencies should stay in the project's own flake or development shell so
-they remain reproducible and do not enlarge the base system.
+they remain reproducible and do not enlarge the base system. The base C/C++
+toolchain uses wrapped GCC/Clang; Emacs's internal libgccjit is not installed as
+a command-line compiler. nix-ld libraries are exposed only through its dedicated
+library path, not as an extra collection of executables on the system PATH.
 
 Docker runs rootless in `glom`'s user manager with declarative subordinate ID
 ranges and lingering enabled. The account is intentionally not in the

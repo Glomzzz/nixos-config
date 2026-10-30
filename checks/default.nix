@@ -408,5 +408,11 @@
     inherit (self.nixosConfigurations.nixos) config;
   };
 
+  toolchains = import ./toolchains.nix {
+    inherit pkgs;
+    hostPkgs = self.nixosConfigurations.nixos.pkgs;
+    inherit (self.nixosConfigurations.nixos) config;
+  };
+
   host = self.nixosConfigurations.nixos.config.system.build.toplevel;
 }
