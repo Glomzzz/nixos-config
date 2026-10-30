@@ -6,8 +6,19 @@ deploy:
 build HOST="nixos":
   host='{{HOST}}'; host="${host#HOST=}"; ./scripts/with-github-token nix build ".#nixosConfigurations.${host}.config.system.build.toplevel" --no-link
 
-check:
-  ./scripts/with-github-token nix flake check --no-build
+# Evaluate every output; this does not execute build-time tests.
+eval:
+  ./scripts/with-github-token nix flake check --no-build --no-update-lock-file
+
+# Compatibility alias: evaluation only. Use `test` for regression execution.
+check: eval
+
+# Run every regression check, excluding style checks and the full host build.
+test:
+  ./scripts/with-github-token ./scripts/test-checks
+
+# Complete validation, including the full system build without activation.
+validate: eval lint test build
 
 # Format every .nix file in place with alejandra (the flake's formatter).
 format:
@@ -16,7 +27,7 @@ format:
 format-check:
   ./scripts/with-github-token nix fmt -- --check .
 
-# Everything CI enforces: formatting, dead code, lints, and a full eval.
+# Formatting, dead code, and Nix lints only; evaluation is a separate recipe.
 lint:
   ./scripts/with-github-token nix build --no-link \
     '.#checks.x86_64-linux.formatting' \

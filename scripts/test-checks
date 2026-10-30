@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Build every regression check, but leave style checks and the host build to
+# their explicitly named recipes. Keep this list dynamic as checks are added.
+# Nix interpolation belongs to Nix, not the invoking shell.
+# shellcheck disable=SC2016
+checks=$(nix eval --raw --no-update-lock-file .#checks.x86_64-linux --apply '
+  checks: builtins.concatStringsSep "\n" (
+    map (name: ".#checks.x86_64-linux.${name}") (
+      builtins.attrNames (builtins.removeAttrs checks ["host" "formatting" "dead-code" "lint"])
+    )
+  )
+')
+if [[ -z "$checks" ]]; then
+  printf '%s\n' 'No regression checks were discovered.' >&2
+  exit 1
+fi
+mapfile -t installables <<< "$checks"
+exec nix build --no-link --no-update-lock-file "${installables[@]}"

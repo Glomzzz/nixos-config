@@ -29,11 +29,17 @@ user's Home Manager entrypoint.
 ## Common commands
 
 ```bash
-# Evaluate the flake and its checks
-just check
+# Evaluate every flake output (does not execute tests)
+just eval
+
+# Execute regression checks without building the full system
+just test
 
 # Build without changing the active system
 just build
+
+# Evaluate, lint, execute tests, and build the full system
+just validate
 
 # Check formatting separately
 just format-check
@@ -45,8 +51,11 @@ just update
 just deploy
 ```
 
-Use `nix fmt -- .` to format Nix files. A build does not switch generations; use
-`deploy` only when the generated system has been reviewed.
+`just check` remains an alias for evaluation only. `just lint` runs formatting,
+dead-code, and Nix-lint checks; `just test` dynamically discovers all remaining
+checks except the full host build. Checks are defined in `checks/default.nix`.
+Use `nix fmt -- .` to format Nix files. Neither tests nor a build switch
+generations; use `deploy` only when the generated system has been reviewed.
 
 The scripts under `scripts/` are manual recovery helpers, not part of the
 declarative configuration. Review them before running because they use `sudo`
