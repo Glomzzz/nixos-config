@@ -47,9 +47,6 @@ _: {
               pythonDeps = pythonDeps oldAttrs.passthru.pythonDeps;
             };
         });
-      openldap = prev.openldap.overrideAttrs (_: {
-        doCheck = false;
-      });
     })
   ];
 
