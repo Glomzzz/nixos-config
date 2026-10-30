@@ -73,17 +73,17 @@
       exec rclone mount macmini:glom "$mount_point" \
         --config /dev/null \
         --attr-timeout 1s \
-        --contimeout 30s \
+        --contimeout 10s \
         --daemon-timeout 10s \
         --dir-cache-time 30s \
         --log-level NOTICE \
         --log-systemd \
-        --low-level-retries 10 \
+        --low-level-retries 2 \
         --multi-thread-streams 0 \
         --poll-interval 0 \
-        --retries 5 \
+        --retries 1 \
         --smb-idle-timeout 5m \
-        --timeout 10m \
+        --timeout 1m \
         --transfers 1 \
         --vfs-cache-mode full \
         --cache-dir "$cache_root" \
