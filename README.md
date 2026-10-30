@@ -97,6 +97,20 @@ for manual recovery, with daily cleanup of existing snapshots. These local
 snapshots do not protect against disk failure or theft; off-device backups remain
 to be configured.
 
+## Laptop power and firmware
+
+UPower reports low battery at 20%, critical at 10%, and requests hibernation at
+3%; poweralertd sends desktop notifications. The existing swap partition is the
+explicit resume device. After activation, save work and verify hibernate/resume
+on AC power before relying on the emergency action. Neither swap nor the saved
+hibernation image is encrypted. ASUS profile handling remains with asusd; no
+second competing profile daemon is added.
+
+fwupd supports `fwupdmgr get-devices` and `fwupdmgr get-updates`. Metadata may
+refresh automatically, but firmware is not installed unattended. Review vendor
+instructions, power requirements, dual-boot implications, and recovery options
+before approving an update.
+
 ## Authentication
 
 TTY1 shows a wallpaper-backed, dark ReGreet login screen with a clock and

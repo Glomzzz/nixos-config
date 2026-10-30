@@ -13,6 +13,7 @@
     ./disk.nix
     ./snapshots.nix
     ./storage-health.nix
+    ./power.nix
     ./bluetooth.nix
     ./audio.nix
     ./boot.nix
