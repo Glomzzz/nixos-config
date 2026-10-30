@@ -2,6 +2,7 @@ _: {
   imports = [
     ./docker.nix
     ./maintenance-alerts.nix
+    ./mac-mini-backup.nix
     ./openssh.nix
     ./printing.nix
     ./speechd.nix

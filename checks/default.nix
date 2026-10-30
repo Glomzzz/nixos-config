@@ -370,6 +370,11 @@
     inherit (self.nixosConfigurations.nixos) config;
   };
 
+  backups = import ./backups.nix {
+    inherit pkgs;
+    inherit (self.nixosConfigurations.nixos) config;
+  };
+
   power = import ./power.nix {
     inherit pkgs;
     inherit (self.nixosConfigurations.nixos) config;
