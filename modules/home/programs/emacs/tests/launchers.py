@@ -33,8 +33,8 @@ for name in ('emacs', 'emacsclient', 'emacs-dirvish'):
 assert 'emacs-gui' not in settings['desktopEntries']
 # Win+; and Win+' run the fish functions through fish, not a shell.
 for shortcut, function, expression in (
-        ('calcShortcut', 'calc', '(calc)'),
-        ('emailShortcut', 'email', '(mu4e)')):
+        ('calcShortcut', 'calc', '(run-at-time 0.3 nil (function calc))'),
+        ('emailShortcut', 'email', '(run-at-time 0.3 nil (function mu4e))')):
     argv = settings[shortcut]
     # --no-config would skip the function path, so fish could not autoload these.
     assert argv[0].endswith('/bin/fish') and argv[1:] == ['-c', function], argv
