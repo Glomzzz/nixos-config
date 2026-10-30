@@ -408,6 +408,11 @@
     inherit (self.nixosConfigurations.nixos) config;
   };
 
+  storage-health = import ./storage-health.nix {
+    inherit pkgs;
+    inherit (self.nixosConfigurations.nixos) config;
+  };
+
   nix-credentials = import ./nix-credentials.nix {inherit pkgs;};
 
   overlays = import ./overlays.nix {
