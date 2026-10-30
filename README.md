@@ -76,9 +76,15 @@ for commands and migration limits. Never add plaintext API keys, passwords,
 private keys, or PINs to Nix files.
 
 Commands that evaluate this flake need a GitHub token for the private input. Use
-`just check`, `just build`, or `just deploy`; they obtain the token through `gh`
-and pass it ephemerally via `NIX_CONFIG`. Do not put a token in `flake.nix` or a
-committed environment file.
+`just check`, `just build`, or `just deploy`; they prefer a separate mode-0600
+`${XDG_CONFIG_HOME:-~/.config}/nixos/github-read-token` file and pass its value
+only to the child via `NIX_CONFIG`. `NIX_GITHUB_TOKEN_FILE` selects another
+private file. Until that file is provisioned, the wrapper falls back to `gh`.
+Use a fine-grained token restricted to read-only contents of `nixos-secrets`,
+not the general administration credential. Home Manager activation removes
+persistent access-token assignments from the unmanaged Nix user config without
+copying their values. See [credential migration](docs/secrets.md#nix-private-input-credentials).
+Do not put a token in `flake.nix`, Nix settings, or a committed environment file.
 
 ## Recovery generations
 

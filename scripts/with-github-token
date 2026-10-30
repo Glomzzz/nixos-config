@@ -6,13 +6,25 @@ if (($# == 0)); then
   exit 2
 fi
 
-# Keep the token in an ephemeral child environment. gh reads it from its
-# configured credential store; it is never written to this repository.
-token=$(gh auth token)
-if [[ -z "$token" || "$token" == *$'\n'* ]]; then
-  printf '%s\n' 'Unable to obtain a GitHub token from gh.' >&2
+# Prefer a separate repository-read credential over the general gh account.
+# Provision this private file outside the repository/Nix store; never log it.
+token_file="${NIX_GITHUB_TOKEN_FILE:-${XDG_CONFIG_HOME:-$HOME/.config}/nixos/github-read-token}"
+if [[ -e "$token_file" || -n "${NIX_GITHUB_TOKEN_FILE:-}" ]]; then
+  if [[ ! -f "$token_file" || -L "$token_file" || ! -O "$token_file" || $(stat -c %a -- "$token_file") != 600 ]]; then
+    printf '%s\n' 'GitHub read-token file must be an owned regular file with mode 0600.' >&2
+    exit 1
+  fi
+  token=$(< "$token_file")
+else
+  # Migration fallback only. Set up the read-only token before rotating gh's
+  # broad credential; do not lock yourself out of the private flake input.
+  token=$(gh auth token)
+fi
+if [[ -z "$token" || "$token" == *[[:space:]]* ]]; then
+  printf '%s\n' 'Unable to obtain a valid GitHub credential.' >&2
   exit 1
 fi
-export NIX_CONFIG="access-tokens = github.com=$token"
+# Preserve unrelated caller settings. The last assignment overrides old tokens.
+export NIX_CONFIG="${NIX_CONFIG:+$NIX_CONFIG$'\n'}access-tokens = github.com=$token"
 unset token
 exec "$@"

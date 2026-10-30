@@ -31,6 +31,36 @@ metadata without decrypting anything:
 ./scripts/with-github-token nix build --no-link .#checks.x86_64-linux.sops
 ```
 
+## Nix private-input credentials
+
+The rebuild wrapper prefers `~/.config/nixos/github-read-token` (or
+`$NIX_GITHUB_TOKEN_FILE`) over the general `gh` account. Provision a fine-grained
+GitHub token limited to **Contents: read** for `Glomzzz/nixos-secrets` and store it
+in that regular, user-owned file with mode `0600`. Use a hidden local prompt or
+password manager; never put the value in argv, a Nix expression, shell history,
+or this repository. A private file is still persistent plaintext: protect its
+parent directory and encrypt the disk. This wrapper is scope reduction, not
+protection from processes sharing your UID.
+
+Build/evaluate with the new read-only credential before revoking or narrowing
+the older token. Until the file exists, `gh auth token` remains a migration
+fallback. The wrapper preserves unrelated `NIX_CONFIG` settings and never
+writes a token into Nix configuration. At Home Manager activation, a targeted
+migration removes `access-tokens` and `extra-access-tokens` assignments from
+`~/.config/nix/nix.conf`, preserves other lines, and makes the result mode `0600`.
+It refuses symlinks and creates no backup containing the old credential.
+Included config files and custom `NIX_USER_CONF_FILES` paths require separate
+manual review; the migration does not recursively follow configuration files.
+
+No real credential is provisioned, rotated, or deleted merely by committing this
+configuration. After validating the replacement, rotate/revoke the provider-side
+broad token; removing a local setting does not revoke older copies in snapshots,
+backups, or prior processes. Tests use fake tokens only:
+
+```sh
+./scripts/with-github-token nix build --no-link .#checks.x86_64-linux.nix-credentials
+```
+
 ## On-demand user credentials
 
 `secrets/users/glom.yaml` has **only** the operator OpenPGP recipient: no age,
