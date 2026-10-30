@@ -23,6 +23,8 @@
   emc = "${config.home.homeDirectory}/.local/bin/emc";
   editor = [emc];
   filemanager = [emc config.home.homeDirectory];
+  # niri spawns argv directly, so the Emacs fish functions run through fish.
+  fish = "${pkgs.fish}/bin/fish";
   locker = "${config.programs.swaylock.package}/bin/swaylock";
   brightness = "${pkgs.brightnessctl}/bin/brightnessctl";
   playerctl = "${pkgs.playerctl}/bin/playerctl";
@@ -205,6 +207,8 @@ in {
       "Mod+Escape".action.spawn = locker;
       # Picker script defined in clipboard.nix.
       "Mod+Shift+C".action.spawn = "clipboard-history";
+      "Mod+Semicolon".action.spawn = [fish "-c" "calc"];
+      "Mod+Apostrophe".action.spawn = [fish "-c" "email"];
 
       # --- window management ----------------------------------------------
       "Mod+Q".action.close-window = [];

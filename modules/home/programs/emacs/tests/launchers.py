@@ -35,6 +35,15 @@ assert entry['exec'] == emc + ' --create-frame --no-wait %F'
 assert settings['associations']['text/plain'] == ['emacsclient.desktop']
 assert settings['associations']['inode/directory'] == ['emacs-dirvish.desktop']
 assert not any('emacs-gui.desktop' in apps for apps in settings['associations'].values())
+# Win+; and Win+' run the fish functions through fish, not a shell.
+for shortcut, function, expression in (
+        ('calcShortcut', 'calc', '(calc)'),
+        ('emailShortcut', 'email', '(mu4e)')):
+    argv = settings[shortcut]
+    # --no-config would skip the function path, so fish could not autoload these.
+    assert argv[0].endswith('/bin/fish') and argv[1:] == ['-c', function], argv
+    body = settings['fishCalc' if function == 'calc' else 'fishEmail'].strip()
+    assert body == emc + " --create-frame --no-wait --eval '" + expression + "'", body
 print('Terminal-first editor, Git, shortcuts, MIME entries, and explicit GUI policy passed')
 
 with tempfile.TemporaryDirectory(prefix='emacs-launchers-') as directory:

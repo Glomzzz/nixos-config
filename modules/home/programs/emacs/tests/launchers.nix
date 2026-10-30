@@ -22,6 +22,10 @@
     associations = home.xdg.mimeApps.defaultApplications;
     editorShortcut = home.programs.niri.settings.binds."Mod+Return".action.spawn;
     directoryShortcut = home.programs.niri.settings.binds."Mod+E".action.spawn;
+    calcShortcut = home.programs.niri.settings.binds."Mod+Semicolon".action.spawn;
+    emailShortcut = home.programs.niri.settings.binds."Mod+Apostrophe".action.spawn;
+    fishCalc = home.programs.fish.functions.calc.body;
+    fishEmail = home.programs.fish.functions.email.body;
     niriEnvironment = home.programs.niri.settings.environment;
   });
 in
