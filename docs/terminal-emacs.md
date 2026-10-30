@@ -46,7 +46,7 @@ selection, and wheel input go to Emacs.
 The separate source configuration at `~/.config/emacs/` owns TTY behavior in
 `modules/ui/tty.el` and keyboard negotiation through the existing KKP package.
 
-Terminal Emacs is the default editor:
+Editor commands stay terminal-first; desktop and hotkey launches use GUI frames:
 
 - `emc` or `emc file` opens a blocking TTY client, even on a graphical desktop.
 - `majj` opens Majutsu's change graph and working-copy status in terminal
@@ -54,22 +54,23 @@ Terminal Emacs is the default editor:
   workspace. Use `C-x C-c` to close the client and return to the shell without
   stopping the daemon. Majutsu is managed by `~/.config/emacs/`, not Nix.
 - `EDITOR`, `VISUAL`, `SUDO_EDITOR`, and Git's editor use `emc`.
-- Niri **Mod+Return** opens terminal Emacs; **Mod+E** opens terminal Dirvish.
-- The Emacs desktop launcher and existing file associations use a Kitty TTY.
+- Desktop and hotkey launches open GUI frames without blocking: niri
+  **Mod+Return** (Emacs), **Mod+E** (Dirvish), **Mod+;** (`calc`), and
+  **Mod+'** (`email`, mu4e). The Emacs desktop entry and file associations use
+  the same path. The fish functions `calc` and `email` open the last two from a shell.
 - **`emc -c`** explicitly opens a GUI frame; add `-n` to return immediately.
-  The application menu also offers **Emacs (GUI)**.
 
 When launched without a TTY, the managed `emc` wrapper opens Kitty and waits
 for editing to finish. Never use `--no-wait` for TTY sessions: the terminal
 must stay alive. `--eval`, `--help`, and `--version` do not open a terminal.
 
-Dedicated Emacs windows use Kitty's `--override confirm_os_window_close=0`,
-so **Win+Q / Mod+Q** closes them without Kitty's running-program confirmation.
-This disconnects the client, not the daemon: buffers, including unsaved edits,
-remain in Emacs, but are not automatically saved to disk. Desktop Emacs/Dirvish
-entries use `Terminal=false` so `emc` creates this dedicated Kitty itself;
-they still run terminal Emacs. Other Kitty windows retain the default close
-confirmation, including an existing shell window where you manually run `emc`.
+Dedicated terminal windows that `emc` creates use Kitty's
+`--override confirm_os_window_close=0`, so **Win+Q / Mod+Q** closes them without
+Kitty's running-program confirmation. This disconnects the client, not the
+daemon: buffers, including unsaved edits, remain in Emacs, but are not
+automatically saved to disk. GUI frames from desktop and hotkey launches need no
+Kitty window. Other Kitty windows retain the default close confirmation,
+including an existing shell window where you manually run `emc`.
 
 The raw `emacs` executable remains unchanged for batch/daemon/standalone use.
 Existing shells keep their inherited editor variables until refreshed; Niri

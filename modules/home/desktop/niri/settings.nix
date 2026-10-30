@@ -21,8 +21,11 @@
   terminal = "${config.programs.kitty.package}/bin/kitty";
   launcher = "${pkgs.fuzzel}/bin/fuzzel";
   emc = "${config.home.homeDirectory}/.local/bin/emc";
-  editor = [emc];
-  filemanager = [emc config.home.homeDirectory];
+  # Desktop and hotkey launches open GUI frames and return at once. Terminal
+  # callers (EDITOR, git, sudoedit) keep emc's blocking TTY default.
+  guiEmacs = [emc "--create-frame" "--no-wait"];
+  editor = guiEmacs;
+  filemanager = guiEmacs ++ [config.home.homeDirectory];
   # niri spawns argv directly, so the Emacs fish functions run through fish.
   fish = "${pkgs.fish}/bin/fish";
   locker = "${config.programs.swaylock.package}/bin/swaylock";
