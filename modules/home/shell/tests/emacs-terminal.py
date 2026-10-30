@@ -28,6 +28,8 @@ assert options.font_family == 'Cascadia Mono NF', options.font_family
 assert options.font_size == 15
 assert options.wayland_enable_ime
 assert options.clear_all_shortcuts
+# Fish must not negotiate the keyboard protocol at its prompt (see kitty.nix).
+assert options.env.get('fish_features') == 'no-query-term', options.env
 assert not options.allow_remote_control
 assert options.text_fg_override_threshold == 0
 assert options.symbol_map

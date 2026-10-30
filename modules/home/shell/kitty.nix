@@ -12,6 +12,10 @@
 
     settings = {
       shell = "${pkgs.fish}/bin/fish --login --interactive";
+      # Fish 4.x negotiates the kitty keyboard protocol at its prompt. Ctrl+Shift+C/V
+      # would then be forwarded to fish, which does not bind them, so the clipboard
+      # kitten never copies or pastes there. Keep the prompt in legacy key mode.
+      env = "fish_features=no-query-term";
       linux_display_server = "wayland";
       wayland_enable_ime = true;
       scrollback_lines = 10000;
