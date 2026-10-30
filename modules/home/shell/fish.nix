@@ -2,7 +2,9 @@
   config,
   pkgs,
   ...
-}: {
+}: let
+  emc = "${config.home.homeDirectory}/.local/bin/emc";
+in {
   home.file.".local/bin/fish-completion-shell" = {
     executable = true;
     text = ''
@@ -39,6 +41,20 @@
       body = ''
         set --local --export SHELL ${pkgs.runtimeShell}
         command ssh $argv
+      '';
+    };
+    # Win+; and Win+' (niri/settings.nix) run these through fish, since niri
+    # spawns argv directly. Each opens a new GUI frame and returns at once.
+    functions.calc = {
+      description = "Open Emacs calc in a new GUI frame";
+      body = ''
+        ${emc} --create-frame --no-wait --eval '(calc)'
+      '';
+    };
+    functions.email = {
+      description = "Open Emacs mu4e mail in a new GUI frame";
+      body = ''
+        ${emc} --create-frame --no-wait --eval '(mu4e)'
       '';
     };
   };
