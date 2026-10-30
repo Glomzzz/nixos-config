@@ -408,6 +408,11 @@
     inherit (self.nixosConfigurations.nixos) config;
   };
 
+  overlays = import ./overlays.nix {
+    inherit pkgs;
+    hostPkgs = self.nixosConfigurations.nixos.pkgs;
+  };
+
   toolchains = import ./toolchains.nix {
     inherit pkgs;
     hostPkgs = self.nixosConfigurations.nixos.pkgs;
