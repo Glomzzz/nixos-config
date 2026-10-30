@@ -408,6 +408,11 @@
     inherit (self.nixosConfigurations.nixos) config;
   };
 
+  power = import ./power.nix {
+    inherit pkgs;
+    inherit (self.nixosConfigurations.nixos) config;
+  };
+
   storage-health = import ./storage-health.nix {
     inherit pkgs;
     inherit (self.nixosConfigurations.nixos) config;
