@@ -12,6 +12,14 @@
       (throw "waybar: more than one clipboard-history in home.packages")
       config.home.packages)
     "clipboard-history";
+  appLauncher =
+    lib.getExe'
+    (lib.findSingle
+      (p: (lib.getName p) == "app-launcher")
+      (throw "waybar: app-launcher not found in home.packages (fuzzel.nix)")
+      (throw "waybar: more than one app-launcher in home.packages")
+      config.home.packages)
+    "app-launcher";
   swayncClient = lib.getExe' config.services.swaync.package "swaync-client";
   networkEditor = lib.getExe' config.services.network-manager-applet.package "nm-connection-editor";
   bluetoothManager = lib.getExe' config.services.blueman-applet.package "blueman-manager";
@@ -44,7 +52,7 @@ in {
   "custom/launcher" = {
     format = "󱄅";
     tooltip = false;
-    on-click = "${pkgs.fuzzel}/bin/fuzzel";
+    on-click = appLauncher;
   };
 
   "niri/workspaces" = {

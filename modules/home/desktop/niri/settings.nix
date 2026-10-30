@@ -19,7 +19,6 @@
         ++ [../../../../patches/xwayland-satellite-popup-parent-offset.patch];
     });
   terminal = "${config.programs.kitty.package}/bin/kitty";
-  launcher = "${pkgs.fuzzel}/bin/fuzzel";
   emc = "${config.home.homeDirectory}/.local/bin/emc";
   # Desktop and hotkey launches open GUI frames and return at once. Terminal
   # callers (EDITOR, git, sudoedit) keep emc's blocking TTY default.
@@ -205,7 +204,8 @@ in {
       # --- launching -------------------------------------------------------
       "Mod+Slash".action.spawn = terminal;
       "Mod+Return".action.spawn = editor;
-      "Mod+D".action.spawn = launcher;
+      # Steam game launchers are filtered out; see fuzzel.nix.
+      "Mod+D".action.spawn = "app-launcher";
       "Mod+E".action.spawn = filemanager;
       "Mod+Escape".action.spawn = locker;
       # Picker script defined in clipboard.nix.
