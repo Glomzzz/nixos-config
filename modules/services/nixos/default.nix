@@ -1,6 +1,7 @@
 _: {
   imports = [
     ./docker.nix
+    ./maintenance-alerts.nix
     ./openssh.nix
     ./printing.nix
     ./speechd.nix

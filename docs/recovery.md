@@ -50,6 +50,45 @@ specific user service actually needs a larger limit, grant it explicitly to that
 unit, not as a blanket global default. Confirm
 `stat -c '%A' /run/wrappers/bin/getcap` has no setuid `s`.
 
+## Btrfs health and allocation pressure
+
+`hardware/zephyrus/storage-health.nix` schedules a monthly scrub of `/`, limited
+to 100 MiB/s, and an hourly **read-only** allocation check. The monitor reads
+kernel counters for metadata usage and physical device-unallocated space, rather
+than interpreting `df` as an allocation budget. It warns independently at 80%
+metadata usage or less than 10 GiB unallocated; low unallocated space is a warning,
+not proof of an imminent full-filesystem failure. DUP accounting uses physical
+`disk_total` values rather than doubling a second time.
+
+Warnings and failures are written to the journal. Desktop notifications are
+attempted when the user's D-Bus session is available, with repeated allocation
+warnings limited to once a day when unchanged. Scrub failures also notify the
+desktop. Inspect these even when no desktop session was running:
+
+```sh
+systemctl list-timers 'btrfs-*'
+journalctl -u btrfs-allocation-monitor -u 'btrfs-scrub@*'
+sudo btrfs scrub status /
+sudo btrfs filesystem usage /
+```
+
+No scheduled balance or snapshot creation is enabled. Before manual reclamation:
+
+1. Verify the off-device backup and restore path, check for filesystem/device
+   errors, and review snapshots instead of deleting them blindly.
+2. Inspect `sudo btrfs filesystem usage /` and `sudo btrfs balance status /`.
+   Avoid relocation while another balance is running or devices report errors.
+3. If there are wholly empty chunks, an explicit
+   `sudo btrfs balance start -dusage=0 /` reclaims only those empty **data** chunks.
+   It may reclaim nothing; recheck allocation rather than escalating blindly.
+4. For partly used chunks, review Btrfs guidance and plan bounded relocation
+   based on the actual allocation. Do not run an unfiltered balance on a nearly
+   allocation-full filesystem, and do not automate it as an emergency response.
+
+Automatic whole-root snapshots remain disabled. A future layout migration should
+separate `/nix` and high-churn application/game data before restoring automation;
+no subvolumes or files are moved during activation by this change.
+
 ## Local Btrfs snapshots
 
 Automatic hourly and boot-time snapshots are **disabled** after a Btrfs
