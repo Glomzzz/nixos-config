@@ -29,12 +29,12 @@ No key generation, reset, PIN change, or transfer is performed by Nix activation
 - Git/Jujutsu signing stays **disabled until provisioned**. Once both fields in
   `users/glom/openpgp.nix` are set, the public certificate is imported, and GnuPG,
   Git, and Jujutsu all select the same exact signing subkey. Git signs commits/tags
-  by default, and Jujutsu signs commits authored by you when creating or rewriting
-  them (`signing.behavior = "own"`), including working-copy snapshots. This may
-  require a YubiKey touch on each rewrite. Sign-on-push remains enabled as a fallback
-  for unsigned outgoing mutable commits authored by you.
-  `jj sign -r REV` can sign an explicitly selected revision manually. Signing
-  changes commit hashes; review the outgoing stack before pushing.
+  by default. Jujutsu uses `signing.behavior = "drop"`: it creates and rewrites
+  commits unsigned, and `git.sign-on-push` signs the unsigned outgoing mutable commits
+  authored by you when you run `jj git push`. One touch covers that push's signatures
+  only because the `sig` touch policy is `cached` (about 15 s). Plain `git push` does
+  not sign. `jj sign -r REV` can sign an explicitly selected revision manually.
+  Signing changes commit hashes; review the outgoing stack before pushing.
 
 ### Touch notifications
 
@@ -287,7 +287,7 @@ OpenPGP operation, with reversible `on` policies:
 
 ```bash
 gpgconf --kill scdaemon
-ykman openpgp keys set-touch sig on
+ykman openpgp keys set-touch sig cached
 ykman openpgp keys set-touch dec on
 ykman openpgp keys set-touch aut on
 ykman openpgp info
@@ -340,9 +340,9 @@ and activate with `test`; then test real signing before `switch`.
 Upload `public.asc` to GitHub's **GPG keys** settings if using GitHub, and ensure
 your address is verified there. Do not upload the secret backup or revoke.asc.
 Use a disposable repository to test Git signing; in this jj workspace use jj
-commands, not `git commit`. Jujutsu signs your commits on creation and rewrite;
-`jj sign -r REV` signs an explicitly selected revision manually. Push also signs
-any remaining unsigned mutable commits authored by you. Verify signatures locally
+commands, not `git commit`. Jujutsu leaves new commits unsigned; `jj git push`
+signs unsigned outgoing mutable commits authored by you. `jj sign -r REV` signs an
+explicitly selected revision manually. Verify signatures locally
 and on the hosting service.
 No commit or push is performed by this configuration change.
 
@@ -360,18 +360,18 @@ unset workdir verifydir
 ## PIN retention and card-management access
 
 The inspected card uses **Signature PIN: not forced** (`ykman` calls this
-**Require PIN for signature: Once**) and touch policy **On** for all three slots.
+**Require PIN for signature: Once**) touch policy **On** for `dec` and `aut`, and **Cached** (15 s) for `sig`.
 With that PIN policy, consecutive signatures should not need a newly typed PIN
-while the card's verification state remains intact. Touch is still required for
-each operation. Unplugging, a card reset, or restarting scdaemon can require the
+while the card's verification state remains intact. Touch is still required, but
+a `sig` touch covers signatures for about 15 seconds. Unplugging, a card reset, or restarting scdaemon can require the
 PIN again; signing and decryption/SSH can also need separate initial verification.
 Ordinary `gpg-agent` passphrase-cache TTLs do not reliably control this card state.
 
 `disable-ccid` keeps GPG on the PC/SC backend; `pcsc-shared` is deliberately absent.
 Shared access has a [reported repeated-PIN problem](https://dev.gnupg.org/T7041),
 and another smart-card client can invalidate the state GPG relies on. Generic
-desktop password caching remains disabled, and Jujutsu still signs local
-snapshots and rewrites. Exclusive access does not change the card's PIN/touch
+desktop password caching remains disabled. Jujutsu does not sign local snapshots
+or rewrites; signing happens at push. Exclusive access does not change the card's PIN/touch
 policies. The separate saved-PIN opt-in below deliberately automates user-PIN
 entry; it is not enabled by the `no-allow-external-cache` setting.
 
@@ -418,8 +418,9 @@ signatures outside the repository, using the configured default signing subkey:
 )
 ```
 
-Enter the user PIN in pinentry if requested and touch for each signature. The
-second signature should require touch, not another PIN entry. Cancel rather than
+Enter the user PIN in pinentry if requested and touch once. The second signature
+should not need another PIN entry; it needs a new touch only if it runs more than
+15 seconds after the first touch. Cancel rather than
 guess if unsure of the PIN. If the second operation still asks, inspect
 `journalctl --user -u gpg-agent.service` and other running smart-card clients;
 exclusive access is a candidate fix, not proof that every reset source is gone.
@@ -484,7 +485,7 @@ gpgconf --homedir "$HOME/.gnupg" --kill gpg-agent
 
 Use the disposable two-signature test above, leaving normal pinentry mode
 (`ask`): the first unlock should obtain the saved PIN without a dialog, and
-both signatures should require touch. `--pinentry-mode error` intentionally
+touch is requested only when the 15 s `sig` cache has expired. `--pinentry-mode error` intentionally
 forbids **any** PIN provider and therefore is unsuitable for testing an initial
 automatic unlock. It remains useful to test subsequent on-card verification.
 

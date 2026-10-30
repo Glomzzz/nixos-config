@@ -68,10 +68,10 @@ in {
         backend = "gpg";
         key = identity.signingKey;
         backends.gpg.program = gpg;
-        # Sign our commits on creation and rewrite, including working-copy snapshots.
-        behavior = "own";
+        # Create and rewrite unsigned; sign at push so the card touch is batched.
+        behavior = "drop";
       };
-      # Also sign any unsigned outgoing mutable commits authored by us.
+      # Sign unsigned outgoing mutable commits authored by us, at push time.
       git.sign-on-push = true;
     };
   };
