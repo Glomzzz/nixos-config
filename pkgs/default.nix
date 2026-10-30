@@ -1,6 +1,7 @@
 final: _prev: {
   cherry-studio = final.callPackage ./cherry-studio.nix {};
   cherry-studio-with-desktop = final.callPackage ./cherry-studio-with-desktop.nix {};
+  chinese-word-segmentation = final.callPackage ./chinese-word-segmentation.nix {};
   clipferry = final.callPackage ./clipferry.nix {};
   bun = final.callPackage ./bun.nix {};
   ix = final.callPackage ./ix.nix {};

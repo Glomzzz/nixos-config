@@ -2,6 +2,9 @@
   # Runtime helpers for Dirvish previews, plus the Han font the Emacs
   # configuration uses for Chinese text and EPUB body text.
   home.packages = with pkgs; [
+    # Jieba segmenter behind the Emacs Chinese word motion (`cns-mode'), see
+    # `modules/feat/editing/chinese-words.el' in ~/.config/emacs.
+    chinese-word-segmentation
     epub-thumbnailer
     ffmpegthumbnailer
     ghostscript
