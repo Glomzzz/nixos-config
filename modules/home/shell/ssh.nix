@@ -11,13 +11,19 @@ in {
     enableDefaultConfig = false;
     settings = {
       "*" = {
-        # A public IdentityFile selects the matching private key in gpg-agent.
-        # Avoid silently falling back to unrelated software keys in the agent.
-        IdentityFile = "~/.ssh/yubikey-openpgp.pub";
         IdentitiesOnly = true;
         ForwardAgent = false;
       };
+      # A public IdentityFile selects the matching private key in gpg-agent.
+      # Avoid silently falling back to unrelated software keys in the agent.
+      # mac-mini is excluded: it uses a software key and must not load this.
+      "* !macmini !mac-mini" = {
+        IdentityFile = "~/.ssh/yubikey-openpgp.pub";
+      };
       "macmini mac-mini" = {
+        # Software key, no agent: avoids YubiKey touch prompts for this host.
+        IdentityFile = "~/.ssh/id_ed25519";
+        IdentityAgent = "none";
         hostname = "mac-mini";
         proxyCommand = "${pkgs.ssh-proxy-mac-mini} %p %h";
         serverAliveInterval = 30;
