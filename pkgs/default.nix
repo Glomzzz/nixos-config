@@ -14,4 +14,5 @@ final: _prev: {
   v2raya-assets = final.callPackage ./v2raya-assets.nix {};
   wechat = final.callPackage ./wechat {};
   wivrn = final.callPackage ./wivrn.nix {};
+  zotero = final.callPackage ./zotero {};
 }

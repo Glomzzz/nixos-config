@@ -1,0 +1,43 @@
+diff --git a/js-build/document-worker.js b/js-build/document-worker.js
+index 8899b16..6c36dd3 100644
+--- a/js-build/document-worker.js
++++ b/js-build/document-worker.js
+@@ -43,9 +43,6 @@ async function getDocumentWorker(signatures) {
+ 			}
+ 		}
+ 		catch (e) {
+-			console.error(e);
+-			await exec('npm ci', { cwd: modulePath });
+-			await exec('npm run build', { cwd: modulePath });
+ 			await fs.copy(path.join(modulePath, 'build'), targetDir);
+ 			let missingFiles = await getMissingFiles(targetDir);
+ 			if (missingFiles.length) {
+diff --git a/js-build/note-editor.js b/js-build/note-editor.js
+index 641680b..b9b8ac6 100644
+--- a/js-build/note-editor.js
++++ b/js-build/note-editor.js
+@@ -39,9 +39,6 @@ async function getZoteroNoteEditor(signatures) {
+ 			await fs.remove(path.join(targetDir, 'zotero'));
+ 		}
+ 		catch (e) {
+-			console.error(e);
+-			await exec('npm ci', { cwd: modulePath });
+-			await exec('npm run build', { cwd: modulePath });
+ 			await fs.copy(path.join(modulePath, 'build', 'zotero'), targetDir);
+ 		}
+ 		signatures['note-editor'] = { hash };
+diff --git a/js-build/reader.js b/js-build/reader.js
+index 831997d..0e9154b 100644
+--- a/js-build/reader.js
++++ b/js-build/reader.js
+@@ -42,10 +42,6 @@ async function getReader(signatures) {
+ 			if (!e.message?.includes('The requested URL returned error: 403')) {
+ 				console.error(e);
+ 			}
+-			await exec('npm ci', { cwd: modulePath });
+-			// The reader's npm scripts use POSIX shell syntax, which cmd.exe (npm's default
+-			// script shell on Windows) can't run
+-			await exec('npm run build:zotero --script-shell=bash', { cwd: modulePath });
+ 			if (!fs.pathExists(path.join(modulePath, 'build', 'zotero', 'pdf', 'build', 'pdf.mjs'))) {
+ 				throw new Error('pdf.js build failed to produce output');
+ 			}

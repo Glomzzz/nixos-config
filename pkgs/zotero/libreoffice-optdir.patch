@@ -1,0 +1,28 @@
+diff --git a/app/modules/zotero-libreoffice-integration/resource/installer.mjs b/app/modules/zotero-libreoffice-integration/resource/installer.mjs
+index a52b45e..d936459 100644
+--- a/app/modules/zotero-libreoffice-integration/resource/installer.mjs
++++ b/app/modules/zotero-libreoffice-integration/resource/installer.mjs
+@@ -200,11 +200,18 @@ var Plugin = new (function() {
+ 		else if (Zotero.isLinux) {
+ 			let optDir = Plugin.getFile('/opt')
+ 			if (optDir.exists()) {
+-				await Zotero.File.iterateDirectory('/opt', async (entry) => {
+-					if (entry.name.startsWith('libreoffice')) {
+-						potentialLocations.push(entry.path + '/program/unopkg');
+-					}
+-				});
++				// /opt is often not readable by ordinary users (e.g. mode 711). That must
++				// not abort detection of the other locations.
++				try {
++					await Zotero.File.iterateDirectory('/opt', async (entry) => {
++						if (entry.name.startsWith('libreoffice')) {
++							potentialLocations.push(entry.path + '/program/unopkg');
++						}
++					});
++				}
++				catch (e) {
++					Zotero.logError(e);
++				}
+ 			}
+ 		}
+ 
