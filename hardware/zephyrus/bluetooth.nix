@@ -3,10 +3,7 @@ _: {
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
-    settings = {
-      General = {
-        Enable = "Source,Sink,Media,Socket";
-      };
-    };
+    # BlueZ enables its supported profiles by default. General.Enable is not
+    # a supported main.conf key and only produces a startup warning.
   };
 }
