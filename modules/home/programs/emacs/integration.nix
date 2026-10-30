@@ -4,13 +4,14 @@
   ...
 }: let
   emc = "${config.home.homeDirectory}/.local/bin/emc";
-  terminalEditor = {
-    name = "Emacs (Terminal)";
+  # Desktop launches open a GUI frame and return at once, so no Kitty wrapper
+  # is involved. Terminal callers keep emc's blocking TTY default.
+  guiEditor = {
+    name = "Emacs";
     genericName = "Text Editor";
-    comment = "Edit text in terminal Emacs";
-    exec = "${emc} --tty %F";
+    comment = "Edit text in Emacs";
+    exec = "${emc} --create-frame --no-wait %F";
     icon = "emacs";
-    # emc supplies Kitty itself, including its Emacs-only close policy.
     terminal = false;
     categories = ["Development" "TextEditor"];
     startupNotify = false;
@@ -19,30 +20,20 @@
       config.xdg.mimeApps.defaultApplications);
   };
 in {
-  # Preserve the desktop IDs used by existing MIME associations, but never
-  # detach a TTY client: its terminal must stay alive until editing finishes.
-  # Terminal=false avoids a generic terminal wrapping emc before its handoff.
+  # Preserve the desktop IDs used by existing MIME associations.
   xdg.desktopEntries = {
-    emacs = terminalEditor;
+    emacs = guiEditor;
     emacsclient =
-      terminalEditor
+      guiEditor
       // {
-        name = "Emacs Client (Terminal)";
+        name = "Emacs Client";
         noDisplay = true;
-      };
-    emacs-gui =
-      terminalEditor
-      // {
-        name = "Emacs (GUI)";
-        comment = "Explicitly open a graphical Emacs client frame";
-        exec = "${emc} --create-frame --no-wait %F";
-        terminal = false;
       };
     emacs-dirvish = {
       name = "Emacs Dirvish";
       genericName = "File Manager";
-      comment = "Manage files with Dirvish in terminal Emacs";
-      exec = "${emc} --tty %f";
+      comment = "Manage files with Dirvish in Emacs";
+      exec = "${emc} --create-frame --no-wait %f";
       icon = "emacs";
       terminal = false;
       categories = ["System" "FileTools" "FileManager"];

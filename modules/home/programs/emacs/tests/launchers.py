@@ -21,20 +21,16 @@ assert settings['gitEditor'] == emc
 assert not settings['generatedClient']
 assert settings['majjExecutable']
 assert 'lazyjj' not in settings['packages']
-assert settings['editorShortcut'] == [emc]
-assert settings['directoryShortcut'] == [emc, str(Path(emc).parents[2])]
+# Desktop and hotkey launches request GUI frames without blocking; terminal
+# callers (EDITOR, git, sudoedit) keep emc's default blocking TTY path.
+assert settings['editorShortcut'] == [emc, '--create-frame', '--no-wait']
+assert settings['directoryShortcut'] == [emc, '--create-frame', '--no-wait', str(Path(emc).parents[2])]
 for name in ('emacs', 'emacsclient', 'emacs-dirvish'):
     entry = settings['desktopEntries'][name]
-    # The managed wrapper, not the desktop, must create the dedicated Kitty.
     assert not entry['terminal'], name
-    assert entry['exec'].startswith(emc + ' --tty '), entry
-    assert '--no-wait' not in entry['exec'], name
-entry = settings['desktopEntries']['emacs-gui']
-assert not entry['terminal']
-assert entry['exec'] == emc + ' --create-frame --no-wait %F'
-assert settings['associations']['text/plain'] == ['emacsclient.desktop']
-assert settings['associations']['inode/directory'] == ['emacs-dirvish.desktop']
-assert not any('emacs-gui.desktop' in apps for apps in settings['associations'].values())
+    assert entry['exec'].startswith(emc + ' --create-frame --no-wait '), entry
+    assert '--tty' not in entry['exec'], name
+assert 'emacs-gui' not in settings['desktopEntries']
 # Win+; and Win+' run the fish functions through fish, not a shell.
 for shortcut, function, expression in (
         ('calcShortcut', 'calc', '(calc)'),
@@ -44,7 +40,10 @@ for shortcut, function, expression in (
     assert argv[0].endswith('/bin/fish') and argv[1:] == ['-c', function], argv
     body = settings['fishCalc' if function == 'calc' else 'fishEmail'].strip()
     assert body == emc + " --create-frame --no-wait --eval '" + expression + "'", body
-print('Terminal-first editor, Git, shortcuts, MIME entries, and explicit GUI policy passed')
+assert settings['associations']['text/plain'] == ['emacsclient.desktop']
+assert settings['associations']['inode/directory'] == ['emacs-dirvish.desktop']
+assert not any('emacs-gui.desktop' in apps for apps in settings['associations'].values())
+print('Blocking editor policy, GUI desktop/hotkey launches, and MIME entries passed')
 
 with tempfile.TemporaryDirectory(prefix='emacs-launchers-') as directory:
     root = Path(directory)

@@ -8,7 +8,7 @@
 in {
   services.emacs = {
     enable = true;
-    # integration.nix owns terminal desktop entries and the explicit GUI entry.
+    # integration.nix owns the Emacs desktop entries.
     # Home Manager's generated client entry always declares Terminal=false.
     client.enable = false;
     # Socket activation is disabled on purpose: the generated
