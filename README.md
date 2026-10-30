@@ -94,8 +94,10 @@ its store closure independently of age-based pruning. See
 [recovery instructions](docs/recovery.md). Automatic hourly and boot-time Btrfs
 snapshots are disabled after a metadata-full incident. Snapper remains available
 for manual recovery, with daily cleanup of existing snapshots. These local
-snapshots do not protect against disk failure or theft; off-device backups remain
-to be configured.
+snapshots do not protect against disk failure or theft. An encrypted Restic/SFTP
+backup to the Mac mini is configured, but its daily timer stays disabled until
+credentials, destination storage, and a real restore have been verified. See
+[backup provisioning and recovery](docs/backups.md).
 
 ## Network trust
 

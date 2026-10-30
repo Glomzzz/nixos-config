@@ -148,5 +148,7 @@ uses an explicit `subvol=@` mount and does not configure automatic boot into
 snapshots. System-generation rollback is the preferred way to undo NixOS changes.
 
 **These snapshots are not off-device backups.** Disk failure, theft, or root-level
-destruction can remove both originals and snapshots. An independent backup
-repository remains to be configured; Syncthing is not a substitute.
+destruction can remove both originals and snapshots. The independent Mac mini
+Restic repository still requires credential provisioning and a verified off-device
+restore before enabling its timer; see [backup setup](backups.md). Syncthing is
+not a substitute.
