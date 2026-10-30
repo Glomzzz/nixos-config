@@ -1,9 +1,15 @@
-{pkgs, ...}: {
+{
+  lib,
+  pkgs,
+  ...
+}: {
   home.packages = with pkgs; [
     gnumake
-    glibc
     clang-tools
-    libgccjit
+    # Wrapped GCC supplies headers, startup objects, and the linker setup.
+    # Emacs already closes over libgccjit; exposing its bin/ shadows gcc.
+    # Clang owns generic cc/c++ names; gcc/g++ remain available explicitly.
+    (lib.setPrio 20 gcc)
     cmake
     ninja
     clang
