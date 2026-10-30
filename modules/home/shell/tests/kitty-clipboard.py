@@ -18,7 +18,7 @@ for key, action in (("c", "copy"), ("v", "paste")):
     assert len(definitions) == 1
     assert definitions[0].definition == "kitten clipboard.py " + action
 # Other modified keys must not accidentally acquire terminal actions.
-for key in ("ctrl+c", "ctrl+v", "ctrl+tab", "ctrl+shift+left", "ctrl+shift+x"):
+for key in ("ctrl+c", "ctrl+v", "ctrl+super+c", "ctrl+super+v", "ctrl+tab", "ctrl+shift+left", "ctrl+shift+x"):
     assert parse_shortcut(key) not in keymap, key
 for key, action in (("c", "copy_to_clipboard"), ("v", "paste_from_clipboard")):
     assert keymap[parse_shortcut("ctrl+alt+shift+" + key)][0].definition == action

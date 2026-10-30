@@ -29,6 +29,11 @@ terminal Emacs and Pi), the clipboard kitten forwards those keys using Kitty's
 own key encoder instead: the application owns their meaning. This uses the
 current window's protocol state, not its title or a process-name heuristic.
 
+Fish 4.x enables that protocol at its prompt, which would forward Ctrl+Shift+C/V
+to fish, where they do nothing. Kitty therefore sets `fish_features=no-query-term`
+for its child processes, so the prompt stays in legacy key mode. This also turns
+off fish's other terminal queries; run `fish --features query-term` to restore them.
+
 Unconditional terminal actions use **Ctrl+Alt+Shift**:
 
 | Chord | Action |
