@@ -138,15 +138,16 @@ class CredentialsTests(unittest.TestCase):
         with patch.object(credentials, "decrypt_section", return_value=section) as decrypt, \
              patch.object(credentials, "run_command", side_effect=command):
             code = credentials.main(["--ssh-program", "fake-ssh", "--secrets-file", "ciphertext.yaml",
-                                     "ssh-host", "--", "-v"])
+                                     "ssh-host", "--", "-v", f"root@{credentials.SSH_HOST_ALIAS}"])
         self.assertEqual(code, 3)
         decrypt.assert_called_once_with("sops", "ciphertext.yaml", "ssh-host")
-        self.assertEqual(seen["argv"][:4], ["fake-ssh", "-F", seen["argv"][2], credentials.SSH_HOST_ALIAS])
-        self.assertEqual(seen["argv"][4:], ["-v"])
+        self.assertEqual(seen["argv"][:3], ["fake-ssh", "-F", seen["argv"][2]])
+        self.assertEqual(seen["argv"][3:], ["-v", f"root@{credentials.SSH_HOST_ALIAS}"])
         self.assertNotIn(FAKE_HOST, " ".join(seen["argv"]))
         self.assertNotIn("BEGIN OPENSSH", " ".join(seen["argv"]))
         self.assertIn(f"HostName {FAKE_HOST}", seen["text"])
         self.assertIn("IdentitiesOnly yes", seen["text"])
+        self.assertIn("PreferredAuthentications publickey", seen["text"])
         self.assertEqual(seen["key"], FAKE_KEY)
         self.assertEqual(seen["config_mode"], 0o600)
         self.assertEqual(seen["key_mode"], 0o600)

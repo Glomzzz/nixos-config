@@ -177,11 +177,12 @@ def ssh_host_command(args):
             f"  HostName {host}\n"
             f"  IdentityFile {identity}\n"
             "  IdentitiesOnly yes\n"
+            "  PreferredAuthentications publickey\n"
             "  IdentityAgent none\n"
             "  ForwardAgent no\n"
         ))
-        return run_command([args.ssh_program, "-F", str(config), SSH_HOST_ALIAS, *command],
-                           clean_environment())
+        # The caller supplies the destination, e.g. user@credential-host.
+        return run_command([args.ssh_program, "-F", str(config), *command], clean_environment())
     finally:
         shutil.rmtree(staging, ignore_errors=True)
 
