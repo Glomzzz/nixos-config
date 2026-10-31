@@ -13,6 +13,7 @@
     muInit = home.home.activation.runMuInit.data;
     service = home.systemd.user.services.mbsync;
     timer = home.systemd.user.timers.mbsync;
+    notify = home.systemd.user.services.mail-notify;
     legacyConfig = toString home.home.file.".mbsyncrc".source;
     xdgConfig = toString home.xdg.configFile."isyncrc".source;
   });
@@ -57,11 +58,15 @@ in
       assert service["Service"]["ExecCondition"] == s["passwordCommand"][0] + " check"
       assert service["Service"]["UMask"] == "0077"
       assert "ExecStartPost" not in service["Service"], "mu4e must own the index lock"
+      assert service["Unit"]["OnSuccess"] == ["mail-notify.service"]
+      assert s["notify"]["Service"]["Type"] == "oneshot"
       assert s["timer"]["Timer"]["OnCalendar"] == "*:0/5"
       assert s["timer"]["Timer"]["Persistent"]
       assert "--my-address=" + sys.argv[2] in s["muInit"]
       assert "--maildir=/home/glom/Maildir" in s["muInit"]
       PY
+
+      python3 ${./notify-tests.py} ${./notify.py}
 
       # Exercise the pinned mu version with a private, synthetic mailbox only.
       export HOME="$TMPDIR/home" MUHOME="$TMPDIR/mu"

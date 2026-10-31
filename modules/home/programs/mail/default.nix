@@ -8,6 +8,9 @@
 }: let
   passwordStore = "${config.home.homeDirectory}/.password-store";
   python = pkgs.python3.withPackages (ps: [ps.secretstorage]);
+  account = config.accounts.email.accounts.infomaniak;
+  inboxNew = "${account.maildir.absPath}/${account.folders.inbox}/new";
+  notifyState = "${config.xdg.stateHome}/mail-notify/infomaniak-inbox.json";
   credential = pkgs.writeShellApplication {
     name = "infomaniak-password";
     text = ''
@@ -90,13 +93,26 @@ in {
   };
 
   systemd.user = {
-    services.mbsync = {
-      Service = {
-        # Status 1 skips this attempt cleanly when locked/missing. The next
-        # timer tick retries without pinentry, GUI prompts, or GPG access.
-        ExecCondition = "${credential}/bin/infomaniak-password check";
-        UMask = "0077";
-        TimeoutStartSec = "15min";
+    services = {
+      mbsync = {
+        # A successful sync starts the notifier.  That unit only reads new
+        # message headers, so mu's database lock is left alone.
+        Unit.OnSuccess = ["mail-notify.service"];
+        Service = {
+          # Status 1 skips this attempt cleanly when locked/missing. The next
+          # timer tick retries without pinentry, GUI prompts, or GPG access.
+          ExecCondition = "${credential}/bin/infomaniak-password check";
+          UMask = "0077";
+          TimeoutStartSec = "15min";
+        };
+      };
+      mail-notify = {
+        Unit.Description = "Notify about new Infomaniak INBOX mail";
+        Service = {
+          Type = "oneshot";
+          ExecStart = "${pkgs.python3}/bin/python3 ${./notify.py} --new-dir ${inboxNew} --state ${notifyState} --notify-send ${pkgs.libnotify}/bin/notify-send";
+          UMask = "0077";
+        };
       };
     };
     timers.mbsync.Timer.Persistent = true;
