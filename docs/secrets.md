@@ -75,7 +75,7 @@ runtime file. It never invokes a shell to interpolate a secret:
 ```sh
 user-credentials github -- gh api user
 user-credentials github -- YOUR_COMMAND ARGUMENTS
-user-credentials ssh-host -- ARGUMENTS
+user-credentials ssh-host -- root@credential-host
 mac-mini-connect
 mac-mini-disconnect
 ```
