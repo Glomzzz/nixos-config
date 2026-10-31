@@ -3,7 +3,9 @@
 import argparse
 import json
 import os
+import re
 from pathlib import Path
+import shutil
 import signal
 import stat
 import subprocess
@@ -129,18 +131,77 @@ def smb_credential(args):
     return 0
 
 
+SSH_HOST_ALIAS = "credential-host"
+
+
+def required_host(data):
+    value = required_string(data, "host")
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9.-]{0,252}", value):
+        raise CredentialError("Missing or invalid SSH host field.")
+    return value
+
+
+def required_private_key(data):
+    value = data.get("private_key")
+    if (not isinstance(value, str) or "BEGIN OPENSSH PRIVATE KEY" not in value
+            or "\x00" in value or "\r" in value):
+        raise CredentialError("Missing or invalid SSH private key field.")
+    return value if value.endswith("\n") else value + "\n"
+
+
+def write_private(path, text):
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    with os.fdopen(fd, "w") as target:
+        target.write(text)
+
+
+def ssh_host_command(args):
+    # The host and key exist only in a private per-run staging directory. ssh
+    # gets a private alias config, so neither value is placed in argv or env.
+    command = args.command
+    if command[:1] == ["--"]:
+        command = command[1:]
+    section = decrypt_section(args.sops_program, args.secrets_file, "ssh-host")
+    host = required_host(section)
+    key = required_private_key(section)
+    root = runtime_root()
+    if re.search(r'[\s"]', str(root)):
+        raise CredentialError("Runtime directory path must not contain spaces or quotes.")
+    staging = Path(tempfile.mkdtemp(prefix=".ssh-host.", dir=root))
+    try:
+        identity = staging / "identity"
+        config = staging / "config"
+        write_private(identity, key)
+        write_private(config, (
+            f"Host {SSH_HOST_ALIAS}\n"
+            f"  HostName {host}\n"
+            f"  IdentityFile {identity}\n"
+            "  IdentitiesOnly yes\n"
+            "  IdentityAgent none\n"
+            "  ForwardAgent no\n"
+        ))
+        return run_command([args.ssh_program, "-F", str(config), SSH_HOST_ALIAS, *command],
+                           clean_environment())
+    finally:
+        shutil.rmtree(staging, ignore_errors=True)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--sops-program", default="sops")
+    parser.add_argument("--ssh-program", default="ssh")
     parser.add_argument("--secrets-file", required=True)
     actions = parser.add_subparsers(dest="action", required=True)
     actions.add_parser("github").add_argument("command", nargs=argparse.REMAINDER)
+    actions.add_parser("ssh-host").add_argument("command", nargs=argparse.REMAINDER)
     actions.add_parser("unlock-smb")
     actions.add_parser("lock-smb")
     args = parser.parse_args(argv)
     try:
         if args.action == "github":
             return scoped_command(args)
+        if args.action == "ssh-host":
+            return ssh_host_command(args)
         return smb_credential(args)
     except (CredentialError, OSError) as error:
         # OSError strings can contain arbitrary filenames. Keep diagnostics

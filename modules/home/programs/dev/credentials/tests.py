@@ -20,6 +20,8 @@ credentials = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(credentials)
 
 FAKE = "fake-test-only-secret"
+FAKE_KEY = "-----BEGIN OPENSSH PRIVATE KEY-----\nfake-test-only\n-----END OPENSSH PRIVATE KEY-----\n"
+FAKE_HOST = "fake-host.example.test"
 
 
 class CredentialsTests(unittest.TestCase):
@@ -36,7 +38,8 @@ class CredentialsTests(unittest.TestCase):
 
     def args(self, action, command=None):
         return SimpleNamespace(action=action, command=command or ["--", "fake-command"],
-                               sops_program="fake-sops", secrets_file="ciphertext.yaml")
+                               sops_program="fake-sops", ssh_program="fake-ssh",
+                               secrets_file="ciphertext.yaml")
 
     def test_missing_command_never_decrypts(self):
         with patch.object(credentials, "decrypt_section") as decrypt:
@@ -115,6 +118,71 @@ class CredentialsTests(unittest.TestCase):
         for value in (None, "", "secret\nvalue", "secret\x00value", 123):
             with self.assertRaises(credentials.CredentialError):
                 credentials.required_string({"pat": value}, "pat")
+
+    def test_ssh_host_stages_private_alias_and_cleans_up(self):
+        section = {"host": FAKE_HOST, "private_key": FAKE_KEY}
+        seen = {}
+
+        def command(argv, env):
+            config = Path(argv[2])
+            seen["argv"] = argv
+            seen["config_mode"] = stat.S_IMODE(config.stat().st_mode)
+            seen["text"] = config.read_text()
+            identity = Path(next(line.split(None, 1)[1] for line in seen["text"].splitlines()
+                                 if line.strip().startswith("IdentityFile")))
+            seen["key"] = identity.read_text()
+            seen["key_mode"] = stat.S_IMODE(identity.stat().st_mode)
+            seen["env_has_token"] = "GH_TOKEN" in env
+            return 3
+
+        with patch.object(credentials, "decrypt_section", return_value=section) as decrypt, \
+             patch.object(credentials, "run_command", side_effect=command):
+            code = credentials.main(["--ssh-program", "fake-ssh", "--secrets-file", "ciphertext.yaml",
+                                     "ssh-host", "--", "-v"])
+        self.assertEqual(code, 3)
+        decrypt.assert_called_once_with("sops", "ciphertext.yaml", "ssh-host")
+        self.assertEqual(seen["argv"][:4], ["fake-ssh", "-F", seen["argv"][2], credentials.SSH_HOST_ALIAS])
+        self.assertEqual(seen["argv"][4:], ["-v"])
+        self.assertNotIn(FAKE_HOST, " ".join(seen["argv"]))
+        self.assertNotIn("BEGIN OPENSSH", " ".join(seen["argv"]))
+        self.assertIn(f"HostName {FAKE_HOST}", seen["text"])
+        self.assertIn("IdentitiesOnly yes", seen["text"])
+        self.assertEqual(seen["key"], FAKE_KEY)
+        self.assertEqual(seen["config_mode"], 0o600)
+        self.assertEqual(seen["key_mode"], 0o600)
+        self.assertFalse(seen["env_has_token"])
+        self.assertFalse(Path(seen["argv"][2]).exists())
+        self.assertEqual(list((self.runtime / "nixos-credentials").iterdir()), [])
+
+    def staging_entries(self):
+        staged = self.runtime / "nixos-credentials"
+        return list(staged.iterdir()) if staged.exists() else []
+
+    def test_ssh_host_rejects_unsafe_fields_before_staging(self):
+        for section in (
+            {"host": "", "private_key": FAKE_KEY},
+            {"host": "-oProxyCommand=evil", "private_key": FAKE_KEY},
+            {"host": "bad host", "private_key": FAKE_KEY},
+            {"host": "bad\nhost", "private_key": FAKE_KEY},
+            {"host": 5, "private_key": FAKE_KEY},
+            {"host": FAKE_HOST, "private_key": "not a key"},
+            {"host": FAKE_HOST, "private_key": FAKE_KEY + "\x00"},
+            {"host": FAKE_HOST, "private_key": None},
+        ):
+            with self.subTest(section=section), \
+                 patch.object(credentials, "decrypt_section", return_value=section), \
+                 patch.object(credentials, "run_command") as run:
+                with self.assertRaises(credentials.CredentialError):
+                    credentials.ssh_host_command(self.args("ssh-host"))
+                run.assert_not_called()
+        self.assertEqual(self.staging_entries(), [])
+
+    def test_ssh_host_staging_removed_when_launch_fails(self):
+        with patch.object(credentials, "decrypt_section", return_value={"host": FAKE_HOST, "private_key": FAKE_KEY}), \
+             patch.object(credentials, "run_command", side_effect=OSError("launch failed")):
+            with self.assertRaises(OSError):
+                credentials.ssh_host_command(self.args("ssh-host"))
+        self.assertEqual(self.staging_entries(), [])
 
     def test_child_exit_status_and_signal_handler_restoration(self):
         before = {s: signal.getsignal(s) for s in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)}
