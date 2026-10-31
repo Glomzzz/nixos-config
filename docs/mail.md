@@ -199,15 +199,16 @@ the SMTP password or prove delivery.
 ## New-mail notifications
 
 `mail-notify.service` runs after each successful sync and posts a desktop
-notification for mail that arrived in `INBOX/new`, through the notification
-daemon (swaync). Each notification shows the sender and subject.
+notification for mail that arrived in the `new/` folder of each notified folder,
+through the notification daemon (swaync). Each notification shows the sender and subject.
 
-- Only INBOX notifies. Promotions, SocialNetworks, Spam, Sent, and other folders do not.
+- Notified folders: INBOX, alimail, gmail, monash, and qqmail. Spam, Promotions, SocialNetworks, Sent, and other folders do not.
 - Notifications follow the sync timer, so they can arrive up to five minutes late.
-- The first run after activation records mail that is already waiting, without notifying.
-- More than five new messages in one sync become a single summary.
-- Its state is `~/.local/state/mail-notify/infomaniak-inbox.json`. Delete it to
-  reset; the next run then records the current mail without notifying.
+- The first run after activation records mail that is already waiting in each folder, without notifying.
+- More than five new messages in one folder's sync become a single summary.
+- Each folder's state is `~/.local/state/mail-notify/infomaniak-<folder>.json`
+  (lowercased, for example `infomaniak-inbox.json`). Delete one to reset that
+  folder; the next run then records its current mail without notifying.
 - Offline checks are part of `checks.x86_64-linux.mail`, using synthetic messages.
 
 ## Synchronization and deletion policy
@@ -221,7 +222,8 @@ daemon (swaync). Each notification shows the sender and subject.
   another client/server can expunge them. Use care with move/delete operations.
 - msmtp submits mail directly; there is no offline outgoing-message queue.
 - systemd runs mbsync. After a successful sync it also starts
-  `mail-notify.service`, which reads headers in `INBOX/new` and sends desktop
+  `mail-notify.service`, which reads headers in the notified folders' `new/`
+  directories and sends desktop
   notifications; see [New-mail notifications](#new-mail-notifications). It never
   touches mu. There is deliberately no post-sync `mu index` process to compete
   with the database lock held by mu4e. Closed mu4e means sync continues but

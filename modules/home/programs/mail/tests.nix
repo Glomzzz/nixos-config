@@ -60,6 +60,10 @@ in
       assert "ExecStartPost" not in service["Service"], "mu4e must own the index lock"
       assert service["Unit"]["OnSuccess"] == ["mail-notify.service"]
       assert s["notify"]["Service"]["Type"] == "oneshot"
+      execStart = " ".join(s["notify"]["Service"]["ExecStart"])
+      for folder in ("INBOX", "alimail", "gmail", "monash", "qqmail"):
+          assert "--folder " + folder + " /home/glom/Maildir/infomaniak/" + folder + "/new " in execStart
+      assert "Spam" not in execStart
       assert s["timer"]["Timer"]["OnCalendar"] == "*:0/5"
       assert s["timer"]["Timer"]["Persistent"]
       assert "--my-address=" + sys.argv[2] in s["muInit"]

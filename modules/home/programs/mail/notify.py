@@ -1,9 +1,10 @@
-"""Notify about newly delivered INBOX messages.
+"""Notify about newly delivered messages in the watched folders.
 
-mbsync delivers unread messages into INBOX/new and moves them to cur/ once
-they are read.  After each successful sync, this lists new/, announces the
-names it has not announced before, and records the listing.  It reads message
-headers only and never touches mu's database.
+mbsync delivers unread messages into each folder's new/ and moves them to cur/
+once they are read.  After each successful sync, this lists every watched new/
+directory, announces the names it has not announced before, and records the
+listing per folder.  It reads message headers only and never touches mu's
+database.
 """
 
 import argparse
@@ -76,25 +77,19 @@ def arrival(path):
         return 0.0
 
 
-def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--new-dir", type=Path, required=True)
-    parser.add_argument("--state", type=Path, required=True)
-    parser.add_argument("--notify-send", required=True)
-    args = parser.parse_args(argv)
-
-    current = {path.name: path for path in args.new_dir.iterdir() if path.is_file()}
-    seen = read_seen(args.state)
+def watch(new_dir, state, notify_send):
+    current = {path.name: path for path in new_dir.iterdir() if path.is_file()}
+    seen = read_seen(state)
     if seen is None:
         # The first run only records mail that is already waiting.
-        write_seen(args.state, current)
-        return 0
+        write_seen(state, current)
+        return
 
     fresh = sorted(
         (path for name, path in current.items() if name not in seen), key=arrival
     )
     if len(fresh) > MAX_SEPARATE:
-        notify(args.notify_send, f"{len(fresh)} new emails", "Open mu4e to read them.")
+        notify(notify_send, f"{len(fresh)} new emails", "Open mu4e to read them.")
     else:
         for path in fresh:
             try:
@@ -102,9 +97,32 @@ def main(argv=None):
             except OSError:
                 continue  # Moved by another client after the listing.
             summary = f"New mail from {sender}" if sender else "New mail"
-            notify(args.notify_send, summary, subject)
-    write_seen(args.state, current)
-    return 0
+            notify(notify_send, summary, subject)
+    write_seen(state, current)
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument(
+        "--folder",
+        nargs=3,
+        metavar=("NAME", "NEW_DIR", "STATE"),
+        action="append",
+        required=True,
+        help="watch NEW_DIR, recording announced names in STATE",
+    )
+    parser.add_argument("--notify-send", required=True)
+    args = parser.parse_args(argv)
+
+    # A failing folder (for example, a missing directory) must not stop the others.
+    status = 0
+    for name, new_dir, state in args.folder:
+        try:
+            watch(Path(new_dir), Path(state), args.notify_send)
+        except OSError as error:
+            print(f"mail-notify: {name}: {error}", file=sys.stderr)
+            status = 1
+    return status
 
 
 if __name__ == "__main__":

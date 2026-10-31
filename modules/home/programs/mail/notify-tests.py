@@ -28,26 +28,23 @@ fake.write_text(
 fake.chmod(0o755)
 
 
-def deliver(name, headers):
+def deliver(name, headers, directory=new):
     """Write a synthetic message with the given (header, value) pairs."""
     text = "".join(f"{key}: {value}\n" for key, value in headers) + "\nBody.\n"
-    (new / name).write_text(text)
+    (directory / name).write_text(text)
+
+
+def run_folders(*folders):
+    """Run the notifier over (name, new_dir, state) folders; return its exit status."""
+    args = []
+    for name, directory, state_file in folders:
+        args += ["--folder", name, str(directory), str(state_file)]
+    command = [sys.executable, str(script), *args, "--notify-send", str(fake)]
+    return subprocess.run(command).returncode
 
 
 def run():
-    subprocess.run(
-        [
-            sys.executable,
-            str(script),
-            "--new-dir",
-            str(new),
-            "--state",
-            str(state),
-            "--notify-send",
-            str(fake),
-        ],
-        check=True,
-    )
+    assert run_folders(("inbox", new, state)) == 0
 
 
 def shown():
@@ -93,6 +90,23 @@ assert shown()[1:] == [("6 new emails", "Open mu4e to read them.")], shown()
 deliver("anonymous.1", [("Subject", "No sender")])
 run()
 assert shown()[-1] == ("New mail", "No sender"), shown()
+
+# Each watched folder keeps its own state; a broken folder does not stop the rest.
+gmail = work / "gmail" / "new"
+gmail.mkdir(parents=True)
+gmail_state = work / "state" / "gmail.json"
+missing = work / "missing" / "new"
+missing_state = work / "state" / "missing.json"
+before = len(shown())
+deliver("gmail.old", [("From", "Old <old@example.org>"), ("Subject", "Waiting")], gmail)
+assert run_folders(("missing", missing, missing_state), ("gmail", gmail, gmail_state)) == 1
+assert shown()[before:] == [], "the first run for a folder only records its waiting mail"
+assert json.loads(gmail_state.read_text()) == ["gmail.old"]
+assert not missing_state.exists()
+
+deliver("gmail.1", [("From", "Gmail <gmail@example.org>"), ("Subject", "Hello")], gmail)
+assert run_folders(("missing", missing, missing_state), ("gmail", gmail, gmail_state)) == 1
+assert shown()[before:] == [("New mail from Gmail", "Hello")], shown()
 
 assert sorted(path.name for path in cur.iterdir()) == ["new.1:2,S"]
 shutil.rmtree(work)

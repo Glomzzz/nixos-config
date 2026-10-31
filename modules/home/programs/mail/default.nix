@@ -9,8 +9,10 @@
   passwordStore = "${config.home.homeDirectory}/.password-store";
   python = pkgs.python3.withPackages (ps: [ps.secretstorage]);
   account = config.accounts.email.accounts.infomaniak;
-  inboxNew = "${account.maildir.absPath}/${account.folders.inbox}/new";
-  notifyState = "${config.xdg.stateHome}/mail-notify/infomaniak-inbox.json";
+  # Folders whose new/ mail is announced. Spam and others stay silent.
+  notifiedFolders = [account.folders.inbox "alimail" "gmail" "monash" "qqmail"];
+  notifyFolder = folder: "--folder ${folder} ${account.maildir.absPath}/${folder}/new ${config.xdg.stateHome}/mail-notify/infomaniak-${lib.toLower folder}.json";
+  notifyArgs = lib.concatMapStringsSep " " notifyFolder notifiedFolders;
   credential = pkgs.writeShellApplication {
     name = "infomaniak-password";
     text = ''
@@ -110,7 +112,7 @@ in {
         Unit.Description = "Notify about new Infomaniak INBOX mail";
         Service = {
           Type = "oneshot";
-          ExecStart = "${pkgs.python3}/bin/python3 ${./notify.py} --new-dir ${inboxNew} --state ${notifyState} --notify-send ${pkgs.libnotify}/bin/notify-send";
+          ExecStart = "${pkgs.python3}/bin/python3 ${./notify.py} ${notifyArgs} --notify-send ${pkgs.libnotify}/bin/notify-send";
           UMask = "0077";
         };
       };
