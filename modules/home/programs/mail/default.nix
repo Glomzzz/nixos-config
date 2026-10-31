@@ -13,6 +13,8 @@
   notifiedFolders = [account.folders.inbox "alimail" "gmail" "monash" "qqmail"];
   notifyFolder = folder: "--folder ${folder} ${account.maildir.absPath}/${folder}/new ${config.xdg.stateHome}/mail-notify/infomaniak-${lib.toLower folder}.json";
   notifyArgs = lib.concatMapStringsSep " " notifyFolder notifiedFolders;
+  # The launcher behind the email shortcut; a click opens mu4e in a new frame.
+  emc = "${config.home.homeDirectory}/.local/bin/emc";
   credential = pkgs.writeShellApplication {
     name = "infomaniak-password";
     text = ''
@@ -112,7 +114,7 @@ in {
         Unit.Description = "Notify about new Infomaniak INBOX mail";
         Service = {
           Type = "oneshot";
-          ExecStart = "${pkgs.python3}/bin/python3 ${./notify.py} ${notifyArgs} --notify-send ${pkgs.libnotify}/bin/notify-send";
+          ExecStart = "${pkgs.python3}/bin/python3 ${./notify.py} ${notifyArgs} --notify-send ${pkgs.libnotify}/bin/notify-send --systemd-run ${pkgs.systemd}/bin/systemd-run --emc ${emc}";
           UMask = "0077";
         };
       };

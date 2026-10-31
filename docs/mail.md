@@ -209,6 +209,11 @@ through the notification daemon (swaync). Each notification shows the sender and
 - Each folder's state is `~/.local/state/mail-notify/infomaniak-<folder>.json`
   (lowercased, for example `infomaniak-inbox.json`). Delete one to reset that
   folder; the next run then records its current mail without notifying.
+- Clicking a notification opens its message in mu4e, in a new Emacs frame as the
+  `email` launcher does. A summary opens the folder's new mail.
+- A click first updates mu4e's index, because a message that has just arrived may
+  not be indexed yet. Each notification waits for its click in a transient user
+  unit (`run-*.service`) until it is dismissed or times out.
 - Offline checks are part of `checks.x86_64-linux.mail`, using synthetic messages.
 
 ## Synchronization and deletion policy

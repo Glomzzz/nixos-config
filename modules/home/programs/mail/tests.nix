@@ -64,6 +64,7 @@ in
       for folder in ("INBOX", "alimail", "gmail", "monash", "qqmail"):
           assert "--folder " + folder + " /home/glom/Maildir/infomaniak/" + folder + "/new " in execStart
       assert "Spam" not in execStart
+      assert "--systemd-run " in execStart and "--emc /home/glom/.local/bin/emc" in execStart
       assert s["timer"]["Timer"]["OnCalendar"] == "*:0/5"
       assert s["timer"]["Timer"]["Persistent"]
       assert "--my-address=" + sys.argv[2] in s["muInit"]
