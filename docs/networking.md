@@ -11,6 +11,8 @@ to:
 The approved UUIDs are declared in `modules/nixos/core/networking.nix`:
 
 - `77cdd16f-65e8-4dec-80cc-72ceb2b1700b`: home Wi-Fi, `sudo connect-me`;
+- `da787781-5e46-43f9-b083-cea4b5f48533`: home Wi-Fi 5 GHz, `sudo connect-me_5G`
+  (same router and `192.168.50.0/24` subnet);
 - `72d3039f-b16e-3e34-8f8c-450eea674357`: `Wired connection 1`, the home adapter.
 
 These are profile approvals, **not network authentication**. A wired profile can

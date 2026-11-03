@@ -9,7 +9,8 @@
   tailscale,
 }: let
   awk = lib.getExe' gawk "awk";
-  getent = lib.getExe' glibc.bin "getent";
+  # getent lives in its own glibc output; glibc.bin is empty on current nixpkgs.
+  getent = lib.getExe' glibc.getent "getent";
   grep = lib.getExe' gnugrep "grep";
   ip = lib.getExe' iproute2 "ip";
   nc = lib.getExe' libressl.nc "nc";
@@ -21,7 +22,7 @@ in
     port="$1"
     host="$2"
     lan_host="mac-mini.local"
-    lan_ip_fallback="192.168.50.192"
+    lan_ip_fallback="192.168.50.198"
 
     direct_lan_route() {
       route="$(${ip} -4 route get "$1" 2>/dev/null || true)"

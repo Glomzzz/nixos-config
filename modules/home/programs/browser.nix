@@ -11,6 +11,8 @@
         };
       };
     })
+    # Secondary browser for sites that need Chrome; Firefox remains the default.
+    pkgs.google-chrome
   ];
 
   home.sessionVariables = {

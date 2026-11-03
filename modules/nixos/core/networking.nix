@@ -5,7 +5,8 @@
 }: let
   # Approved current home connections, not every interface with an RFC1918 IP.
   homeProfiles = [
-    "77cdd16f-65e8-4dec-80cc-72ceb2b1700b" # home Wi-Fi: sudo connect-me
+    "77cdd16f-65e8-4dec-80cc-72ceb2b1700b" # home Wi-Fi 2.4 GHz: sudo connect-me
+    "da787781-5e46-43f9-b083-cea4b5f48533" # home Wi-Fi 5 GHz: sudo connect-me_5G
     "72d3039f-b16e-3e34-8f8c-450eea674357" # Wired connection 1 (home adapter)
   ];
   serviceTCPPorts = "{ 9757, 27036, 27037 }";

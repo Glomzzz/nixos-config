@@ -17,7 +17,10 @@
       coreutils
       iproute2
       libressl.nc
+      gawk
+      glibc.getent
       jq
+      tailscale
       rclone
       util-linux
     ];
@@ -43,15 +46,33 @@
         exit 1
       fi
 
-      lan_ip=192.168.50.198
-      smb_host=mac-mini
-      lan_route=$(ip -4 route get "$lan_ip" 2>/dev/null || true)
-      if [ -n "$lan_route" ] && \
-        [[ "$lan_route" != *" via "* ]] && \
-        [[ "$lan_route" != *" dev tailscale0 "* ]] && \
-        nc -n -z -w 3 "$lan_ip" 445 >/dev/null 2>&1
-      then
-        smb_host=$lan_ip
+      # LAN first: mDNS, then the known home address. Tailscale is the fallback.
+      lan_route_ok() {
+        local route
+        route=$(ip -4 route get "$1" 2>/dev/null || true)
+        [ -n "$route" ] &&
+          [[ "$route" != *" via "* ]] &&
+          [[ "$route" != *" dev tailscale0 "* ]]
+      }
+
+      smb_host=""
+      mdns_ip=$(getent ahostsv4 mac-mini.local 2>/dev/null | awk '
+        !seen[$1]++ && $1 !~ /^100\./ { print $1; exit }
+      ' || true)
+      for candidate in "$mdns_ip" 192.168.50.198; do
+        if [ -n "$candidate" ] && lan_route_ok "$candidate" &&
+          nc -n -z -w 3 "$candidate" 445 >/dev/null 2>&1
+        then
+          smb_host=$candidate
+          break
+        fi
+      done
+
+      if [ -z "$smb_host" ]; then
+        smb_host=$(tailscale ip -4 mac-mini 2>/dev/null | head -n 1 || true)
+      fi
+      if [ -z "$smb_host" ]; then
+        smb_host=mac-mini
       fi
 
       printf 'mac-mini-smb-mount: using SMB host %s\n' "$smb_host"
