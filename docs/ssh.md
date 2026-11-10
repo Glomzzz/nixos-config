@@ -9,7 +9,8 @@ Home Manager enables `gpg-agent`'s SSH socket and exports `SSH_AUTH_SOCK` to
 shells, systemd user services, and D-Bus. Other configured SSH agents remain
 disabled. `~/.ssh/config` selects `~/.ssh/yubikey-openpgp.pub` with
 `IdentitiesOnly yes`; the matching private-key operation goes through the card.
-Agent forwarding is disabled. Existing Mac mini routing is unchanged.
+Agent forwarding is disabled. Mac mini uses the same card identity, so
+connections there also require the card (PIN plus touch).
 
 ## Activate and enroll remote accounts
 
@@ -29,6 +30,7 @@ Install the contents of `~/.ssh/yubikey-openpgp.pub` in each remote account's
 `authorized_keys`, or in GitHub/GitLab's **authentication SSH keys** settings.
 Uploading a GPG signing certificate does not enroll an SSH authentication key.
 Remote-account changes are deliberately not automated by Nix activation.
+`glom@mac-mini` is already enrolled with the card's authentication key.
 
 Before removing any old remote key, verify an actual connection using only
 public-key authentication:

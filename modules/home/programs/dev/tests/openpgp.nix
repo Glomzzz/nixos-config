@@ -73,13 +73,25 @@ in
       export PYTHONDONTWRITEBYTECODE=1
       python3 ${../yubikey-pin/tests.py} ${../yubikey-pin/pinentry.py} ${../yubikey-pin/provision.py}
       ssh -G -F ${home.home.file.".ssh/config".source} github.com > ssh-settings.txt
+      ssh -G -F ${home.home.file.".ssh/config".source} mac-mini > ssh-settings-mac-mini.txt
       python3 - <<'PY'
       import pathlib
 
-      settings = [line.split(maxsplit=1) for line in pathlib.Path("ssh-settings.txt").read_text().splitlines()]
-      assert [value for key, value in settings if key == "identityfile"] == ["~/.ssh/yubikey-openpgp.pub"]
-      assert [value for key, value in settings if key == "identitiesonly"] == ["yes"]
-      assert [value for key, value in settings if key == "forwardagent"] == ["no"]
+      def settings(name):
+          lines = pathlib.Path(name).read_text().splitlines()
+          return [line.split(maxsplit=1) for line in lines]
+
+      remote = settings("ssh-settings.txt")
+      assert [value for key, value in remote if key == "identityfile"] == ["~/.ssh/yubikey-openpgp.pub"]
+      assert [value for key, value in remote if key == "identitiesonly"] == ["yes"]
+      assert [value for key, value in remote if key == "forwardagent"] == ["no"]
+
+      # mac-mini authenticates through the card as well; no software key, no agent override.
+      mac = settings("ssh-settings-mac-mini.txt")
+      assert [value for key, value in mac if key == "identityfile"] == ["~/.ssh/yubikey-openpgp.pub"], mac
+      assert [value for key, value in mac if key == "identitiesonly"] == ["yes"]
+      assert [value for key, value in mac if key == "identityagent"] == [], mac
+      assert [value for key, value in mac if key == "proxycommand"], mac
       PY
       ${pkgs.lib.optionalString ready ''
         export GNUPGHOME
