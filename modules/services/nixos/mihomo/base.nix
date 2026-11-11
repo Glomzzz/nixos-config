@@ -62,17 +62,12 @@ in {
     allow-origins = ["http://127.0.0.1:9090" "http://localhost:9090"];
     allow-private-network = false;
   };
-  profile = {
-    store-selected = true;
-    store-fake-ip = true;
-  };
+  profile.store-selected = true;
 
   tun = {
     enable = true;
     stack = "mixed";
     device = "mihomo0";
-    # A fixed address: the system resolver points at 172.19.0.2 while the TUN is up.
-    inet4-address = ["172.19.0.1/30"];
     mtu = 1500;
     auto-route = true;
     # Off: with auto-redirect, mihomo 1.19.33 fails at start ("netlink receive: file exists")
@@ -92,7 +87,9 @@ in {
   sniffer = {
     enable = true;
     parse-pure-ip = true;
-    # Recover the domain for rule matching; the connection keeps its destination address.
+    # Recover the domain of connections that carry one (TLS SNI, HTTP host, QUIC) for rule
+    # matching. With redir-host there is no fake-IP mapping, so this is the only domain source.
+    # The connection keeps its destination address.
     override-destination = false;
     sniff = {
       TLS.ports = [443 8443];
@@ -104,21 +101,9 @@ in {
   dns = {
     enable = true;
     ipv6 = false;
-    # Fake addresses keep the domain attached to each connection (sing-box reverse_mapping),
-    # so AI names still route to vless-sg when an application connects by address.
-    enhanced-mode = "fake-ip";
-    fake-ip-range = "198.18.0.1/16";
-    fake-ip-filter-mode = "rule";
-    # Mainland and local names get real addresses, so geoip-cn and proxyCidrs match them.
-    fake-ip-filter = [
-      "RULE-SET,geosite-cn,real-ip"
-      "DOMAIN-SUFFIX,local,real-ip"
-      "DOMAIN-SUFFIX,lan,real-ip"
-      "DOMAIN-SUFFIX,home.arpa,real-ip"
-      "DOMAIN-SUFFIX,ts.net,real-ip"
-      "DOMAIN-REGEX,^[^.]+$,real-ip"
-      "MATCH,fake-ip"
-    ];
+    # Real addresses, so geoip-cn and the proxyCidrs rules see the destination an
+    # application actually uses. Fake-IP made every unlisted mainland site look foreign.
+    enhanced-mode = "redir-host";
     # Everything else resolves through dns-auto: the proxy pool, with vless-hk as fallback.
     nameserver = ["https://1.1.1.1/dns-query#dns-auto"];
     # Node domains and direct connections use the system resolver, as sing-box local-dns did.

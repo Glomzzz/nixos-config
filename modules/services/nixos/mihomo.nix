@@ -61,7 +61,9 @@
       ${pkgs.iproute2}/bin/ip link show mihomo0 >/dev/null 2>&1 && break
       sleep 0.1
     done
-    ${pkgs.systemd}/bin/resolvectl dns mihomo0 172.19.0.2 || true
+    # mihomo always uses 198.18.0.1/30 for the TUN (its address is derived from the DNS
+    # range), so the resolver sits in that subnet. dns-hijack answers any port-53 query.
+    ${pkgs.systemd}/bin/resolvectl dns mihomo0 198.18.0.2 || true
     ${pkgs.systemd}/bin/resolvectl domain mihomo0 '~.' || true
   '';
 in {
