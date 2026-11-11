@@ -13,12 +13,12 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "ix";
-  version = "0.13.0";
+  version = "0.14.0";
 
   # The release includes the CLI, native tree-sitter bindings, and Compass UI.
   src = fetchurl {
     url = "https://github.com/ix-infrastructure/Ix/releases/download/v${finalAttrs.version}/ix-${finalAttrs.version}-linux-amd64.tar.gz";
-    hash = "sha256-KaHXh1N/S5N/IAqslpTD/Xq3L8udzXBnlskfwOR7LN0=";
+    hash = "sha256-4qYqYllnir0uyxjpxX3q15MMltn7ViebeLeOFclhO8E=";
   };
 
   strictDeps = true;
@@ -45,7 +45,7 @@ stdenv.mkDerivation (finalAttrs: {
 
     # Keep application files in the store, not in the writable IX_HOME state dir.
     substituteInPlace "$out/lib/ix/cli/dist/cli/commands/view.js" \
-      --replace-fail 'join(IX_HOME, "cli", "compass")' "\"$out/lib/ix/compass\""
+      --replace-fail 'join(ixHome(), "cli", "compass")' "\"$out/lib/ix/compass\""
 
     makeWrapper ${lib.getExe nodejs_22} "$out/bin/ix" \
       --add-flags "$out/lib/ix/cli/dist/cli/main.js" \
