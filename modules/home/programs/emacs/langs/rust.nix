@@ -7,7 +7,8 @@
     (lib.hiPrio rust-analyzer)
     rustup
     lldb
-    trunk
+    # trunk is temporarily removed: nixpkgs' current build fails (zstd-sys cannot
+    # find libzstd). Re-add it once nixpkgs fixes the build.
     cargo-generate
     wasm-pack
     openssl
