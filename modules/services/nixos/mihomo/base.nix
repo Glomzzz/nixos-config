@@ -108,9 +108,10 @@ in {
     enhanced-mode = "redir-host";
     # Everything else resolves through dns-auto: the proxy pool, with vless-hk as fallback.
     nameserver = ["https://1.1.1.1/dns-query#dns-auto"];
-    # Node domains and direct connections use the system resolver, as sing-box local-dns did.
-    proxy-server-nameserver = ["system"];
-    direct-nameserver = ["system"];
+    # Node domains and direct connections resolve through AliDNS, sent direct. "system"
+    # would loop: resolv.conf points at systemd-resolved, which sends every name back here.
+    proxy-server-nameserver = ["https://223.5.5.5/dns-query#DIRECT"];
+    direct-nameserver = ["https://223.5.5.5/dns-query#DIRECT"];
     nameserver-policy =
       builtins.listToAttrs (map (set: {
           name = "rule-set:${set}";
@@ -118,10 +119,12 @@ in {
         })
         aiSets)
       // {
-        "rule-set:geosite-cn" = ["system"];
-        "+.local" = ["system"];
-        "+.lan" = ["system"];
-        "+.home.arpa" = ["system"];
+        "rule-set:geosite-cn" = ["https://223.5.5.5/dns-query#DIRECT"];
+        # LAN names: the home router, sent direct.
+        "+.local" = ["udp://192.168.50.1#DIRECT"];
+        "+.lan" = ["udp://192.168.50.1#DIRECT"];
+        "+.home.arpa" = ["udp://192.168.50.1#DIRECT"];
+        # Tailnet names: systemd-resolved routes ts.net to the tailscale link, so no loop.
         "+.ts.net" = ["system"];
       };
   };
