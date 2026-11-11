@@ -7,7 +7,6 @@ _: {
       enable = true;
       support32Bit = true;
     };
-    jack.enable = true;
     extraConfig = {
       pipewire."92-audio-quality" = {
         "context.properties" = {
