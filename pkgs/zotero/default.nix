@@ -36,15 +36,15 @@
   firefox = callPackage ./firefox-esr-153-bin.nix {};
 
   pname = "zotero";
-  version = "11.0-unstable-2026-10-29";
-  rev = "212a7d6a585d1209bc4e698a904490205f139500";
+  version = "11.0-unstable-2026-11-10";
+  rev = "52048d4e7ad54a4c1986af9cc8b0c1f331a02442";
 
   src = fetchFromGitHub {
     owner = "zotero";
     repo = "zotero";
     inherit rev;
     fetchSubmodules = true;
-    hash = "sha256-AHxS2MUyEykP92Dqw2LFD+XGZZLdmbFA4LgmRg6lIsI=";
+    hash = "sha256-ysk2Vf50DmKvhRwV5TLenoboPy7BB4iAx83pcgUxiQs=";
   };
 
   pdf-js = buildNpmPackage {
