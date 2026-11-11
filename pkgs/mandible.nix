@@ -8,16 +8,16 @@
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "mandible";
-  version = "0.8.4";
+  version = "0.9.0";
 
   src = fetchFromGitHub {
     owner = "AS-FOSS";
     repo = "mandible";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-eR6WkKD1qFV0zYKIKkeuwBngF7dVGnAhCkMUr4Nzaj0=";
+    hash = "sha256-Eo2vwSiopyZyhARo8dIKgQuchWQ4q1gSYahhf0KqJS4=";
   };
 
-  cargoHash = "sha256-pX8MOcUxZXSMhEGBukEM27S1xEFGTGoTuXOaoEdaAW4=";
+  cargoHash = "sha256-H4uKnj6C+Ly6R8SjccdER/hlxuvFOqEgMrDRk3cFdb4=";
 
   nativeBuildInputs = [installShellFiles];
   nativeCheckInputs = [git];
