@@ -5,21 +5,6 @@
 }: let
   emc = "${config.home.homeDirectory}/.local/bin/emc";
 in {
-  home.file.".local/bin/fish-completion-shell" = {
-    executable = true;
-    text = ''
-      #!${pkgs.runtimeShell}
-      exec ${pkgs.fish}/bin/fish --no-config --init-command '
-        set --prepend --global --export PATH ${config.programs.carapace.finalPackage}/bin
-        set --prepend fish_complete_path /etc/fish/generated_completions
-        set --prepend fish_complete_path /run/current-system/sw/share/fish/vendor_completions.d
-        set --prepend fish_complete_path ${config.xdg.dataFile."fish/home-manager/generated_completions".source}
-        set --prepend fish_complete_path ${config.home.path}/share/fish/vendor_completions.d
-        ${config.programs.carapace.finalPackage}/bin/carapace _carapace fish | source
-      ' "$@"
-    '';
-  };
-
   programs.fish = {
     enable = true;
     package = pkgs.fish;
@@ -35,30 +20,33 @@ in {
         end
       end
     '';
-    functions.ssh = {
-      description = "OpenSSH client with a POSIX SHELL for the remote session";
-      wraps = "ssh";
-      body = ''
-        set --local --export SHELL ${pkgs.runtimeShell}
-        command ssh $argv
-      '';
-    };
-    # Win+; and Win+' (niri/settings.nix) run these through fish, since niri
-    # spawns argv directly. Each opens a new GUI frame and returns at once.
-    # emc/open-calc waits 0.3 s for a brand-new frame to settle; emc/open-mail
-    # shows mu4e at once and falls back to the whole window if the frame refuses
-    # to split (both in modules/core/emc.el).
-    functions.calc = {
-      description = "Open Emacs calc in a new GUI frame";
-      body = ''
-        ${emc} --create-frame --no-wait --eval '(emc/open-calc)'
-      '';
-    };
-    functions.email = {
-      description = "Open Emacs mu4e mail in a new GUI frame";
-      body = ''
-        ${emc} --create-frame --no-wait --eval '(emc/open-mail)'
-      '';
+    functions = {
+      ssh = {
+        description = "OpenSSH client with a POSIX SHELL for the remote session";
+        wraps = "ssh";
+        body = ''
+          set --local --export SHELL ${pkgs.runtimeShell}
+          command ssh $argv
+        '';
+      };
+
+      # Win+; and Win+' (niri/settings.nix) run these through fish, since niri
+      # spawns argv directly. Each opens a new GUI frame and returns at once.
+      # emc/open-calc waits 0.3 s for a brand-new frame to settle; emc/open-mail
+      # shows mu4e at once and falls back to the whole window if the frame refuses
+      # to split (both in modules/core/emc.el).
+      calc = {
+        description = "Open Emacs calc in a new GUI frame";
+        body = ''
+          ${emc} --create-frame --no-wait --eval '(emc/open-calc)'
+        '';
+      };
+      email = {
+        description = "Open Emacs mu4e mail in a new GUI frame";
+        body = ''
+          ${emc} --create-frame --no-wait --eval '(emc/open-mail)'
+        '';
+      };
     };
   };
 

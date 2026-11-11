@@ -59,14 +59,7 @@ separately locked GNOME Keyring, since no account password is supplied.
    that ReGreet returns; check readability on the laptop panel and any docked
    monitor. Ctrl+Alt+F2 opens a recovery console if the greeter fails.
 
-Configuration regressions run with
-`nix build --no-link .#checks.x86_64-linux.login`. The check validates the greeter
-compositor's KDL, session discovery, and password/keyring PAM integration;
-visual appearance and hardware login still require the interactive tests above.
-`nix build --no-link .#checks.x86_64-linux.authentication` checks both generated
-sudo/unlock PAM stacks, including all face/key/password OR outcomes, missing
-hardware modules, all-failed denial, opt-in scope, and empty-input policy, using
-synthetic modules rather than real hardware or credentials.
+Visual appearance and hardware login still require the interactive tests above.
 
 ## Set a non-empty keyring password
 

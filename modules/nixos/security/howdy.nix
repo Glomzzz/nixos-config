@@ -34,7 +34,4 @@
       };
     };
   };
-
-  # With Howdy disabled for polkit, its helper needs no camera access and the
-  # upstream PrivateDevices sandbox can remain intact.
 }

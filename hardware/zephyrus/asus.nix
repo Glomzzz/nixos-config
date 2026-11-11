@@ -11,7 +11,4 @@ _: {
     restartIfChanged = false;
     unitConfig.PartOf = "";
   };
-  # # SuperGXD https://wiki.archlinux.org/title/Supergfxctl
-  # services.supergfxd.enable = true;
-  # systemd.services.supergfxd.path = [ pkgs.pciutils ];
 }

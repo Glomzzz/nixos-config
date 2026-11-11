@@ -214,7 +214,6 @@ through the notification daemon (swaync). Each notification shows the sender and
 - A click first updates mu4e's index, because a message that has just arrived may
   not be indexed yet. Each notification waits for its click in a transient user
   unit (`run-*.service`) until it is dismissed or times out.
-- Offline checks are part of `checks.x86_64-linux.mail`, using synthetic messages.
 
 ## Synchronization and deletion policy
 
@@ -244,20 +243,3 @@ Maildir messages and index contents are **not encrypted at rest by this setup**.
 Directory permissions protect against other ordinary local users, not disk theft
 or root. Use encrypted storage and a separate encrypted backup. Do not sync mu's
 database between machines; index each machine's own Maildir.
-
-## Offline validation
-
-```sh
-nix build --no-link ~/nixos-config#checks.x86_64-linux.mail
-nix flake check --no-build ~/nixos-config
-cd ~/.config/emacs
-emacs --batch -Q -l tests/run.el
-```
-
-These checks use synthetic messages and mocked keyrings; they do not retrieve
-real mail, decrypt real credentials, or send messages. Provider tests cover
-locked/missing/plaintext keyrings, silent checks, explicit import, and rejection
-of empty/ambiguous credentials without automatic unlock or GPG fallback. The Emacs suite exercises mu4e-specific checks
-when the Nix-managed mu4e package is on its load path. Its background-send tests
-use a gated fake SMTP executable to exercise real process success, rejection,
-termination, MIME attachments, and delayed Sent filing without sending mail.

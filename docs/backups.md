@@ -113,7 +113,4 @@ rerun manually when it becomes available. Check backup freshness regularly and
 perform periodic restore tests; desktop notifications are not an off-device
 monitoring service and cannot report a dead laptop.
 
-`checks.x86_64-linux.backups` exercises initialization, backup, exclusions,
-retention, a full integrity check, and a byte-for-byte restore using an isolated
-local repository and synthetic files. It never connects to the Mac or reads real
-credentials. Real SFTP enrollment and off-device restoration remain manual gates.
+Real SFTP enrollment and off-device restoration remain manual gates.

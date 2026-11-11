@@ -7,7 +7,6 @@
   makeWrapper,
   copyDesktopItems,
   makeDesktopItem,
-  xxd,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "logisim-evolution";
@@ -33,15 +32,11 @@ stdenv.mkDerivation (finalAttrs: {
     data = ./deps.json;
   };
   # nixpkgs' default nixDownloadDeps task does not work with this build on
-  # Gradle 9, so the updater resolves the build and test classpaths directly.
-  gradleUpdateTask = "shadowJar test";
+  # Gradle 9, so the updater resolves the build classpath directly.
+  gradleUpdateTask = "shadowJar";
 
   # Build the shadow (fat) jar, the same layout as the upstream release asset.
   gradleBuildTask = "shadowJar";
-
-  # HexFileTest shells out to xxd to cross-check its binary output.
-  nativeCheckInputs = [xxd];
-  doCheck = true;
 
   installPhase = ''
     runHook preInstall

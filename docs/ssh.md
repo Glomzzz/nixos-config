@@ -61,9 +61,3 @@ GPG automatically offers the inserted card's authentication key; importing it
 with `ssh-add ~/.ssh/id_ed25519` is not necessary and would introduce a software
 key. Do not put private keys or PINs in `sshcontrol` or Nix configuration.
 
-Regression checks compare the checked-in SSH public key with an export of the
-exact authentication subkey in an isolated public-only keyring:
-
-```sh
-nix build --no-link .#checks.x86_64-linux.openpgp
-```

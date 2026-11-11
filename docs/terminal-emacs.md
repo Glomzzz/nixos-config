@@ -125,19 +125,5 @@ ordinary limited-color clients must retain their real capabilities.
 
 ## Validation
 
-```sh
-nix build .#checks.x86_64-linux.emacs-terminal .#checks.x86_64-linux.emacs-launchers
-emacs --batch -Q -l ~/.config/emacs/tests/run.el
-sh ~/.config/emacs/tests/launcher-tests.sh
-```
-
-The Nix check parses the generated configuration using Kitty's actual parser,
-then starts a clean, display-less daemon and real pseudo-terminal clients. It
-verifies clipboard routing and protocol key encoding, 24-bit output for Kitty
-and Foot, and 256-color behavior for an ordinary xterm client. The launcher
-check uses mocked clients/services in real PTYs to verify frontend selection,
-blocking behavior, Majutsu directory selection, desktop handoff, and safe
-restart handling. The Emacs suite checks startup laziness, GUI isolation, terminal
-setup, clipboard policy, restart guards, and the optional graphics declaration. Actual font
-appearance, IME candidate placement, and interactive graphics still require a
-real Wayland terminal session to assess.
+Actual font appearance, IME candidate placement, and interactive graphics still
+require a real Wayland terminal session to assess.

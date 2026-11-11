@@ -5,7 +5,6 @@
   ...
 }: {
   imports = [
-    ./networking.nix
     ./overlays.nix
     ../../hardware/zephyrus
     ../../modules/nixos

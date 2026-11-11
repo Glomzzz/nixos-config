@@ -79,20 +79,14 @@ XDG directory overrides are respected. Phono can read text before the cursor
 for local context-aware inference; disable **Use surrounding text from
 applications** in its settings if undesired.
 
-## Verification
+## Build
 
 ```bash
 nix build --no-link .#phono-fcitx5-addon
-nix build --no-link .#checks.x86_64-linux.fcitx5
 ```
 
-The configuration check verifies the profile, both Phono input-method entries,
-loads the installed Phono/punctuation/fullwidth shared libraries from the final
-Fcitx bundle, checks that Rime and its deployment/configuration are absent, and
-checks that the managed addon hotkeys remain empty and that only the Chinese
-full-stop mapping differs from upstream. Offline
-checks do not exercise model inference or a live Wayland application; test
-those interactively after downloading a model and deploying.
+Model inference and live Wayland applications must be tested interactively after
+downloading a model and deploying.
 
 When updating the addon, check its `ci/core-sdk.json` for a required SDK version
 change and update both fixed-output hashes as necessary.

@@ -45,5 +45,4 @@ journalctl -u home-firewall-sync
 
 Verify that the set follows approved profile connect/disconnect events and is
 empty on an unapproved profile. Preserve another recovery path before changing
-network/firewall policy. The regression check validates configuration and set
-reconciliation with synthetic profile data; it does not probe network services.
+network/firewall policy.

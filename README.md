@@ -18,7 +18,7 @@ modules/home/            Home Manager programs, shell, and desktop settings
 modules/services/home/   Home Manager services
 users/glom/              NixOS and Home Manager user entrypoints
 pkgs/                    local package definitions and overlays
-scripts/                 manual rebuild and proxy helpers
+scripts/                 helpers wired into services and wrappers
 ```
 
 `flake.nix` composes the host. `hosts/nixos/default.nix` imports the hardware
@@ -29,37 +29,25 @@ user's Home Manager entrypoint.
 ## Common commands
 
 ```bash
-# Evaluate every flake output (does not execute tests)
-just eval
-
-# Execute regression checks without building the full system
-just test
-
 # Build without changing the active system
 just build
 
-# Evaluate, lint, execute tests, and build the full system
-just validate
-
-# Check formatting separately
-just format-check
-
-# Update inputs (or one input with `just upgrade NAME=...`)
+# Update all inputs, or one input (for example `just upgrade nixpkgs`)
 just update
+just upgrade nixpkgs
+
+# Format Nix files in place
+just format
 
 # Apply the configuration
 just deploy
 ```
 
-`just check` remains an alias for evaluation only. `just lint` runs formatting,
-dead-code, and Nix-lint checks; `just test` dynamically discovers all remaining
-checks except the full host build. Checks are defined in `checks/default.nix`.
-Use `nix fmt -- .` to format Nix files. Neither tests nor a build switch
-generations; use `deploy` only when the generated system has been reviewed.
+`build` and `deploy` evaluate the flake and build the host; there is no separate
+test or lint step. Review the generated system before running `deploy`.
 
-The scripts under `scripts/` are manual recovery helpers, not part of the
-declarative configuration. Review them before running because they use `sudo`
-and can restart system services.
+The scripts under `scripts/` are wired into the NixOS and Home Manager modules.
+Review them before changing them: some run as root and restart system services.
 
 ## Secrets
 
@@ -157,9 +145,8 @@ optional image/PDF support, reserved terminal shortcuts, and GUI limitations.
 ## Waybar
 
 `modules/home/desktop/niri/waybar.nix` is a small entrypoint. Its sibling
-`waybar/` directory owns Nix settings, GTK CSS, the XML menu, shell helpers, and
-offline tests. Run `nix build --no-link .#checks.x86_64-linux.waybar`; see the
-[Waybar layout](modules/home/desktop/niri/waybar/README.md).
+`waybar/` directory owns Nix settings, GTK CSS, the XML menu, and shell helpers;
+see the [Waybar layout](modules/home/desktop/niri/waybar/README.md).
 
 ## Media playback
 
@@ -170,9 +157,7 @@ profile, and keep-open behavior. The old standalone `vo=gpu-next` and Vulkan
 options are not carried over: Celluloid manages its embedded GTK render context.
 MPRIS remains enabled for media keys and Waybar through playerctld.
 
-Run `nix build --no-link .#checks.x86_64-linux.celluloid` to check the desktop/MIME
-integration, GSettings schema, and config loading with the real libmpv. Rendering
-and hardware decoding still need a playback test after activation.
+Rendering and hardware decoding still need a playback test after activation.
 
 ## Clipboard
 
@@ -219,8 +204,7 @@ Emacs daemon.
 Check `systemctl --user status fcitx5-daemon` and confirm `printenv GTK_IM_MODULE`
 prints nothing. In Foot and Emacs, press **Right Shift**, type `nihao`, and select
 `你好`; check that the Emacs candidate popup stays stable while typing and near
-window edges. These need interactive testing. Offline configuration regressions
-run with `nix build --no-link .#checks.x86_64-linux.fcitx5`.
+window edges. These need interactive testing.
 
 Phono 0.1.3 is the Chinese input engine, with Pinyin as the default and Shuangpin
 also available in the managed profile. Rime and its deployment hooks are removed;
@@ -241,7 +225,6 @@ After deploying, reload Fcitx with `fcitx5-remote -r` and restart Dota 2. Open a
 chat input, press **Right Shift**, type `nihao`, and select `你好`. No Ctrl+Space
 fallback is configured. Check the modifier-only toggle, committing text, and the
 candidate popup; these need an interactive in-game test, not just Nix evaluation.
-Offline launcher regressions run with `nix build --no-link .#checks.x86_64-linux.steam-game-laptop`.
 
 ## Development tools
 

@@ -75,15 +75,11 @@ leave a pending notification or prevent password fallback.
 ```sh
 systemctl --user status yubikey-touch-detector.service
 journalctl --user -u yubikey-touch-detector.service -b
-nix build --no-link .#checks.x86_64-linux.yubikey-touch .#checks.x86_64-linux.authentication
 ```
 
 Stop/restart the detector gracefully: it proxies the local GPG and SSH agent
 sockets and restores them on termination. Do not run a second copy alongside the
-user service or kill it with `SIGKILL`. The tests use a private D-Bus session,
-private sockets, and fake process metadata. They verify requester labels,
-notification creation/replacement/closure, and critical/transient hints without
-prompting for touches or altering the live agent.
+user service or kill it with `SIGKILL`.
 
 Public FIDO enrollment records and OpenPGP public certificates may live in this
 repository/Nix store. **Never add private keys, secret-key exports, revocation
@@ -97,7 +93,6 @@ From this repository, save your work and keep a root recovery shell open on
 another VT (`sudo -i`). Verify that you know the account password first.
 
 ```sh
-nix build --no-link .#checks.x86_64-linux.authentication .#checks.x86_64-linux.openpgp
 sudo nixos-rebuild build --flake .#nixos
 sudo nixos-rebuild test --flake .#nixos
 ```
@@ -334,7 +329,7 @@ Use the signing **subkey** fingerprint, including `!`, to pin the exact signing
 key. Set both fields together. Run `jj status` so the new public file is tracked
 by the colocated jj/Git flake, and review that no secrets appear in the changes.
 Home Manager imports this public certificate with ultimate ownertrust
-(appropriate only for your own verified identity). Re-run the checks, build,
+(appropriate only for your own verified identity). Re-run the build
 and activate with `test`; then test real signing before `switch`.
 
 Upload `public.asc` to GitHub's **GPG keys** settings if using GitHub, and ensure
@@ -424,8 +419,6 @@ should not need another PIN entry; it needs a new touch only if it runs more tha
 guess if unsure of the PIN. If the second operation still asks, inspect
 `journalctl --user -u gpg-agent.service` and other running smart-card clients;
 exclusive access is a candidate fix, not proof that every reset source is gone.
-The automated OpenPGP check validates configuration/public data and exercises
-the PIN provider with fake secrets/devices, not hardware PIN retention.
 
 ## Optional host-decryptable user PIN
 
@@ -465,8 +458,6 @@ before evaluating this flake. Build
 and activate safely:
 
 ```bash
-nix build --no-link .#checks.x86_64-linux.openpgp \
-  .#checks.x86_64-linux.sops .#checks.x86_64-linux.credentials
 sudo nixos-rebuild build --flake .#nixos
 sudo nixos-rebuild test --flake .#nixos
 ```

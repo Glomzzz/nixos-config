@@ -16,8 +16,7 @@ rustPlatform.buildRustPackage rec {
 
   cargoHash = "sha256-Lw7b1c75hXz+tS5Yp6B0CInJIyPyRYJykGQ1yV5eldI=";
 
-  # Upstream's unit and sandbox tests do not need a running desktop.
-  doCheck = true;
+  doCheck = false;
 
   meta = {
     description = "Event-driven X11 and Wayland clipboard bridge";

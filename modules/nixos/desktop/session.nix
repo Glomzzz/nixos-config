@@ -44,9 +44,7 @@ in {
   };
 
   services = {
-    getty.autologinUser = null;
     displayManager = {
-      autoLogin.enable = false;
       regreet = {
         enable = true;
         theme = {

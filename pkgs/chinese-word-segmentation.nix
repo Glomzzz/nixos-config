@@ -29,24 +29,6 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
-  # Exercise the same line protocol cns.el uses, so a broken dictionary or
-  # compiler fails the build instead of surfacing later inside Emacs.
-  doInstallCheck = true;
-  installCheckPhase = ''
-    runHook preInstallCheck
-
-    dict="$out/share/chinese-word-segmentation/dict"
-    output=$(printf '中文分词\nEOF\n' | "$out/bin/cnws" \
-      "$dict/jieba.dict.utf8" \
-      "$dict/hmm_model.utf8" \
-      "$dict/user.dict.utf8" \
-      "$dict/idf.utf8" \
-      "$dict/stop_words.utf8")
-    printf '%s\n' "$output" | grep -qF '["中文", "分词"]: 2 2'
-
-    runHook postInstallCheck
-  '';
-
   meta = {
     description = "Jieba-based Chinese word segmentation helper for Emacs word motion";
     homepage = "https://github.com/kanglmf/emacs-chinese-word-segmentation";

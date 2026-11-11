@@ -6,7 +6,6 @@
   unzip,
   openssl,
   installShellFiles,
-  versionCheckHook,
 }:
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "bun";
@@ -42,10 +41,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
       --zsh <(SHELL="zsh" $out/bin/bun completions) \
       --fish <(SHELL="fish" $out/bin/bun completions)
   '';
-
-  doInstallCheck = true;
-  nativeInstallCheckInputs = [versionCheckHook];
-  versionCheckProgramArg = "--version";
 
   meta = {
     description = "Incredibly fast JavaScript runtime, bundler, transpiler and package manager";

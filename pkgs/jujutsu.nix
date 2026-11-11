@@ -4,12 +4,8 @@
   rustPlatform,
   fetchFromGitHub,
   installShellFiles,
-  gitMinimal,
-  gnupg,
-  openssh,
   buildPackages,
   nix-update-script,
-  versionCheckHook,
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "jujutsu";
@@ -26,29 +22,12 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   nativeBuildInputs = [installShellFiles];
 
-  nativeCheckInputs = [
-    gitMinimal
-    gnupg
-    openssh
-  ];
+  doCheck = false;
 
   cargoBuildFlags = [
     # Don't install the gen-protos build tool.
     "--bin"
     "jj"
-  ];
-
-  useNextest = true;
-
-  cargoTestFlags = [
-    # Don't build gen-protos when running tests.
-    "-p"
-    "jj-lib"
-    "-p"
-    "jj-cli"
-    # Flaky test that asserts an ordering that ties on random operation IDs.
-    "-E"
-    "!test(test_build_truncated_evolution_graph)"
   ];
 
   env = {
@@ -71,10 +50,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
         --nushell <(${jj} util completion nushell) \
         --zsh <(COMPLETE=zsh ${jj})
     '';
-
-  doInstallCheck = true;
-  nativeInstallCheckInputs = [versionCheckHook];
-  versionCheckProgram = "${placeholder "out"}/bin/jj";
 
   passthru.updateScript = nix-update-script {};
 

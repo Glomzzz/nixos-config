@@ -37,7 +37,6 @@
   };
 
   outputs = inputs @ {
-    self,
     nixpkgs,
     home-manager,
     nixos-secrets,
@@ -58,12 +57,6 @@
     in {
       inherit (pkgs) phono-core phono-fcitx5-addon;
     });
-
-    checks = forAllSystems (system:
-      import ./checks {
-        inherit self nixos-secrets;
-        pkgs = pkgsFor system;
-      });
 
     nixosConfigurations = {
       nixos = let

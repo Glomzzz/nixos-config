@@ -30,7 +30,6 @@
   # Additional input packages and tools
   environment.systemPackages = with pkgs; [
     libinput
-    xf86-input-libinput
     # Diagnostic tools
     evtest
     # Wireless receiver diagnostics

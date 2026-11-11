@@ -24,12 +24,7 @@ unencrypted, so tmpfs alone does not guarantee plaintext cannot reach disk.
 
 Changing `~/nixos-secrets/.sops.yaml` only changes policy for future operations. To apply new
 recipients to an existing file, use `sops updatekeys FILE` and inspect only the
-encrypted diff. The regression check validates both policy and encrypted-file
-metadata without decrypting anything:
-
-```sh
-./scripts/with-github-token nix build --no-link .#checks.x86_64-linux.sops
-```
+encrypted diff.
 
 ## Nix private-input credentials
 
@@ -55,11 +50,7 @@ manual review; the migration does not recursively follow configuration files.
 No real credential is provisioned, rotated, or deleted merely by committing this
 configuration. After validating the replacement, rotate/revoke the provider-side
 broad token; removing a local setting does not revoke older copies in snapshots,
-backups, or prior processes. Tests use fake tokens only:
-
-```sh
-./scripts/with-github-token nix build --no-link .#checks.x86_64-linux.nix-credentials
-```
+backups, or prior processes.
 
 ## On-demand user credentials
 
@@ -153,12 +144,6 @@ use/disclose its credential; root can compromise it. Runtime storage is
 nonpersistent, not a guarantee against swapping. SIGKILL/crashes can leave the
 credential files until runtime-directory cleanup. Full-disk and swap
 encryption remain necessary for offline protection.
-
-Regression tests use fake credentials, never real decryption or network access:
-
-```sh
-./scripts/with-github-token nix build --no-link .#checks.x86_64-linux.credentials .#checks.x86_64-linux.sops
-```
 
 ## Opt-in automatic OpenPGP user-PIN entry
 

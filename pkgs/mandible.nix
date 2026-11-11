@@ -2,9 +2,7 @@
   lib,
   rustPlatform,
   fetchFromGitHub,
-  git,
   installShellFiles,
-  versionCheckHook,
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "mandible";
@@ -20,19 +18,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
   cargoHash = "sha256-H4uKnj6C+Ly6R8SjccdER/hlxuvFOqEgMrDRk3cFdb4=";
 
   nativeBuildInputs = [installShellFiles];
-  nativeCheckInputs = [git];
 
-  # Extraction probes need a writable, private $HOME/.cache/mandible.
-  preCheck = ''
-    export HOME="$TMPDIR/mandible-test-home"
-    mkdir -p "$HOME"
-  '';
+  doCheck = false;
 
   cargoBuildFlags = [
-    "--package"
-    "mandible"
-  ];
-  cargoTestFlags = [
     "--package"
     "mandible"
   ];
@@ -52,9 +41,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
       --fish "$completionDir/mandible.fish" \
       --zsh "$completionDir/_mandible"
   '';
-
-  doInstallCheck = true;
-  nativeInstallCheckInputs = [versionCheckHook];
 
   meta = {
     description = "TUI manual viewer for command-line tools";

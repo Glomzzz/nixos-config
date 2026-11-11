@@ -130,8 +130,6 @@ in {
         inactive.color = "#45475a";
       };
 
-      border.enable = false;
-
       shadow = {
         enable = true;
         softness = 20;

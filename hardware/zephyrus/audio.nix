@@ -40,5 +40,4 @@ _: {
     };
   };
   security.rtkit.enable = true;
-  services.pulseaudio.enable = false;
 }
