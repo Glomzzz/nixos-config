@@ -66,7 +66,9 @@ in {
 
   tun = {
     enable = true;
-    stack = "mixed";
+    # gVisor handles TCP and UDP in userspace. The mixed stack hands TCP to the kernel, and
+    # the NixOS input chain (policy drop) then drops it: UDP passed, no TCP reached mihomo.
+    stack = "gvisor";
     device = "mihomo0";
     mtu = 1500;
     auto-route = true;
