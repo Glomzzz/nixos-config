@@ -75,7 +75,10 @@ in {
     inet4-address = ["172.19.0.1/30"];
     mtu = 1500;
     auto-route = true;
-    auto-redirect = true;
+    # Off: with auto-redirect, mihomo 1.19.33 fails at start ("netlink receive: file exists")
+    # when it builds its nftables address sets, and the TUN never comes up. auto-route alone
+    # still captures all traffic.
+    auto-redirect = false;
     auto-detect-interface = true;
     dns-hijack = ["any:53"];
     strict-route = false;
