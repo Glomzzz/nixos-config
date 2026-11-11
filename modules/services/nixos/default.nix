@@ -3,6 +3,7 @@ _: {
     ./docker.nix
     ./maintenance-alerts.nix
     ./mac-mini-backup.nix
+    ./mihomo.nix
     ./openssh.nix
     ./printing.nix
     ./tailscale.nix

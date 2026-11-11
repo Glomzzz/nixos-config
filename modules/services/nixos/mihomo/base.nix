@@ -64,6 +64,8 @@ in {
     enable = true;
     stack = "mixed";
     device = "mihomo0";
+    # A fixed address: the system resolver points at 172.19.0.2 while the TUN is up.
+    inet4-address = ["172.19.0.1/30"];
     mtu = 1500;
     auto-route = true;
     auto-redirect = true;
