@@ -18,9 +18,9 @@
     telegram-desktop
     mumble
     discord
-    anydesk
-    # VNC/RDP/SPICE client, kept alongside anydesk because anydesk only speaks
-    # its own protocol. nixpkgs builds remmina against libvncserver and freerdp
+    # anydesk is temporarily removed: nixpkgs' pinned hash no longer matches the
+    # re-published 8.1.0 tarball. Re-add it once nixpkgs updates the hash.
+    # VNC/RDP/SPICE client. nixpkgs builds remmina against libvncserver and freerdp
     # unconditionally, so the vnc plugin is present without extra options.
     remmina
     cherry-studio-with-desktop
