@@ -8,7 +8,7 @@
 }: let
   stateDir = "/var/lib/mihomo";
   runDir = "/run/mihomo";
-  base = import ./mihomo/base.nix;
+  base = import ./mihomo/base.nix {dashboard = pkgs.metacubexd;};
   baseFile = pkgs.writeText "mihomo-base.json" (builtins.toJSON base);
   renderer = ./mihomo/render.py;
   seeds = import ./mihomo/rulesets.nix {inherit pkgs;};
@@ -118,6 +118,9 @@ in {
     wantedBy = ["multi-user.target"];
     wants = ["network-online.target"];
     after = ["network-online.target"];
+    # The dashboard lives in the Nix store, outside the home directory, so mihomo
+    # serves it only through SAFE_PATHS.
+    environment.SAFE_PATHS = "${pkgs.metacubexd}";
     # Keep retrying at boot until the subscription is reachable; never give up.
     startLimitIntervalSec = 0;
     serviceConfig = {

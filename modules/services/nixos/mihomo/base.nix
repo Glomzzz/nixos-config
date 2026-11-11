@@ -1,7 +1,7 @@
 # mihomo base configuration. render.py adds the proxies, the proxy groups and the API
 # secret at start. The rules and DNS policy below refer to the groups render.py
 # defines (proxy, auto, dns-auto, ai) and to the VLESS nodes (vless-hk, vless-sg).
-let
+{dashboard}: let
   # Local explicit-proxy listener (sing-box mixed-in). Only the listener-specific
   # rules below match on it; TUN traffic takes the general path.
   mixedPort = 20172;
@@ -55,6 +55,13 @@ in {
   # Temporary: info names the outbound in connection errors. Revert to "warn" after diagnosis.
   log-level = "info";
   external-controller = "127.0.0.1:9090";
+  # The dashboard is served from the controller at /ui. Browser pages may call the API
+  # only from the controller's own origins.
+  external-ui = "${dashboard}";
+  external-controller-cors = {
+    allow-origins = ["http://127.0.0.1:9090" "http://localhost:9090"];
+    allow-private-network = false;
+  };
   profile = {
     store-selected = true;
     store-fake-ip = true;
