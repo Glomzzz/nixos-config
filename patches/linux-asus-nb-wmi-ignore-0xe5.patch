@@ -1,0 +1,26 @@
+platform/x86: asus-nb-wmi: Ignore unknown event 0xE5
+
+On ASUS laptops such as the ROG Zephyrus G16 GU605MY, the firmware sends
+WMI event 0xE5 about every 10-12 seconds with nobody touching the keyboard.
+asus-wmi has no keymap entry for it, so it logs "Unknown key code 0xe5" and
+reports KEY_UNKNOWN on the "Asus WMI hotkeys" input device. Desktop
+environments treat that as user activity, and IMEs such as fcitx5 treat the
+keycode-only event as a non-text key, which can commit the composition.
+
+Add a KE_IGNORE entry next to the existing ignored events (0xC6, 0xCF, 0x7B).
+No model in the shared keymap maps 0xE5 to a key.
+
+Adapted from the upstream series by Seyed Mohammad Mahdi Hosseini
+("platform/x86: asus-nb-wmi: Ignore events 0xE5 and 0x4F"). The 0x4F
+(Fn+Windows lock notification) patch is intentionally not included here.
+
+--- a/drivers/platform/x86/asus-nb-wmi.c
++++ b/drivers/platform/x86/asus-nb-wmi.c
+@@ -662,6 +662,7 @@
+ 	{ KE_KEY, 0xCB, { KEY_F14 } }, /* Fn+noise-cancel */
+ 	{ KE_IGNORE, 0xC6, },  /* Ambient Light Sensor notification */
+ 	{ KE_IGNORE, 0xCF, },	/* AC mode */
++	{ KE_IGNORE, 0xE5, },	/* Unknown event repeated every ~10 s on ASUS laptops */
+ 	{ KE_KEY, 0xFA, { KEY_PROG2 } },           /* Lid flip action */
+ 	{ KE_KEY, 0xBD, { KEY_PROG2 } },           /* Lid flip action on ROG xflow laptops */
+ 	{ KE_KEY, ASUS_WMI_KEY_ARMOURY, { KEY_PROG3 } },

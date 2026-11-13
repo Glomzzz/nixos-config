@@ -27,6 +27,14 @@
         hash = "sha256-sRtt+Clejpkf8EC3GqpJlKi1XKojtrCSkH8ZW1hA/R8=";
       };
     };
+    # Ignore the firmware's ~10 s WMI event 0xE5 (reported as KEY_UNKNOWN).
+    # Without this, fcitx5/Phono commits the pending pinyin when it fires.
+    kernelPatches = [
+      {
+        name = "asus-nb-wmi-ignore-0xe5";
+        patch = ../../patches/linux-asus-nb-wmi-ignore-0xe5.patch;
+      }
+    ];
   });
 
   # Compatibility baseline, NOT the installed NixOS release. Earlier upgrades
