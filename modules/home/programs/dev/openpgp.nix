@@ -72,7 +72,7 @@ in {
         behavior = "drop";
       };
       # Sign unsigned outgoing mutable commits authored by us, at push time.
-      git.sign-on-push = true;
+      revsets.git-sign-on-push = "~signed() & mine()";
     };
   };
 
