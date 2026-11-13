@@ -22,22 +22,22 @@ per-buffer font zoom cannot configure a terminal's cell font. Complex emoji
 sequences can still have width/cursor limitations in Emacs 31.
 
 Kitty's default keyboard shortcuts are cleared so Ctrl/Alt/Shift combinations,
-Ctrl+Tab, and modified arrows can reach Emacs. **Ctrl+Shift+C / V** copy the
-terminal selection / paste the clipboard when extended keyboard reporting is
-inactive. When an application negotiates the Kitty keyboard protocol (including
-terminal Emacs and Pi), the clipboard kitten forwards those keys using Kitty's
-own key encoder instead: the application owns their meaning. This uses the
-current window's protocol state, not its title or a process-name heuristic.
+Ctrl+Tab, and modified arrows can reach Emacs. **Ctrl+Shift+C / V** always copy
+the terminal selection / paste the clipboard, including over ssh and in programs
+that negotiate the Kitty keyboard protocol. Terminal Emacs and Pi therefore do
+not receive Ctrl+Shift+C / V. Paste does not prompt for confirmation; dangerous
+control codes are stripped silently.
 
-Fish 4.x enables that protocol at its prompt, which would forward Ctrl+Shift+C/V
-to fish, where they do nothing. Kitty therefore sets `fish_features=no-query-term`
-for its child processes, so the prompt stays in legacy key mode. This also turns
-off fish's other terminal queries; run `fish --features query-term` to restore them.
+Fish 4.x enables the keyboard protocol at its prompt. Kitty therefore sets
+`fish_features=no-query-term` for its child processes, so the prompt stays in
+legacy key mode. This also turns off fish's other terminal queries; run
+`fish --features query-term` to restore them.
 
-Unconditional terminal actions use **Ctrl+Alt+Shift**:
+Terminal actions:
 
 | Chord | Action |
 | --- | --- |
+| Ctrl+Shift+C / V | Copy terminal selection / paste clipboard |
 | Ctrl+Alt+Shift+C / V | Copy terminal selection / paste clipboard |
 | Ctrl+Alt+Shift+= / - | Increase / decrease this window's font size |
 | Ctrl+Alt+Shift+0 | Reset font size |

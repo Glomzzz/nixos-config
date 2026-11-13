@@ -12,9 +12,7 @@
 
     settings = {
       shell = "${pkgs.fish}/bin/fish --login --interactive";
-      # Fish 4.x negotiates the kitty keyboard protocol at its prompt. Ctrl+Shift+C/V
-      # would then be forwarded to fish, which does not bind them, so the clipboard
-      # kitten never copies or pastes there. Keep the prompt in legacy key mode.
+      # Fish 4.x negotiates the kitty keyboard protocol at its prompt. Keep the prompt in legacy key mode.
       env = "fish_features=no-query-term";
       linux_display_server = "wayland";
       wayland_enable_ime = true;
@@ -27,17 +25,19 @@
       text_fg_override_threshold = 0;
       allow_remote_control = false;
       clipboard_control = "write-clipboard write-primary read-clipboard-ask read-primary-ask";
+      # Paste without the unsafe-paste confirmation; dangerous C0 codes are still stripped silently.
+      paste_actions = "quote-urls-at-prompt,replace-dangerous-control-codes";
 
       # Let Emacs receive Ctrl/Alt/Shift combinations, including Ctrl+Tab,
-      # Ctrl+Shift+arrows, and Ctrl+Shift+letters. Clipboard shortcuts below
-      # defer to applications that negotiate extended keyboard reporting.
+      # Ctrl+Shift+arrows, and Ctrl+Shift+letters. Ctrl+Shift+C/V below are always
+      # clipboard actions, including over ssh and in protocol-aware programs.
       clear_all_shortcuts = true;
       kitty_mod = "ctrl+alt+shift";
     };
 
     keybindings = {
-      "ctrl+shift+c" = "kitten clipboard.py copy";
-      "ctrl+shift+v" = "kitten clipboard.py paste";
+      "ctrl+shift+c" = "copy_to_clipboard";
+      "ctrl+shift+v" = "paste_from_clipboard";
       # Explicit terminal clipboard access even in protocol-aware applications.
       "kitty_mod+c" = "copy_to_clipboard";
       "kitty_mod+v" = "paste_from_clipboard";
@@ -66,8 +66,6 @@
       symbol_map U+3040-U+309F,U+30A0-U+30FF,U+31F0-U+31FF Noto Sans Mono CJK JP
     '';
   };
-
-  xdg.configFile."kitty/clipboard.py".source = ./kitty-clipboard.py;
 
   fonts.fontconfig.enable = true;
   home.packages = with pkgs; [
