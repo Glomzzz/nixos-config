@@ -6,6 +6,26 @@
   # rules below match on it; TUN traffic takes the general path.
   mixedPort = 20172;
 
+  # Steam and the programs it runs, matched by the basename of /proc/<pid>/exe. The names
+  # come from the installed Steam, SteamVR and Steam Linux Runtime. `reaper` and `wine`/`wine64`
+  # are generic, so any other program with the same basename also goes direct.
+  directProcesses = [
+    # Steam client and its helpers
+    "steam" "steamwebhelper" "steamerrorreporter" "steamsysinfo" "steam_monitor"
+    "steam-launch-wrapper" "streaming_client" "gameoverlayui" "gamelauncher" "reaper"
+    "fossilize_replay"
+    # Steam Linux Runtime (pressure-vessel)
+    "pressure-vessel-wrap" "srt-logger" "steam-runtime-launcher-service" "steam-runtime-steam-remote"
+    # SteamVR
+    "vrserver" "vrmonitor" "vrdashboard" "vrcompositor-launcher"
+    # Gamescope, which Steam launches games under (steam-game-laptop uses it)
+    "gamescope" "gamescopereaper"
+    # Prism Launcher, started through steam-run (the Minecraft java child is not listed)
+    "prismlauncher"
+    # Games: native Dota 2 and the Proton Wine loader (Deadlock and other Proton games)
+    "dota2" "wine" "wine64"
+  ];
+
   # Bilibili cn-hk CDN nodes. GeoIP lists them as mainland, but direct connections
   # time out from this network, so they use the proxy. Extend when other nodes fail
   # the same way.
@@ -120,6 +140,9 @@ in {
         aiSets)
       // {
         "rule-set:geosite-cn" = ["https://223.5.5.5/dns-query#DIRECT"];
+        # Steam and Valve domains resolve through AliDNS, sent direct. mihomo cannot tell Steam's
+        # queries apart by process: systemd-resolved relays every query from the host.
+        "rule-set:geosite-steam" = ["https://223.5.5.5/dns-query#DIRECT"];
         # LAN names: the home router, sent direct.
         "+.local" = ["udp://192.168.50.1#DIRECT"];
         "+.lan" = ["udp://192.168.50.1#DIRECT"];
@@ -135,6 +158,7 @@ in {
     geosite-google-gemini = ruleSet "geosite-google-gemini" "domain" "geosite/google-gemini";
     geosite-geolocation-not-cn = ruleSet "geosite-geolocation-not-cn" "domain" "geosite/geolocation-!cn";
     geosite-cn = ruleSet "geosite-cn" "domain" "geosite/cn";
+    geosite-steam = ruleSet "geosite-steam" "domain" "geosite/steam";
     geoip-hk = ruleSet "geoip-hk" "ipcidr" "geoip/hk";
     geoip-mo = ruleSet "geoip-mo" "ipcidr" "geoip/mo";
     geoip-cn = ruleSet "geoip-cn" "ipcidr" "geoip/cn";
@@ -145,15 +169,10 @@ in {
   rules =
     [
       "PROCESS-NAME,nix-daemon,DIRECT"
-      # Dota 2 is the native Linux binary (game/bin/linuxsteamrt64/dota2) and connects directly.
-      "PROCESS-NAME,dota2,DIRECT"
-      # Proton runs Windows games (Deadlock included) under the Wine loader, so mihomo sees
-      # wine or wine64 rather than the game's .exe. This also sends every other Proton game direct.
-      "PROCESS-NAME,wine,DIRECT"
-      "PROCESS-NAME,wine64,DIRECT"
       "IP-CIDR,100.64.0.0/10,DIRECT,no-resolve"
       "IP-CIDR6,fd7a:115c:a1e0::/48,DIRECT,no-resolve"
     ]
+    ++ map (name: "PROCESS-NAME,${name},DIRECT") directProcesses
     ++ map (set: "RULE-SET,${set},ai") aiSets
     ++ map (cidr: "IP-CIDR,${cidr},DIRECT,no-resolve") privateCidrs
     ++ map (cidr: "IP-CIDR6,${cidr},DIRECT,no-resolve") privateCidrs6
