@@ -1,5 +1,5 @@
 diff --git a/app/build.sh b/app/build.sh
-index e4bcf9c..cf7999a 100755
+index 5bdf360..d9550f5 100755
 --- a/app/build.sh
 +++ b/app/build.sh
 @@ -252,7 +252,8 @@ if [ "$UPDATE_CHANNEL" == "beta" ] || [ "$UPDATE_CHANNEL" == "dev" ] || [ "$UPDA
@@ -12,7 +12,7 @@ index e4bcf9c..cf7999a 100755
  
  # Paths to Gecko runtimes
  MAC_RUNTIME_PATH="$CALLDIR/xulrunner/Firefox.app"
-@@ -427,10 +428,9 @@ echo "" >> $prefs_file
+@@ -427,15 +428,12 @@ echo "" >> $prefs_file
  
  rm -rf defaults-z
  
@@ -24,9 +24,16 @@ index e4bcf9c..cf7999a 100755
 +# CertRevocations at startup is not refreshed here. The list shipped with the
 +# pinned Firefox runtime is used instead, and Firefox syncs it at runtime.
  
+-# Replace the built-in plugin blocklist with the published one
+-if [ $quick_build -eq 0 ]; then
+-	"$CALLDIR/scripts/fetch_plugin_blocklist" resource/schema/plugin-blocklist/blocked-plugins.json
+-fi
++# Nix builds have no network access, so the built-in plugin blocklist is kept
++# instead of fetching the published one.
+ 
  # Platform-specific prefs
  if [ $BUILD_MAC == 1 ]; then
-@@ -719,11 +719,6 @@ if [ $BUILD_MAC == 1 ]; then
+@@ -727,11 +725,6 @@ if [ $BUILD_MAC == 1 ]; then
  		cp -R "$MAC_RUNTIME_PATH/../MacOS/." "$CONTENTSDIR/MacOS/"
  	fi
  
@@ -38,7 +45,7 @@ index e4bcf9c..cf7999a 100755
  	# Modify Info.plist
  	perl -pi -e "s/\{\{VERSION\}\}/$VERSION/" "$CONTENTSDIR/Info.plist"
  	perl -pi -e "s/\{\{VERSION_NUMERIC\}\}/$VERSION_NUMERIC/" "$CONTENTSDIR/Info.plist"
-@@ -1168,11 +1163,6 @@ if [ $BUILD_LINUX == 1 ]; then
+@@ -1176,11 +1169,6 @@ if [ $BUILD_LINUX == 1 ]; then
  		# Copy Ubuntu launcher files
  		cp "$CALLDIR/linux/zotero.desktop" "$APPDIR"
  		cp "$CALLDIR/linux/set_launcher_icon" "$APPDIR"
