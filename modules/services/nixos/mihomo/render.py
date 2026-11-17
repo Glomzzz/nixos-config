@@ -268,9 +268,10 @@ def render_config(base, nodes, vless, clash_secret):
         # No DIRECT here: a manual pick must never send general traffic out of the real
         # address. vless-sg is left out too: the ai group is its only user.
         {"name": "proxy", "type": "select", "proxies": ["auto", *names, "vless-hk"]},
-        # Automatic choice tests only the allowed regions.
+        # Automatic choice tests only the allowed regions. Re-tests every 120s so a node that
+        # starts timing out is dropped within two minutes instead of five.
         {"name": "auto", "type": "url-test", "proxies": [*auto_names, "vless-hk"],
-         "url": TEST_URL, "interval": 300, "tolerance": 50, "lazy": True},
+         "url": TEST_URL, "interval": 120, "tolerance": 50, "lazy": True},
         # DNS prefers the subscription pool and falls back to vless-hk, in order. A failing
         # VLESS node is never waited on before the pool answers.
         {"name": "dns-auto", "type": "fallback", "proxies": ["auto", "vless-hk"],
