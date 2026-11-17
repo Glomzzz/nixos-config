@@ -45,7 +45,7 @@
 
   # OpenAI, Anthropic and Gemini exit through vless-sg (the Singapore server). Their
   # names resolve through vless-sg as well, so no domestic resolver answers for them.
-  # When vless-sg is down, these connections fail.
+  # vless-sg dials through vless-hk, so when either is down, these connections fail.
   aiSets = ["geosite-openai" "geosite-anthropic" "geosite-google-gemini"];
   aiNameserver = ["https://1.1.1.1/dns-query#vless-sg"];
 

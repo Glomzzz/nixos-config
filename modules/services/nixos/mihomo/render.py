@@ -4,6 +4,8 @@
 Proxy sources:
 - vless-hk and vless-sg: REALITY nodes from secrets (vless.<region>.*). They do
   not depend on the subscription. The ai group uses vless-sg only, with no fallback.
+  Singapore nodes (vless-sg and subscription nodes named SG, Singapore or 新加坡)
+  dial through vless-hk as a mid-point hop.
 - subscription nodes: fetched from the private v2rayA subscription (VLESS, Trojan,
   AnyTLS). They form the general proxy pool when reachable.
 
@@ -55,6 +57,9 @@ AUTO_REGION = re.compile(
 )
 # Turkey exits, and nodes the subscription marks as failing, stay manual-only.
 AUTO_EXCLUDE = re.compile(r"土耳其|故障")
+# Singapore nodes dial through vless-hk (dialer-proxy). A direct connection to Singapore is slow.
+SG_REGION = re.compile(r"\bSG\b|Singapore|新加坡", re.IGNORECASE)
+RELAY = "vless-hk"
 VLESS_REGIONS = ("hk", "sg")
 # Field names as stored in nixos-secrets (vless.<region>.<field>).
 VLESS_FIELDS = ("host", "port", "uuid", "public-key", "short-id", "sni")
@@ -263,7 +268,11 @@ def render_config(base, nodes, vless, clash_secret):
     auto_names = [name for name in names if AUTO_REGION.search(name) and not AUTO_EXCLUDE.search(name)] or names
     config = copy.deepcopy(base)
     config["secret"] = clash_secret
-    config["proxies"] = [vless["vless-hk"], vless["vless-sg"], *nodes]
+    proxies = [vless["vless-hk"], vless["vless-sg"], *nodes]
+    for proxy in proxies:
+        if proxy["name"] == "vless-sg" or SG_REGION.search(proxy["name"]):
+            proxy["dialer-proxy"] = RELAY
+    config["proxies"] = proxies
     config["proxy-groups"] = [
         # No DIRECT here: a manual pick must never send general traffic out of the real
         # address. vless-sg is left out too: the ai group is its only user.
