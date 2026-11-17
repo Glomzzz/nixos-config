@@ -182,6 +182,9 @@ in {
       "DOMAIN-SUFFIX,home.arpa,DIRECT"
       "DOMAIN-SUFFIX,ts.net,DIRECT"
       "DOMAIN-REGEX,^[^.]+$,DIRECT"
+      # Steam and Valve domains (steamcontent.com, steamstatic.com, ...) go direct. Matches
+      # connections whose domain is sniffed or known from DNS, as the process rules cannot.
+      "RULE-SET,geosite-steam,DIRECT"
     ]
     ++ localRules "geosite-geolocation-not-cn"
     ++ map (cidr: "IP-CIDR,${cidr},proxy,no-resolve") proxyCidrs
