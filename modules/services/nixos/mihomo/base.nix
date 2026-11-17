@@ -145,9 +145,12 @@ in {
   rules =
     [
       "PROCESS-NAME,nix-daemon,DIRECT"
-      # Dota 2 goes through vless-hk. Its IPv6 path is rejected so the game falls back to IPv4.
-      "AND,((PROCESS-NAME,dota2),(IP-CIDR6,::/0)),REJECT"
-      "PROCESS-NAME,dota2,vless-hk"
+      # Dota 2 is the native Linux binary (game/bin/linuxsteamrt64/dota2) and connects directly.
+      "PROCESS-NAME,dota2,DIRECT"
+      # Proton runs Windows games (Deadlock included) under the Wine loader, so mihomo sees
+      # wine or wine64 rather than the game's .exe. This also sends every other Proton game direct.
+      "PROCESS-NAME,wine,DIRECT"
+      "PROCESS-NAME,wine64,DIRECT"
       "IP-CIDR,100.64.0.0/10,DIRECT,no-resolve"
       "IP-CIDR6,fd7a:115c:a1e0::/48,DIRECT,no-resolve"
     ]
