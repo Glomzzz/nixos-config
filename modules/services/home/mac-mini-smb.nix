@@ -59,7 +59,7 @@
       mdns_ip=$(getent ahostsv4 mac-mini.local 2>/dev/null | awk '
         !seen[$1]++ && $1 !~ /^100\./ { print $1; exit }
       ' || true)
-      for candidate in "$mdns_ip" 192.168.50.198; do
+      for candidate in "$mdns_ip" 192.168.1.6; do
         if [ -n "$candidate" ] && lan_route_ok "$candidate" &&
           nc -n -z -w 3 "$candidate" 445 >/dev/null 2>&1
         then
