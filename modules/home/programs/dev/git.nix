@@ -28,6 +28,16 @@
       core = {
         editor = "${config.home.homeDirectory}/.local/bin/emc";
       };
+      # GitHub rejects account passwords over HTTPS. The "password" is the
+      # OAuth token that `gh auth login` keeps in the credential store; gh
+      # supplies it on demand and git never persists it.
+      credential."https://github.com" = {
+        username = "Glomzzz";
+        helper = [
+          ""
+          "!${pkgs.gh}/bin/gh auth git-credential"
+        ];
+      };
     };
   };
 }
