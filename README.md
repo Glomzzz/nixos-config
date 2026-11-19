@@ -56,7 +56,15 @@ just format
 
 # Apply the configuration
 just deploy
+
+# Build through the local proxy (nothing is activated); --switch activates after confirmation
+scripts/deploy.sh
+scripts/deploy.sh --switch
 ```
+
+`scripts/deploy.sh` builds the flake with the local `nixos-secrets` checkout
+(`NIXOS_SECRETS_DIR`, default `~/nixos-secrets`) and routes both the client and
+`nix-daemon` through the first working proxy.
 
 `build` and `deploy` evaluate the flake and build the host; there is no separate
 test or lint step. Review the generated system before running `deploy`.
