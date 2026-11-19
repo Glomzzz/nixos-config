@@ -17,7 +17,6 @@
 
   environment.systemPackages = with pkgs; [
     android-tools
-    android-studio
     mesa-demos
     pciutils
     vulkan-tools
