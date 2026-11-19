@@ -7,20 +7,21 @@ hardware, system features, services, and user programs have clear ownership.
 ## Layout
 
 ```text
-hosts/nixos/             host composition and machine-wide overrides
-hardware/                 hardware profile selection (see below)
-hardware/common/         hardware-independent modules shared by profiles
-hardware/zephyrus/       Zephyrus-specific boot, disk, GPU, and kernel
-modules/nixos/core/      baseline NixOS settings
-modules/nixos/desktop/   login manager and niri compositor settings
-modules/nixos/programs/  optional system integrations and tools
-modules/nixos/security/  authentication and sops-nix wiring
-modules/services/nixos/  system services
-modules/home/            Home Manager programs, shell, and desktop settings
-modules/services/home/   Home Manager services
-users/glom/              NixOS and Home Manager user entrypoints
-pkgs/                    local package definitions and overlays
-scripts/                 helpers wired into services and wrappers
+hosts/nixos/                      host composition and machine-wide overrides
+hardware/                         hardware profile selection (see below)
+hardware/common/                  hardware-independent modules shared by profiles
+hardware/zephyrus/                Zephyrus laptop: boot, disk, GPU, kernel
+hardware/zephyrus/addition/       laptop-only sub-modules, paths mirror modules/
+modules/nixos/core/               baseline NixOS settings
+modules/nixos/desktop/            login manager and niri compositor settings
+modules/nixos/programs/           optional system integrations and tools
+modules/nixos/security/           authentication and sops-nix wiring
+modules/services/nixos/           system services
+modules/home/                     Home Manager programs, shell, and desktop settings
+modules/services/home/            Home Manager services
+users/glom/                       NixOS and Home Manager user entrypoints
+pkgs/                             local package definitions and overlays
+scripts/                          helpers wired into services and wrappers
 ```
 
 `flake.nix` composes the host. `hosts/nixos/default.nix` imports the hardware
@@ -40,6 +41,22 @@ Because DMI lives outside the flake, every evaluation must pass `--impure`. The
 reading DMI from that laptop; confirm with `cat /sys/class/dmi/id/product_name`
 there before relying on it. New profile files must be tracked by git, or the
 flake will not see them.
+
+### Hardware-specific sub-modules
+
+A sub-module that only one machine uses lives under `hardware/<profile>/addition/`
+at the path of the shared module it extends: `addition/nixos/...` for
+`modules/nixos/...`, `addition/home/...` for `modules/home/...`, and
+`addition/services/{nixos,home}/...` for `modules/services/...`. Each profile
+integrates them explicitly in its `default.nix`: NixOS modules in `imports`, Home
+Manager modules in `home-manager.users.${username}.imports`.
+
+A whole sub-module moves out of `modules/` (Steam, VR, WiVRn, `gaming/`, battery
+alerts on the laptop). A partial addition merges into a shared module (Android
+Studio, Zotero, tailnet firewall rules, panel outputs). Shared modules do not
+branch on `hardware.profile`. Panel outputs are per profile:
+`eDP-1` and the greeter's panel scale are laptop-only, while `HDMI-A-1` is set in
+both profiles. `desktop.greeterOutputs` carries the greeter's panel blocks.
 
 ## Common commands
 
