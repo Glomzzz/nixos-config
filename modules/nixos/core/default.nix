@@ -12,6 +12,7 @@
     ./fonts.nix
     ./home-manager.nix
     ./input.nix
+    ./keyboard-debounce.nix
     ./locale.nix
     ./networking.nix
     ./nix.nix
