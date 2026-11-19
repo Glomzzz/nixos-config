@@ -28,9 +28,9 @@ No key generation, reset, PIN change, or transfer is performed by Nix activation
   [SSH setup](ssh.md) covers installing the public key on remote accounts.
 - Git/Jujutsu signing stays **disabled until provisioned**. Once both fields in
   `users/glom/openpgp.nix` are set, the public certificate is imported, and GnuPG,
-  Git, and Jujutsu all select the same exact signing subkey. Git signs commits/tags
-  by default. Jujutsu uses `signing.behavior = "drop"`: it creates and rewrites
-  commits unsigned, and `revsets.git-sign-on-push` signs the unsigned outgoing mutable commits
+  Git, and Jujutsu all select the same exact signing subkey. Git does not sign
+  commits/tags by default (`git commit -S` signs one explicitly). Jujutsu uses
+  `signing.behavior = "drop"`: it creates and rewrites commits unsigned, and `revsets.git-sign-on-push` signs the unsigned outgoing mutable commits
   authored by you when you run `jj git push`. One touch covers that push's signatures
   only because the `sig` touch policy is `cached` (about 15 s). Plain `git push` does
   not sign. `jj sign -r REV` can sign an explicitly selected revision manually.

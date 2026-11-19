@@ -57,11 +57,14 @@ in {
 
     # Do not enable broken signing or select an unrelated software key by email
     # before the public certificate and exact card signing subkey are configured.
+    # Commits and tags stay unsigned; `git commit -S` signs one explicitly.
+    # Plain `git push` never signs (git has no push-time batch signing);
+    # `jj git push` does, via revsets.git-sign-on-push below.
     git.signing = lib.mkIf signingReady {
       format = "openpgp";
       key = identity.signingKey;
       signer = gpg;
-      signByDefault = true;
+      signByDefault = false;
     };
     jujutsu.settings = lib.mkIf signingReady {
       signing = {
