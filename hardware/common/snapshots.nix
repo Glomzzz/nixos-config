@@ -26,7 +26,7 @@ in {
   assertions = [
     {
       assertion = config.fileSystems."/".fsType == "btrfs";
-      message = "Zephyrus root snapshots require a Btrfs root filesystem.";
+      message = "Root snapshots require a Btrfs root filesystem.";
     }
   ];
 

@@ -52,7 +52,7 @@ unit, not as a blanket global default. Confirm
 
 ## Btrfs health and allocation pressure
 
-`hardware/zephyrus/storage-health.nix` schedules a monthly scrub of `/`, limited
+`hardware/common/storage-health.nix` schedules a monthly scrub of `/`, limited
 to 100 MiB/s, and an hourly **read-only** allocation check. The monitor reads
 kernel counters for metadata usage and physical device-unallocated space, rather
 than interpreting `df` as an allocation budget. It warns independently at 80%
@@ -92,7 +92,7 @@ no subvolumes or files are moved during activation by this change.
 ## Local Btrfs snapshots
 
 Automatic hourly and boot-time snapshots are **disabled** after a Btrfs
-metadata-full incident. Their origin was `hardware/zephyrus/snapshots.nix`,
+metadata-full incident. Their origin was `hardware/common/snapshots.nix` (formerly `hardware/zephyrus/snapshots.nix`),
 introduced by commit `cba846c` (`feat(recovery): add bounded local Btrfs snapshots
 with Snapper`). The module remains imported to keep Snapper available for manual
 recovery and daily cleanup of existing snapshots. It disables `TIMELINE_CREATE`

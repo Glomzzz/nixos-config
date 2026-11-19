@@ -8,18 +8,18 @@
   imports = [
     # Graphics crash. Disable for now.
     #  <nixos-hardware/asus/zephyrus/gu605my>
-    ./cpu
+    ../common/cpu
     ./gpu
     ./disk.nix
-    ./snapshots.nix
-    ./storage-health.nix
+    ../common/snapshots.nix
+    ../common/storage-health.nix
     ./power.nix
-    ./bluetooth.nix
-    ./audio.nix
+    ../common/bluetooth.nix
+    ../common/audio.nix
     ./boot.nix
     ./asus.nix
-    ./graphics-stack.nix
-    ./input.nix
+    ../common/graphics-stack.nix
+    ../common/input.nix
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
 
