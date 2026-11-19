@@ -6,7 +6,6 @@ _: {
     ./dev
     ./documents.nix
     ./emacs
-    ./gaming
     ./mail
     ./multimedia.nix
   ];

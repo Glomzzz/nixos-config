@@ -1,6 +1,7 @@
 {
   modulesPath,
   pkgs,
+  username,
   ...
 }: {
   nixpkgs.hostPlatform = "x86_64-linux";
@@ -27,6 +28,11 @@
     ./addition/nixos/programs/steam.nix
     ./addition/nixos/programs/vr.nix
     ./addition/services/nixos/wivrn.nix
+  ];
+
+  home-manager.users.${username}.imports = [
+    ./addition/home/programs/gaming
+    ./addition/services/home/power-alerts.nix
   ];
 
   hardware.enableAllFirmware = true;
