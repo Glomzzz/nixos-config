@@ -11,9 +11,9 @@ desktop entry. There is no Fish tty1 auto-launch hook. Greetd includes the
 `login` PAM stack, which passes the account password to GNOME Keyring. Other VTs
 and SSH remain plain password/key-based recovery shells.
 
-For `sudo`, a successful Howdy face match **replaces the password prompt**. If
-recognition fails or the camera is unavailable, sudo tries an enrolled YubiKey
-touch, then falls back to the account password. Face recognition is less secure
+For `sudo`, the account password is asked first. An empty Enter or a wrong
+password moves on to an enrolled YubiKey touch; if no key is present, Howdy is
+tried last. Face recognition is less secure
 than a password and can be spoofed. YubiKey enrollment is initially empty; see
 [yubikey.md](yubikey.md) for enrollment, OpenPGP provisioning, and commit signing.
 
@@ -45,10 +45,10 @@ separately locked GNOME Keyring, since no account password is supplied.
    password fallback remains available.
 3. Keep a root recovery shell open while testing PAM: `sudo -i`.
 4. Build first, then use `sudo nixos-rebuild test --flake .#nixos`. Test a fresh
-   password login on another VT and `sudo -k; sudo true`: a face match should
-   succeed without typing a password. If a key is enrolled, cover the camera and
-   confirm touch succeeds after Howdy fails. Unplug the key and keep the camera
-   covered to confirm password fallback. For screen unlock, test Enter with no
+   password login on another VT and `sudo -k; sudo true`: the correct password
+   should work. If a key is enrolled, press Enter on an empty password and confirm
+   touch succeeds. Unplug the key and cover the camera; the correct password must
+   still work. For screen unlock, test Enter with no
    input and a face match, then an enrolled key with the camera covered. With
    camera covered and key unplugged, the correct password must unlock; incorrect
    and empty passwords must keep the screen locked. Test all of these before
@@ -83,8 +83,9 @@ keyring. Complete these steps to protect its stored contents at rest.
 
 ## Recovery and limitations
 
-If face authentication fails, sudo and screen unlock try the enrolled key, then
-the account password; graphical and tty login still accept the password. If a
+If face authentication fails, screen unlock tries the enrolled key, then the
+account password. Sudo tries the password first, then the key, then face.
+Graphical and tty login still accept the password. If a
 greeter or PAM regression prevents access, use a password login on another VT, a password-based polkit
 prompt, or the root shell kept open during testing to restore the previous
 generation. Boot the prior generation if necessary.

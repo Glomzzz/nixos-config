@@ -58,15 +58,32 @@
         userverification = 0;
       };
     };
-    services = lib.genAttrs ["sudo" "swaylock"] (service: {
-      u2f = {
-        enable = true;
-        control = "sufficient";
+    services = {
+      # sudo: password first, then touch, then Howdy. Sequential, not parallel:
+      # an empty or wrong password falls through to touch; no key falls to Howdy.
+      sudo = {
+        u2f = {
+          enable = true;
+          control = "sufficient";
+        };
+        rules.auth.u2f = {
+          settings.authpending_file = "/run/yubikey-touch/${username}/sudo";
+          order = config.security.pam.services.sudo.rules.auth.unix.order + 10;
+        };
+        rules.auth.howdy.order = config.security.pam.services.sudo.rules.auth.u2f.order + 10;
       };
-      rules.auth.u2f.settings.authpending_file = "/run/yubikey-touch/${username}/${service}";
-      # NixOS normally orders U2F before Howdy. Preserve face-first behavior,
-      # then try touch, then pam_unix. These methods are sequential, not parallel.
-      rules.auth.u2f.order = config.security.pam.services.${service}.rules.auth.howdy.order + 10;
-    });
+      # swaylock: Howdy, then touch, then password. NixOS normally orders U2F
+      # before Howdy, so order it explicitly after Howdy. Still sequential.
+      swaylock = {
+        u2f = {
+          enable = true;
+          control = "sufficient";
+        };
+        rules.auth.u2f = {
+          settings.authpending_file = "/run/yubikey-touch/${username}/swaylock";
+          order = config.security.pam.services.swaylock.rules.auth.howdy.order + 10;
+        };
+      };
+    };
   };
 }

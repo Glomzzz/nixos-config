@@ -10,10 +10,14 @@ No key generation, reset, PIN change, or transfer is performed by Nix activation
 - `programs.yubikey-manager`: `ykman`, PC/SC smart-card access, and Yubico USB rules.
 - `pamu2fcfg` for FIDO enrollment. Runtime authentication uses a root-owned
   `/etc/u2f-mappings`, generated from `users/glom/u2f_keys` (initially empty).
-- Only `sudo` and `swaylock` try **Howdy -> YubiKey touch -> account password**.
-  These are sufficient alternatives, not mandatory two-factor authentication.
-  PAM runs them sequentially: touch begins only after Howdy fails/times out.
-  A connected, untouched key can delay password fallback; unplug it to skip it.
+- `sudo` tries **account password -> YubiKey touch -> Howdy**; `swaylock` tries
+  **Howdy -> YubiKey touch -> account password**. These are sufficient alternatives,
+  not mandatory two-factor authentication. PAM runs them sequentially. For sudo,
+  touch begins only after the password is skipped (empty Enter) or wrong. There is
+  no short timer: a `passwd_timeout` would make sudo reject a successful touch, and
+  sudo's default 5-minute prompt timeout still applies. For swaylock, touch begins
+  only after Howdy fails/times out. A connected, untouched key can delay swaylock's
+  password fallback; unplug it to skip it.
   Missing enrollment or hardware must fall through, never authenticate anyone.
 - Initial graphical/TTY login, SSH, and `su` remain unchanged. A polkit rule
   allows only the configured user (`glom`) the two PC/SC access actions, including
@@ -68,7 +72,8 @@ swaylock or put authentication information above its secure surface.
 
 After rebuilding, log out/in (or restart the user service once the graphical
 session is active), then test a signed commit, SSH, a browser security-key login,
-and `sudo -k; sudo true`. Cover the camera so sudo reaches U2F. Verify the title,
+and `sudo -k; sudo true`. Press Enter on an empty password so sudo reaches U2F.
+Verify the title,
 then touch/cancel and check that the popup disappears. An unplugged key must not
 leave a pending notification or prevent password fallback.
 
@@ -124,9 +129,9 @@ The origin/application ID must match the NixOS hostname, currently `nixos`.
 )
 ```
 
-Rebuild with `test` again to install the root-owned mapping. Cover the camera,
-then test `sudo -k; sudo true`: after Howdy fails, touch should succeed without
-the account password or FIDO PIN. For swaylock, press Enter, let Howdy fail, then
+Rebuild with `test` again to install the root-owned mapping. Then test
+`sudo -k; sudo true`: press Enter on an empty password, and touch should succeed
+without the account password or FIDO PIN. For swaylock, press Enter, let Howdy fail, then
 touch. Repeat with camera covered and key unplugged: the correct password must
 work; incorrect and empty passwords must fail. Verify face authentication still
 works without the key. Only then make the generation persistent with `switch`.
