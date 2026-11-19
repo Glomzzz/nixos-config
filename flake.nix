@@ -12,6 +12,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-secrets.url = "github:Glomzzz/nixos-secrets";
+    # Nix substituter proxy (see modules/services/nixos/selector4nix.nix). It keeps
+    # its own nixpkgs pin so its binary cache entries match.
+    selector4nix.url = "github:StarryReverie/selector4nix";
     nix-alien-source.url = "github:thiagokokada/nix-alien";
     niri = {
       url = "github:sodiboo/niri-flake";

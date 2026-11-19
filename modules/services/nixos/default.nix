@@ -6,6 +6,7 @@ _: {
     ./mihomo.nix
     ./openssh.nix
     ./printing.nix
+    ./selector4nix.nix
     ./tailscale.nix
     ./udisks2.nix
     ./v2raya.nix
