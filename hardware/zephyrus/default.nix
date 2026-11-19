@@ -26,12 +26,14 @@
 
     # Laptop-only additions to shared modules (see README).
     ./addition/nixos/core/networking.nix
+    ./addition/nixos/desktop/session.nix
     ./addition/nixos/programs/steam.nix
     ./addition/nixos/programs/vr.nix
     ./addition/services/nixos/wivrn.nix
   ];
 
   home-manager.users.${username}.imports = [
+    ./addition/home/desktop/niri/outputs.nix
     ./addition/home/programs/gaming
     ./addition/services/home/power-alerts.nix
   ];
