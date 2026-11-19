@@ -22,6 +22,11 @@
     ./asus.nix
     ./kernel.nix
     (modulesPath + "/installer/scan/not-detected.nix")
+
+    # Laptop-only additions to shared modules (see README).
+    ./addition/nixos/programs/steam.nix
+    ./addition/nixos/programs/vr.nix
+    ./addition/services/nixos/wivrn.nix
   ];
 
   hardware.enableAllFirmware = true;

@@ -193,8 +193,6 @@
     };
 in {
   environment.systemPackages = with pkgs; [
-    wayvr
-    openxr-loader
     gamescope
     steamGameLaptop
   ];

@@ -8,7 +8,7 @@
     autoStart = true;
     # Grants cap_sys_nice to the server via a security wrapper so WiVRn's
     # async reprojection can run at realtime priority (together with the
-    # rtprio=99 PAM limit in programs/vr.nix); keeps head-tracked motion
+    # rtprio=99 PAM limit in addition/nixos/programs/vr.nix); keeps head-tracked motion
     # smooth instead of letting it fall back to normal scheduling.
     highPriority = true;
     openFirewall = true;
@@ -35,5 +35,5 @@
     };
   };
 
-  environment.systemPackages = [pkgs.xrizer];
+  environment.systemPackages = [pkgs.xrizer pkgs.wayvr pkgs.openxr-loader];
 }
