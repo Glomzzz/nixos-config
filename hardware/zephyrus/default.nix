@@ -9,17 +9,18 @@
     # Graphics crash. Disable for now.
     #  <nixos-hardware/asus/zephyrus/gu605my>
     ../common/cpu
-    ./gpu
-    ./disk.nix
     ../common/snapshots.nix
     ../common/storage-health.nix
-    ./power.nix
     ../common/bluetooth.nix
     ../common/audio.nix
-    ./boot.nix
-    ./asus.nix
     ../common/graphics-stack.nix
     ../common/input.nix
+    ./gpu
+    ./disk.nix
+    ./power.nix
+    ./boot.nix
+    ./asus.nix
+    ./kernel.nix
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
 

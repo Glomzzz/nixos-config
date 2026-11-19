@@ -8,7 +8,9 @@ hardware, system features, services, and user programs have clear ownership.
 
 ```text
 hosts/nixos/             host composition and machine-wide overrides
-hardware/zephyrus/       Zephyrus-specific boot, disk, GPU, and peripherals
+hardware/                 hardware profile selection (see below)
+hardware/common/         hardware-independent modules shared by profiles
+hardware/zephyrus/       Zephyrus-specific boot, disk, GPU, and kernel
 modules/nixos/core/      baseline NixOS settings
 modules/nixos/desktop/   login manager and niri compositor settings
 modules/nixos/programs/  optional system integrations and tools
@@ -22,9 +24,22 @@ scripts/                 helpers wired into services and wrappers
 ```
 
 `flake.nix` composes the host. `hosts/nixos/default.nix` imports the hardware
-profile, shared NixOS modules, the user module, and generated Cachix settings.
+selector, shared NixOS modules, the user module, and generated Cachix settings.
 The Home Manager bridge in `modules/nixos/core/home-manager.nix` loads the
 user's Home Manager entrypoint.
+
+## Hardware profiles
+
+`hardware/default.nix` reads `sys_vendor` and `product_name` from
+`/sys/class/dmi/id` and imports the matching profile from `hardware/profiles.nix`.
+The result is available as `config.hardware.profile`. Evaluation fails if no
+profile matches or if more than one does; the error shows the detected values.
+
+Because DMI lives outside the flake, every evaluation must pass `--impure`. The
+`just` recipes already do. The ASUS Zephyrus match (`GU605`) was written without
+reading DMI from that laptop; confirm with `cat /sys/class/dmi/id/product_name`
+there before relying on it. New profile files must be tracked by git, or the
+flake will not see them.
 
 ## Common commands
 

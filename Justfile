@@ -1,14 +1,17 @@
 # Common commands for the NixOS configuration.
+#
+# Every recipe that evaluates the host uses --impure: hardware/default.nix reads
+# DMI data from /sys to choose the hardware profile.
 
 gh := "./scripts/with-github-token"
 
 # Build the host without changing the active system.
 build HOST="nixos":
-  {{gh}} nix build ".#nixosConfigurations.{{HOST}}.config.system.build.toplevel" --no-link
+  {{gh}} nix build --impure ".#nixosConfigurations.{{HOST}}.config.system.build.toplevel" --no-link
 
 # Apply the configuration.
 deploy:
-  {{gh}} sudo --preserve-env=NIX_CONFIG nixos-rebuild switch --flake .
+  {{gh}} sudo --preserve-env=NIX_CONFIG nixos-rebuild switch --flake . --impure
 
 # Format every .nix file in place with alejandra (the flake's formatter).
 format:
