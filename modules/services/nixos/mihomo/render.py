@@ -3,11 +3,12 @@
 
 Proxy sources:
 - vless-hk and vless-sg: REALITY nodes from secrets (vless.<region>.*). They do
-  not depend on the subscription. The ai group uses vless-sg only, with no fallback.
+  not depend on the subscription. General traffic uses the vless-pool group (both nodes,
+  the faster one wins). The ai group uses vless-sg only, with no fallback.
   Singapore nodes (vless-sg and subscription nodes named SG, Singapore or 新加坡)
   dial through vless-hk as a mid-point hop.
 - subscription nodes: fetched from the private subscription URL (VLESS, Trojan,
-  AnyTLS). They form the general proxy pool when reachable.
+  AnyTLS). They are the fallback behind vless-pool, used only while both VLESS nodes fail.
 
 Secret values are passed as file paths, never as arguments, and only counts are
 printed. The rendered configuration is written with mode 0600 to tmpfs.
@@ -36,7 +37,7 @@ from urllib.request import Request, urlopen
 # Names that subscription nodes must not take: our groups, our VLESS nodes, and
 # mihomo's built-in names.
 RESERVED_NAMES = {
-    "proxy", "auto", "dns-auto", "ai", "vless-hk", "vless-sg",
+    "proxy", "default", "vless-pool", "auto", "dns-auto", "ai", "vless-hk", "vless-sg",
     "DIRECT", "direct", "REJECT", "reject", "GLOBAL", "global",
 }
 PROXY_TYPES = {"vless", "trojan", "anytls"}
@@ -274,17 +275,30 @@ def render_config(base, nodes, vless, clash_secret):
         if proxy["name"] == "vless-sg" or SG_REGION.search(proxy["name"]):
             proxy["dialer-proxy"] = RELAY
     config["proxies"] = proxies
+    # The subscription pool exists only with subscription nodes. An empty group fails mihomo -t,
+    # and a failed test stops mihomo, which leaves the kill switch blocking egress.
+    pool = ["vless-pool", *(["auto"] if nodes else [])]
     config["proxy-groups"] = [
         # No DIRECT here: a manual pick must never send general traffic out of the real
-        # address. vless-sg is left out too: the ai group is its only user.
-        {"name": "proxy", "type": "select", "proxies": ["auto", *names, "vless-hk"]},
+        # address. The first entry is the default: the default group.
+        {"name": "proxy", "type": "select",
+         "proxies": ["default", *pool, *names, "vless-hk", "vless-sg"]},
+        # General traffic: VLESS nodes first, the subscription pool only while both fail.
+        {"name": "default", "type": "fallback", "proxies": pool,
+         "url": TEST_URL, "interval": 60},
+        # Both VLESS nodes; the faster one is used. vless-sg dials through vless-hk.
+        {"name": "vless-pool", "type": "url-test", "proxies": ["vless-hk", "vless-sg"],
+         "url": TEST_URL, "interval": 120, "tolerance": 50, "lazy": True},
+    ]
+    if nodes:
         # Automatic choice tests only the allowed regions. Re-tests every 120s so a node that
         # starts timing out is dropped within two minutes instead of five.
-        {"name": "auto", "type": "url-test", "proxies": [*auto_names, "vless-hk"],
-         "url": TEST_URL, "interval": 120, "tolerance": 50, "lazy": True},
-        # DNS prefers the subscription pool and falls back to vless-hk, in order. A failing
-        # VLESS node is never waited on before the pool answers.
-        {"name": "dns-auto", "type": "fallback", "proxies": ["auto", "vless-hk"],
+        config["proxy-groups"].append(
+            {"name": "auto", "type": "url-test", "proxies": auto_names,
+             "url": TEST_URL, "interval": 120, "tolerance": 50, "lazy": True})
+    config["proxy-groups"] += [
+        # DNS follows the same order as traffic: VLESS first, the subscription pool as fallback.
+        {"name": "dns-auto", "type": "fallback", "proxies": pool,
          "url": TEST_URL, "interval": 60},
         # AI services: vless-sg only, no fallback.
         {"name": "ai", "type": "select", "proxies": ["vless-sg"]},

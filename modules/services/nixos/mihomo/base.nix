@@ -1,6 +1,6 @@
 # mihomo base configuration. render.py adds the proxies, the proxy groups and the API
 # secret at start. The rules and DNS policy below refer to the groups render.py
-# defines (proxy, auto, dns-auto, ai) and to the VLESS nodes (vless-hk, vless-sg).
+# defines (proxy, default, dns-auto, ai).
 {dashboard}: let
   # Local explicit-proxy listener (sing-box mixed-in). Only the listener-specific
   # rules below match on it; TUN traffic takes the general path.
@@ -32,7 +32,7 @@
   proxyCidrs = ["103.151.151.0/24" "124.238.244.202/32"];
 
   # MetaCubeX geo lists. Each file lives under the home directory so the NixOS module
-  # can seed it for an offline start. Downloads go through the auto group.
+  # can seed it for an offline start. Downloads go through the default group.
   ruleSet = name: behavior: file: {
     type = "http";
     inherit behavior;
@@ -40,7 +40,7 @@
     path = "./ruleset/${name}.list";
     format = "text";
     interval = 86400;
-    proxy = "auto";
+    proxy = "default";
   };
 
   # OpenAI, Anthropic and Gemini exit through vless-sg (the Singapore server). Their
@@ -126,7 +126,7 @@ in {
     # Real addresses, so geoip-cn and the proxyCidrs rules see the destination an
     # application actually uses. Fake-IP made every unlisted mainland site look foreign.
     enhanced-mode = "redir-host";
-    # Everything else resolves through dns-auto: the proxy pool, with vless-hk as fallback.
+    # Everything else resolves through dns-auto: the VLESS pool, with the subscription pool as fallback.
     nameserver = ["https://1.1.1.1/dns-query#dns-auto"];
     # Node domains and direct connections resolve through AliDNS, sent direct. "system"
     # would loop: resolv.conf points at systemd-resolved, which sends every name back here.
