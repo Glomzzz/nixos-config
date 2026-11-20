@@ -11,7 +11,6 @@ final: _prev: {
   phono-core = final.callPackage ./phono-core.nix {};
   phono-fcitx5-addon = final.callPackage ./phono-fcitx5-addon.nix {};
   ssh-proxy-mac-mini = final.callPackage ./ssh-proxy-mac-mini.nix {};
-  v2raya-assets = final.callPackage ./v2raya-assets.nix {};
   wechat = final.callPackage ./wechat {};
   wivrn = final.callPackage ./wivrn.nix {};
   zotero = final.callPackage ./zotero {};

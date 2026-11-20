@@ -9,6 +9,5 @@ _: {
     ./selector4nix.nix
     ./tailscale.nix
     ./udisks2.nix
-    ./v2raya.nix
   ];
 }
