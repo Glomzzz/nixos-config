@@ -11,19 +11,36 @@
   # are generic, so any other program with the same basename also goes direct.
   directProcesses = [
     # Steam client and its helpers
-    "steam" "steamwebhelper" "steamerrorreporter" "steamsysinfo" "steam_monitor"
-    "steam-launch-wrapper" "streaming_client" "gameoverlayui" "gamelauncher" "reaper"
+    "steam"
+    "steamwebhelper"
+    "steamerrorreporter"
+    "steamsysinfo"
+    "steam_monitor"
+    "steam-launch-wrapper"
+    "streaming_client"
+    "gameoverlayui"
+    "gamelauncher"
+    "reaper"
     "fossilize_replay"
     # Steam Linux Runtime (pressure-vessel)
-    "pressure-vessel-wrap" "srt-logger" "steam-runtime-launcher-service" "steam-runtime-steam-remote"
+    "pressure-vessel-wrap"
+    "srt-logger"
+    "steam-runtime-launcher-service"
+    "steam-runtime-steam-remote"
     # SteamVR
-    "vrserver" "vrmonitor" "vrdashboard" "vrcompositor-launcher"
+    "vrserver"
+    "vrmonitor"
+    "vrdashboard"
+    "vrcompositor-launcher"
     # Gamescope, which Steam launches games under (steam-game-laptop uses it)
-    "gamescope" "gamescopereaper"
+    "gamescope"
+    "gamescopereaper"
     # Prism Launcher, started through steam-run (the Minecraft java child is not listed)
     "prismlauncher"
     # Games: native Dota 2 and the Proton Wine loader (Deadlock and other Proton games)
-    "dota2" "wine" "wine64"
+    "dota2"
+    "wine"
+    "wine64"
   ];
 
   # Bilibili cn-hk CDN nodes. GeoIP lists them as mainland, but direct connections
@@ -181,6 +198,7 @@ in {
       "DOMAIN-SUFFIX,lan,DIRECT"
       "DOMAIN-SUFFIX,home.arpa,DIRECT"
       "DOMAIN-SUFFIX,ts.net,DIRECT"
+      "DOMAIN-SUFFIX,skillw.com,DIRECT"
       "DOMAIN-REGEX,^[^.]+$,DIRECT"
       # Steam and Valve domains (steamcontent.com, steamstatic.com, ...) go direct. Matches
       # connections whose domain is sniffed or known from DNS, as the process rules cannot.
