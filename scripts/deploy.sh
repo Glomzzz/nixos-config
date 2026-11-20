@@ -40,10 +40,10 @@ host=nixos
 action=build
 if [[ $dry_run -eq 1 ]]; then action=dry-build; fi
 
-# Measured on GitHub archives with the ~/nixos-config deploy: SOCKS5 20170 was fastest,
-# the HTTP listener on 27101 next, and 20172 slower. 20172 is also the nc mihomo mixed
-# port once nc is active, so it stays as the last candidate.
-proxy_candidates=(socks5h://127.0.0.1:20170 http://127.0.0.1:27101 http://127.0.0.1:20172)
+# Both candidates are mihomo listeners (mihomo/base.nix: socks-port 20170, mixed-port 20172).
+# Earlier timings on GitHub archives ranked SOCKS5 20170 ahead of the mixed port 20172.
+# The 27101 HTTP listener is gone: it is not part of the mihomo configuration.
+proxy_candidates=(socks5h://127.0.0.1:20170 http://127.0.0.1:20172)
 if [[ -n ${DEPLOY_PROXY:-} ]]; then
   proxy_candidates=("$DEPLOY_PROXY" "${proxy_candidates[@]}")
 fi
