@@ -6,7 +6,7 @@ Proxy sources:
   not depend on the subscription. The ai group uses vless-sg only, with no fallback.
   Singapore nodes (vless-sg and subscription nodes named SG, Singapore or 新加坡)
   dial through vless-hk as a mid-point hop.
-- subscription nodes: fetched from the private v2rayA subscription (VLESS, Trojan,
+- subscription nodes: fetched from the private subscription URL (VLESS, Trojan,
   AnyTLS). They form the general proxy pool when reachable.
 
 Secret values are passed as file paths, never as arguments, and only counts are
@@ -45,6 +45,7 @@ CLIENT_FINGERPRINTS = {"chrome": "chrome", "firefox": "firefox", "safari": "safa
                        "ios": "iOS", "android": "android", "edge": "edge",
                        "360": "360", "qq": "qq", "random": "random"}
 REALITY_FINGERPRINT = "chrome"
+# Sent with the subscription request. Not yet tested against the provider with another value.
 USER_AGENT = "v2rayA"
 TEST_URL = "https://www.gstatic.com/generate_204"
 # Subscription info entries are not servers ("剩余 13.21GB 流量", "将在 11-12 恢复", ...).
