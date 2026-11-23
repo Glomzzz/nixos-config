@@ -320,9 +320,8 @@ in {
       "Mod+WheelScrollLeft".action.focus-column-left = [];
 
       # --- monitors --------------------------------------------------------
-      # Left/right only covers this desk's layout (eDP-1 at x=0, HDMI-A-1 to
-      # its right), but up/down and previous/next are bound too so a rearranged
-      # or stacked output setup does not need a config change to be reachable.
+      # Left/right reaches the monitor to the right of eDP-1, but not the LG,
+      # which sits above it. previous/next (Mod+Ctrl+Tab) reaches both.
       "Mod+Ctrl+Left".action.focus-monitor-left = [];
       "Mod+Ctrl+Right".action.focus-monitor-right = [];
       "Mod+Ctrl+H".action.focus-monitor-left = [];
