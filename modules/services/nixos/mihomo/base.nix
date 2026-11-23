@@ -198,7 +198,6 @@ in {
       "DOMAIN-SUFFIX,lan,DIRECT"
       "DOMAIN-SUFFIX,home.arpa,DIRECT"
       "DOMAIN-SUFFIX,ts.net,DIRECT"
-      "DOMAIN-SUFFIX,skillw.com,DIRECT"
       "DOMAIN-REGEX,^[^.]+$,DIRECT"
       # Steam and Valve domains (steamcontent.com, steamstatic.com, ...) go direct. Matches
       # connections whose domain is sniffed or known from DNS, as the process rules cannot.
