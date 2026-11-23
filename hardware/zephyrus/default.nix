@@ -9,13 +9,7 @@
   imports = [
     # Graphics crash. Disable for now.
     #  <nixos-hardware/asus/zephyrus/gu605my>
-    ../common/cpu
-    ../common/snapshots.nix
-    ../common/storage-health.nix
-    ../common/bluetooth.nix
-    ../common/audio.nix
-    ../common/graphics-stack.nix
-    ../common/input.nix
+    ../common
     ./gpu
     ./disk.nix
     ./power.nix

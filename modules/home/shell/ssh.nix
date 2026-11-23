@@ -12,8 +12,9 @@ in {
     settings = {
       "*" = {
         IdentitiesOnly = true;
-        ForwardAgent = false;
       };
+      # A public IdentityFile selects the matching private key in gpg-agent.
+      # Avoid silently falling back to unrelated software keys in the agent.
       "macmini mac-mini" = {
         # YubiKey OpenPGP authentication key: PIN plus touch per connection.
         hostname = "mac-mini";

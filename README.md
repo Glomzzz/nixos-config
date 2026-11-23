@@ -25,9 +25,13 @@ scripts/                          helpers wired into services and wrappers
 ```
 
 `flake.nix` composes the host. `hosts/nixos/default.nix` imports the hardware
-selector, shared NixOS modules, the user module, and generated Cachix settings.
-The Home Manager bridge in `modules/nixos/core/home-manager.nix` loads the
-user's Home Manager entrypoint.
+selector and `hosts/nixos/shared.nix`, which holds the shared NixOS modules, the
+user module, and generated Cachix settings. The Home Manager bridge in
+`modules/nixos/core/home-manager.nix` loads the user's Home Manager entrypoint.
+
+Other machines can be built from their own flake, which consumes
+`nixosModules.shared` and `nixosModules.hardware-common` from this one, so the
+shared configuration stays in a single place.
 
 ## Hardware profiles
 
@@ -35,6 +39,8 @@ user's Home Manager entrypoint.
 `/sys/class/dmi/id` and imports the matching profile from `hardware/profiles.nix`.
 The result is available as `config.hardware.profile`. Evaluation fails if no
 profile matches or if more than one does; the error shows the detected values.
+Only the Zephyrus laptop has a profile here, so this flake fails on any other
+machine by design.
 
 Because DMI lives outside the flake, every evaluation must pass `--impure`. The
 `just` recipes already do. The ASUS Zephyrus match (`GU605`) was written without
@@ -55,8 +61,8 @@ A whole sub-module moves out of `modules/` (Steam, VR, WiVRn, `gaming/`, battery
 alerts on the laptop). A partial addition merges into a shared module (Android
 Studio, Zotero, tailnet firewall rules, panel outputs). Shared modules do not
 branch on `hardware.profile`. Panel outputs are per profile:
-`eDP-1` and the greeter's panel scale are laptop-only, while `HDMI-A-1` is set in
-both profiles. `desktop.greeterOutputs` carries the greeter's panel blocks.
+`eDP-1` and the greeter's panel scale are laptop-only. `desktop.greeterOutputs`
+carries the greeter's panel blocks.
 
 ## Common commands
 

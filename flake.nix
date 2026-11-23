@@ -61,6 +61,14 @@
       inherit (pkgs) phono-core phono-fcitx5-addon;
     });
 
+    # Shared host modules for other flakes that bring their own hardware. `shared` is
+    # everything in hosts/nixos except the hardware selector; `hardware-common` is the
+    # hardware-independent set that every profile imports.
+    nixosModules = {
+      shared = ./hosts/nixos/shared.nix;
+      hardware-common = ./hardware/common;
+    };
+
     nixosConfigurations = {
       nixos = let
         system = "x86_64-linux";
