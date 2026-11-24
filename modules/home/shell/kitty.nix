@@ -45,6 +45,9 @@
       "kitty_mod+minus" = "change_font_size current -1.0";
       "kitty_mod+0" = "change_font_size current 0";
       "kitty_mod+enter" = "new_os_window_with_cwd";
+      # fish binds Alt+E to edit_command_buffer, which runs $VISUAL (emc) on the
+      # command line; send that chord to the prompt so Kitty can start it too.
+      "kitty_mod+e" = "send_text normal \\x1be";
       "kitty_mod+f5" = "load_config_file";
       "kitty_mod+f6" = "debug_config";
     };

@@ -42,6 +42,7 @@ Terminal actions:
 | Ctrl+Alt+Shift+= / - | Increase / decrease this window's font size |
 | Ctrl+Alt+Shift+0 | Reset font size |
 | Ctrl+Alt+Shift+Enter | New terminal window in the current directory |
+| Ctrl+Alt+Shift+E | At the fish prompt, edit the command line in terminal Emacs (`emc`); `C-x #` returns it to the prompt |
 | Ctrl+Alt+Shift+F5 / F6 | Reload / inspect Kitty configuration |
 
 The Ctrl+Alt+Shift chords and compositor shortcuts are still reserved; no
