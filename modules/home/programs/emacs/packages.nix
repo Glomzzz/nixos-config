@@ -5,6 +5,9 @@
     # Jieba segmenter behind the Emacs Chinese word motion (`cns-mode'), see
     # `modules/feat/editing/chinese-words.el' in ~/.config/emacs.
     chinese-word-segmentation
+    # JSON Lines file and grep helper behind the fff commands (C-c s, C-c F),
+    # see `modules/feat/workspace/fff-search.el' in ~/.config/emacs.
+    fff-emacs-helper
     epub-thumbnailer
     ffmpegthumbnailer
     ghostscript

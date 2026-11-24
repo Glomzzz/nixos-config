@@ -4,6 +4,7 @@ final: _prev: {
   chinese-word-segmentation = final.callPackage ./chinese-word-segmentation.nix {};
   clipferry = final.callPackage ./clipferry.nix {};
   bun = final.callPackage ./bun.nix {};
+  fff-emacs-helper = final.callPackage ./fff-emacs-helper.nix {};
   ix = final.callPackage ./ix.nix {};
   jujutsu = final.callPackage ./jujutsu.nix {};
   logisim-evolution = final.callPackage ./logisim-evolution {};
