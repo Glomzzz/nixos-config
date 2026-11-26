@@ -4,7 +4,7 @@
 Proxy sources:
 - vless-hk and vless-sg: REALITY nodes from secrets (vless.<region>.*). They do
   not depend on the subscription. General traffic uses the vless-pool group (both nodes,
-  the faster one wins). The ai group uses vless-sg only, with no fallback.
+  the faster one wins). The ai and antigravity groups use vless-sg only, with no fallback.
   Singapore nodes (vless-sg and subscription nodes named SG, Singapore or 新加坡)
   dial through vless-hk as a mid-point hop.
 - subscription nodes: fetched from the private subscription URL (VLESS, Trojan,
@@ -37,7 +37,8 @@ from urllib.request import Request, urlopen
 # Names that subscription nodes must not take: our groups, our VLESS nodes, and
 # mihomo's built-in names.
 RESERVED_NAMES = {
-    "proxy", "default", "vless-pool", "auto", "dns-auto", "ai", "vless-hk", "vless-sg",
+    "proxy", "default", "vless-pool", "auto", "dns-auto", "ai", "antigravity",
+    "vless-hk", "vless-sg",
     "DIRECT", "direct", "REJECT", "reject", "GLOBAL", "global",
 }
 PROXY_TYPES = {"vless", "trojan", "anytls"}
@@ -302,6 +303,8 @@ def render_config(base, nodes, vless, clash_secret):
          "url": TEST_URL, "interval": 60},
         # AI services: vless-sg only, no fallback.
         {"name": "ai", "type": "select", "proxies": ["vless-sg"]},
+        # Antigravity listener (base.nix): vless-sg only, no fallback.
+        {"name": "antigravity", "type": "select", "proxies": ["vless-sg"]},
     ]
     return config
 

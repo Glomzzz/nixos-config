@@ -30,6 +30,18 @@ in {
         '';
       };
 
+      # Antigravity CLI through the loopback listener on 127.0.0.1:20174 (mihomo base.nix),
+      # which routes to vless-sg via vless-hk. Only this command gets the proxy variables.
+      agy = {
+        description = "Antigravity CLI through the mihomo Singapore listener";
+        wraps = "agy";
+        body = ''
+          set --local --export HTTPS_PROXY http://127.0.0.1:20174
+          set --local --export HTTP_PROXY http://127.0.0.1:20174
+          command agy $argv
+        '';
+      };
+
       # Win+; and Win+' (niri/settings.nix) run these through fish, since niri
       # spawns argv directly. Each opens a new GUI frame and returns at once.
       # emc/open-calc waits 0.3 s for a brand-new frame to settle; emc/open-mail

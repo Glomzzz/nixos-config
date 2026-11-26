@@ -1,6 +1,6 @@
 # mihomo base configuration. render.py adds the proxies, the proxy groups and the API
 # secret at start. The rules and DNS policy below refer to the groups render.py
-# defines (proxy, default, dns-auto, ai).
+# defines (proxy, default, dns-auto, ai, antigravity).
 {dashboard}: let
   # Local explicit-proxy listener (sing-box mixed-in). Only the listener-specific
   # rules below match on it; TUN traffic takes the general path.
@@ -48,6 +48,11 @@
   # the same way.
   proxyCidrs = ["103.151.151.0/24" "124.238.244.202/32"];
 
+  # Antigravity (Google's agentic IDE) reaches the proxy through its own loopback listener, not
+  # by process name, so no process lookup is needed. Apps send traffic here with HTTPS_PROXY
+  # (see the agy function in modules/home/shell/fish.nix). Routed to the antigravity group.
+  antigravityPort = 20174;
+
   # MetaCubeX geo lists. Each file lives under the home directory so the NixOS module
   # can seed it for an offline start. Downloads go through the default group.
   ruleSet = name: behavior: file: {
@@ -85,6 +90,14 @@ in {
   socks-port = 20170;
   port = 20171;
   bind-address = "127.0.0.1";
+  listeners = [
+    {
+      name = "antigravity";
+      type = "mixed";
+      listen = "127.0.0.1";
+      port = antigravityPort;
+    }
+  ];
   allow-lan = false;
   ipv6 = false;
   # Rule mode only: mihomo's global and direct modes skip every rule below.
@@ -203,6 +216,7 @@ in {
       # connections whose domain is sniffed or known from DNS, as the process rules cannot.
       "RULE-SET,geosite-steam,DIRECT"
     ]
+    ++ ["IN-NAME,antigravity,antigravity"]
     ++ localRules "geosite-geolocation-not-cn"
     ++ map (cidr: "IP-CIDR,${cidr},proxy,no-resolve") proxyCidrs
     ++ [
