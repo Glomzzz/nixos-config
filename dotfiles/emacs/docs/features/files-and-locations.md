@@ -1,0 +1,41 @@
+# Files and Locations
+
+Machine-specific paths, mount safety, and file-operation observers.
+
+## Machine-Specific Locations
+
+`modules/core/locations.el` is the single source for project/Desktop paths,
+Android/Mac-mini mount paths, and the Mac-mini SSH host/remote home.  Customize
+these options rather than editing file commands, Recentf exclusions, and
+Auto Revert separately.  `locations/unreliable-path-p` derives exclusions
+from current mount settings without probing the filesystem; add extra risky
+mounts through `locations/additional-unreliable-directories`.  Auto Revert is
+vetoed before its mode body runs (`emacs/auto-revert-mode-guard`), because
+enabling it adds a file-notify watch that blocks on an unreachable FUSE mount.
+The remote home defaults to `~/`, resolved by TRAMP on the remote host, not
+`/Users/glom/` or the local user's home.  Trust defaults derive from
+`locations/projects-directory`, but explicit `trusted-content` Customize
+choices still take precedence.
+
+Desktop actions use configurable argument lists: `dirvish/drag-command`
+(default ripdrag -x), `dirvish/file-manager-command` (default Thunar),
+`mounts/android-command`, and `mounts/mac-mini-connect-command`.  Files are
+passed as separate process arguments, not interpolated into shell commands.
+Missing tools report the configured executable, without assuming NixOS is
+how every machine must install it.
+
+Connecting to the Mac-mini share from Emacs never unlocks its SMB credentials,
+because that step decrypts with the YubiKey.  Emacs runs `mac-mini-connect`
+only when `mounts/mac-mini-smb-service` is already active; otherwise it reports
+that the share must be unlocked from a terminal.  SSH to `mac-mini` (TRAMP)
+uses `~/.ssh/id_ed25519` with `IdentityAgent none` and does not touch the
+YubiKey.
+
+## File-Operation Observers
+
+Dirvish task tracking observes its public yank handler and rsync command,
+not the private process constructor or positional process `details` payload.
+Progress uses the package's `dirvish-prop` accessor.  Disable observers with
+`dirvish/task-tracking`; their removal does not alter Dirvish file operations.
+`dirvish/selected-window-redisplay-only` controls the existing selected-window
+redisplay workaround without changing package internals.

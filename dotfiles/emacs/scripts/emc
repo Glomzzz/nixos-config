@@ -1,0 +1,58 @@
+#!/bin/sh
+# Portable, on-demand client for a dedicated daemon.  Bootstrap separately.
+set -eu
+
+emacs=${EMACS:-emacs}
+client=${EMACSCLIENT:-emacsclient}
+config=${EMC_CONFIG_DIR:-${XDG_CONFIG_HOME:-"$HOME/.config"}/emacs}
+server=${EMC_SERVER_NAME:-emc}
+
+for executable in "$emacs" "$client"; do
+  command -v "$executable" >/dev/null 2>&1 || {
+    echo "emc: executable not found: $executable" >&2
+    exit 1
+  }
+done
+[ -r "$config/init.el" ] || {
+  echo "emc: configuration not found: $config/init.el" >&2
+  exit 1
+}
+
+# Terminal editing is the default even on a desktop and when files are given.
+# Preserve explicit GUI/control operations and options with separate values.
+frontend='tty'
+explicit=no
+skip=no
+no_wait=no
+for argument do
+  if [ "$skip" = yes ]; then skip=no; continue; fi
+  case "$argument" in
+    --) break ;;
+    -s|--socket-name|-f|--server-file|-a|--alternate-editor) skip=yes ;;
+    -c|--create-frame|-r|--reuse-frame) frontend=gui; explicit=yes ;;
+    -d|--display) frontend=gui; explicit=yes; skip=yes ;;
+    --display=*) frontend=gui; explicit=yes ;;
+    -t|--tty) frontend='tty'; explicit=yes ;;
+    -e|--eval) frontend=control; explicit=yes; skip=yes ;;
+    --eval=*) frontend=control; explicit=yes ;;
+    -n|--no-wait) no_wait=yes ;;
+    -h|--help|-V|--version)
+      exec "$client" --socket-name="$server" --alternate-editor=false "$@" ;;
+  esac
+done
+[ "$explicit" = yes ] || set -- --tty "$@"
+if [ "$frontend" = tty ] && [ "$no_wait" = yes ]; then
+  echo 'emc: TTY clients must wait; use --create-frame with --no-wait' >&2
+  exit 1
+fi
+
+# Never let emacsclient spawn an unconfigured fallback editor.  Do not restart
+# an existing daemon automatically: that could discard buffers or busy work.
+if ! "$client" --socket-name="$server" --timeout=5 \
+     --alternate-editor=false --eval t >/dev/null 2>&1; then
+  "$emacs" --init-directory="$config" --daemon="$server" || {
+    echo "emc: daemon unavailable; run scripts/bootstrap.el first and check startup errors" >&2
+    exit 1
+  }
+fi
+exec "$client" --socket-name="$server" --alternate-editor=false "$@"

@@ -1,0 +1,744 @@
+;;; configuration-tests.el --- Configuration regressions -*- lexical-binding: t; -*-
+
+(require 'cl-lib)
+(require 'ert)
+(require 'eglot)
+(require 'project)
+(require 'apheleia)
+
+(defconst config-test/kkp-loaded-on-startup (featurep 'kkp)
+  "Whether configuration startup eagerly loaded KKP.")
+
+(ert-deftest config-test/kkp-startup-stays-lazy ()
+  (should (memq 'kkp packages/declared))
+  (should-not config-test/kkp-loaded-on-startup)
+  (should-not (bound-and-true-p global-kkp-mode))
+  (should (memq #'global-kkp-mode tty-setup-hook)))
+
+(ert-deftest config-test/kkp-tty-hook-enables-current-and-future-terminals ()
+  (require 'kkp)
+  (let ((tty-setup-hook (list #'global-kkp-mode))
+        enabled)
+    (cl-letf (((symbol-function 'kkp-enable-in-terminal)
+               (lambda (&optional _terminal) (setq enabled t))))
+      (unwind-protect
+          (progn
+            (run-hooks 'tty-setup-hook)
+            (should global-kkp-mode)
+            (should (memq #'kkp-enable-in-terminal tty-setup-hook))
+            ;; Repeated terminal setup must enable, not toggle the mode off.
+            (run-hooks 'tty-setup-hook)
+            (should global-kkp-mode)
+            (should enabled))
+        (global-kkp-mode -1)))))
+
+(defmacro config-test/with-directory (&rest body)
+  "Run BODY with a temporary project ROOT, then remove it."
+  (declare (indent 0) (debug t))
+  `(let* ((root (file-name-as-directory
+                (make-temp-file "emacs-config-test-" t)))
+          (default-directory root)
+          (project-vc-cache-timeout 0)
+          (project-vc-non-essential-cache-timeout 0))
+     (unwind-protect
+         (progn ,@body)
+       (delete-directory root t))))
+
+(defun config-test/file (root path &optional content)
+  "Write CONTENT to PATH below ROOT and return its absolute name."
+  (let ((file (expand-file-name path root)))
+    (make-directory (file-name-directory file) t)
+    (write-region (or content "") nil file nil 'silent)
+    file))
+
+(ert-deftest config-test/workspace-settings-are-separated ()
+  (dolist (entry '((nix-ts-mode . :nixd)
+                   (typst-ts-mode . :tinymist)
+                   (typescript-ts-mode . :typescript)
+                   (haskell-mode . :haskell)
+                   (haskell-literate-mode . :haskell)))
+    (with-temp-buffer
+      (setq major-mode (car entry))
+      (should (plist-member (lsp/workspace-configuration 'server)
+                            (cdr entry))))))
+
+(ert-deftest config-test/direct-completion-command-runs-after-exit ()
+  (with-temp-buffer
+    (let* ((command (list :title "Import" :command "extend-import"))
+           (item (list :command command))
+           (proxy (propertize "foo" 'eglot--lsp-item item))
+           events)
+      (cl-letf (((symbol-function 'eglot-execute)
+                 (lambda (server action)
+                   (should (eq server 'server))
+                   (push action events)
+                   (cl-remf action :title))))
+        (lsp/completion-command-execute
+         (lambda (_proxy _status) (push 'exit events))
+         proxy 'finished (current-buffer) 'server (list proxy))
+        (should (eq (cadr events) 'exit))
+        (should (equal (plist-get (car events) :command) "extend-import"))
+        (should (equal (plist-get (plist-get item :command) :title) "Import"))))))
+
+(ert-deftest config-test/completion-command-uses-originating-buffer ()
+  (let ((source (generate-new-buffer " *config-test source*")))
+    (unwind-protect
+        (let* ((item (list :command '(:command "import")))
+               (proxy (propertize "foo" 'eglot--lsp-item item))
+               (exit (lambda (_proxy _status)
+                       (should (eq (current-buffer) source))))
+               capf executed)
+          (with-current-buffer source
+            (cl-letf (((symbol-function 'eglot-current-server)
+                       (lambda () 'origin-server)))
+              (setq capf (lsp/completion-command-filter
+                          (list 1 1 (list proxy) :exit-function exit)))))
+          (with-temp-buffer
+            (cl-letf (((symbol-function 'eglot-execute)
+                       (lambda (server _command)
+                         (should (eq server 'origin-server))
+                         (should (eq (current-buffer) source))
+                         (setq executed t))))
+              ;; *Completions* strips candidate properties.
+              (funcall (plist-get (cdddr capf) :exit-function)
+                       (substring-no-properties proxy) 'finished)))
+          (should executed))
+      (kill-buffer source))))
+
+(ert-deftest config-test/completion-command-does-not-run-on-abort-or-error ()
+  (with-temp-buffer
+    (let* ((proxy (propertize "foo" 'eglot--lsp-item
+                              '(:command (:command "import"))))
+           executed exited)
+      (cl-letf (((symbol-function 'eglot-execute)
+                 (lambda (&rest _) (setq executed t))))
+        (lsp/completion-command-execute
+         (lambda (&rest _) (setq exited t)) proxy 'sole
+         (current-buffer) 'server (list proxy))
+        (should exited)
+        (should-not executed)
+        (should-error
+         (lsp/completion-command-execute
+          (lambda (&rest _) (error "Edit failed")) proxy 'finished
+          (current-buffer) 'server (list proxy)))
+        (should-not executed)))))
+
+(ert-deftest config-test/completion-after-source-buffer-is-killed ()
+  (let ((source (generate-new-buffer " *config-test killed*")))
+    (kill-buffer source)
+    (lsp/completion-command-execute
+     (lambda (&rest _) (ert-fail "Dead-buffer exit ran"))
+     "foo" 'finished source 'server '("foo"))))
+
+(ert-deftest config-test/completion-filter-preserves-original-capf ()
+  (let* ((exit #'ignore)
+         (capf (list 1 1 '("foo") :exit-function exit)))
+    (cl-letf (((symbol-function 'eglot-current-server) (lambda () nil)))
+      (let ((wrapped (lsp/completion-command-filter capf)))
+        (should (eq (plist-get (cdddr capf) :exit-function) exit))
+        (should-not (eq (plist-get (cdddr wrapped) :exit-function) exit)))))
+  (should-not (lsp/completion-command-filter nil)))
+
+(defun config-test/resolved-completion (prefetch strip-properties)
+  "Check a resolved completion, optionally PREFETCH or STRIP-PROPERTIES."
+  (with-temp-buffer
+    (setq buffer-file-name "/tmp/emacs-config-test.hs"
+          buffer-file-truename buffer-file-name)
+    (insert "f")
+    (let* ((eglot--capf-session :none)
+           (item (list :label "foo" :sortText "1" :data '(:id 1)))
+           (command (list :title "Import" :command "extend-import"))
+           (resolved (append item (list :command command :detail ":: Int")))
+           (resolve-count 0)
+           executed)
+      (cl-letf (((symbol-function 'eglot-server-capable) (lambda (&rest _) t))
+                ((symbol-function 'eglot--current-server-or-lose)
+                 (lambda () 'server))
+                ((symbol-function 'eglot-current-server) (lambda () 'server))
+                ((symbol-function 'jsonrpc-request)
+                 (lambda (&rest args)
+                   (apply #'lsp/completion-resolve-command
+                          (lambda (_server method &rest _args)
+                            (pcase method
+                              (:textDocument/completion (vector item))
+                              (:completionItem/resolve
+                               (cl-incf resolve-count)
+                               resolved)
+                              (_ (error "Unexpected request: %S" method))))
+                          args)))
+                ((symbol-function 'eglot--signal-textDocument/didChange) #'ignore)
+                ((symbol-function 'eglot-execute)
+                 (lambda (_server action) (setq executed action))))
+        (let* ((capf (eglot-completion-at-point))
+               (proxy (car (funcall (nth 2 capf) "" nil t))))
+          (when prefetch
+            (funcall (plist-get (cdddr capf) :company-docsig) proxy))
+          (funcall (plist-get (cdddr capf) :exit-function)
+                   (if strip-properties (substring-no-properties proxy) proxy)
+                   'finished)
+          (should (equal executed command))
+          (should (= resolve-count 1)))))))
+
+(ert-deftest config-test/resolved-completion-command-is-not-lost ()
+  (config-test/resolved-completion nil nil))
+
+(ert-deftest config-test/cached-resolution-does-not-request-again ()
+  (config-test/resolved-completion t nil))
+
+(ert-deftest config-test/resolved-completion-without-properties ()
+  (config-test/resolved-completion nil t))
+
+(ert-deftest config-test/unrelated-requests-do-not-modify-params ()
+  (let ((params (list :data 1)))
+    (lsp/completion-resolve-command
+     (lambda (&rest _) '(:command (:command "ignore")))
+     'server :textDocument/hover params)
+    (should-not (plist-member params :command))))
+
+(defun config-test/sync-with-changes (text changes)
+  "Sync a buffer holding TEXT with queued CHANGES; return the sent queue.
+Return `not-sent' when the guard refuses to call Eglot's sender."
+  (with-temp-buffer
+    (insert text)
+    (setq-local eglot--recent-changes changes)
+    (let ((sent 'not-sent))
+      (condition-case nil
+          (lsp/sync-without-raw-bytes
+           (lambda () (setq sent eglot--recent-changes)))
+        (user-error nil))
+      sent)))
+
+(ert-deftest config-test/eglot-sync-guard-is-installed ()
+  (should (advice-member-p #'lsp/sync-without-raw-bytes
+                           'eglot--signal-textDocument/didChange)))
+
+(ert-deftest config-test/eglot-sync-keeps-clean-incremental-changes ()
+  (let ((changes (list (list '(:line 0 :character 0) '(:line 0 :character 0)
+                             0 "教"))))
+    (should (eq (config-test/sync-with-changes "教" changes) changes))))
+
+(ert-deftest config-test/eglot-sync-recovers-after-raw-bytes-are-deleted ()
+  (let ((changes (list (list '(:line 0 :character 1) '(:line 0 :character 1)
+                             0 (string #x3fffe7)))))
+    ;; The poisoned queue is replaced by one full-text update.
+    (should (eq (config-test/sync-with-changes "教" changes) :emacs-messup))
+    ;; While a raw byte remains, nothing is sent against stale text.
+    (should (eq (config-test/sync-with-changes
+                 (concat "教" (string #x3fffe7)) changes)
+                'not-sent))
+    (should (eq (config-test/sync-with-changes
+                 (concat "教" (string #x3fffe7)) :emacs-messup)
+                'not-sent))))
+
+(ert-deftest config-test/text-capf-skips-missing-word-lists ()
+  (let* ((words (make-temp-file "config-test-words"))
+         (missing (concat words "-missing")))
+    (unwind-protect
+        (dolist (entry `((,missing . nil) (,words . t)))
+          (let ((cape-dict-file (car entry)))
+            (with-temp-buffer
+              (text-mode)
+              (should-not (memq #'ispell-completion-at-point
+                                completion-at-point-functions))
+              (should (eq (and (memq #'cape-dict completion-at-point-functions) t)
+                          (cdr entry))))))
+      (delete-file words))))
+
+(ert-deftest config-test/manual-format-respects-apheleia-owner ()
+  (with-temp-buffer
+    (setq-local format/apheleia-owns t)
+    (let (formatter)
+      (cl-letf (((symbol-function 'eglot-managed-p) (lambda () t))
+                ((symbol-function 'eglot-format)
+                 (lambda (&rest _) (interactive) (setq formatter 'eglot)))
+                ((symbol-function 'apheleia-format-buffer)
+                 (lambda (&rest _) (interactive) (setq formatter 'apheleia))))
+        (funcs/format-buffer)
+        (should (eq formatter 'apheleia))))))
+
+(ert-deftest config-test/manual-format-falls-back-without-capability ()
+  (with-temp-buffer
+    (let (formatter)
+      (cl-letf (((symbol-function 'eglot-managed-p) (lambda () t))
+                ((symbol-function 'eglot-server-capable) (lambda (&rest _) nil))
+                ((symbol-function 'apheleia-format-buffer)
+                 (lambda (&rest _) (interactive) (setq formatter 'apheleia))))
+        (funcs/format-buffer)
+        (should (eq formatter 'apheleia))))))
+
+(ert-deftest config-test/manual-format-selects-supported-eglot ()
+  (with-temp-buffer
+    (let (formatter)
+      (cl-letf (((symbol-function 'eglot-managed-p) (lambda () t))
+                ((symbol-function 'eglot-server-capable)
+                 (lambda (cap) (eq cap :documentFormattingProvider)))
+                ((symbol-function 'eglot-format)
+                 (lambda (&rest _) (interactive) (setq formatter 'eglot))))
+        (funcs/format-buffer)
+        (should (eq formatter 'eglot))))))
+
+(ert-deftest config-test/manual-range-falls-back-to-whole-buffer-eglot ()
+  (with-temp-buffer
+    (insert "example")
+    (set-mark (point-min))
+    (setq mark-active t)
+    (let ((transient-mark-mode t)
+          (called 'not-called))
+      (cl-letf (((symbol-function 'eglot-managed-p) (lambda () t))
+                ((symbol-function 'eglot-server-capable)
+                 (lambda (cap) (eq cap :documentFormattingProvider)))
+                ((symbol-function 'eglot-format)
+                 (lambda (&rest bounds) (interactive) (setq called bounds))))
+        (should (region-active-p))
+        (funcs/format-buffer)
+        (should (null called))))))
+
+(ert-deftest config-test/range-formatting-has-its-own-capability ()
+  (with-temp-buffer
+    (cl-letf (((symbol-function 'eglot-managed-p) (lambda () t))
+              ((symbol-function 'eglot-server-capable)
+               (lambda (cap) (eq cap :documentRangeFormattingProvider))))
+      (should (format/eglot-owns-p t))
+      (should-not (format/eglot-owns-p)))))
+
+(ert-deftest config-test/ignored-formatting-capability-falls-back ()
+  (with-temp-buffer
+    (let ((eglot-ignored-server-capabilities '(:documentFormattingProvider)))
+      (cl-letf (((symbol-function 'eglot-managed-p) (lambda () t))
+                ((symbol-function 'eglot--current-server-or-lose)
+                 (lambda () 'server))
+                ((symbol-function 'eglot--capabilities)
+                 (lambda (_server) '(:documentFormattingProvider t))))
+        (should-not (format/eglot-owns-p))))))
+
+(ert-deftest config-test/literate-haskell-inherits-formatting-and-lsp ()
+  (config-test/with-directory
+    (with-temp-buffer
+      (let (started)
+        (cl-letf (((symbol-function 'eglot-ensure)
+                   (lambda () (setq started t))))
+          (haskell-literate-mode)
+          (should (eq major-mode 'haskell-literate-mode))
+          (should started)
+          (should format/apheleia-owns)
+          (should apheleia-mode)
+          (should (equal (car (funcall (alist-get major-mode eglot-server-programs)))
+                         "haskell-language-server-wrapper"))
+          (should (eq (alist-get major-mode apheleia-mode-alist) 'ormolu)))))))
+
+(ert-deftest config-test/save-formatting-honors-apheleia-owner ()
+  (with-temp-buffer
+    (setq-local format/apheleia-owns t
+                before-save-hook (list #'eglot-format))
+    (let (fallback)
+      (cl-letf (((symbol-function 'eglot-managed-p) (lambda () t))
+                ((symbol-function 'format/mode-maybe)
+                 (lambda () (setq fallback t))))
+        (lsp/format-on-save)
+        (should fallback)
+        (should-not (memq #'eglot-format before-save-hook))))))
+
+(ert-deftest config-test/save-formatting-checks-server-capability ()
+  (with-temp-buffer
+    (setq-local before-save-hook nil)
+    (let (fallback)
+      (cl-letf (((symbol-function 'eglot-managed-p) (lambda () t))
+                ((symbol-function 'eglot-server-capable) (lambda (&rest _) nil))
+                ((symbol-function 'format/mode-maybe)
+                 (lambda () (setq fallback t))))
+        (lsp/format-on-save)
+        (should fallback)
+        (should-not (memq #'eglot-format before-save-hook))))))
+
+(ert-deftest config-test/save-formatting-enables-only-one-owner ()
+  (with-temp-buffer
+    (setq-local before-save-hook nil)
+    (apheleia-mode 1)
+    (cl-letf (((symbol-function 'eglot-managed-p) (lambda () t))
+              ((symbol-function 'eglot-server-capable) (lambda (&rest _) t)))
+      (lsp/format-on-save)
+      (should (memq #'eglot-format before-save-hook))
+      (should-not apheleia-mode)
+      (should-not (memq #'apheleia-format-after-save after-save-hook)))))
+
+(ert-deftest config-test/apheleia-claims-buffer-at-save-not-open ()
+  (with-temp-buffer
+    (prog-mode)
+    (should-not apheleia-mode)
+    (should (memq #'format/mode-maybe
+                  (buffer-local-value 'before-save-hook (current-buffer))))
+    (cl-letf (((symbol-function 'format/inhibit-eglot) (lambda () t)))
+      (format/mode-maybe)
+      (should-not apheleia-mode))
+    (cl-letf (((symbol-function 'format/inhibit-eglot) (lambda () nil)))
+      (format/mode-maybe)
+      (should apheleia-mode))))
+
+(ert-deftest config-test/disconnecting-eglot-restores-apheleia ()
+  (with-temp-buffer
+    (setq-local before-save-hook (list #'eglot-format))
+    (cl-letf (((symbol-function 'eglot-managed-p) (lambda () nil)))
+      (lsp/format-on-save)
+      (should-not (memq #'eglot-format before-save-hook))
+      (should apheleia-mode))))
+
+(ert-deftest config-test/project-finder-preserves-git-and-ignores ()
+  (config-test/with-directory
+    (should (zerop (call-process "git" nil nil nil "init" "--quiet" root)))
+    (config-test/file root "package.json" "{}")
+    (config-test/file root ".gitignore" "ignored.txt\n")
+    (config-test/file root "kept.txt")
+    (config-test/file root "ignored.txt")
+    (let ((project (project-current nil root)))
+      (should (eq (car project) 'vc))
+      (should (eq (cadr project) 'Git))
+      (should (member (expand-file-name "kept.txt" root) (project-files project)))
+      (should-not (member (expand-file-name "ignored.txt" root)
+                          (project-files project))))))
+
+(ert-deftest config-test/project-finder-prefers-nearer-haskell-cradle ()
+  (config-test/with-directory
+    (config-test/file root "package.json" "{}")
+    (config-test/file root "haskell/hie.yaml" "cradle: {}")
+    (make-directory (expand-file-name "haskell/src/" root))
+    (let ((project (project-current nil (expand-file-name "haskell/src/" root))))
+      (should (equal (project-root project) (expand-file-name "haskell/" root)))
+      (should (eq (car project) 'vc)))))
+
+(ert-deftest config-test/project-finder-prefers-nearer-javascript-manifest ()
+  (config-test/with-directory
+    (config-test/file root "stack.yaml")
+    (config-test/file root "web/package.json" "{}")
+    (make-directory (expand-file-name "web/src/" root))
+    (should (equal
+             (project-root (project-current nil (expand-file-name "web/src/" root)))
+             (expand-file-name "web/" root)))))
+
+(ert-deftest config-test/nested-manifest-keeps-git-backend ()
+  (config-test/with-directory
+    (should (zerop (call-process "git" nil nil nil "init" "--quiet" root)))
+    (config-test/file root "web/package.json" "{}")
+    (let ((project (project-current nil (expand-file-name "web/" root))))
+      (should (equal (project-root project) (expand-file-name "web/" root)))
+      (should (eq (cadr project) 'Git)))))
+
+(ert-deftest config-test/project-finder-matches-dotted-cabal-file ()
+  (config-test/with-directory
+    (config-test/file root "example.test.cabal")
+    (make-directory (expand-file-name "src/" root))
+    (should (equal (project-root
+                    (project-current nil (expand-file-name "src/" root)))
+                   root))))
+
+(ert-deftest config-test/typst-root-without-vcs ()
+  (config-test/with-directory
+    (config-test/file root ".typst-root")
+    (config-test/file root "chapters/intro.typ" "= Introduction\n")
+    (let ((project (project-current nil (expand-file-name "chapters/" root))))
+      (should project)
+      (should (equal (project-root project) root)))))
+
+(ert-deftest config-test/typst-root-prefers-nearest-marker ()
+  (config-test/with-directory
+    (config-test/file root ".typst-root")
+    (config-test/file root "book/.typst-root")
+    (config-test/file root "book/chapters/intro.typ" "= Introduction\n")
+    (should (equal
+             (project-root
+              (project-current nil (expand-file-name "book/chapters/" root)))
+             (expand-file-name "book/" root)))))
+
+(ert-deftest config-test/typst-root-inside-git-preserves-ignores ()
+  (config-test/with-directory
+    (should (zerop (call-process "git" nil nil nil "init" "--quiet" root)))
+    (config-test/file root "package.json" "{}")
+    (config-test/file root ".gitignore" "ignored.typ\n")
+    (config-test/file root "docs/.typst-root")
+    (config-test/file root "docs/chapters/kept.typ" "= Kept\n")
+    (config-test/file root "docs/chapters/ignored.typ" "= Ignored\n")
+    (config-test/file root "outside.typ" "= Outside\n")
+    (let ((project (project-current nil (expand-file-name "docs/chapters/" root))))
+      (should (equal (project-root project) (expand-file-name "docs/" root)))
+      (should (eq (car project) 'vc))
+      (should (eq (cadr project) 'Git))
+      (should (member (expand-file-name "docs/chapters/kept.typ" root)
+                      (project-files project)))
+      (should-not (member (expand-file-name "docs/chapters/ignored.typ" root)
+                          (project-files project)))
+      (should-not (member (expand-file-name "outside.typ" root)
+                          (project-files project))))))
+
+(ert-deftest config-test/javascript-selects-nearest-manifest ()
+  (config-test/with-directory
+    (config-test/file root "deno.json" "{}")
+    (config-test/file root "inner/package.json" "{}")
+    (make-directory (expand-file-name "inner/src/" root))
+    (should (equal
+             (javascript--marker-root (expand-file-name "inner/src/" root))
+             (expand-file-name "inner/" root)))))
+
+(ert-deftest config-test/lockfiles-do-not-create-projects ()
+  (config-test/with-directory
+    (config-test/file root "bun.lock")
+    (let ((locate-dominating-stop-dir-regexp
+           (concat "\\`" (regexp-quote root) "\\'")))
+      (should-not (javascript--marker-root root))
+      (should-not (project-current nil root)))))
+
+(ert-deftest config-test/javascript-tools-use-javascript-manifest ()
+  (config-test/with-directory
+    (config-test/file root "package.json" "{}")
+    (config-test/file root "haskell/hie.yaml")
+    (let ((default-directory (expand-file-name "haskell/" root)))
+      (should (equal (javascript/project-root) root)))))
+
+(ert-deftest config-test/navigation-bindings-are-reachable ()
+  (should (eq (key-binding (kbd "C-c i")) 'consult-info))
+  (should (eq (key-binding (kbd "M-g i")) 'consult-imenu))
+  (should-not (key-binding (kbd "C-c i m"))))
+
+(ert-deftest config-test/hydra-keyword-is-available-to-features ()
+  (should (memq 'hydra packages/declared))
+  (should (memq 'use-package-hydra packages/declared))
+  (should (fboundp 'defhydra))
+  (should (memq :hydra use-package-keywords)))
+
+(ert-deftest config-test/undo-tree-is-global-and-memory-only ()
+  (should (memq 'undo-tree packages/declared))
+  (should global-undo-tree-mode)
+  (should-not undo-tree-auto-save-history)
+  ;; The undo-tree keys live in its minor-mode map, so check inside a buffer
+  ;; that has the mode, as the global mode would enable it.
+  (with-temp-buffer
+    (undo-tree-mode 1)
+    (should (eq (key-binding (kbd "C-/")) #'undo-tree-undo))
+    (should (eq (key-binding (kbd "C-x u")) #'undo-tree-visualize))))
+
+(ert-deftest config-test/fingertip-menu-is-global-and-navigation-autoloaded ()
+  (should (eq (key-binding (kbd "C-x C-h f")) #'hydra-fingertip/body))
+  (dolist (command '(fingertip-jump-right fingertip-jump-left
+                     fingertip-jump-up fingertip-match-paren))
+    (should (fboundp command))))
+
+(ert-deftest config-test/diff-hl-menu-is-bound-and-hooks-stay-eager ()
+  (should (eq (key-binding (kbd "C-x C-h g")) #'hydra-diff-hl/body))
+  (should (featurep 'diff-hl))
+  (should (memq #'git/diff-hl-maybe prog-mode-hook)))
+
+(ert-deftest config-test/window-menu-is-bound-with-winner-history ()
+  (should (eq (key-binding (kbd "C-x C-h w")) #'hydra-window/body))
+  (should (bound-and-true-p winner-mode))
+  (should (lookup-key hydra-window/keymap (kbd "h")))
+  (should (lookup-key hydra-window/keymap (kbd "dw"))))
+
+(ert-deftest config-test/ibuffer-menus-nest-and-bind-dot ()
+  (should (eq (key-binding (kbd "C-x C-h b")) #'hydra-ibuffer-main/body))
+  (require 'ibuffer)
+  (should (eq (lookup-key ibuffer-mode-map (kbd ".")) #'hydra-ibuffer-main/body))
+  (dolist (menu '(hydra-ibuffer-mark hydra-ibuffer-action hydra-ibuffer-sort hydra-ibuffer-filter))
+    (should (fboundp (intern (format "%s/body" menu))))))
+
+(ert-deftest config-test/recent-buffer-menu-numbers-other-buffers ()
+  (should (eq (key-binding (kbd "C-x C-h o")) #'hydra-buffers/body))
+  (let ((names '("alpha" "beta")))
+    (should (equal (buffers/number-names names) "1. alpha, 2. beta")))
+  (let ((buffer (generate-new-buffer "recent-menu-test")))
+    (unwind-protect
+        (with-current-buffer buffer
+          (should (listp (buffers/recent-names 4)))
+          (should-not (member "recent-menu-test" (buffers/recent-names 4))))
+      (kill-buffer buffer))))
+
+(ert-deftest config-test/avy-menu-is-bound-and-direct-jump-unchanged ()
+  (should (eq (key-binding (kbd "C-x C-h a")) #'hydra-avy/body))
+  (should (eq (key-binding (kbd "C-'")) #'avy-goto-char-timer))
+  (dolist (command '(avy-goto-line avy-kill-region avy-copy-region avy-move-line))
+    (should (fboundp command))))
+
+(ert-deftest config-test/rectangle-menu-is-bound-and-keeps-built-in-chord ()
+  (should (eq (key-binding (kbd "C-x C-h r")) #'hydra-rectangle/body))
+  (should (eq (key-binding (kbd "C-x SPC")) #'rectangle-mark-mode))
+  (require 'rect)
+  (dolist (key '("k" "j" "h" "l" "d" "y" "w" "o" "t" "c" "e" "N" "r" "u" "q"))
+    (should (lookup-key hydra-rectangle/keymap (kbd key)))))
+
+(ert-deftest config-test/kmacro-menu-is-bound-and-ends-recording ()
+  (should (eq (key-binding (kbd "C-x C-h k")) #'hydra-macro/body))
+  (require 'kmacro)
+  (dolist (key '("j" "l" "i" "k" "e" "n" "t" "a" "f" "b" "K" "B" "x" "'" "," "q"))
+    (should (lookup-key hydra-macro/keymap (kbd key)))))
+
+(ert-deftest config-test/compile-error-menu-is-bound-and-next-error-unchanged ()
+  (should (eq (key-binding (kbd "C-x C-h c")) #'hydra-next-error/body))
+  (should (eq (key-binding (kbd "C-x `")) #'next-error))
+  (require 'compile)
+  (dolist (key '("`" "j" "k" "h" "l" "q"))
+    (should (lookup-key hydra-next-error/keymap (kbd key)))))
+
+(ert-deftest config-test/profiler-menu-is-bound-and-reports-stopped ()
+  (should (eq (key-binding (kbd "C-x C-h p")) #'hydra-profiler/body))
+  (should (equal (profiler/running-modes) "stopped"))
+  (require 'profiler)
+  (dolist (key '("s" "c" "m" "b" "." "R" "C" "q" "r" "f" "4" "5"))
+    (should (lookup-key hydra-profiler/keymap (kbd key)))))
+
+(ert-deftest config-test/dired-menu-is-bound-and-covers-marks ()
+  (should (eq (key-binding (kbd "C-x C-h D")) #'hydra-dired/body))
+  (require 'dired)
+  (dolist (key '("+" "C" "D" "R" "m" "u" "U" "t" "g" "A" "Q" "?" "."))
+    (should (lookup-key hydra-dired/keymap (kbd key)))))
+
+(ert-deftest config-test/markdown-menu-is-mode-local-and-keeps-global-undo ()
+  ;; markdown-mode loads lazily, so its :custom settings apply only after this.
+  (require 'markdown-mode)
+  (should (member "--from=gfm" markdown-command))
+  (with-temp-buffer
+    (markdown-mode)
+    (should (eq (key-binding (kbd "C-x C-h M")) #'hydra-markdown/body))
+    ;; The mode-local C-x C-h prefix must not hide the global undo menu.
+    (should (eq (key-binding (kbd "C-x C-h u")) #'hydra-undo-tree/body)))
+  (with-temp-buffer
+    (fundamental-mode)
+    (should-not (eq (key-binding (kbd "C-x C-h M")) #'hydra-markdown/body))))
+
+(ert-deftest config-test/dape-menu-is-bound-and-autoloaded ()
+  (should (eq (key-binding (kbd "C-x C-h d")) #'hydra-dape/body))
+  (dolist (command '(dape-continue dape-next dape-step-in dape-step-out
+                     dape-restart dape-kill dape-breakpoint-toggle))
+    (should (fboundp command))))
+
+(ert-deftest config-test/multiple-cursors-menu-is-bound ()
+  (should (eq (key-binding (kbd "C-x C-h m")) #'hydra-multiple-cursors/body))
+  (should (eq (key-binding (kbd "C-c C-S-c")) #'mc/edit-lines))
+  (should (eq (key-binding (kbd "C->")) #'mc/mark-next-like-this))
+  (should (eq (key-binding (kbd "C-S-<mouse-1>")) #'mc/toggle-cursor-on-click))
+  (require 'multiple-cursors)
+  (dolist (key '("n" "N" "M-n" "p" "P" "M-p" "|" "s" "0" "A" "l" "a" "q"))
+    (should (lookup-key hydra-multiple-cursors/keymap (kbd key))))
+  (should (lookup-key hydra-multiple-cursors/keymap [mouse-1])))
+
+(ert-deftest config-test/undo-tree-menu-is-bound-and-saves-under-cache ()
+  (should (fboundp 'hydra-undo-tree/body))
+  (should (eq (key-binding (kbd "C-x C-h u")) #'hydra-undo-tree/body))
+  (let ((root (file-name-as-directory (expand-file-name cache/root))))
+    (should (string-prefix-p root
+                             (expand-file-name (cdar undo-tree-history-directory-alist))))))
+
+(ert-deftest config-test/undo-tree-undo-and-redo-restore-text ()
+  (with-temp-buffer
+    (undo-tree-mode 1)
+    (buffer-enable-undo)
+    (insert "one")
+    (undo-boundary)
+    (insert " two")
+    (undo-boundary)
+    (undo-tree-undo)
+    (should (equal (buffer-string) "one"))
+    (undo-tree-redo)
+    (should (equal (buffer-string) "one two"))))
+
+(ert-deftest config-test/c-z-marks-in-gui-and-suspends-in-terminal ()
+  (should (eq (key-binding (kbd "C-z")) #'funcs/mark-or-suspend))
+  (let (marked suspended)
+    (cl-letf (((symbol-function 'display-graphic-p) (lambda (&rest _) t))
+              ((symbol-function 'set-mark-command) (lambda (_arg) (setq marked t)))
+              ((symbol-function 'suspend-frame) (lambda (&rest _) (setq suspended t))))
+      (funcs/mark-or-suspend nil))
+    (should marked)
+    (should-not suspended))
+  (let (marked suspended)
+    (cl-letf (((symbol-function 'display-graphic-p) (lambda (&rest _) nil))
+              ((symbol-function 'set-mark-command) (lambda (_arg) (setq marked t)))
+              ((symbol-function 'suspend-frame) (lambda (&rest _) (setq suspended t))))
+      (funcs/mark-or-suspend nil))
+    (should suspended)
+    (should-not marked)))
+
+(ert-deftest config-test/stale-check-includes-local-packages ()
+  (config-test/with-directory
+    (let* ((user-emacs-directory root)
+           (custom-file (expand-file-name "custom.el" root))
+           (old (seconds-to-time 1000000000))
+           (new (seconds-to-time 1100000000)))
+      (set-file-times (config-test/file root "init.el") old)
+      (set-file-times (config-test/file root "pkgs/example.el") new)
+      (set-file-times (config-test/file root "custom.el") (current-time))
+      (set-file-times (config-test/file root "tests/fixture.el") (current-time))
+      (should (equal (emc/config-newest-mtime) new)))))
+
+(ert-deftest config-test/stale-check-includes-modules-without-custom-file ()
+  (config-test/with-directory
+    (let* ((user-emacs-directory root)
+           (custom-file nil)
+           (old (seconds-to-time 1000000000))
+           (new (seconds-to-time 1100000000)))
+      (set-file-times (config-test/file root "init.el") old)
+      (set-file-times (config-test/file root "modules/example.el") new)
+      (should (equal (emc/config-newest-mtime) new)))))
+
+(ert-deftest config-test/module-import-prefers-current-compiled-module ()
+  (should load-prefer-newer)
+  (config-test/with-directory
+    (let ((caller (config-test/file root "modules/mod.el"))
+          (source (config-test/file root "modules/example.el"
+                                    "(setq config-test-module-kind 'source)\n")))
+      (unwind-protect
+          (progn
+            (byte-compile-file source)
+            (with-temp-file source
+              (insert "(setq config-test-module-kind 'edited)\n"))
+            ;; A source older than its compiled file must not hide the .elc.
+            (set-file-times source (seconds-to-time 1000000000))
+            (let ((load-file-name caller))
+              (mod/import '("example.el")))
+            (should (eq config-test-module-kind 'source))
+            ;; A newer edit must win over the stale compiled file.
+            (set-file-times source (time-add (current-time) 3600))
+            (let ((load-file-name caller))
+              (mod/import '("example.el")))
+            (should (eq config-test-module-kind 'edited)))
+        (makunbound 'config-test-module-kind)))))
+
+(ert-deftest config-test/state-paths-stay-below-cache-root ()
+  (let ((root (file-name-as-directory (expand-file-name cache/root))))
+    ;; `package-user-dir' is excluded: tests/run.el deliberately reuses the
+    ;; installed package directory.
+    (dolist (file (list custom-file package-quickstart-file
+                        savehist-file bookmark-default-file project-list-file
+                        projectile-known-projects-file projectile-frecency-file
+                        projectile-session-directory tabspaces-session-file
+                        workspaces/project-session-directory tramp-persistency-file-name
+                        tramp-auto-save-directory transient-history-file
+                        auto-save-list-file-prefix
+                        org-id-locations-file org-clock-persist-file
+                        org-roam-db-location
+                        (cdar backup-directory-alist)
+                        (nth 1 (car auto-save-file-name-transforms))))
+      (should (string-prefix-p root (expand-file-name file))))))
+
+(ert-deftest config-test/trust-excludes-shared-tmp-and-downloads ()
+  (dolist (file (list (expand-file-name "config-test.el" temporary-file-directory)
+                      (expand-file-name "Downloads/config-test.el" "~/")))
+    (with-temp-buffer
+      (setq buffer-file-name file
+            buffer-file-truename file)
+      (should-not (trusted-content-p)))))
+
+(ert-deftest config-test/trust-includes-development-and-config ()
+  (dolist (file (list (expand-file-name "git/config-test.el" "~/")
+                      (expand-file-name "init.el" user-emacs-directory)))
+    (with-temp-buffer
+      (setq buffer-file-name file
+            buffer-file-truename file)
+      (should (trusted-content-p)))))
+
+(ert-deftest config-test/gc-idle-policy-stays-bounded ()
+  (should (featurep 'gcmh))
+  (should gcmh-mode)
+  (should (= gcmh-low-cons-threshold (* 16 1024 1024)))
+  (should (<= gcmh-high-cons-threshold (* 128 1024 1024)))
+  (should (memq #'gcmh-set-high-threshold pre-command-hook))
+  (should (memq #'gcmh-register-idle-gc post-command-hook)))
+
+(provide 'configuration-tests)
+;;; configuration-tests.el ends here
