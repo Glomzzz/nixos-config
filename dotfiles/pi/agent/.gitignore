@@ -1,0 +1,14 @@
+# Default-deny: ignore everything in the agent dir, re-admit only the curated config.
+# Runtime data (sessions, npm, git, fff, fabric, pi-web-*, tokens, auth) stays ignored.
+*
+!.gitignore
+!AGENTS.md
+!keybindings.json
+!settings.json
+!mcp.json
+!models.json.tmpl
+!extensions/
+extensions/*
+!extensions/*.ts
+!prompts/
+!themes/

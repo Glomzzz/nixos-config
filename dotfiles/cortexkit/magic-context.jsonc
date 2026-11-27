@@ -1,0 +1,23 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cortexkit/magic-context/master/assets/magic-context.schema.json",
+  "historian": {
+    "pi": {
+      "model": "sub2api/claude-haiku-5-5",
+      "thinking_level": "high",
+    },
+  },
+  "dreamer": {
+    "pi": {
+      "model": "sub2api/claude-haiku-5-5",
+      "thinking_level": "high",
+    },
+  },
+  "embedding": {
+    "provider": "local",
+    "model": "Xenova/all-MiniLM-L6-v2",
+  },
+  "execute_threshold_tokens": {
+    "default": 300000,
+    "sub2api/claude-haiku-5-5": 500000,
+  },
+}

@@ -1,0 +1,4 @@
+# Default-deny: ignore everything, re-admit only the config file.
+*
+!.gitignore
+!magic-context.jsonc
