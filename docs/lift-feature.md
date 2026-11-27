@@ -105,6 +105,17 @@ cd /home/glom/nixos-config-geekpro && just deploy
 
 `scripts/deploy.sh --switch` is the proxy-aware alternative. The zephyrus laptop receives the feature on its next pull of the parent; it should run `just build` there before deploying.
 
+## Dependent package entries
+
+Some features are two files: a package entry in `pkgs/` and a Home Manager or NixOS module that uses it (`pkgs.<name>`). Lift both together, or the module fails to evaluate.
+
+- Package: copy the file to `pkgs/<name>.nix` unchanged, and add `<name> = final.callPackage ./<name>.nix {};` to `pkgs/default.nix`, in alphabetical order.
+- Module: copy the module to its mirror path under `modules/` and import it from the neighbour `default.nix`.
+- Child removal: remove the overlay line before deleting the package file. The overlay line calls the file, so deleting only the file breaks evaluation.
+- Overlay application needs no child change: `hosts/nixos/shared.nix` imports `hosts/nixos/overlays.nix`, which applies `pkgs/` to every host.
+
+Worked example: plannotator (`pkgs/plannotator.nix` and `modules/home/programs/dev/plannotator.nix`).
+
 ## Commit messages
 
 | Repo | Message |

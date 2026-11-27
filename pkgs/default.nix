@@ -10,6 +10,7 @@ final: _prev: {
   mandible = final.callPackage ./mandible.nix {};
   phono-core = final.callPackage ./phono-core.nix {};
   phono-fcitx5-addon = final.callPackage ./phono-fcitx5-addon.nix {};
+  plannotator = final.callPackage ./plannotator.nix {};
   ssh-proxy-mac-mini = final.callPackage ./ssh-proxy-mac-mini.nix {};
   wechat = final.callPackage ./wechat {};
   wivrn = final.callPackage ./wivrn.nix {};

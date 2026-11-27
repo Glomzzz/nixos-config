@@ -8,5 +8,6 @@ _: {
     ./ix.nix
     ./logisim-evolution.nix
     ./openpgp.nix
+    ./plannotator.nix
   ];
 }
