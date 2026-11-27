@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Block commits that add credentials. Install once with: just hooks
+set -euo pipefail
+exec nix run nixpkgs#gitleaks -- git --redact --no-banner --staged --exit-code 1 .

@@ -1,0 +1,3 @@
+# Public OpenPGP key fingerprint (authenticationKey in users/glom/openpgp.nix). Not a secret.
+81a02e29a1e55cee964d475031756bb5779b70ac:users/glom/openpgp.nix:generic-api-key:11
+27fe1deebb691d8caaaf795b15a2d58a678c77fa:users/glom/openpgp.nix:generic-api-key:11

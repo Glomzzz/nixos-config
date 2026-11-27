@@ -48,6 +48,18 @@ clean:
 gc:
   sudo nix-collect-garbage --delete-older-than 30d
 
+# Scan the full git history (all refs) for credentials. Values are redacted.
+scan-secrets:
+  nix run nixpkgs#gitleaks -- git --redact --no-banner --log-opts=--all --exit-code 1 .
+
+# Scan only staged changes, the same check as the pre-commit hook.
+scan-staged:
+  nix run nixpkgs#gitleaks -- git --redact --no-banner --staged --exit-code 1 .
+
+# Use the versioned hooks in .githooks (run once per clone).
+hooks:
+  git config core.hooksPath .githooks
+
 # Pin only after this running generation has been verified on the hardware.
 pin-known-good:
   sudo nix-store --add-root /nix/var/nix/gcroots/known-good-nixos --realise "$(readlink -f /run/current-system)"
