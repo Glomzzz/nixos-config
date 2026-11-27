@@ -188,3 +188,7 @@ Do not erase working recovery keys as part of ordinary configuration activation.
 Boot/activation must not depend on the removable YubiKey. Machine secrets should
 remain narrowly scoped, and full-disk encryption is needed to protect the host
 SSH identity against offline disk access.
+
+## Pi and cortexkit configuration
+
+Pi provider keys and base URLs live under `pi` in `secrets/users/glom.yaml`. The keys are `skillw`, `sub2api`, and `deepseek`; the base URLs are `skillw` and `sub2api`. Only one `sub2api` key is stored. The configuration files in `dotfiles/` contain no credentials: `models.json` is a template with placeholders. Rendering into `$XDG_RUNTIME_DIR` is planned, not implemented. See `docs/dotfiles.md`.
