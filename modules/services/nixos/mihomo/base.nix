@@ -126,10 +126,10 @@ in {
     # when it builds its nftables address sets, and the TUN never comes up. auto-route alone
     # still captures all traffic.
     auto-redirect = false;
-    # Off: auto-detect bound DIRECT sockets to the interface found at dial time. During a
-    # default-interface change that lookup returned nothing, so dials failed with "no such
-    # device" or "no route to host". Without it, sockets follow the kernel routing table.
-    auto-detect-interface = false;
+    # Keep on. Off, DIRECT dials to 223.5.5.5 failed with "reject loopback connection": the
+    # TUN captured the unbound sockets. The flip errors ("no such device", "no route to host")
+    # are a separate problem, not solved by turning this off.
+    auto-detect-interface = true;
     dns-hijack = ["any:53"];
     strict-route = false;
     # Local, tailnet and IPv6-only ranges stay off the TUN, as in sing-box.
