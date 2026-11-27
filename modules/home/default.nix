@@ -5,6 +5,7 @@
 }: {
   imports = [
     ./desktop
+    ./dotfiles
     ./programs
     ./shell
     ../services/home
