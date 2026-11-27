@@ -95,6 +95,12 @@ test or lint step. Review the generated system before running `deploy`.
 The scripts under `scripts/` are wired into the NixOS and Home Manager modules.
 Review them before changing them: some run as root and restart system services.
 
+## Lifting a feature from a child config
+
+Moving a feature from a child configuration (for example nixos-config-geekpro)
+into this repository (commit, push, child lock upgrade and removal, deploy) is
+described in [docs/lift-feature.md](docs/lift-feature.md).
+
 ## Secrets
 
 Encrypted SOPS files and evaluation-time personal metadata live in the private
