@@ -24,3 +24,6 @@ auto-save-list/
 
 # Local game state such as Snake high scores
 /games/
+# Runtime state from pi-fabric and installed package trees: never tracked.
+.pi/
+elpa/
