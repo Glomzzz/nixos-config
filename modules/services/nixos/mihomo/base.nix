@@ -126,7 +126,10 @@ in {
     # when it builds its nftables address sets, and the TUN never comes up. auto-route alone
     # still captures all traffic.
     auto-redirect = false;
-    auto-detect-interface = true;
+    # Off: auto-detect bound DIRECT sockets to the interface found at dial time. During a
+    # default-interface change that lookup returned nothing, so dials failed with "no such
+    # device" or "no route to host". Without it, sockets follow the kernel routing table.
+    auto-detect-interface = false;
     dns-hijack = ["any:53"];
     strict-route = false;
     # Local, tailnet and IPv6-only ranges stay off the TUN, as in sing-box.
@@ -169,7 +172,10 @@ in {
         })
         aiSets)
       // {
-        "rule-set:geosite-cn" = ["https://223.5.5.5/dns-query#DIRECT"];
+        # Two resolvers, queried in parallel with the first answer used. AliDNS goes direct; the
+        # proxy resolver answers while a DIRECT dial fails during a default-interface change
+        # ("dial DIRECT ... 223.5.5.5:443: no route to host" in the mihomo journal).
+        "rule-set:geosite-cn" = ["https://223.5.5.5/dns-query#DIRECT" "https://1.1.1.1/dns-query#dns-auto"];
         # Steam and Valve domains resolve through AliDNS, sent direct. mihomo cannot tell Steam's
         # queries apart by process: systemd-resolved relays every query from the host.
         "rule-set:geosite-steam" = ["https://223.5.5.5/dns-query#DIRECT"];
