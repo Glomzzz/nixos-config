@@ -6,6 +6,28 @@
   # rules below match on it; TUN traffic takes the general path.
   mixedPort = 20172;
 
+  # Steam community, store, API and related sites. They are matched by domain before the
+  # process rules below, so the Steam client and its web helper send them through the proxy.
+  # Content and CDN downloads are not listed here and stay direct (the geosite-steam rule).
+  steamProxySuffixes = [
+    "steamcommunity.com"
+    "steampowered.com"
+    "steamgames.com"
+    "steam-chat.com"
+    "steam-api.com"
+    "steamstatic.com"
+    "s.team"
+    "valvesoftware.com"
+    "dota2.com"
+  ];
+  steamProxyHosts = [
+    "steamcommunity-a.akamaihd.net"
+    "steamstore-a.akamaihd.net"
+  ];
+  steamProxyRules =
+    map (d: "DOMAIN-SUFFIX,${d},proxy") steamProxySuffixes
+    ++ map (h: "DOMAIN,${h},proxy") steamProxyHosts;
+
   # Steam and the programs it runs, matched by the basename of /proc/<pid>/exe. The names
   # come from the installed Steam, SteamVR and Steam Linux Runtime. `reaper` and `wine`/`wine64`
   # are generic, so any other program with the same basename also goes direct.
@@ -208,6 +230,7 @@ in {
       "IP-CIDR,100.64.0.0/10,DIRECT,no-resolve"
       "IP-CIDR6,fd7a:115c:a1e0::/48,DIRECT,no-resolve"
     ]
+    ++ steamProxyRules
     ++ map (name: "PROCESS-NAME,${name},DIRECT") directProcesses
     ++ map (set: "RULE-SET,${set},ai") aiSets
     ++ map (cidr: "IP-CIDR,${cidr},DIRECT,no-resolve") privateCidrs
@@ -218,7 +241,7 @@ in {
       "DOMAIN-SUFFIX,home.arpa,DIRECT"
       "DOMAIN-SUFFIX,ts.net,DIRECT"
       "DOMAIN-REGEX,^[^.]+$,DIRECT"
-      # Steam and Valve domains (steamcontent.com, steamstatic.com, ...) go direct. Matches
+      # Remaining Steam and Valve domains (content and CDN downloads) go direct. Matches
       # connections whose domain is sniffed or known from DNS, as the process rules cannot.
       "RULE-SET,geosite-steam,DIRECT"
     ]
