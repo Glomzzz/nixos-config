@@ -28,6 +28,11 @@ in {
     force = true;
   };
 
+  xdg.configFile."emacs" = {
+    source = config.lib.file.mkOutOfStoreSymlink "${repo}/emacs";
+    force = true;
+  };
+
   systemd.user.services.pi-render-secrets = {
     Unit = {
       Description = "Render pi credentials from nixos-secrets and link them into the agent directory";
