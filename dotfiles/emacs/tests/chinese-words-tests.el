@@ -49,4 +49,96 @@
         (should (equal (cns-segmentation-handler "中文分词") '(2 2)))
       (cns-mode -1))))
 
+(ert-deftest config-test/chinese-words-restarts-segmenter-after-last-buffer ()
+  "A Chinese buffer opened after the last one closes gets a fresh segmenter.
+The stopped helper must not be reused: it no longer reads its input."
+  (skip-unless (and (chinese-words/program)
+                    (require 'cns nil t)))
+  (chinese-words/configure)
+  (let ((cns-recent-segmentation nil)
+        stopped)
+    (with-temp-buffer
+      (cns-mode 1)
+      (setq stopped cns-process)
+      (cns-mode -1))
+    (should-not (process-live-p stopped))
+    (with-temp-buffer
+      (cns-mode 1)
+      (unwind-protect
+          (progn
+            (should (process-live-p cns-process))
+            (should-not (eq cns-process stopped))
+            (should (equal (cns-segmentation-handler "中文分词") '(2 2))))
+        (cns-mode -1)))))
+
+(ert-deftest config-test/chinese-words-backward-stops-at-buffer-start ()
+  "M-b at the start of a Chinese buffer stays at `point-min' without an error."
+  (skip-unless (and (chinese-words/program)
+                    (require 'cns nil t)))
+  (chinese-words/configure)
+  (with-temp-buffer
+    (insert "中文分词")
+    (cns-mode 1)
+    (unwind-protect
+        (progn
+          (goto-char (point-min))
+          (should (null (condition-case err (cns-backward-word) (error err))))
+          (should (= (point) (point-min))))
+      (cns-mode -1))))
+
+(ert-deftest config-test/chinese-words-backward-stops-after-punctuation ()
+  "M-b with only punctuation before point moves to `point-min'."
+  (skip-unless (and (chinese-words/program)
+                    (require 'cns nil t)))
+  (chinese-words/configure)
+  (with-temp-buffer
+    (insert "，中文分词")
+    (cns-mode 1)
+    (unwind-protect
+        (progn
+          (goto-char 2)
+          (should (null (condition-case err (cns-backward-word) (error err))))
+          (should (= (point) (point-min))))
+      (cns-mode -1))))
+
+(ert-deftest config-test/chinese-words-typed-han-schedules-enable-once ()
+  "Typing Han characters into a Latin buffer schedules `cns-mode' once."
+  (skip-unless (chinese-words/program))
+  (with-temp-buffer
+    (insert "hello")
+    (let ((scheduled 0))
+      (cl-letf (((symbol-function 'run-at-time)
+                 (lambda (&rest _) (setq scheduled (1+ scheduled)))))
+        (insert "中文")
+        (insert "分词")
+        (should (= scheduled 1))))))
+
+(ert-deftest config-test/chinese-words-latin-insertion-does-not-schedule ()
+  (skip-unless (chinese-words/program))
+  (with-temp-buffer
+    (let ((scheduled 0))
+      (cl-letf (((symbol-function 'run-at-time)
+                 (lambda (&rest _) (setq scheduled (1+ scheduled)))))
+        (insert "plain English")
+        (should (= scheduled 0))))))
+
+(ert-deftest config-test/chinese-words-typed-han-moves-by-word ()
+  "Chinese typed after opening a Latin buffer moves by segmented word."
+  (skip-unless (and (chinese-words/program)
+                    (require 'cns nil t)))
+  (chinese-words/configure)
+  (with-temp-buffer
+    (insert "hello")
+    (cl-letf (((symbol-function 'run-at-time) #'ignore))
+      (insert "中文分词"))
+    (unwind-protect
+        (progn
+          (chinese-words/enable-pending (current-buffer))
+          (should (bound-and-true-p cns-mode))
+          (goto-char (point-max))
+          (cns-backward-word)
+          ;; "hello" is 5 characters, "中文" starts at 6, "分词" at 8.
+          (should (= (point) 8)))
+      (cns-mode -1))))
+
 ;;; chinese-words-tests.el ends here
