@@ -8,3 +8,5 @@ secrets/
 __pycache__/
 *.pyc
 .sops.yaml
+.env
+.pi/fabric/
