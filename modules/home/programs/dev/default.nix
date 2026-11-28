@@ -9,5 +9,6 @@ _: {
     ./logisim-evolution.nix
     ./openpgp.nix
     ./plannotator.nix
+    ./python.nix
   ];
 }
