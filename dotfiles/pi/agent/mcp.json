@@ -14,7 +14,8 @@
       ],
       "env": {
         "PHONEDRIVER_DISPLAY": "hidden"
-      }
+      },
+      "enabled": false
     }
   }
 }
