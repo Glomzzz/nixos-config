@@ -18,8 +18,8 @@
   "tui.altScreen.searchClose": ["escape", "ctrl+g"],
   "app.interrupt": ["escape", "ctrl+g"],
   "app.clipboard.pasteImage": ["ctrl+alt+v", "ctrl+shift+v"],
-  "app.editor.external": "ctrl+shift+e",
+  "app.editor.external": "ctrl+alt+x",
   "app.message.copy": ["ctrl+x", "ctrl+shift+c"],
   "app.model.cycleForward": "ctrl+alt+n",
-  "app.session.toggleNamedFilter": "ctrl+alt+n"
+  "app.session.toggleNamedFilter": "ctrl+alt+f"
 }
